@@ -86,6 +86,15 @@ http://localhost:3000/api/health/supabase
 
 환경변수가 없으면 `not_configured`, 스키마가 적용되지 않았거나 키가 틀리면 `connection_failed`가 반환됩니다.
 
+현재 로컬 연결 확인 결과:
+
+```json
+{
+  "ok": true,
+  "status": "connected"
+}
+```
+
 ## 6. Vercel 환경변수
 
 Vercel Project Settings에서 Production/Preview 환경변수에 같은 값을 등록합니다.

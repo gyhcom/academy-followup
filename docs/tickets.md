@@ -86,25 +86,25 @@
 
 ### T-103 Supabase 프로젝트 연결
 
-상태: 진행 중
+상태: 완료
 
 목표:
 - 실제 Supabase 프로젝트와 로컬 앱 연결
 
 작업:
-- Supabase 프로젝트 생성: 대기
-- `schema.sql` 적용: 준비 완료
+- Supabase 프로젝트 생성: 완료
+- `schema.sql` 적용: 완료
 - migration 파일 추가: 완료
 - 파일럿 seed 데이터 추가: 완료
-- `.env.local` 설정: 대기
-- Supabase client/server 연결 확인: health endpoint 준비 완료
+- `.env.local` 설정: 완료
+- Supabase client/server 연결 확인: 완료
 
 완료 기준:
 - 앱에서 Supabase 접속 가능
 - 빌드 통과
 
 메모:
-- Supabase 계정에서 프로젝트를 생성하고 URL/anon key/service role key를 넣으면 연결 확인 가능
+- `GET /api/health/supabase`가 `{ "ok": true, "status": "connected" }`를 반환함
 - 설정 절차는 `docs/supabase-setup.md` 참고
 
 ## Phase 2: 인증/온보딩
