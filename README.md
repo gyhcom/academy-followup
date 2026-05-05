@@ -63,3 +63,11 @@
 - SMS: SOLAPI 우선 검토
 - Error Tracking: Sentry
 - Analytics: PostHog 또는 자체 이벤트 로그
+
+## 개발 문서
+
+- [제품 기획서](./docs/product-plan.md)
+- [기술 설계서](./docs/technical-plan.md)
+- [시스템 아키텍처](./docs/architecture.md)
+- [작업 티켓](./docs/tickets.md)
+- [Supabase 연결 가이드](./docs/supabase-setup.md)
