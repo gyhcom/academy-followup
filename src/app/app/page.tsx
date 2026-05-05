@@ -1,7 +1,11 @@
 import { redirect } from "next/navigation";
-import { AlertCircle, School, ShieldCheck } from "lucide-react";
+import { AlertCircle, School } from "lucide-react";
 import type { ReactNode } from "react";
 import { LogoutButton } from "@/app/app/logout-button";
+import {
+  OperationsBoard,
+  type OperationsClass,
+} from "@/app/app/operations-board";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -18,6 +22,25 @@ type ProfileWithAcademy = {
     brand_color: string;
     sender_name: string | null;
   } | null;
+};
+
+type ClassRecord = {
+  id: string;
+  name: string;
+  subject: string | null;
+  grade_label: string | null;
+  teacher_id: string | null;
+};
+
+type StudentRecord = {
+  id: string;
+  class_id: string | null;
+  name: string;
+  school_name: string | null;
+  grade_label: string | null;
+  parent_name: string | null;
+  parent_phone: string;
+  status: string;
 };
 
 export default async function AppPage() {
@@ -83,54 +106,81 @@ export default async function AppPage() {
     );
   }
 
-  return (
-    <AppShell email={user.email ?? ""}>
-      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-emerald-700">
-              {profile.academies.category ?? "학원 워크스페이스"}
-            </p>
-            <h2 className="mt-2 text-3xl font-semibold text-stone-950">
-              {profile.academies.name} 운영 보드
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-stone-600">
-              {profile.name}님은 현재 {roleLabel(profile.role)} 권한으로 접속 중입니다.
-            </p>
-          </div>
-          <div className="rounded-lg bg-emerald-50 p-3 text-emerald-800">
-            <ShieldCheck size={24} />
-          </div>
-        </div>
-      </section>
+  const [classesResult, studentsResult] = await Promise.all([
+    admin
+      .from("classes")
+      .select("id, name, subject, grade_label, teacher_id")
+      .eq("academy_id", profile.academy_id)
+      .order("name"),
+    admin
+      .from("students")
+      .select("id, class_id, name, school_name, grade_label, parent_name, parent_phone, status")
+      .eq("academy_id", profile.academy_id)
+      .eq("status", "active")
+      .order("name"),
+  ]);
 
-      <section className="mt-5 grid gap-4 md:grid-cols-3">
-        <StatusCard label="오늘 팔로업" value="준비 중" />
-        <StatusCard label="반/학생 목록" value="다음 단계" />
-        <StatusCard label="문자 발송" value="dry-run 예정" />
-      </section>
+  if (classesResult.error || studentsResult.error) {
+    return (
+      <AppShell email={user.email ?? ""}>
+        <EmptyState
+          title="운영 데이터 조회 실패"
+          description={
+            classesResult.error?.message ??
+            studentsResult.error?.message ??
+            "반과 학생 정보를 가져오지 못했습니다."
+          }
+        />
+      </AppShell>
+    );
+  }
+
+  const operationsClasses = buildOperationsClasses({
+    classes: (classesResult.data ?? []) as ClassRecord[],
+    students: (studentsResult.data ?? []) as StudentRecord[],
+    profileId: user.id,
+    role: profile.role,
+  });
+
+  return (
+    <AppShell
+      email={user.email ?? ""}
+      title={profile.academies.name}
+      subtitle={profile.academies.category ?? "학원 워크스페이스"}
+    >
+      <OperationsBoard
+        academyName={profile.academies.name}
+        senderName={profile.academies.sender_name ?? profile.academies.name}
+        teacherName={profile.name}
+        roleLabel={roleLabel(profile.role)}
+        classes={operationsClasses}
+      />
     </AppShell>
   );
 }
 
 function AppShell({
   email,
+  title = "내 학원 운영 보드",
+  subtitle = "Academy Follow-up",
   children,
 }: {
   email: string;
+  title?: string;
+  subtitle?: string;
   children: ReactNode;
 }) {
   return (
     <main className="min-h-screen bg-stone-50">
-      <section className="mx-auto w-full max-w-6xl px-5 py-6 sm:px-8">
-        <header className="flex items-center justify-between border-b border-stone-200 pb-5">
-          <div className="flex items-center gap-3">
+      <section className="mx-auto w-full max-w-7xl px-5 py-5 sm:px-8">
+        <header className="flex flex-col gap-4 border-b border-stone-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
             <div className="flex size-11 items-center justify-center rounded-lg bg-emerald-700 text-white">
               <School size={22} />
             </div>
-            <div>
-              <p className="text-sm font-medium text-stone-500">Academy Follow-up</p>
-              <h1 className="text-xl font-semibold text-stone-950">내 학원 운영 보드</h1>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-stone-500">{subtitle}</p>
+              <h1 className="truncate text-xl font-semibold text-stone-950">{title}</h1>
               <p className="mt-1 text-xs text-stone-500">{email}</p>
             </div>
           </div>
@@ -167,15 +217,6 @@ function EmptyState({
   );
 }
 
-function StatusCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
-      <p className="text-sm text-stone-500">{label}</p>
-      <p className="mt-2 text-lg font-semibold text-stone-950">{value}</p>
-    </div>
-  );
-}
-
 function roleLabel(role: string) {
   const labels: Record<string, string> = {
     owner: "원장",
@@ -185,4 +226,53 @@ function roleLabel(role: string) {
   };
 
   return labels[role] ?? role;
+}
+
+function buildOperationsClasses({
+  classes,
+  students,
+  profileId,
+  role,
+}: {
+  classes: ClassRecord[];
+  students: StudentRecord[];
+  profileId: string;
+  role: string;
+}): OperationsClass[] {
+  const scopedClasses = canViewAllClasses(role)
+    ? classes
+    : classes.filter((classItem) => classItem.teacher_id === profileId);
+  const classIds = new Set(scopedClasses.map((classItem) => classItem.id));
+
+  return scopedClasses.map((classItem) => ({
+    id: classItem.id,
+    name: classItem.name,
+    subject: classItem.subject,
+    gradeLabel: classItem.grade_label,
+    students: students
+      .filter((student) => student.class_id && classIds.has(student.class_id))
+      .filter((student) => student.class_id === classItem.id)
+      .map((student) => ({
+        id: student.id,
+        name: student.name,
+        schoolName: student.school_name,
+        gradeLabel: student.grade_label,
+        parentName: student.parent_name,
+        maskedParentPhone: maskPhone(student.parent_phone),
+      })),
+  }));
+}
+
+function canViewAllClasses(role: string) {
+  return role === "owner" || role === "manager";
+}
+
+function maskPhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+
+  if (digits.length < 7) {
+    return "연락처 확인";
+  }
+
+  return `${digits.slice(0, 3)}-****-${digits.slice(-4)}`;
 }
