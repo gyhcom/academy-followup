@@ -70,4 +70,5 @@
 - [기술 설계서](./docs/technical-plan.md)
 - [시스템 아키텍처](./docs/architecture.md)
 - [작업 티켓](./docs/tickets.md)
+- [기능 테스트 계획](./docs/test-plan.md)
 - [Supabase 연결 가이드](./docs/supabase-setup.md)
