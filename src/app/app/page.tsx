@@ -171,23 +171,25 @@ function AppShell({
   children: ReactNode;
 }) {
   return (
-    <main className="min-h-screen bg-stone-50">
-      <section className="mx-auto w-full max-w-7xl px-5 py-5 sm:px-8">
-        <header className="flex flex-col gap-4 border-b border-stone-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+    <main className="min-h-screen bg-stone-50 pb-[env(safe-area-inset-bottom)]">
+      <section className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-8 sm:py-5">
+        <header className="flex items-start justify-between gap-3 border-b border-stone-200 pb-4 sm:items-center sm:pb-5">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-lg bg-emerald-700 text-white">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-emerald-700 text-white sm:size-11">
               <School size={22} />
             </div>
             <div className="min-w-0">
               <p className="text-sm font-medium text-stone-500">{subtitle}</p>
-              <h1 className="truncate text-xl font-semibold text-stone-950">{title}</h1>
-              <p className="mt-1 text-xs text-stone-500">{email}</p>
+              <h1 className="text-lg font-semibold leading-snug text-stone-950 sm:text-xl">
+                {title}
+              </h1>
+              <p className="mt-1 break-all text-xs text-stone-500">{email}</p>
             </div>
           </div>
           <LogoutButton />
         </header>
 
-        <div className="py-6">{children}</div>
+        <div className="py-4 sm:py-6">{children}</div>
       </section>
     </main>
   );

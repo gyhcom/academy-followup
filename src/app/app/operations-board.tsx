@@ -115,39 +115,49 @@ export function OperationsBoard({
   }
 
   return (
-    <div className="space-y-5">
-      <section className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+    <div className="space-y-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:space-y-5">
+      <section className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-medium text-emerald-700">{academyName}</p>
-            <h2 className="mt-2 text-2xl font-semibold text-stone-950 sm:text-3xl">
+            <h2 className="mt-2 text-xl font-semibold text-stone-950 sm:text-3xl">
               오늘의 팔로업
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-600">
-              {teacherName}님은 {roleLabel} 권한으로 접속 중입니다. 반과 학생을 선택한 뒤
-              학부모에게 보낼 안내 문구를 확인합니다.
+              {teacherName}님은 {roleLabel} 권한으로 접속 중입니다. 반, 학생, 사유 순서로
+              선택하면 문자 초안을 바로 확인합니다.
             </p>
           </div>
 
-          <div className="grid gap-2 sm:grid-cols-3 lg:min-w-[390px]">
+          <div className="grid grid-cols-3 gap-2 lg:min-w-[390px]">
             <Metric label="반" value={`${classes.length}개`} />
             <Metric label="학생" value={`${totalStudents}명`} />
-            <Metric label="발송" value="dry-run 준비" />
+            <Metric label="발송" value="준비" />
           </div>
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)_380px]">
+      <ol
+        aria-label="팔로업 작성 단계"
+        className="grid grid-cols-3 gap-2 text-xs font-medium lg:hidden"
+      >
+        <StepPill step="1" label="반" active={Boolean(selectedClass)} />
+        <StepPill step="2" label="학생" active={Boolean(selectedStudent)} />
+        <StepPill step="3" label="문자" active={Boolean(messageBody)} />
+      </ol>
+
+      <section className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)_380px] lg:items-start">
         <section
           aria-labelledby="class-list-title"
-          className="rounded-lg border border-stone-200 bg-white shadow-sm"
+          className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm"
         >
           <PanelHeader
+            titleId="class-list-title"
             icon={<ClipboardCheck size={18} />}
             title="반 선택"
             description="오늘 처리할 반을 고릅니다."
           />
-          <div className="space-y-2 p-3">
+          <div className="flex gap-2 overflow-x-auto px-3 pb-3 pt-2 lg:block lg:space-y-2 lg:overflow-visible lg:p-3">
             {classes.map((classItem) => {
               const isSelected = classItem.id === selectedClass?.id;
               return (
@@ -157,7 +167,7 @@ export function OperationsBoard({
                   aria-pressed={isSelected}
                   onClick={() => handleClassSelect(classItem.id)}
                   className={[
-                    "w-full rounded-md border px-3 py-3 text-left transition",
+                    "min-w-[9.5rem] shrink-0 rounded-md border px-3 py-3 text-left transition lg:w-full lg:min-w-0 lg:shrink",
                     isSelected
                       ? "border-emerald-600 bg-emerald-50"
                       : "border-stone-200 bg-white hover:border-emerald-300 hover:bg-emerald-50",
@@ -177,14 +187,15 @@ export function OperationsBoard({
 
         <section
           aria-labelledby="student-list-title"
-          className="rounded-lg border border-stone-200 bg-white shadow-sm"
+          className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm"
         >
           <PanelHeader
+            titleId="student-list-title"
             icon={<UsersRound size={18} />}
             title="학생 선택"
             description={selectedClass ? `${selectedClass.name} 학생 목록` : "학생 목록"}
           />
-          <div className="divide-y divide-stone-100">
+          <div className="max-h-[19rem] divide-y divide-stone-100 overflow-y-auto lg:max-h-none lg:overflow-visible">
             {selectedClass?.students.length ? (
               selectedClass.students.map((student) => {
                 const isSelected = student.id === selectedStudent?.id;
@@ -195,7 +206,7 @@ export function OperationsBoard({
                     aria-pressed={isSelected}
                     onClick={() => setSelectedStudentId(student.id)}
                     className={[
-                      "flex min-h-16 w-full items-center justify-between gap-4 px-4 py-3 text-left transition",
+                      "flex min-h-16 w-full flex-col items-start gap-2 px-4 py-3 text-left transition sm:flex-row sm:items-center sm:justify-between sm:gap-4",
                       isSelected ? "bg-emerald-50" : "bg-white hover:bg-stone-50",
                     ].join(" ")}
                   >
@@ -208,7 +219,7 @@ export function OperationsBoard({
                           "학년 정보 없음"}
                       </span>
                     </span>
-                    <span className="shrink-0 rounded-md border border-stone-200 bg-white px-2 py-1 text-xs text-stone-600">
+                    <span className="max-w-full shrink-0 rounded-md border border-stone-200 bg-white px-2 py-1 text-xs text-stone-600">
                       {student.maskedParentPhone}
                     </span>
                   </button>
@@ -224,15 +235,16 @@ export function OperationsBoard({
 
         <section
           aria-labelledby="followup-panel-title"
-          className="rounded-lg border border-stone-200 bg-white shadow-sm"
+          className="rounded-lg border border-stone-200 bg-white shadow-sm lg:sticky lg:top-5"
         >
           <PanelHeader
+            titleId="followup-panel-title"
             icon={<MessageSquareText size={18} />}
             title="문자 작업"
             description="사유 선택 후 초안을 확인합니다."
           />
 
-          <div className="space-y-5 p-4">
+          <div className="space-y-4 p-3 sm:space-y-5 sm:p-4">
             {selectedStudent ? (
               <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
                 <p className="text-xs font-medium text-stone-500">선택 학생</p>
@@ -284,7 +296,7 @@ export function OperationsBoard({
                   setMessageDraft({ key: messageKey, body: event.target.value })
                 }
                 rows={8}
-                className="mt-2 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 sm:min-h-48"
               />
               <p className="mt-2 text-xs text-stone-500">
                 {messageBody.length}자 · 실제 발송 전 원장/선생님이 문구를 수정할 수 있습니다.
@@ -304,7 +316,7 @@ export function OperationsBoard({
             <button
               type="button"
               disabled
-              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-stone-300 px-4 text-sm font-semibold text-stone-600"
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-stone-300 px-4 text-sm font-semibold text-stone-600"
             >
               <Send size={17} />
               dry-run 발송 준비 중
@@ -316,32 +328,60 @@ export function OperationsBoard({
   );
 }
 
+function StepPill({
+  step,
+  label,
+  active,
+}: {
+  step: string;
+  label: string;
+  active: boolean;
+}) {
+  return (
+    <li
+      className={[
+        "flex min-h-10 items-center justify-center gap-1 rounded-md border px-2",
+        active
+          ? "border-emerald-600 bg-emerald-50 text-emerald-800"
+          : "border-stone-200 bg-white text-stone-500",
+      ].join(" ")}
+    >
+      <span>{step}</span>
+      <span>{label}</span>
+    </li>
+  );
+}
+
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-stone-200 bg-stone-50 px-3 py-2">
       <p className="text-xs text-stone-500">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-stone-950">{value}</p>
+      <p className="mt-1 truncate text-sm font-semibold text-stone-950">{value}</p>
     </div>
   );
 }
 
 function PanelHeader({
+  titleId,
   icon,
   title,
   description,
 }: {
+  titleId: string;
   icon: ReactNode;
   title: string;
   description: string;
 }) {
   return (
-    <div className="border-b border-stone-200 px-4 py-3">
+    <div className="border-b border-stone-200 px-3 py-3 sm:px-4">
       <div className="flex items-center gap-2 text-sm font-semibold text-stone-950">
         <span className="text-emerald-700">{icon}</span>
-        <span>{title}</span>
+        <h2 id={titleId} className="text-sm font-semibold">
+          {title}
+        </h2>
         <CheckCircle2 className="ml-auto text-stone-300" size={16} />
       </div>
-      <p className="mt-1 text-xs text-stone-500">{description}</p>
+      <p className="mt-1 hidden text-xs text-stone-500 sm:block">{description}</p>
     </div>
   );
 }
