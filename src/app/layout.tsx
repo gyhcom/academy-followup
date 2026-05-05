@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Academy Follow-up",
-  description: "한국 학원용 팔로업 문자 발송 SaaS",
+  title: "Academy Follow-up | 학원 팔로업 문자 운영 보드",
+  description: "결석, 재시험, 숙제 미완료 안내를 빠르게 만들고 기록하는 한국 학원용 팔로업 문자 SaaS",
 };
 
 export default function RootLayout({
