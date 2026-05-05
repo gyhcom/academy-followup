@@ -20,9 +20,10 @@
 
 - Demo URL: https://academy-followup.vercel.app
 - Vercel Project: `academy-followup`
-- 현재 배포 방식: Vercel CLI 수동 배포
+- 현재 배포 방식: GitHub repo 연결을 통한 Vercel 자동 배포
+- Connected Repository: `gyhcom/academy-followup`
 
-Vercel GitHub 자동 배포를 사용하려면 Vercel 계정에 GitHub Login Connection을 추가한 뒤 GitHub repo를 연결해야 합니다.
+`main` 브랜치에 push하면 Vercel Production Deployment가 생성됩니다.
 
 ## 주요 사용자
 
