@@ -54,11 +54,11 @@ seed에는 더배움프라임영수학원, 샘플 반, 샘플 학생, 기본 문
 
 ```text
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-`NEXT_PUBLIC_SUPABASE_ANON_KEY`에는 Supabase의 publishable/anon key를 넣습니다.
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`에는 Supabase의 publishable key를 넣습니다.
 `SUPABASE_SERVICE_ROLE_KEY`는 서버 health check와 관리자 작업용 secret key입니다. 클라이언트에 노출하면 안 됩니다.
 
 로컬에서는 실제 문자 발송을 막기 위해 아래 값을 유지합니다.
