@@ -16,6 +16,14 @@
 
 > 학생 이름 클릭 -> 사유 선택 -> 문자 미리보기 -> 발송 -> 기록 저장
 
+## 배포
+
+- Demo URL: https://academy-followup.vercel.app
+- Vercel Project: `academy-followup`
+- 현재 배포 방식: Vercel CLI 수동 배포
+
+Vercel GitHub 자동 배포를 사용하려면 Vercel 계정에 GitHub Login Connection을 추가한 뒤 GitHub repo를 연결해야 합니다.
+
 ## 주요 사용자
 
 - 원장: 전체 발송 현황, 반별/선생님별 팔로업 누락 확인
@@ -54,4 +62,3 @@
 - SMS: SOLAPI 우선 검토
 - Error Tracking: Sentry
 - Analytics: PostHog 또는 자체 이벤트 로그
-
