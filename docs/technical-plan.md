@@ -84,7 +84,9 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 핵심 테이블:
 
 ```text
+platform_admins
 academies
+academy_settings
 profiles
 classes
 students
@@ -99,11 +101,14 @@ message_logs
 - 원장/관리자/선생님은 자기 학원 데이터만 볼 수 있습니다.
 - Route Handler와 DB 정책 모두 `academy_id`를 기준으로 검증합니다.
 - 나중에 여러 학원/지점 확장을 고려하되, 초기에는 한 사용자가 한 학원에만 속한다고 가정합니다.
+- 플랫폼 관리자는 `platform_admins`에서 별도로 관리하며 특정 학원 소속 권한과 분리합니다.
 
 ## 7. 권한
 
 초기 권한은 4개입니다.
 
+- 플랫폼 권한:
+  - `super_admin`: 전체 학원/운영 상태를 확인하는 SaaS 관리자
 - `owner`: 원장, 전체 관리
 - `manager`: 실장/관리자, 대부분의 운영 관리
 - `teacher`: 담당 반/학생 관리 및 발송
@@ -115,6 +120,16 @@ message_logs
 
 실제 초기 스키마는 [supabase/schema.sql](../supabase/schema.sql)에 둡니다.
 
+권한/테넌트 분리 배경은 [시스템 아키텍처](./architecture.md)에 둡니다.
+
+### platform_admins
+
+SaaS 전체를 운영하는 플랫폼 관리자입니다.
+
+- `user_id`
+- `role`
+- `created_at`
+
 ### academies
 
 학원 워크스페이스입니다.
@@ -122,6 +137,9 @@ message_logs
 - `id`
 - `name`
 - `slug`
+- `owner_user_id`
+- `plan`
+- `status`
 - `category`
 - `logo_url`
 - `brand_color`
@@ -129,6 +147,18 @@ message_logs
 - `sender_name`
 - `sender_phone`
 - `created_at`
+
+### academy_settings
+
+학원별 운영 설정입니다.
+
+- `academy_id`
+- `sms_dry_run`
+- `allow_assistant_send`
+- `duplicate_guard_minutes`
+- `parent_phone_masking`
+- `created_at`
+- `updated_at`
 
 ### profiles
 
