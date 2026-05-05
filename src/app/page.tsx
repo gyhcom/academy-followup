@@ -2,12 +2,13 @@ import {
   Bell,
   CheckCircle2,
   ClipboardCheck,
+  LogIn,
   MessageSquareText,
   School,
-  Settings,
   ShieldCheck,
   UsersRound,
 } from "lucide-react";
+import Link from "next/link";
 import { demoAcademy } from "@/lib/demo-academy";
 
 const students = [
@@ -39,10 +40,13 @@ export default function Home() {
               <h1 className="text-xl font-semibold tracking-normal text-stone-950">{demoAcademy.name}</h1>
             </div>
           </div>
-          <button className="flex items-center gap-2 rounded-md border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition hover:bg-stone-100">
-            <Settings size={16} />
-            학원 설정
-          </button>
+          <Link
+            href="/login"
+            className="flex items-center gap-2 rounded-md border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition hover:bg-stone-100"
+          >
+            <LogIn size={16} />
+            로그인
+          </Link>
         </header>
 
         <div className="grid flex-1 gap-6 py-8 lg:grid-cols-[0.95fr_1.35fr]">
