@@ -58,6 +58,9 @@ export default function Home() {
                     선생님이 학생 이름을 누르고 사유를 선택하면 학부모에게 보낼 안내 문구를 만들고
                     발송 기록까지 남깁니다.
                   </p>
+                  <p className="mt-4 text-sm leading-6 text-stone-500">
+                    {demoAcademy.address} · {demoAcademy.nearestStation}
+                  </p>
                 </div>
                 <div className="hidden rounded-lg bg-emerald-50 p-3 text-emerald-800 sm:block">
                   <ShieldCheck size={24} />
@@ -69,6 +72,8 @@ export default function Home() {
                 <Metric label="선생님" value={`${demoAcademy.stats.staff}명`} />
                 <Metric label="오늘 수업" value={`${demoAcademy.stats.classesToday}개 반`} />
                 <Metric label="팔로업 대기" value={`${demoAcademy.stats.pendingFollowups}건`} />
+                <Metric label="방문자 리뷰" value={`${demoAcademy.visitorReviewCount}개`} />
+                <Metric label="블로그 리뷰" value={`${demoAcademy.blogReviewCount}개`} />
               </div>
             </div>
 
