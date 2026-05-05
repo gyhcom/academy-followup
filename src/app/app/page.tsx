@@ -3,7 +3,10 @@ import { AlertCircle, School, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { LogoutButton } from "@/app/app/logout-button";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  createSupabaseServerClient,
+  hasSupabaseServerEnv,
+} from "@/lib/supabase/server";
 
 type ProfileWithAcademy = {
   name: string;
@@ -18,6 +21,17 @@ type ProfileWithAcademy = {
 };
 
 export default async function AppPage() {
+  if (!hasSupabaseServerEnv()) {
+    return (
+      <AppShell email="">
+        <EmptyState
+          title="Supabase 환경변수 설정 필요"
+          description="Vercel Production에 NEXT_PUBLIC_SUPABASE_URL과 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY를 등록해야 로그인 세션을 확인할 수 있습니다."
+        />
+      </AppShell>
+    );
+  }
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

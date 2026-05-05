@@ -2,10 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { env } from "@/lib/env";
 
+export function hasSupabaseServerEnv() {
+  return Boolean(env.supabaseUrl && env.supabasePublishableKey);
+}
+
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
 
-  if (!env.supabaseUrl || !env.supabasePublishableKey) {
+  if (!hasSupabaseServerEnv()) {
     throw new Error("Supabase 환경변수가 설정되지 않았습니다.");
   }
 

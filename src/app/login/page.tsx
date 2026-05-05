@@ -1,16 +1,21 @@
 import { redirect } from "next/navigation";
-import { School } from "lucide-react";
+import { AlertCircle, School } from "lucide-react";
 import { LoginForm } from "@/app/login/login-form";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  createSupabaseServerClient,
+  hasSupabaseServerEnv,
+} from "@/lib/supabase/server";
 
 export default async function LoginPage() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (hasSupabaseServerEnv()) {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (user) {
-    redirect("/app");
+    if (user) {
+      redirect("/app");
+    }
   }
 
   return (
@@ -30,7 +35,17 @@ export default async function LoginPage() {
           원장과 선생님이 수업 후 팔로업 문자를 관리하는 내부 화면입니다.
         </p>
 
-        <LoginForm />
+        {hasSupabaseServerEnv() ? (
+          <LoginForm />
+        ) : (
+          <div className="mt-8 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+            <div className="mb-2 flex items-center gap-2 font-semibold">
+              <AlertCircle size={17} />
+              Supabase 환경변수 설정 필요
+            </div>
+            Vercel Production에 Supabase URL과 publishable key를 등록하면 로그인 화면을 사용할 수 있습니다.
+          </div>
+        )}
       </section>
     </main>
   );
