@@ -18,6 +18,11 @@ create type public.followup_status as enum ('draft', 'sent', 'failed');
 create table public.academies (
   id uuid primary key default gen_random_uuid(),
   name text not null,
+  slug text not null unique,
+  category text,
+  logo_url text,
+  brand_color text not null default '#047857',
+  naver_place_id text,
   sender_name text,
   sender_phone text,
   created_at timestamptz not null default now()

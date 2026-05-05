@@ -1,4 +1,14 @@
-import { Bell, ClipboardCheck, MessageSquareText, School, UsersRound } from "lucide-react";
+import {
+  Bell,
+  CheckCircle2,
+  ClipboardCheck,
+  MessageSquareText,
+  School,
+  Settings,
+  ShieldCheck,
+  UsersRound,
+} from "lucide-react";
+import { demoAcademy } from "@/lib/demo-academy";
 
 const students = [
   { name: "김민준", status: "결석 안내", className: "중2 수학 A반", tone: "확인 필요" },
@@ -9,39 +19,70 @@ const students = [
 
 const reasons = ["결석", "지각", "숙제 미완료", "재시험", "준비물", "상담 권장"];
 
+const activity = [
+  "중2 수학 A반 결석 안내 2건 발송",
+  "고1 수학 C반 재시험 안내 1건 대기",
+  "중3 영어 B반 숙제 미완료 안내 1건 검토",
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-stone-50">
       <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-10">
         <header className="flex items-center justify-between border-b border-stone-200 pb-5">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-700 text-white">
-              <School size={21} />
+            <div className="flex size-11 items-center justify-center rounded-lg bg-emerald-700 text-white">
+              <School size={22} />
             </div>
             <div>
-              <p className="text-sm font-medium text-stone-500">한국 학원용 팔로업 SaaS</p>
-              <h1 className="text-xl font-semibold tracking-normal text-stone-950">Academy Follow-up</h1>
+              <p className="text-sm font-medium text-stone-500">Academy Follow-up</p>
+              <h1 className="text-xl font-semibold tracking-normal text-stone-950">{demoAcademy.name}</h1>
             </div>
           </div>
-          <button className="rounded-md bg-stone-950 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-stone-800">
-            파일럿 시작
+          <button className="flex items-center gap-2 rounded-md border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition hover:bg-stone-100">
+            <Settings size={16} />
+            학원 설정
           </button>
         </header>
 
         <div className="grid flex-1 gap-6 py-8 lg:grid-cols-[0.95fr_1.35fr]">
-          <section className="flex flex-col justify-center">
-            <div className="max-w-xl">
-              <h2 className="text-4xl font-semibold leading-tight tracking-normal text-stone-950 sm:text-5xl">
-                수업 후 학부모 팔로업을 10초 안에 끝내는 보드
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-stone-600">
-                학생 이름을 누르고 결석, 재시험, 숙제 미완료 같은 사유를 선택하면
-                한국어 안내 문구를 만들고 문자 발송 기록까지 남깁니다.
-              </p>
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                <Metric label="원생" value="200명" />
-                <Metric label="선생님" value="16명" />
-                <Metric label="첫 목표" value="문자 발송" />
+          <section className="flex flex-col gap-6">
+            <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-emerald-700">{demoAcademy.category}</p>
+                  <h2 className="mt-3 text-4xl font-semibold leading-tight tracking-normal text-stone-950">
+                    {demoAcademy.displayName}
+                  </h2>
+                  <p className="mt-4 text-base leading-7 text-stone-600">
+                    선생님이 학생 이름을 누르고 사유를 선택하면 학부모에게 보낼 안내 문구를 만들고
+                    발송 기록까지 남깁니다.
+                  </p>
+                </div>
+                <div className="hidden rounded-lg bg-emerald-50 p-3 text-emerald-800 sm:block">
+                  <ShieldCheck size={24} />
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <Metric label="원생" value={`${demoAcademy.stats.students}명`} />
+                <Metric label="선생님" value={`${demoAcademy.stats.staff}명`} />
+                <Metric label="오늘 수업" value={`${demoAcademy.stats.classesToday}개 반`} />
+                <Metric label="팔로업 대기" value={`${demoAcademy.stats.pendingFollowups}건`} />
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
+              <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-stone-800">
+                <CheckCircle2 size={17} />
+                오늘 운영 로그
+              </div>
+              <div className="space-y-3">
+                {activity.map((item) => (
+                  <div key={item} className="rounded-lg bg-stone-50 px-3 py-3 text-sm text-stone-700">
+                    {item}
+                  </div>
+                ))}
               </div>
             </div>
           </section>
@@ -54,7 +95,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2 rounded-md bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
                 <Bell size={16} />
-                4건 대기
+                {demoAcademy.stats.pendingFollowups}건 대기
               </div>
             </div>
 
@@ -104,7 +145,7 @@ export default function Home() {
                     문자 미리보기
                   </div>
                   <p className="text-sm leading-7 text-stone-700">
-                    [데모학원] 안녕하세요. 김민준 학생이 오늘 수업에 결석하여 안내드립니다.
+                    [{demoAcademy.senderName}] 안녕하세요. 김민준 학생이 오늘 수업에 결석하여 안내드립니다.
                     확인 부탁드리며, 보강 일정이 필요한 경우 담당 선생님이 다시 안내드리겠습니다.
                   </p>
                   <button className="mt-4 w-full rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800">
@@ -122,7 +163,7 @@ export default function Home() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-4">
+    <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
       <p className="text-sm text-stone-500">{label}</p>
       <p className="mt-2 text-xl font-semibold text-stone-950">{value}</p>
     </div>
