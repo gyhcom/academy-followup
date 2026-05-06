@@ -395,7 +395,7 @@ function MessageComposer({
   return (
     <section
       aria-labelledby="message-composer-title"
-      className="rounded-lg border border-stone-200 bg-white shadow-sm max-lg:sticky max-lg:bottom-3 max-lg:z-20 lg:sticky lg:top-5"
+      className="rounded-lg border border-stone-200 bg-white shadow-sm lg:sticky lg:top-5"
     >
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
