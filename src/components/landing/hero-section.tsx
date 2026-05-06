@@ -5,11 +5,13 @@ import {
   ClipboardList,
   MessageSquareText,
   MonitorSmartphone,
+  Smartphone,
+  Tablet,
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
 import { demoAcademy } from "@/lib/demo-academy";
-import { demoSteps, heroStats, roleCards } from "@/lib/landing-content";
+import { heroStats, roleCards } from "@/lib/landing-content";
 
 export function HeroSection() {
   return (
@@ -71,10 +73,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div className="relative min-w-0">
-          <PlatformPreview />
-          <ChatPreview />
-        </div>
+        <ResponsiveDeviceShowcase />
       </div>
 
       <div className="bg-white px-4 py-5 text-[#202557] sm:px-8">
@@ -91,17 +90,41 @@ export function HeroSection() {
   );
 }
 
-function PlatformPreview() {
+function ResponsiveDeviceShowcase() {
   return (
-    <div className="mx-auto w-full max-w-[18.5rem] overflow-hidden rounded-[1.4rem] border-[6px] border-[#e7e9ff] bg-white p-2 text-[#202557] shadow-2xl shadow-[#26328f]/28 sm:max-w-[42rem] sm:p-3">
+    <div className="relative mx-auto h-[29rem] w-full max-w-[42rem] min-w-0 overflow-hidden sm:h-[36rem] lg:overflow-visible">
+      <DesktopDevice />
+      <TabletDevice />
+      <PhoneDevice />
+
+      <div className="absolute bottom-2 left-1/2 z-20 w-[min(92%,28rem)] -translate-x-1/2 rounded-xl bg-white p-4 text-[#202557] shadow-2xl shadow-[#26328f]/18 sm:bottom-6">
+        <div className="flex gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eef0ff] text-[#5862d9]">
+            <MonitorSmartphone size={20} />
+          </div>
+          <div>
+            <p className="break-keep text-sm font-semibold">앱 설치 없이 웹으로 접속합니다.</p>
+            <p className="mt-1 text-xs leading-5 text-[#68709b]">
+              PC에서는 원장 보드, 태블릿에서는 출결, 휴대폰에서는 수업 후 연락을 빠르게 처리합니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DesktopDevice() {
+  return (
+    <div className="absolute left-1 top-5 w-[21rem] rotate-[-7deg] rounded-[1.4rem] border-[6px] border-[#eef0ff] bg-white p-2 text-[#202557] shadow-2xl shadow-[#26328f]/26 sm:left-4 sm:top-10 sm:w-[35rem] lg:left-0 lg:top-16">
       <div className="overflow-hidden rounded-[1rem] border border-[#dfe3ff] bg-[#f7f8ff]">
-        <div className="grid min-h-[23rem] grid-cols-[3.4rem_minmax(0,1fr)] sm:grid-cols-[6.4rem_1fr]">
-          <aside className="bg-[#4e58ce] p-2 text-white sm:p-3">
+        <div className="grid min-h-[22rem] grid-cols-[5rem_1fr]">
+          <aside className="bg-[#4e58ce] p-3 text-white">
             <div className="flex items-center gap-2">
               <div className="size-4 rounded bg-white" />
-              <span className="hidden text-xs font-semibold sm:inline">academy</span>
+              <span className="text-xs font-semibold">academy</span>
             </div>
-            <div className="mt-8 grid gap-2 text-[0.64rem] sm:text-xs">
+            <div className="mt-8 grid gap-2 text-xs">
               {["홈", "학생", "반", "출결", "연락", "리포트"].map((item, index) => (
                 <div
                   key={item}
@@ -116,13 +139,13 @@ function PlatformPreview() {
             </div>
           </aside>
 
-          <div className="min-w-0 p-4 sm:p-6">
-            <div className="flex flex-col gap-3 border-b border-[#dfe3ff] pb-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 p-5">
+            <div className="flex items-start justify-between gap-3 border-b border-[#dfe3ff] pb-4">
               <div>
                 <p className="truncate text-sm font-semibold text-[#68709b]">{demoAcademy.name}</p>
-                <h2 className="mt-1 break-keep text-xl font-semibold sm:text-2xl">오늘의 학원 운영</h2>
+                <h2 className="mt-1 break-keep text-2xl font-semibold">오늘의 학원 운영</h2>
               </div>
-              <div className="hidden grid-cols-3 gap-2 text-center text-xs sm:grid">
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
                 {["결석", "재시험", "상담"].map((item, index) => (
                   <div key={item} className="rounded-md bg-white px-3 py-2 shadow-sm">
                     <p className="font-semibold text-[#4e58ce]">{index + 2}</p>
@@ -168,7 +191,7 @@ function PlatformPreview() {
                   </p>
                 </div>
                 <div className="mt-3 grid gap-2">
-                  {demoSteps.map((step, index) => (
+                  {["내 역할 선택", "현재 운영 방식 확인", "파일럿 데모 보기"].map((step, index) => (
                     <div key={step} className="flex items-center gap-2 text-xs text-[#68709b]">
                       <span className="flex size-5 items-center justify-center rounded bg-[#eef0ff] font-semibold text-[#4e58ce]">
                         {index + 1}
@@ -186,24 +209,65 @@ function PlatformPreview() {
   );
 }
 
-function ChatPreview() {
+function TabletDevice() {
   return (
-    <div className="mt-5 rounded-xl bg-white p-4 text-[#202557] shadow-2xl shadow-[#26328f]/18 lg:absolute lg:-bottom-12 lg:right-0 lg:w-[23rem]">
-      <div className="flex gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eef0ff] text-[#5862d9]">
-          <MonitorSmartphone size={20} />
+    <div className="absolute right-0 top-24 z-10 w-[17rem] rotate-[8deg] rounded-[1.6rem] border-[7px] border-[#eef0ff] bg-white p-3 text-[#202557] shadow-2xl shadow-[#26328f]/30 sm:right-0 sm:top-28 sm:w-[27rem] lg:top-24">
+      <div className="overflow-hidden rounded-[1.1rem] border border-[#dfe3ff] bg-[#f7f8ff]">
+        <div className="flex items-center justify-between bg-[#5862d9] px-4 py-3 text-white">
+          <div className="flex items-center gap-2 text-sm font-semibold">
+            <Tablet size={16} />
+            중2 수학 A반 출결
+          </div>
+          <span className="rounded-md bg-white/16 px-2 py-1 text-xs">태블릿</span>
         </div>
-        <div>
-          <p className="break-keep text-sm font-semibold">이 학원에서는 어떤 기능부터 쓰면 좋을까요?</p>
-          <p className="mt-1 text-xs text-[#68709b]">파일럿 상담 · 1분 전</p>
+
+        <div className="grid grid-cols-2 gap-2 p-3 sm:gap-3 sm:p-4">
+          {["김민준", "이서연", "박지호", "최하린", "정도윤", "한서아"].map((student, index) => (
+            <div key={student} className="rounded-xl bg-white p-3 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-full bg-[#eef0ff] text-sm font-semibold text-[#5862d9]">
+                  {student.slice(0, 1)}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{student}</p>
+                  <p className="mt-0.5 text-xs text-[#68709b]">{index % 2 === 0 ? "출석" : "확인 필요"}</p>
+                </div>
+              </div>
+              <button className="mt-3 min-h-8 w-full rounded-md bg-[#26b8b1] text-xs font-semibold text-white">
+                {index % 2 === 0 ? "출석 완료" : "결석 표시"}
+              </button>
+            </div>
+          ))}
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {["학생/반 관리", "후속 문자", "원장 보드"].map((item) => (
-          <span key={item} className="rounded-full bg-[#f1f3ff] px-3 py-1.5 text-xs font-semibold text-[#4e58ce]">
-            {item}
-          </span>
-        ))}
+    </div>
+  );
+}
+
+function PhoneDevice() {
+  return (
+    <div className="absolute bottom-16 left-3 z-20 w-[7.6rem] rotate-[-5deg] rounded-[1.7rem] border-[6px] border-[#eef0ff] bg-white p-2 text-[#202557] shadow-2xl shadow-[#26328f]/28 sm:bottom-16 sm:left-0 sm:w-[10rem] lg:left-2">
+      <div className="overflow-hidden rounded-[1.15rem] border border-[#dfe3ff] bg-white">
+        <div className="bg-[#5862d9] px-3 py-3 text-white">
+          <div className="flex items-center gap-1.5 text-[0.68rem] font-semibold">
+            <Smartphone size={12} />
+            수업 후 연락
+          </div>
+        </div>
+        <div className="space-y-3 p-3">
+          <div className="rounded-lg bg-[#f1f3ff] p-2">
+            <p className="text-[0.7rem] font-semibold">김민준</p>
+            <p className="mt-1 text-[0.64rem] leading-4 text-[#68709b]">결석 안내 초안</p>
+          </div>
+          <div className="rounded-lg bg-[#e6fbf5] p-2">
+            <p className="text-[0.64rem] leading-4 text-[#24766f]">
+              보강 일정 확인 후 연락드리겠습니다.
+            </p>
+          </div>
+          <button className="min-h-8 w-full rounded-md bg-[#ff6a67] text-[0.68rem] font-semibold text-white">
+            수정 후 기록
+          </button>
+        </div>
       </div>
     </div>
   );
