@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   ClipboardCheck,
   MessageSquareText,
+  RotateCcw,
   Send,
   UsersRound,
 } from "lucide-react";
@@ -99,6 +100,8 @@ export function OperationsBoard({
     messagePreview.key === messageKey && messagePreview.status === "ready";
   const isPreviewError =
     messagePreview.key === messageKey && messagePreview.status === "error";
+  const isDraftEdited = isPreviewReady && messageBody !== messagePreview.body;
+  const isMessageBlank = isPreviewReady && messageBody.trim().length === 0;
 
   const totalStudents = classes.reduce(
     (total, classItem) => total + classItem.students.length,
@@ -170,6 +173,14 @@ export function OperationsBoard({
     const nextClass = classes.find((classItem) => classItem.id === classId);
     setSelectedClassId(classId);
     setSelectedStudentId(nextClass?.students[0]?.id ?? "");
+  }
+
+  function handleRestorePreview() {
+    if (!isPreviewReady) {
+      return;
+    }
+
+    setMessageDraft({ key: messageKey, body: messagePreview.body });
   }
 
   if (classes.length === 0) {
@@ -357,12 +368,31 @@ export function OperationsBoard({
             </fieldset>
 
             <div>
-              <label
-                htmlFor="message-body"
-                className="text-sm font-semibold text-stone-800"
-              >
-                {isPreviewReady ? messagePreview.title : "문자 미리보기"}
-              </label>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <label
+                    htmlFor="message-body"
+                    className="truncate text-sm font-semibold text-stone-800"
+                  >
+                    {isPreviewReady ? messagePreview.title : "문자 미리보기"}
+                  </label>
+                  {isPreviewReady ? (
+                    <span className="shrink-0 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800">
+                      수정 가능
+                    </span>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  aria-label="원문으로 되돌리기"
+                  title="원문으로 되돌리기"
+                  disabled={!isDraftEdited}
+                  onClick={handleRestorePreview}
+                  className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600 transition hover:border-stone-300 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <RotateCcw size={15} />
+                </button>
+              </div>
               <textarea
                 id="message-body"
                 value={messageBody}
@@ -379,9 +409,16 @@ export function OperationsBoard({
                 rows={8}
                 className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition disabled:bg-stone-50 disabled:text-stone-500 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 sm:min-h-48"
               />
-              <p className="mt-2 text-xs text-stone-500">
-                {messageBody.length}자 · DB 템플릿으로 생성한 뒤 발송 전 문구를 수정할 수
-                있습니다.
+              <p
+                className={[
+                  "mt-2 text-xs",
+                  isMessageBlank ? "text-red-700" : "text-stone-500",
+                ].join(" ")}
+              >
+                {messageBody.length}자 ·{" "}
+                {isMessageBlank
+                  ? "본문이 비어 있으면 발송할 수 없습니다."
+                  : "선생님이 발송 전에 문구를 직접 수정할 수 있습니다."}
               </p>
             </div>
 

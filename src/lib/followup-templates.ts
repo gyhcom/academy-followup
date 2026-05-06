@@ -58,6 +58,7 @@ export function renderFollowupTemplate(
   templateBody: string,
   input: RenderFollowupTemplateInput,
 ) {
+  const normalizedTemplateBody = normalizeTemplateBody(templateBody);
   const values: Record<string, string> = {
     academyName: input.academyName,
     "학원명": input.academyName,
@@ -72,8 +73,16 @@ export function renderFollowupTemplate(
 
   return Object.entries(values).reduce(
     (message, [key, value]) => message.replaceAll(`{{${key}}}`, value),
-    templateBody,
+    normalizedTemplateBody,
   );
+}
+
+function normalizeTemplateBody(templateBody: string) {
+  return templateBody
+    .replaceAll("\\r\\n", "\n")
+    .replaceAll("\\n", "\n")
+    .replaceAll("\\r", "\n")
+    .replace(/\r\n?/g, "\n");
 }
 
 export function buildFollowupMessage(input: BuildFollowupMessageInput) {
