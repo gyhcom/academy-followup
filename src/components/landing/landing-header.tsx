@@ -1,21 +1,16 @@
+"use client";
+
 import { ArrowRight, ChevronDown, LogIn, School, X } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { audienceMenuItems, featureMenuGroups, landingNavItems } from "@/lib/landing-content";
 
 export function LandingHeader() {
+  const [showBanner, setShowBanner] = useState(true);
+
   return (
     <header className="relative z-30 bg-[#5862d9] text-white">
-      <div className="bg-[#ff5c62] px-4 py-3 text-center text-sm font-semibold">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-3">
-          <span className="sm:hidden">운영 SaaS 구조를 만드는 중</span>
-          <span className="hidden sm:inline">파일럿 학원 기준으로 운영 SaaS 구조를 만드는 중입니다</span>
-          <a href="#demo" className="hidden items-center gap-1 underline-offset-4 hover:underline sm:inline-flex">
-            데모 보기
-            <ArrowRight size={14} />
-          </a>
-          <X size={16} className="hidden opacity-80 md:block" aria-hidden />
-        </div>
-      </div>
+      {showBanner ? <AnnouncementBanner onClose={() => setShowBanner(false)} /> : null}
 
       <div className="border-b border-white/12">
         <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-8">
@@ -86,6 +81,39 @@ export function LandingHeader() {
         </div>
       </div>
     </header>
+  );
+}
+
+function AnnouncementBanner({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="relative overflow-hidden bg-[#ff7468] px-4 py-3 text-center text-sm font-semibold">
+      <div className="pointer-events-none absolute inset-0 hidden sm:block" aria-hidden>
+        <span className="absolute left-[17%] top-[-0.75rem] size-8 rounded-full bg-[#ffd35a]" />
+        <span className="absolute left-[24%] top-4 h-8 w-3 rotate-[34deg] rounded-full bg-[#6f8cff]" />
+        <span className="absolute left-[28%] top-6 h-10 w-10 rotate-[-18deg] rounded-[0.35rem] bg-[#f14fa3]" />
+        <span className="absolute right-[22%] top-2 h-7 w-9 rotate-[12deg] rounded-[0.35rem] bg-[#ffe8a3]" />
+      </div>
+
+      <div className="relative mx-auto flex w-full max-w-7xl items-center justify-center gap-3">
+        <span className="sm:hidden">운영 SaaS 구조를 만드는 중</span>
+        <span className="hidden sm:inline">파일럿 학원 기준으로 운영 SaaS 구조를 만드는 중입니다</span>
+        <a
+          href="#demo"
+          className="hidden items-center gap-1 underline-offset-4 hover:underline sm:inline-flex"
+        >
+          데모 보기
+          <ArrowRight size={14} />
+        </a>
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/14 text-white transition hover:bg-white/22 md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2"
+          aria-label="상단 안내 닫기"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
   );
 }
 
