@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ChevronDown, LogIn, School, X } from "lucide-react";
+import { ArrowRight, ChevronDown, LogIn, Menu, School, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { audienceMenuItems, featureMenuGroups, landingNavItems } from "@/lib/landing-content";
@@ -9,11 +9,19 @@ export function LandingHeader() {
   const [showBanner, setShowBanner] = useState(true);
 
   return (
-    <header className="relative z-30 bg-[#5862d9] text-white">
+    <header className="relative z-30 text-white">
       {showBanner ? <AnnouncementBanner onClose={() => setShowBanner(false)} /> : null}
 
-      <div className="border-b border-white/12">
-        <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-8">
+      <DesktopHeaderBar />
+      <MobileHeaderBar />
+    </header>
+  );
+}
+
+function DesktopHeaderBar() {
+  return (
+    <div className="hidden border-b border-white/12 bg-[#5862d9] lg:block">
+      <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-8">
         <Link href="/" className="flex min-w-0 items-center gap-3" aria-label="Academy Follow-up 홈">
           <div className="flex size-10 items-center justify-center rounded-md bg-white text-[#5862d9]">
             <School size={21} />
@@ -78,24 +86,65 @@ export function LandingHeader() {
             시작하기
           </Link>
         </div>
-        </div>
       </div>
-    </header>
+    </div>
+  );
+}
+
+function MobileHeaderBar() {
+  return (
+    <div className="border-b border-[#eaecf5] bg-white text-[#202557] shadow-sm lg:hidden">
+      <div className="relative flex min-h-18 w-full items-center gap-2 px-3 pr-14">
+        <Link
+          href="/"
+          className="flex size-10 shrink-0 items-center justify-center rounded-md bg-[#eef0ff] text-[#5862d9]"
+          aria-label="Academy Follow-up 홈"
+        >
+          <School size={21} />
+        </Link>
+
+        <Link
+          href="/login"
+          className="flex min-h-11 w-[7.2rem] min-w-0 shrink items-center justify-center rounded-md border-2 border-[#686d80] px-2 text-[0.82rem] font-semibold text-[#626779]"
+        >
+          제품 보기
+        </Link>
+        <a
+          href="#demo"
+          className="flex min-h-11 w-[7.5rem] min-w-0 shrink items-center justify-center rounded-md bg-[#ef676b] px-2 text-[0.82rem] font-semibold text-white"
+        >
+          가격 문의
+        </a>
+
+        <button
+          type="button"
+          className="absolute right-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-md bg-[#eef0ff] text-[#5862d9]"
+          aria-label="메뉴 열기"
+        >
+          <Menu size={30} strokeWidth={2.4} className="sr-only" />
+          <span className="grid gap-1.5" aria-hidden>
+            <span className="block h-0.5 w-7 rounded-full bg-[#5862d9]" />
+            <span className="block h-0.5 w-7 rounded-full bg-[#5862d9]" />
+            <span className="block h-0.5 w-7 rounded-full bg-[#5862d9]" />
+          </span>
+        </button>
+      </div>
+    </div>
   );
 }
 
 function AnnouncementBanner({ onClose }: { onClose: () => void }) {
   return (
-    <div className="relative overflow-hidden bg-[#ff7468] px-4 py-3 text-center text-sm font-semibold">
-      <div className="pointer-events-none absolute inset-0 hidden sm:block" aria-hidden>
-        <span className="absolute left-[17%] top-[-0.75rem] size-8 rounded-full bg-[#ffd35a]" />
-        <span className="absolute left-[24%] top-4 h-8 w-3 rotate-[34deg] rounded-full bg-[#6f8cff]" />
-        <span className="absolute left-[28%] top-6 h-10 w-10 rotate-[-18deg] rounded-[0.35rem] bg-[#f14fa3]" />
-        <span className="absolute right-[22%] top-2 h-7 w-9 rotate-[12deg] rounded-[0.35rem] bg-[#ffe8a3]" />
+    <div className="relative overflow-hidden bg-[#ef676b] px-4 py-3 text-center text-sm font-semibold">
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <span className="absolute left-[5%] top-[-0.2rem] h-3 w-8 -rotate-[12deg] rounded-full bg-[#58b9c6] sm:left-[17%] sm:top-[-0.75rem] sm:size-8 sm:rounded-full sm:bg-[#ffd35a]" />
+        <span className="absolute left-[10%] bottom-1 h-8 w-9 rotate-[-17deg] rounded-[0.35rem] bg-[#9d50dc] sm:left-[24%] sm:top-4 sm:h-8 sm:w-3 sm:rotate-[34deg] sm:rounded-full sm:bg-[#6f8cff]" />
+        <span className="absolute right-[8%] top-2 size-7 rounded-full bg-[#f4cc4e] sm:left-[28%] sm:right-auto sm:top-6 sm:h-10 sm:w-10 sm:rotate-[-18deg] sm:rounded-[0.35rem] sm:bg-[#f14fa3]" />
+        <span className="absolute right-[22%] top-2 hidden h-7 w-9 rotate-[12deg] rounded-[0.35rem] bg-[#ffe8a3] sm:block" />
       </div>
 
       <div className="relative mx-auto flex w-full max-w-7xl items-center justify-center gap-3">
-        <span className="sm:hidden">운영 SaaS 구조를 만드는 중</span>
+        <span className="max-w-[15rem] break-keep sm:hidden">학원 운영 SaaS 파일럿을 준비 중입니다</span>
         <span className="hidden sm:inline">파일럿 학원 기준으로 운영 SaaS 구조를 만드는 중입니다</span>
         <a
           href="#demo"

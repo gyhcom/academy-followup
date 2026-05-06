@@ -5,6 +5,7 @@ import {
   ClipboardList,
   MessageSquareText,
   MonitorSmartphone,
+  School,
   Smartphone,
   Tablet,
   UsersRound,
@@ -16,77 +17,138 @@ import { heroStats, roleCards } from "@/lib/landing-content";
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-[#5862d9] text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-14 pt-12 sm:px-8 sm:pb-20 sm:pt-16 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:pb-24 lg:pt-20">
-        <div className="flex min-w-0 flex-col justify-center">
-          <p className="text-base font-semibold text-white/86">학원 운영을 위한 커뮤니케이션 OS</p>
-          <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.08] tracking-normal sm:text-6xl lg:text-7xl">
-            <span className="block">학생 관리부터</span>
-            <span className="block">학부모 연락까지</span>
-            <span className="block">한 곳에서</span>
-          </h1>
-          <p className="mt-6 max-w-2xl break-words text-base font-medium leading-8 text-white/82 sm:break-keep sm:text-lg">
-            <span className="block sm:inline">결석 문자로 시작해 </span>
-            <span className="block sm:inline">학생·반·선생님 기록까지 </span>
-            <span className="block sm:inline">연결하는 운영 SaaS입니다.</span>
-          </p>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/login"
-              className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#ff6a67] px-5 text-sm font-semibold text-white shadow-lg shadow-[#26328f]/20 transition hover:bg-[#ff565b]"
-            >
-              제품 화면 보기
-              <ArrowRight size={17} />
-            </Link>
-            <a
-              href="#features"
-              className="flex min-h-12 items-center justify-center rounded-md border border-white/50 bg-white/8 px-5 text-sm font-semibold text-white transition hover:bg-white/14"
-            >
-              기능 구조 보기
-            </a>
-          </div>
-
-          <div className="mt-10">
-            <p className="text-xl font-semibold">먼저, 어떤 역할로 볼까요?</p>
-            <div className="mt-4 grid max-w-xl gap-3">
-              {roleCards.map((card, index) => (
-                <a
-                  key={card.role}
-                  href="#features"
-                  className="group flex min-h-20 items-center justify-between gap-4 rounded-xl bg-white p-4 text-[#202557] shadow-xl shadow-[#25308d]/10 transition hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-[#25308d]/18"
-                >
-                  <div className="flex min-w-0 items-center gap-4">
-                    <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-[#eef0ff] text-[#5862d9]">
-                      {index === 0 ? <Building2 size={21} /> : null}
-                      {index === 1 ? <UsersRound size={21} /> : null}
-                      {index === 2 ? <ClipboardList size={21} /> : null}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold">{card.role}</p>
-                      <p className="mt-1 truncate text-sm text-[#68709b]">{card.title}</p>
-                    </div>
-                  </div>
-                  <ArrowRight size={18} className="shrink-0 text-[#5862d9] transition group-hover:translate-x-1" />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <ResponsiveDeviceShowcase />
-      </div>
-
-      <div className="bg-white px-4 py-5 text-[#202557] sm:px-8">
-        <div className="mx-auto grid max-w-7xl gap-3 sm:grid-cols-3">
-          {heroStats.map((stat) => (
-            <div key={stat.label} className="min-w-0 border-l border-[#dfe3ff] pl-4 first:border-l-0 first:pl-0">
-              <p className="text-xs font-semibold text-[#68709b]">{stat.label}</p>
-              <p className="mt-1 break-keep text-lg font-semibold">{stat.value}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <MobileHeroContent />
+      <DesktopHeroContent />
+      <HeroStatsStrip />
     </section>
+  );
+}
+
+function MobileHeroContent() {
+  return (
+    <div className="mx-auto max-w-md px-4 pb-14 pt-10 text-center lg:hidden">
+      <Link href="/" className="inline-flex items-center justify-center gap-3" aria-label="Academy Follow-up 홈">
+        <span className="flex size-10 items-center justify-center rounded-md bg-white text-[#5862d9]">
+          <School size={21} />
+        </span>
+        <span className="text-xl font-semibold">Academy Follow-up</span>
+      </Link>
+
+      <h1 className="mt-12 text-[2.82rem] font-semibold leading-[1.12] tracking-normal">
+        <span className="block">학원 운영은</span>
+        <span className="block">가볍게.</span>
+        <span className="block">기록은 한 곳에.</span>
+      </h1>
+
+      <div className="mt-10 grid gap-3 text-left">
+        {roleCards.map((card, index) => (
+          <HeroRoleCard key={card.role} card={card} index={index} mobile />
+        ))}
+      </div>
+
+      <p className="mt-8 text-base text-white/82">
+        이미 사용 중인가요?{" "}
+        <Link href="/login" className="font-semibold underline underline-offset-4">
+          로그인
+        </Link>
+      </p>
+    </div>
+  );
+}
+
+function DesktopHeroContent() {
+  return (
+    <div className="mx-auto hidden max-w-7xl gap-10 px-8 pb-24 pt-20 lg:grid lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
+      <div className="flex min-w-0 flex-col justify-center">
+        <p className="text-base font-semibold text-white/86">학원 운영을 위한 커뮤니케이션 OS</p>
+        <h1 className="mt-5 max-w-3xl text-7xl font-semibold leading-[1.08] tracking-normal">
+          <span className="block">학생 관리부터</span>
+          <span className="block">학부모 연락까지</span>
+          <span className="block">한 곳에서</span>
+        </h1>
+        <p className="mt-6 max-w-2xl break-keep text-lg font-medium leading-8 text-white/82">
+          결석 문자로 시작해 학생·반·선생님 기록까지 연결하는 운영 SaaS입니다.
+        </p>
+
+        <div className="mt-8 flex gap-3">
+          <Link
+            href="/login"
+            className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#ff6a67] px-5 text-sm font-semibold text-white shadow-lg shadow-[#26328f]/20 transition hover:bg-[#ff565b]"
+          >
+            제품 화면 보기
+            <ArrowRight size={17} />
+          </Link>
+          <a
+            href="#features"
+            className="flex min-h-12 items-center justify-center rounded-md border border-white/50 bg-white/8 px-5 text-sm font-semibold text-white transition hover:bg-white/14"
+          >
+            기능 구조 보기
+          </a>
+        </div>
+
+        <div className="mt-10">
+          <p className="text-xl font-semibold">먼저, 어떤 역할로 볼까요?</p>
+          <div className="mt-4 grid max-w-xl gap-3">
+            {roleCards.map((card, index) => (
+              <HeroRoleCard key={card.role} card={card} index={index} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <ResponsiveDeviceShowcase />
+    </div>
+  );
+}
+
+function HeroRoleCard({
+  card,
+  index,
+  mobile = false,
+}: {
+  card: (typeof roleCards)[number];
+  index: number;
+  mobile?: boolean;
+}) {
+  return (
+    <a
+      href="#features"
+      className={[
+        "group flex items-center justify-between gap-4 bg-white text-[#202557] shadow-xl shadow-[#25308d]/10 transition hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-[#25308d]/18",
+        mobile ? "min-h-24 rounded-2xl px-5 py-4" : "min-h-20 rounded-xl p-4",
+      ].join(" ")}
+    >
+      <div className="flex min-w-0 items-center gap-4">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-[#eef0ff] text-[#5862d9]">
+          {index === 0 ? <Building2 size={21} /> : null}
+          {index === 1 ? <UsersRound size={21} /> : null}
+          {index === 2 ? <ClipboardList size={21} /> : null}
+        </div>
+        <div className="min-w-0">
+          <p className={mobile ? "text-xl font-semibold" : "font-semibold"}>{card.role}</p>
+          <p className="mt-1 truncate text-sm text-[#68709b]">{card.title}</p>
+        </div>
+      </div>
+      <ArrowRight size={mobile ? 22 : 18} className="shrink-0 text-[#5862d9] transition group-hover:translate-x-1" />
+    </a>
+  );
+}
+
+function HeroStatsStrip() {
+  return (
+    <div className="bg-white px-4 py-5 text-[#202557] sm:px-8">
+      <div className="mx-auto grid max-w-7xl gap-3 sm:grid-cols-3">
+        {heroStats.map((stat) => (
+          <div
+            key={stat.label}
+            className="min-w-0 rounded-lg border border-[#dfe3ff] bg-white px-4 py-3 sm:rounded-none sm:border-y-0 sm:border-r-0 sm:border-l sm:py-0 sm:first:border-l-0 sm:first:pl-0"
+          >
+            <p className="text-xs font-semibold text-[#68709b]">{stat.label}</p>
+            <p className="mt-1 break-keep text-lg font-semibold">{stat.value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

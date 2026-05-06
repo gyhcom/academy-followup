@@ -4,6 +4,8 @@ import {
   ClipboardCheck,
   CreditCard,
   MessageSquareText,
+  Minus,
+  Plus,
   Sparkles,
   UsersRound,
 } from "lucide-react";
@@ -25,7 +27,9 @@ export function ProductSection() {
           </p>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
+        <MobileProductOverview />
+
+        <div className="hidden gap-4 lg:grid lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
           <MobilePhoneMockup />
           <DirectorBoardMockup />
         </div>
@@ -53,21 +57,7 @@ export function FeatureTabsSection() {
 
         <div className="mt-10 grid gap-4 lg:grid-cols-3">
           {productTabs.map((tab) => (
-            <article key={tab.label} className="rounded-xl border border-[#dfe3ff] bg-white p-5 shadow-sm">
-              <p className="text-sm font-semibold text-[#5862d9]">{tab.label}</p>
-              <h3 className="mt-4 break-keep text-xl font-semibold leading-7 text-[#202557]">
-                {tab.title}
-              </h3>
-              <p className="mt-3 break-keep text-sm leading-6 text-[#60688e]">{tab.body}</p>
-              <div className="mt-5 grid gap-2">
-                {tab.bullets.map((bullet) => (
-                  <div key={bullet} className="flex gap-2 text-sm text-[#424b74]">
-                    <CheckCircle2 className="mt-0.5 shrink-0 text-[#69c48f]" size={16} />
-                    <p>{bullet}</p>
-                  </div>
-                ))}
-              </div>
-            </article>
+            <FeatureDetailCard key={tab.label} tab={tab} />
           ))}
         </div>
 
@@ -92,6 +82,81 @@ export function FeatureTabsSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+function MobileProductOverview() {
+  return (
+    <div className="grid gap-4 lg:hidden">
+      {productTabs.map((tab, index) => (
+        <article key={tab.label} className="rounded-2xl bg-white p-5 text-[#202557] shadow-2xl shadow-black/12">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="break-keep text-2xl font-semibold leading-8">{tab.label}</h3>
+              <p className="mt-2 break-keep text-base leading-7 text-[#60688e]">{tab.body}</p>
+            </div>
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#eef0ff] text-[#5862d9]">
+              {index === 0 ? <Minus size={21} /> : <Plus size={21} />}
+            </span>
+          </div>
+
+          {index === 0 ? (
+            <div className="mt-6">
+              <div className="rounded-xl bg-[#5fc0bd] p-4">
+                <div className="rounded-lg bg-white p-3 shadow-lg shadow-[#176b68]/18">
+                  <div className="flex items-center justify-between border-b border-[#dfe3ff] pb-2">
+                    <p className="text-sm font-semibold">학생·반 관리</p>
+                    <span className="rounded-md bg-[#eef0ff] px-2 py-1 text-xs font-semibold text-[#5862d9]">
+                      모바일
+                    </span>
+                  </div>
+                  <div className="mt-3 grid gap-2">
+                    {followupRows.slice(0, 3).map((row) => (
+                      <div key={row.student} className="flex items-center justify-between rounded-md bg-[#f6f7ff] px-3 py-2">
+                        <div>
+                          <p className="text-sm font-semibold">{row.student}</p>
+                          <p className="text-xs text-[#68709b]">{row.className}</p>
+                        </div>
+                        <span className="rounded-md bg-white px-2 py-1 text-xs text-[#5862d9]">{row.reason}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4">
+                {tab.bullets.map((bullet) => (
+                  <div key={bullet} className="flex gap-3 text-lg font-medium leading-7">
+                    <CheckCircle2 className="mt-1 shrink-0 text-[#5862d9]" size={20} />
+                    <p>{bullet}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function FeatureDetailCard({ tab }: { tab: (typeof productTabs)[number] }) {
+  return (
+    <article className="rounded-xl border border-[#dfe3ff] bg-white p-5 shadow-sm">
+      <p className="text-sm font-semibold text-[#5862d9]">{tab.label}</p>
+      <h3 className="mt-4 break-keep text-xl font-semibold leading-7 text-[#202557]">
+        {tab.title}
+      </h3>
+      <p className="mt-3 break-keep text-sm leading-6 text-[#60688e]">{tab.body}</p>
+      <div className="mt-5 grid gap-2">
+        {tab.bullets.map((bullet) => (
+          <div key={bullet} className="flex gap-2 text-sm text-[#424b74]">
+            <CheckCircle2 className="mt-0.5 shrink-0 text-[#69c48f]" size={16} />
+            <p>{bullet}</p>
+          </div>
+        ))}
+      </div>
+    </article>
   );
 }
 
