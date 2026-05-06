@@ -49,6 +49,23 @@ type MessagePreviewResponse = {
   error?: string;
 };
 
+type FollowupSaveState = {
+  key: string;
+  body: string;
+  status: "idle" | "saving" | "saved" | "error";
+  error: string;
+  followupId: string;
+};
+
+type CreateFollowupResponse = {
+  followup?: {
+    id: string;
+    status: string;
+    createdAt: string;
+  };
+  error?: string;
+};
+
 const quickReasonIds: FollowupReason[] = ["absence", "retest", "homework_missing"];
 
 export function OperationsBoard({
@@ -90,6 +107,13 @@ export function OperationsBoard({
     error: "",
   });
   const [messageDraft, setMessageDraft] = useState({ key: "", body: "" });
+  const [followupSave, setFollowupSave] = useState<FollowupSaveState>({
+    key: "",
+    body: "",
+    status: "idle",
+    error: "",
+    followupId: "",
+  });
   const messageBody =
     messageDraft.key === messageKey
       ? messageDraft.body
@@ -104,6 +128,18 @@ export function OperationsBoard({
     messagePreview.key === messageKey && messagePreview.status === "error";
   const isDraftEdited = isPreviewReady && messageBody !== messagePreview.body;
   const isMessageBlank = isPreviewReady && messageBody.trim().length === 0;
+  const isFollowupSaving =
+    followupSave.key === messageKey &&
+    followupSave.body === messageBody &&
+    followupSave.status === "saving";
+  const isFollowupSaved =
+    followupSave.key === messageKey &&
+    followupSave.body === messageBody &&
+    followupSave.status === "saved";
+  const followupSaveError =
+    followupSave.key === messageKey && followupSave.status === "error"
+      ? followupSave.error
+      : "";
   const shouldShowMobileSelectionBar =
     hasMobileFollowupSelection && Boolean(selectedStudent);
   const totalStudents = classes.reduce(
@@ -226,6 +262,60 @@ export function OperationsBoard({
     }
 
     setMessageDraft({ key: messageKey, body: messagePreview.body });
+  }
+
+  async function handleSaveFollowup() {
+    if (!selectedStudent || !isPreviewReady || isMessageBlank) {
+      return;
+    }
+
+    const bodyToSave = messageBody.trim();
+
+    setFollowupSave({
+      key: messageKey,
+      body: bodyToSave,
+      status: "saving",
+      error: "",
+      followupId: "",
+    });
+
+    try {
+      const response = await fetch("/api/followups", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId: selectedStudent.id,
+          reason: selectedReason,
+          messageBody: bodyToSave,
+        }),
+      });
+      const payload = (await response.json()) as CreateFollowupResponse;
+
+      if (!response.ok || !payload.followup) {
+        throw new Error(payload.error ?? "팔로업 기록을 저장하지 못했습니다.");
+      }
+
+      setFollowupSave({
+        key: messageKey,
+        body: bodyToSave,
+        status: "saved",
+        error: "",
+        followupId: payload.followup.id,
+      });
+    } catch (error) {
+      setFollowupSave({
+        key: messageKey,
+        body: bodyToSave,
+        status: "error",
+        error:
+          error instanceof Error
+            ? error.message
+            : "팔로업 기록을 저장하지 못했습니다.",
+        followupId: "",
+      });
+    }
   }
 
   if (classes.length === 0) {
@@ -400,15 +490,19 @@ export function OperationsBoard({
           composerId="desktop-message-composer"
           isDraftEdited={isDraftEdited}
           isMessageBlank={isMessageBlank}
+          isFollowupSaved={isFollowupSaved}
+          isFollowupSaving={isFollowupSaving}
           isPreviewError={isPreviewError}
           isPreviewLoading={isPreviewLoading}
           isPreviewReady={isPreviewReady}
+          followupSaveError={followupSaveError}
           messageBody={messageBody}
           messagePreview={messagePreview}
           selectedReason={selectedReason}
           selectedStudent={selectedStudent}
           onReasonChange={handleComposerReasonChange}
           onRestorePreview={handleRestorePreview}
+          onSaveFollowup={handleSaveFollowup}
           onMessageChange={(body) => setMessageDraft({ key: messageKey, body })}
         />
       </section>
@@ -437,9 +531,12 @@ export function OperationsBoard({
               composerId="mobile-message-composer"
               isDraftEdited={isDraftEdited}
               isMessageBlank={isMessageBlank}
+              isFollowupSaved={isFollowupSaved}
+              isFollowupSaving={isFollowupSaving}
               isPreviewError={isPreviewError}
               isPreviewLoading={isPreviewLoading}
               isPreviewReady={isPreviewReady}
+              followupSaveError={followupSaveError}
               messageBody={messageBody}
               messagePreview={messagePreview}
               selectedReason={selectedReason}
@@ -447,6 +544,7 @@ export function OperationsBoard({
               onClose={() => setIsMobileComposerOpen(false)}
               onReasonChange={handleComposerReasonChange}
               onRestorePreview={handleRestorePreview}
+              onSaveFollowup={handleSaveFollowup}
               onMessageChange={(body) => setMessageDraft({ key: messageKey, body })}
             />
           </div>
@@ -461,9 +559,12 @@ function MessageComposer({
   composerId,
   isDraftEdited,
   isMessageBlank,
+  isFollowupSaved,
+  isFollowupSaving,
   isPreviewError,
   isPreviewLoading,
   isPreviewReady,
+  followupSaveError,
   messageBody,
   messagePreview,
   selectedReason,
@@ -471,15 +572,19 @@ function MessageComposer({
   onClose,
   onReasonChange,
   onRestorePreview,
+  onSaveFollowup,
   onMessageChange,
 }: {
   className?: string;
   composerId: string;
   isDraftEdited: boolean;
   isMessageBlank: boolean;
+  isFollowupSaved: boolean;
+  isFollowupSaving: boolean;
   isPreviewError: boolean;
   isPreviewLoading: boolean;
   isPreviewReady: boolean;
+  followupSaveError: string;
   messageBody: string;
   messagePreview: MessagePreviewState;
   selectedReason: FollowupReason;
@@ -487,8 +592,11 @@ function MessageComposer({
   onClose?: () => void;
   onReasonChange: (reason: FollowupReason) => void;
   onRestorePreview: () => void;
+  onSaveFollowup: () => void;
   onMessageChange: (body: string) => void;
 }) {
+  const canSaveFollowup = isPreviewReady && !isMessageBlank && !isFollowupSaving;
+
   return (
     <section
       aria-labelledby={`${composerId}-title`}
@@ -631,19 +739,52 @@ function MessageComposer({
                 : isPreviewError
                   ? messagePreview.error
                   : isPreviewReady
-                    ? "미리보기만 생성했습니다. 저장과 dry-run 발송은 다음 단계에서 연결합니다."
+                    ? "발송 전에 먼저 팔로업 기록으로 저장합니다. dry-run 발송은 다음 티켓에서 연결합니다."
                     : "학생과 사유를 선택하면 문자 미리보기를 생성합니다."}
             </p>
           </div>
         </div>
 
+        {followupSaveError || isFollowupSaved ? (
+          <div
+            className={[
+              "rounded-md border p-3 text-sm leading-6",
+              followupSaveError
+                ? "border-red-200 bg-red-50 text-red-900"
+                : "border-emerald-200 bg-emerald-50 text-emerald-900",
+            ].join(" ")}
+          >
+            <div className="flex items-start gap-2">
+              {followupSaveError ? (
+                <AlertCircle className="mt-0.5 shrink-0" size={17} />
+              ) : (
+                <CheckCircle2 className="mt-0.5 shrink-0" size={17} />
+              )}
+              <p>
+                {followupSaveError ||
+                  "팔로업 기록을 저장했습니다. 다음 단계에서 dry-run 발송을 이어갑니다."}
+              </p>
+            </div>
+          </div>
+        ) : null}
+
         <button
           type="button"
-          disabled
-          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-stone-300 px-4 text-sm font-semibold text-stone-600"
+          disabled={!canSaveFollowup}
+          onClick={onSaveFollowup}
+          className={[
+            "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+            canSaveFollowup
+              ? "bg-stone-950 text-white hover:bg-stone-800"
+              : "bg-stone-300 text-stone-600",
+          ].join(" ")}
         >
           <Send size={17} />
-          dry-run 발송 준비 중
+          {isFollowupSaving
+            ? "저장 중"
+            : isFollowupSaved
+              ? "저장 완료"
+              : "팔로업 기록 저장"}
         </button>
       </div>
     </section>
