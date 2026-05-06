@@ -1,39 +1,46 @@
-import { roleCards } from "@/lib/landing-content";
+import { ArrowRight, Building2, Home, MapPin, School, Shuffle, UsersRound } from "lucide-react";
+import { audienceMenuItems } from "@/lib/landing-content";
 
 export function RoleSection() {
   return (
-    <section className="border-y border-[#123b3b]/10 bg-white py-14 sm:py-16">
+    <section id="audiences" className="border-y border-[#dfe3ff] bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
-        <div className="grid gap-6 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
+        <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
           <div>
-            <p className="text-sm font-semibold text-[#3a6b5a]">역할별로 보는 제품</p>
-            <h2 className="mt-3 max-w-md break-keep text-3xl font-semibold leading-tight text-[#123b3b] sm:text-4xl">
-              같은 화면을 모두에게 강요하지 않습니다.
+            <p className="text-sm font-semibold text-[#5862d9]">누구를 위한 서비스인가</p>
+            <h2 className="mt-4 max-w-md break-keep text-4xl font-semibold leading-tight text-[#202557] sm:text-5xl">
+              홈스쿨링이 아니라, 센터형 교육기관에 맞춥니다.
             </h2>
+            <p className="mt-5 max-w-md break-keep text-base leading-7 text-[#60688e]">
+              Brightwheel의 preschool 구조는 “집에서 하는 돌봄”보다 “교육 프로그램이 있는 기관
+              운영”에 가깝습니다. 우리는 한국 학원 기준으로 다시 분류합니다.
+            </p>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
-            {roleCards.map((card) => (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {audienceMenuItems.map((card, index) => {
+              const Icon = audienceIcons[index] ?? School;
+              return (
               <article
-                key={card.role}
-                className="rounded-xl border border-[#123b3b]/12 bg-[#f8faf4] p-5"
+                key={card.title}
+                className="group rounded-xl border border-[#dfe3ff] bg-[#f8f9ff] p-5 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-xl hover:shadow-[#26328f]/8"
               >
-                <p className="text-sm font-semibold text-[#3a6b5a]">{card.role}</p>
-                <h3 className="mt-3 break-keep text-lg font-semibold leading-7 text-[#123b3b]">
-                  {card.title}
-                </h3>
-                <div className="mt-5 grid gap-2">
-                  {card.points.map((point) => (
-                    <p key={point} className="rounded-md bg-white px-3 py-2 text-sm text-[#42534d]">
-                      {point}
-                    </p>
-                  ))}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-white text-[#5862d9]">
+                    <Icon size={19} />
+                  </div>
+                  <ArrowRight size={17} className="mt-2 text-[#8d94be] transition group-hover:translate-x-1 group-hover:text-[#5862d9]" />
                 </div>
+                <h3 className="mt-5 break-keep text-lg font-semibold leading-7 text-[#202557]">{card.title}</h3>
+                <p className="mt-2 break-keep text-sm leading-6 text-[#60688e]">{card.body}</p>
               </article>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
     </section>
   );
 }
+
+const audienceIcons = [School, Building2, MapPin, Shuffle, UsersRound, Home];

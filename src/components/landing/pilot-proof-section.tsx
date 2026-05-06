@@ -10,25 +10,29 @@ const proofItems = [
 
 export function PilotProofSection() {
   return (
-    <section className="border-y border-[#123b3b]/10 bg-white py-16 sm:py-20">
+    <section className="border-y border-[#dfe3ff] bg-white py-16 sm:py-20">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
         <div>
-          <p className="text-sm font-semibold text-[#3a6b5a]">첫 검증</p>
-          <h2 className="mt-4 max-w-xl break-keep text-4xl font-semibold leading-tight text-[#123b3b] sm:text-5xl">
-            실제 학원 규모를 기준으로 화면과 흐름을 맞춥니다.
+          <p className="text-sm font-semibold text-[#5862d9]">첫 검증</p>
+          <h2 className="mt-4 max-w-xl break-keep text-4xl font-semibold leading-tight text-[#202557] sm:text-5xl">
+            실제 학원 규모를 기준으로 제품 범위를 좁힙니다.
           </h2>
+          <p className="mt-5 max-w-xl break-keep text-base leading-8 text-[#60688e]">
+            상업화 방향은 넓게 잡되, 지금 개발은 친구 학원의 실제 업무에서 반복되는 흐름부터
+            확인합니다.
+          </p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           {proofItems.map((item) => {
             const Icon = item.icon;
             return (
-              <article key={item.label} className="rounded-xl bg-[#f8faf4] p-5">
-                <div className="mb-5 flex size-10 items-center justify-center rounded-md bg-white text-[#123b3b]">
+              <article key={item.label} className="rounded-xl border border-[#dfe3ff] bg-[#f8f9ff] p-5">
+                <div className="mb-5 flex size-10 items-center justify-center rounded-md bg-white text-[#5862d9]">
                   <Icon size={19} />
                 </div>
-                <p className="text-sm text-[#687872]">{item.label}</p>
-                <p className="mt-2 break-keep text-lg font-semibold leading-7 text-[#123b3b]">
+                <p className="text-sm text-[#68709b]">{item.label}</p>
+                <p className="mt-2 break-keep text-lg font-semibold leading-7 text-[#202557]">
                   {item.value}
                 </p>
               </article>

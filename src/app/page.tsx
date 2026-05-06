@@ -11,7 +11,7 @@ import { RoleSection } from "@/components/landing/role-section";
 
 export default function Home() {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f6f4ed] text-[#123b3b]">
+    <main className="min-h-screen overflow-x-hidden bg-white text-[#202557]">
       <LandingHeader />
       <HeroSection />
       <RoleSection />
