@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   AlertCircle,
@@ -10,11 +10,7 @@ import {
   Send,
   UsersRound,
 } from "lucide-react";
-import {
-  buildFollowupMessage,
-  followupReasons,
-  type FollowupReason,
-} from "@/lib/followup-templates";
+import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 
 export type OperationsStudent = {
   id: string;
@@ -35,15 +31,27 @@ export type OperationsClass = {
 
 type OperationsBoardProps = {
   academyName: string;
-  senderName: string;
   teacherName: string;
   roleLabel: string;
   classes: OperationsClass[];
 };
 
+type MessagePreviewState = {
+  key: string;
+  status: "idle" | "ready" | "error";
+  title: string;
+  body: string;
+  error: string;
+};
+
+type MessagePreviewResponse = {
+  title?: string;
+  body?: string;
+  error?: string;
+};
+
 export function OperationsBoard({
   academyName,
-  senderName,
   teacherName,
   roleLabel,
   classes,
@@ -69,28 +77,94 @@ export function OperationsBoard({
     );
   }, [selectedClass, selectedStudentId]);
 
-  const generatedMessage = useMemo(() => {
-    if (!selectedStudent) {
-      return "";
-    }
-
-    return buildFollowupMessage({
-      academyName: senderName,
-      studentName: selectedStudent.name,
-      teacherName,
-      reason: selectedReason,
-    });
-  }, [selectedReason, selectedStudent, senderName, teacherName]);
-
   const messageKey = `${selectedClass?.id ?? ""}:${selectedStudent?.id ?? ""}:${selectedReason}`;
+  const selectedStudentIdForPreview = selectedStudent?.id ?? "";
+  const [messagePreview, setMessagePreview] = useState<MessagePreviewState>({
+    key: "",
+    status: "idle",
+    title: "",
+    body: "",
+    error: "",
+  });
   const [messageDraft, setMessageDraft] = useState({ key: "", body: "" });
   const messageBody =
-    messageDraft.key === messageKey ? messageDraft.body : generatedMessage;
+    messageDraft.key === messageKey
+      ? messageDraft.body
+      : messagePreview.key === messageKey
+        ? messagePreview.body
+        : "";
+  const isPreviewLoading =
+    Boolean(selectedStudentIdForPreview) && messagePreview.key !== messageKey;
+  const isPreviewReady =
+    messagePreview.key === messageKey && messagePreview.status === "ready";
+  const isPreviewError =
+    messagePreview.key === messageKey && messagePreview.status === "error";
 
   const totalStudents = classes.reduce(
     (total, classItem) => total + classItem.students.length,
     0,
   );
+
+  useEffect(() => {
+    if (!selectedStudentIdForPreview) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const nextMessageKey = messageKey;
+
+    async function loadPreview() {
+      try {
+        const response = await fetch("/api/messages/preview", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            studentId: selectedStudentIdForPreview,
+            reason: selectedReason,
+          }),
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as MessagePreviewResponse;
+
+        if (!response.ok || !payload.body) {
+          throw new Error(payload.error ?? "문자 미리보기를 만들지 못했습니다.");
+        }
+
+        setMessagePreview({
+          key: nextMessageKey,
+          status: "ready",
+          title: payload.title ?? "문자 미리보기",
+          body: payload.body,
+          error: "",
+        });
+        setMessageDraft({ key: nextMessageKey, body: payload.body });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setMessagePreview({
+          key: nextMessageKey,
+          status: "error",
+          title: "",
+          body: "",
+          error:
+            error instanceof Error
+              ? error.message
+              : "문자 미리보기를 만들지 못했습니다.",
+        });
+        setMessageDraft({ key: "", body: "" });
+      }
+    }
+
+    void loadPreview();
+
+    return () => {
+      controller.abort();
+    };
+  }, [messageKey, selectedReason, selectedStudentIdForPreview]);
 
   function handleClassSelect(classId: string) {
     const nextClass = classes.find((classItem) => classItem.id === classId);
@@ -132,7 +206,7 @@ export function OperationsBoard({
           <div className="grid grid-cols-3 gap-2 lg:min-w-[390px]">
             <Metric label="반" value={`${classes.length}개`} />
             <Metric label="학생" value={`${totalStudents}명`} />
-            <Metric label="발송" value="준비" />
+            <Metric label="문자" value={isPreviewReady ? "미리보기" : "준비"} />
           </div>
         </div>
       </section>
@@ -287,7 +361,7 @@ export function OperationsBoard({
                 htmlFor="message-body"
                 className="text-sm font-semibold text-stone-800"
               >
-                문자 미리보기
+                {isPreviewReady ? messagePreview.title : "문자 미리보기"}
               </label>
               <textarea
                 id="message-body"
@@ -295,20 +369,40 @@ export function OperationsBoard({
                 onChange={(event) =>
                   setMessageDraft({ key: messageKey, body: event.target.value })
                 }
+                disabled={!isPreviewReady}
+                aria-busy={isPreviewLoading}
+                placeholder={
+                  isPreviewLoading
+                    ? "문자 초안을 불러오는 중입니다."
+                    : "학생과 사유를 선택하면 문자 초안이 표시됩니다."
+                }
                 rows={8}
-                className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 sm:min-h-48"
+                className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition disabled:bg-stone-50 disabled:text-stone-500 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 sm:min-h-48"
               />
               <p className="mt-2 text-xs text-stone-500">
-                {messageBody.length}자 · 실제 발송 전 원장/선생님이 문구를 수정할 수 있습니다.
+                {messageBody.length}자 · DB 템플릿으로 생성한 뒤 발송 전 문구를 수정할 수
+                있습니다.
               </p>
             </div>
 
-            <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900">
+            <div
+              className={[
+                "rounded-md border p-3 text-sm leading-6",
+                isPreviewError
+                  ? "border-red-200 bg-red-50 text-red-900"
+                  : "border-stone-200 bg-stone-50 text-stone-700",
+              ].join(" ")}
+            >
               <div className="flex items-start gap-2">
                 <AlertCircle className="mt-0.5 shrink-0" size={17} />
                 <p>
-                  지금은 화면 흐름 확인 단계입니다. 다음 티켓에서 미리보기 API와 dry-run
-                  저장을 연결합니다.
+                  {isPreviewLoading
+                    ? "학원별 문자 템플릿을 불러오는 중입니다."
+                    : isPreviewError
+                      ? messagePreview.error
+                      : isPreviewReady
+                        ? "실제 발송 없이 문자 미리보기만 생성했습니다. dry-run 저장과 발송은 다음 티켓에서 연결합니다."
+                        : "학생과 사유를 선택하면 문자 미리보기를 생성합니다."}
                 </p>
               </div>
             </div>

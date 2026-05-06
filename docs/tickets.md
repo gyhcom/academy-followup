@@ -455,18 +455,23 @@
 
 ### T-305 문자 미리보기 생성
 
-상태: 예정
+상태: 완료
 
 목표:
 - 학생과 사유를 선택하면 학원별 템플릿으로 문자 초안 생성
 
 작업:
-- `POST /api/messages/preview`
-- 템플릿 변수 치환
-- 본문 수정 가능 UI
+- `POST /api/messages/preview`: 완료
+- 템플릿 변수 치환: 완료
+- 본문 수정 가능 UI: 완료
 
 완료 기준:
 - 실제 발송 없이 문자 미리보기 생성 가능
+
+메모:
+- 미리보기 API는 로그인 세션을 확인한 뒤 service role로 `profiles`, `students`, `classes`, `message_templates`를 조회합니다.
+- owner/manager는 학원 전체 학생 미리보기가 가능하고, teacher/assistant는 담당 반 학생만 허용합니다.
+- 템플릿 변수는 `{{academyName}}`, `{{studentName}}`, `{{teacherName}}`, `{{className}}`와 한국어 변수명을 함께 지원합니다.
 
 ### T-306 문자 본문 수정 UI
 

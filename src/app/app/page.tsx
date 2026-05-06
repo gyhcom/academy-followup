@@ -150,7 +150,6 @@ export default async function AppPage() {
     >
       <OperationsBoard
         academyName={profile.academies.name}
-        senderName={profile.academies.sender_name ?? profile.academies.name}
         teacherName={profile.name}
         roleLabel={roleLabel(profile.role)}
         classes={operationsClasses}

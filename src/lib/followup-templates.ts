@@ -17,11 +17,20 @@ export const followupReasons: Array<{ id: FollowupReason; label: string }> = [
   { id: "consultation", label: "상담 권장" },
 ];
 
+const followupReasonIds = new Set(followupReasons.map((reason) => reason.id));
+
 type BuildFollowupMessageInput = {
   academyName: string;
   studentName: string;
   teacherName: string;
   reason: FollowupReason;
+};
+
+type RenderFollowupTemplateInput = {
+  academyName: string;
+  studentName: string;
+  teacherName: string;
+  className?: string;
 };
 
 const templates: Record<FollowupReason, string> = {
@@ -41,9 +50,32 @@ const templates: Record<FollowupReason, string> = {
     "[{{academyName}}] 안녕하세요. {{studentName}} 학생의 최근 학습 흐름에 대해 간단한 상담이 필요하여 안내드립니다.\n가능하신 시간에 {{teacherName}}에게 연락 부탁드립니다.",
 };
 
+export function isFollowupReason(value: unknown): value is FollowupReason {
+  return typeof value === "string" && followupReasonIds.has(value as FollowupReason);
+}
+
+export function renderFollowupTemplate(
+  templateBody: string,
+  input: RenderFollowupTemplateInput,
+) {
+  const values: Record<string, string> = {
+    academyName: input.academyName,
+    "학원명": input.academyName,
+    studentName: input.studentName,
+    "학생명": input.studentName,
+    teacherName: input.teacherName,
+    "선생님명": input.teacherName,
+    "담당선생님": input.teacherName,
+    className: input.className ?? "",
+    "반명": input.className ?? "",
+  };
+
+  return Object.entries(values).reduce(
+    (message, [key, value]) => message.replaceAll(`{{${key}}}`, value),
+    templateBody,
+  );
+}
+
 export function buildFollowupMessage(input: BuildFollowupMessageInput) {
-  return templates[input.reason]
-    .replaceAll("{{academyName}}", input.academyName)
-    .replaceAll("{{studentName}}", input.studentName)
-    .replaceAll("{{teacherName}}", input.teacherName);
+  return renderFollowupTemplate(templates[input.reason], input);
 }
