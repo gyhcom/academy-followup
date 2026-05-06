@@ -7,6 +7,7 @@ import {
   MessageSquareText,
   RotateCcw,
   Send,
+  X,
 } from "lucide-react";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 
@@ -65,6 +66,8 @@ export function OperationsBoard({
     selectedClass?.students[0]?.id ?? "",
   );
   const [selectedReason, setSelectedReason] = useState<FollowupReason>("absence");
+  const [hasMobileFollowupSelection, setHasMobileFollowupSelection] = useState(false);
+  const [isMobileComposerOpen, setIsMobileComposerOpen] = useState(false);
 
   const selectedStudent = useMemo(() => {
     if (!selectedClass) {
@@ -101,6 +104,8 @@ export function OperationsBoard({
     messagePreview.key === messageKey && messagePreview.status === "error";
   const isDraftEdited = isPreviewReady && messageBody !== messagePreview.body;
   const isMessageBlank = isPreviewReady && messageBody.trim().length === 0;
+  const shouldShowMobileSelectionBar =
+    hasMobileFollowupSelection && Boolean(selectedStudent);
   const totalStudents = classes.reduce(
     (total, classItem) => total + classItem.students.length,
     0,
@@ -167,15 +172,52 @@ export function OperationsBoard({
     };
   }, [messageKey, selectedReason, selectedStudentIdForPreview]);
 
+  useEffect(() => {
+    if (!isMobileComposerOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsMobileComposerOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMobileComposerOpen]);
+
   function handleClassSelect(classId: string) {
     const nextClass = classes.find((classItem) => classItem.id === classId);
     setSelectedClassId(classId);
     setSelectedStudentId(nextClass?.students[0]?.id ?? "");
+    setHasMobileFollowupSelection(false);
+    setIsMobileComposerOpen(false);
+  }
+
+  function handleStudentSelect(studentId: string) {
+    setSelectedStudentId(studentId);
+    setHasMobileFollowupSelection(false);
+    setIsMobileComposerOpen(false);
   }
 
   function handleStudentReasonSelect(studentId: string, reasonId: FollowupReason) {
     setSelectedStudentId(studentId);
     setSelectedReason(reasonId);
+    setHasMobileFollowupSelection(true);
+    setIsMobileComposerOpen(false);
+  }
+
+  function handleComposerReasonChange(reasonId: FollowupReason) {
+    setSelectedReason(reasonId);
+    setHasMobileFollowupSelection(Boolean(selectedStudent));
   }
 
   function handleRestorePreview() {
@@ -203,7 +245,14 @@ export function OperationsBoard({
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:space-y-5">
+    <div
+      className={[
+        "mx-auto max-w-6xl space-y-4 sm:space-y-5",
+        shouldShowMobileSelectionBar
+          ? "pb-[calc(8rem+env(safe-area-inset-bottom))] lg:pb-[max(1rem,env(safe-area-inset-bottom))]"
+          : "pb-[max(1rem,env(safe-area-inset-bottom))]",
+      ].join(" ")}
+    >
       <section className="rounded-lg border border-stone-200 bg-white px-4 py-4 shadow-sm sm:px-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
@@ -213,7 +262,7 @@ export function OperationsBoard({
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
               {teacherName}님은 {roleLabel} 권한입니다. 학생 옆 사유를 누르면 학부모
-              문자 초안이 아래에 열립니다.
+              문자 초안 확인 바가 열립니다.
             </p>
           </div>
 
@@ -291,7 +340,7 @@ export function OperationsBoard({
                     <div className="flex items-start justify-between gap-3">
                       <button
                         type="button"
-                        onClick={() => setSelectedStudentId(student.id)}
+                        onClick={() => handleStudentSelect(student.id)}
                         className="min-w-0 text-left"
                       >
                         <span className="block text-base font-semibold text-stone-950">
@@ -347,6 +396,8 @@ export function OperationsBoard({
         </section>
 
         <MessageComposer
+          className="hidden lg:block"
+          composerId="desktop-message-composer"
           isDraftEdited={isDraftEdited}
           isMessageBlank={isMessageBlank}
           isPreviewError={isPreviewError}
@@ -356,16 +407,58 @@ export function OperationsBoard({
           messagePreview={messagePreview}
           selectedReason={selectedReason}
           selectedStudent={selectedStudent}
-          onReasonChange={setSelectedReason}
+          onReasonChange={handleComposerReasonChange}
           onRestorePreview={handleRestorePreview}
           onMessageChange={(body) => setMessageDraft({ key: messageKey, body })}
         />
       </section>
+
+      {shouldShowMobileSelectionBar ? (
+        <MobileSelectionBar
+          isPreviewLoading={isPreviewLoading}
+          isPreviewReady={isPreviewReady}
+          selectedReason={selectedReason}
+          selectedStudent={selectedStudent}
+          onOpenComposer={() => setIsMobileComposerOpen(true)}
+        />
+      ) : null}
+
+      {isMobileComposerOpen ? (
+        <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true">
+          <button
+            type="button"
+            aria-label="문자 작성 닫기"
+            className="absolute inset-0 bg-stone-950/35"
+            onClick={() => setIsMobileComposerOpen(false)}
+          />
+          <div className="absolute inset-x-0 bottom-0 max-h-[calc(100dvh-2.5rem)] overflow-y-auto rounded-t-2xl bg-white shadow-2xl">
+            <MessageComposer
+              className="rounded-none border-0 shadow-none"
+              composerId="mobile-message-composer"
+              isDraftEdited={isDraftEdited}
+              isMessageBlank={isMessageBlank}
+              isPreviewError={isPreviewError}
+              isPreviewLoading={isPreviewLoading}
+              isPreviewReady={isPreviewReady}
+              messageBody={messageBody}
+              messagePreview={messagePreview}
+              selectedReason={selectedReason}
+              selectedStudent={selectedStudent}
+              onClose={() => setIsMobileComposerOpen(false)}
+              onReasonChange={handleComposerReasonChange}
+              onRestorePreview={handleRestorePreview}
+              onMessageChange={(body) => setMessageDraft({ key: messageKey, body })}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
 
 function MessageComposer({
+  className = "",
+  composerId,
   isDraftEdited,
   isMessageBlank,
   isPreviewError,
@@ -375,10 +468,13 @@ function MessageComposer({
   messagePreview,
   selectedReason,
   selectedStudent,
+  onClose,
   onReasonChange,
   onRestorePreview,
   onMessageChange,
 }: {
+  className?: string;
+  composerId: string;
   isDraftEdited: boolean;
   isMessageBlank: boolean;
   isPreviewError: boolean;
@@ -388,25 +484,40 @@ function MessageComposer({
   messagePreview: MessagePreviewState;
   selectedReason: FollowupReason;
   selectedStudent: OperationsStudent | undefined;
+  onClose?: () => void;
   onReasonChange: (reason: FollowupReason) => void;
   onRestorePreview: () => void;
   onMessageChange: (body: string) => void;
 }) {
   return (
     <section
-      aria-labelledby="message-composer-title"
-      className="rounded-lg border border-stone-200 bg-white shadow-sm lg:sticky lg:top-5"
+      aria-labelledby={`${composerId}-title`}
+      className={[
+        "rounded-lg border border-stone-200 bg-white shadow-sm lg:sticky lg:top-5",
+        className,
+      ].join(" ")}
     >
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
           <MessageSquareText className="text-emerald-700" size={18} />
-          <h2 id="message-composer-title" className="text-sm font-semibold text-stone-950">
+          <h2 id={`${composerId}-title`} className="text-sm font-semibold text-stone-950">
             학부모 문자
           </h2>
           {isPreviewReady ? (
             <span className="ml-auto rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800">
               수정 가능
             </span>
+          ) : null}
+          {onClose ? (
+            <button
+              type="button"
+              aria-label="문자 작성 닫기"
+              title="닫기"
+              onClick={onClose}
+              className="ml-1 flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+            >
+              <X size={16} />
+            </button>
           ) : null}
         </div>
         <p className="mt-1 text-xs text-stone-500">
@@ -457,7 +568,7 @@ function MessageComposer({
         <div>
           <div className="flex items-center justify-between gap-2">
             <label
-              htmlFor="message-body"
+              htmlFor={`${composerId}-message-body`}
               className="truncate text-sm font-semibold text-stone-800"
             >
               {isPreviewReady ? messagePreview.title : "문자 미리보기"}
@@ -474,7 +585,7 @@ function MessageComposer({
             </button>
           </div>
           <textarea
-            id="message-body"
+            id={`${composerId}-message-body`}
             value={messageBody}
             onChange={(event) => onMessageChange(event.target.value)}
             disabled={!isPreviewReady}
@@ -536,6 +647,50 @@ function MessageComposer({
         </button>
       </div>
     </section>
+  );
+}
+
+function MobileSelectionBar({
+  isPreviewLoading,
+  isPreviewReady,
+  selectedReason,
+  selectedStudent,
+  onOpenComposer,
+}: {
+  isPreviewLoading: boolean;
+  isPreviewReady: boolean;
+  selectedReason: FollowupReason;
+  selectedStudent: OperationsStudent | undefined;
+  onOpenComposer: () => void;
+}) {
+  if (!selectedStudent) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-stone-200 bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_30px_rgba(28,25,23,0.12)] backdrop-blur lg:hidden">
+      <div className="mx-auto flex max-w-6xl items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-stone-950">
+            {selectedStudent.name} · {reasonLabel(selectedReason)}
+          </p>
+          <p className="mt-0.5 truncate text-xs text-stone-500">
+            {isPreviewLoading
+              ? "문자 초안을 준비하는 중입니다."
+              : isPreviewReady
+                ? "문자 초안이 준비됐습니다."
+                : "확인 후 문구를 수정할 수 있습니다."}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onOpenComposer}
+          className="min-h-11 shrink-0 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white"
+        >
+          확인/수정
+        </button>
+      </div>
+    </div>
   );
 }
 
