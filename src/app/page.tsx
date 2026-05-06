@@ -17,38 +17,38 @@ import type { ReactNode } from "react";
 import { demoAcademy } from "@/lib/demo-academy";
 
 const painPoints = [
-  "결석, 재시험, 숙제 미완료 안내가 선생님마다 다른 방식으로 나감",
-  "문자는 보냈지만 누가 언제 어떤 내용으로 보냈는지 기록이 남지 않음",
-  "수업 끝난 직후가 가장 바쁜데, 문구를 매번 새로 쓰거나 복붙해야 함",
+  "선생님마다 문구가 다름",
+  "누가 보냈는지 기록이 없음",
+  "수업 후 복붙이 반복됨",
 ];
 
 const workflow = [
   {
     title: "반 선택",
-    description: "오늘 수업한 반을 고릅니다.",
+    description: "오늘 처리할 반을 고릅니다.",
     icon: ClipboardCheck,
   },
   {
     title: "학생 선택",
-    description: "학부모에게 안내가 필요한 학생을 누릅니다.",
+    description: "안내가 필요한 학생을 누릅니다.",
     icon: UsersRound,
   },
   {
     title: "사유 선택",
-    description: "결석, 재시험, 상담 등 상황을 선택합니다.",
+    description: "결석, 재시험, 상담 등 사유를 고릅니다.",
     icon: MousePointerClick,
   },
   {
     title: "문자 확인",
-    description: "학원 말투로 만든 초안을 확인하고 기록합니다.",
+    description: "초안을 확인하고 기록을 남깁니다.",
     icon: MessageSquareText,
   },
 ];
 
 const outcomes = [
-  "선생님은 수업 직후 10초 안에 안내 초안을 만들 수 있습니다.",
-  "원장은 오늘 어떤 학생에게 어떤 안내가 나갔는지 확인할 수 있습니다.",
-  "학원별 말투와 발신명 기준을 맞춰 학부모 커뮤니케이션을 정리합니다.",
+  "선생님은 10초 안에 초안을 만듭니다.",
+  "원장은 발송 기록을 확인합니다.",
+  "학원 말투를 일정하게 유지합니다.",
 ];
 
 const previewStudents = [
@@ -63,7 +63,7 @@ export default function Home() {
       <header className="sticky top-0 z-30 border-b border-stone-200 bg-white/92 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-8">
           <Link href="/" className="flex items-center gap-3" aria-label="Academy Follow-up 홈">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-700 text-white">
+            <div className="flex size-10 items-center justify-center rounded-lg bg-stone-950 text-white">
               <School size={21} />
             </div>
             <div>
@@ -94,25 +94,25 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="border-b border-stone-200 bg-stone-50">
+      <section className="border-b border-stone-200 bg-white">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 py-12 sm:px-8 sm:py-16 lg:grid-cols-[0.9fr_1.1fr] lg:py-20">
           <div className="min-w-0 max-w-2xl">
             <h1 className="break-keep text-4xl font-semibold leading-tight tracking-normal text-stone-950 sm:text-5xl lg:text-6xl">
-              수업 후 학부모 안내,
+              결석·재시험 문자,
               <br />
-              학생 이름만 누르면 끝.
+              아직도 선생님마다 따로 보내나요?
             </h1>
             <p className="mt-5 max-w-full break-keep text-base leading-8 text-stone-600 sm:text-lg">
-              Academy Follow-up은 학원 선생님이 결석, 재시험, 숙제 미완료, 상담 권장
-              문자를 빠르게 만들고 기록까지 남기는 운영 보드입니다.
+              수업 끝나고 10초. 반, 학생, 사유만 선택하면 학부모 안내 초안과 기록이
+              남습니다.
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/login"
-                className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-emerald-700 px-5 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-stone-950 px-5 text-sm font-semibold text-white transition hover:bg-stone-800"
               >
-                학원 운영 보드 보기
+                운영 보드 보기
                 <ArrowRight size={17} />
               </Link>
               <a
@@ -124,9 +124,9 @@ export default function Home() {
             </div>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              <HeroStat label="예상 원생 규모" value={`${demoAcademy.stats.students}+`} />
-              <HeroStat label="선생님/스태프" value={`${demoAcademy.stats.staff}명`} />
-              <HeroStat label="핵심 작업" value="문자 팔로업" />
+              <HeroStat label="파일럿 규모" value={`${demoAcademy.stats.students}+`} />
+              <HeroStat label="운영 인원" value={`${demoAcademy.stats.staff}명`} />
+              <HeroStat label="첫 검증" value="결석·재시험" />
             </div>
           </div>
 
@@ -138,11 +138,10 @@ export default function Home() {
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-8">
           <div className="max-w-3xl">
             <h2 className="text-3xl font-semibold tracking-normal text-stone-950 sm:text-4xl">
-              학원 문자 업무는 작아 보여도 운영 품질을 바로 흔듭니다.
+              먼저 이 문제부터 줄입니다.
             </h2>
             <p className="mt-4 text-base leading-7 text-stone-600">
-              특히 원생 200명 이상, 선생님 10명 이상이 되면 개인 휴대폰과 기억에 의존한
-              안내는 금방 흐트러집니다.
+              원생과 선생님이 늘면 문자 하나도 기억과 개인 휴대폰에 맡기기 어렵습니다.
             </p>
           </div>
 
@@ -164,11 +163,10 @@ export default function Home() {
           <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
             <div>
               <h2 className="text-3xl font-semibold tracking-normal text-stone-950 sm:text-4xl">
-                선생님 기준으로 만든 4단계 흐름
+                휴대폰에서 끝나는 4단계
               </h2>
               <p className="mt-4 text-base leading-7 text-stone-600">
-                기능을 많이 넣기보다, 수업 직후 가장 자주 반복되는 업무를 한 화면에서 끝내는
-                데 집중합니다.
+                반, 학생, 사유, 문자 확인. 선생님 화면은 이 네 단계만 먼저 잘하면 됩니다.
               </p>
             </div>
 
@@ -178,10 +176,10 @@ export default function Home() {
                 return (
                   <div key={item.title} className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
                     <div className="flex items-center gap-3">
-                      <div className="flex size-10 items-center justify-center rounded-md bg-emerald-50 text-emerald-800">
+                      <div className="flex size-10 items-center justify-center rounded-md bg-white text-stone-800 shadow-sm">
                         <Icon size={20} />
                       </div>
-                      <p className="text-sm font-semibold text-emerald-700">0{index + 1}</p>
+                      <p className="text-sm font-semibold text-stone-500">0{index + 1}</p>
                     </div>
                     <h3 className="mt-5 text-lg font-semibold text-stone-950">{item.title}</h3>
                     <p className="mt-2 text-sm leading-6 text-stone-600">{item.description}</p>
@@ -198,10 +196,10 @@ export default function Home() {
           <div className="rounded-xl border border-stone-200 bg-stone-950 p-5 text-white shadow-sm sm:p-6">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <p className="text-sm font-medium text-emerald-300">{demoAcademy.name}</p>
+                <p className="text-sm font-medium text-stone-300">{demoAcademy.name}</p>
                 <h2 className="mt-1 text-xl font-semibold">오늘의 팔로업</h2>
               </div>
-              <div className="rounded-md bg-emerald-500/15 px-3 py-2 text-sm font-semibold text-emerald-200">
+              <div className="rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-stone-100">
                 4건 대기
               </div>
             </div>
@@ -214,7 +212,7 @@ export default function Home() {
                     className={[
                       "rounded-lg border px-3 py-3",
                       index === 0
-                        ? "border-emerald-400 bg-emerald-400/10"
+                        ? "border-white/35 bg-white/10"
                         : "border-white/10 bg-white/5",
                     ].join(" ")}
                   >
@@ -243,7 +241,7 @@ export default function Home() {
                   <button className="min-h-10 rounded-md border border-stone-200 text-sm font-semibold text-stone-700">
                     수정
                   </button>
-                  <button className="min-h-10 rounded-md bg-emerald-700 text-sm font-semibold text-white">
+                  <button className="min-h-10 rounded-md bg-stone-950 text-sm font-semibold text-white">
                     발송 준비
                   </button>
                 </div>
@@ -253,12 +251,12 @@ export default function Home() {
 
           <div>
             <h2 className="text-3xl font-semibold tracking-normal text-stone-950 sm:text-4xl">
-              원장은 기록을 보고, 선생님은 버튼만 누릅니다.
+              원장은 기록을 보고, 선생님은 선택만 합니다.
             </h2>
             <div className="mt-6 space-y-4">
               {outcomes.map((item) => (
                 <div key={item} className="flex gap-3">
-                  <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-700" size={20} />
+                  <CheckCircle2 className="mt-0.5 shrink-0 text-stone-800" size={20} />
                   <p className="text-base leading-7 text-stone-700">{item}</p>
                 </div>
               ))}
@@ -271,11 +269,10 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 sm:px-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <h2 className="text-3xl font-semibold tracking-normal text-stone-950 sm:text-4xl">
-              첫 파일럿은 실제 학원 운영 규모에 맞춰 검증합니다.
+              첫 파일럿은 좁게 검증합니다.
             </h2>
             <p className="mt-4 text-base leading-7 text-stone-600">
-              처음부터 거대한 학원 CRM을 만들기보다, 더배움프라임영수학원의 실제 수업 후
-              문자 업무부터 좁게 검증합니다.
+              더배움프라임영수학원에서 결석·재시험 문자 흐름부터 확인합니다.
             </p>
           </div>
 
@@ -288,18 +285,17 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-emerald-800 py-14 text-white sm:py-16">
+      <section className="bg-stone-950 py-14 text-white sm:py-16">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-3xl font-semibold tracking-normal">학원 문자 팔로업부터 작게 시작합니다.</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-emerald-50">
-              다음 단계는 문자 미리보기 API와 dry-run 발송 기록입니다. 실제 비용 없이 파일럿
-              흐름을 먼저 검증합니다.
+            <h2 className="text-3xl font-semibold tracking-normal">실제 발송 전, 흐름부터 검증합니다.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-300">
+              미리보기, 기록 저장, dry-run, 중복 방지 후 실제 문자 수신 테스트로 넘어갑니다.
             </p>
           </div>
           <Link
             href="/login"
-            className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-white px-5 text-sm font-semibold text-emerald-900 transition hover:bg-emerald-50"
+            className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-white px-5 text-sm font-semibold text-stone-950 transition hover:bg-stone-100"
           >
             로그인해서 확인하기
             <ArrowRight size={17} />
@@ -320,9 +316,6 @@ export default function Home() {
 function ProductPreview() {
   return (
     <div className="relative mx-auto w-full min-w-0 max-w-2xl">
-      <div className="absolute -left-4 top-16 hidden h-28 w-28 rounded-full bg-emerald-200/60 blur-3xl sm:block" />
-      <div className="absolute -right-4 bottom-10 hidden h-32 w-32 rounded-full bg-sky-200/60 blur-3xl sm:block" />
-
       <div className="relative rounded-2xl border border-stone-200 bg-white p-3 shadow-xl sm:p-4">
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-3 sm:p-4">
           <div className="mb-4 flex items-center justify-between">
@@ -330,20 +323,20 @@ function ProductPreview() {
               <p className="text-xs font-medium text-stone-500">모바일 운영 화면</p>
               <p className="text-base font-semibold text-stone-950">오늘의 팔로업</p>
             </div>
-            <div className="flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-800">
+            <div className="flex items-center gap-1 rounded-md bg-stone-900 px-2 py-1 text-xs font-semibold text-white">
               <Sparkles size={13} />
               10초 초안
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-xs font-semibold text-stone-600">
-            <div className="rounded-md border border-emerald-600 bg-emerald-50 px-2 py-2 text-center text-emerald-800">
+            <div className="rounded-md border border-stone-300 bg-white px-2 py-2 text-center text-stone-800">
               1 반
             </div>
-            <div className="rounded-md border border-emerald-600 bg-emerald-50 px-2 py-2 text-center text-emerald-800">
+            <div className="rounded-md border border-stone-300 bg-white px-2 py-2 text-center text-stone-800">
               2 학생
             </div>
-            <div className="rounded-md border border-emerald-600 bg-emerald-50 px-2 py-2 text-center text-emerald-800">
+            <div className="rounded-md border border-stone-300 bg-white px-2 py-2 text-center text-stone-800">
               3 문자
             </div>
           </div>
@@ -355,7 +348,7 @@ function ProductPreview() {
                 className={[
                   "min-w-36 rounded-md border px-3 py-3",
                   index === 0
-                    ? "border-emerald-600 bg-white"
+                    ? "border-stone-950 bg-white"
                     : "border-stone-200 bg-white/70",
                 ].join(" ")}
               >
@@ -382,7 +375,7 @@ function ProductPreview() {
                   className={[
                     "rounded-md border px-3 py-2 text-center text-sm font-semibold",
                     index === 0
-                      ? "border-emerald-700 bg-emerald-700 text-white"
+                      ? "border-stone-950 bg-stone-950 text-white"
                       : "border-stone-200 bg-stone-50 text-stone-700",
                   ].join(" ")}
                 >
@@ -392,7 +385,7 @@ function ProductPreview() {
             </div>
           </div>
 
-          <div className="mt-3 rounded-lg border border-emerald-200 bg-white p-3">
+          <div className="mt-3 rounded-lg border border-stone-300 bg-white p-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-stone-950">
               <MessageSquareText size={16} />
               문자 미리보기
@@ -428,7 +421,7 @@ function InfoCard({
 }) {
   return (
     <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex size-10 items-center justify-center rounded-md bg-emerald-50 text-emerald-800">
+      <div className="mb-4 flex size-10 items-center justify-center rounded-md bg-stone-100 text-stone-800">
         {icon}
       </div>
       <p className="text-sm text-stone-500">{label}</p>
