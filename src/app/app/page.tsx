@@ -1,11 +1,14 @@
 import { redirect } from "next/navigation";
 import { AlertCircle, School } from "lucide-react";
 import type { ReactNode } from "react";
-import { LogoutButton } from "@/app/app/logout-button";
 import {
-  OperationsBoard,
-  type OperationsClass,
-} from "@/app/app/operations-board";
+  AppWorkspace,
+  type ManagementClass,
+  type ManagementMember,
+  type ManagementStudent,
+} from "@/app/app/app-workspace";
+import { LogoutButton } from "@/app/app/logout-button";
+import type { OperationsClass } from "@/app/app/operations-board";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -41,6 +44,13 @@ type StudentRecord = {
   parent_name: string | null;
   parent_phone: string;
   status: string;
+};
+
+type MemberRecord = {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
 };
 
 export default async function AppPage() {
@@ -106,7 +116,7 @@ export default async function AppPage() {
     );
   }
 
-  const [classesResult, studentsResult] = await Promise.all([
+  const [classesResult, studentsResult, membersResult] = await Promise.all([
     admin
       .from("classes")
       .select("id, name, subject, grade_label, teacher_id")
@@ -116,11 +126,15 @@ export default async function AppPage() {
       .from("students")
       .select("id, class_id, name, school_name, grade_label, parent_name, parent_phone, status")
       .eq("academy_id", profile.academy_id)
-      .eq("status", "active")
+      .order("name"),
+    admin
+      .from("profiles")
+      .select("id, email, name, role")
+      .eq("academy_id", profile.academy_id)
       .order("name"),
   ]);
 
-  if (classesResult.error || studentsResult.error) {
+  if (classesResult.error || studentsResult.error || membersResult.error) {
     return (
       <AppShell email={user.email ?? ""}>
         <EmptyState
@@ -128,6 +142,7 @@ export default async function AppPage() {
           description={
             classesResult.error?.message ??
             studentsResult.error?.message ??
+            membersResult.error?.message ??
             "반과 학생 정보를 가져오지 못했습니다."
           }
         />
@@ -135,12 +150,18 @@ export default async function AppPage() {
     );
   }
 
+  const classes = (classesResult.data ?? []) as ClassRecord[];
+  const students = (studentsResult.data ?? []) as StudentRecord[];
+  const members = (membersResult.data ?? []) as MemberRecord[];
   const operationsClasses = buildOperationsClasses({
-    classes: (classesResult.data ?? []) as ClassRecord[],
-    students: (studentsResult.data ?? []) as StudentRecord[],
+    classes,
+    students,
     profileId: user.id,
     role: profile.role,
   });
+  const managementClasses = buildManagementClasses({ classes, students, members });
+  const managementStudents = buildManagementStudents({ classes, students });
+  const managementMembers = buildManagementMembers({ classes, members });
 
   return (
     <AppShell
@@ -148,11 +169,15 @@ export default async function AppPage() {
       title={profile.academies.name}
       subtitle={profile.academies.category ?? "학원 워크스페이스"}
     >
-      <OperationsBoard
+      <AppWorkspace
         academyName={profile.academies.name}
         teacherName={profile.name}
+        role={profile.role}
         roleLabel={roleLabel(profile.role)}
         classes={operationsClasses}
+        managementClasses={managementClasses}
+        managementStudents={managementStudents}
+        managementMembers={managementMembers}
       />
     </AppShell>
   );
@@ -253,6 +278,7 @@ function buildOperationsClasses({
     students: students
       .filter((student) => student.class_id && classIds.has(student.class_id))
       .filter((student) => student.class_id === classItem.id)
+      .filter((student) => student.status === "active")
       .map((student) => ({
         id: student.id,
         name: student.name,
@@ -261,6 +287,70 @@ function buildOperationsClasses({
         parentName: student.parent_name,
         maskedParentPhone: maskPhone(student.parent_phone),
       })),
+  }));
+}
+
+function buildManagementClasses({
+  classes,
+  students,
+  members,
+}: {
+  classes: ClassRecord[];
+  students: StudentRecord[];
+  members: MemberRecord[];
+}): ManagementClass[] {
+  return classes.map((classItem) => {
+    const teacher = members.find((member) => member.id === classItem.teacher_id);
+
+    return {
+      id: classItem.id,
+      name: classItem.name,
+      subject: classItem.subject,
+      gradeLabel: classItem.grade_label,
+      teacherName: teacher?.name ?? null,
+      studentCount: students.filter(
+        (student) => student.class_id === classItem.id && student.status === "active",
+      ).length,
+    };
+  });
+}
+
+function buildManagementStudents({
+  classes,
+  students,
+}: {
+  classes: ClassRecord[];
+  students: StudentRecord[];
+}): ManagementStudent[] {
+  return students.map((student) => {
+    const classItem = classes.find((item) => item.id === student.class_id);
+
+    return {
+      id: student.id,
+      name: student.name,
+      className: classItem?.name ?? null,
+      schoolName: student.school_name,
+      gradeLabel: student.grade_label,
+      parentName: student.parent_name,
+      maskedParentPhone: maskPhone(student.parent_phone),
+      status: student.status,
+    };
+  });
+}
+
+function buildManagementMembers({
+  classes,
+  members,
+}: {
+  classes: ClassRecord[];
+  members: MemberRecord[];
+}): ManagementMember[] {
+  return members.map((member) => ({
+    id: member.id,
+    name: member.name,
+    email: member.email,
+    role: member.role,
+    classCount: classes.filter((classItem) => classItem.teacher_id === member.id).length,
   }));
 }
 
