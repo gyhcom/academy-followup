@@ -12,7 +12,7 @@ export function RoleSection() {
               홈스쿨링이 아니라, 센터형 교육기관에 맞춥니다.
             </h2>
             <p className="mt-5 max-w-md break-keep text-base leading-7 text-[#60688e]">
-              Brightwheel의 preschool 구조는 “집에서 하는 돌봄”보다 “교육 프로그램이 있는 기관
+              해외 교육기관 SaaS의 센터형 구조는 “집에서 하는 돌봄”보다 “교육 프로그램이 있는 기관
               운영”에 가깝습니다. 우리는 한국 학원 기준으로 다시 분류합니다.
             </p>
           </div>

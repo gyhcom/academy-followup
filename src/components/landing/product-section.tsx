@@ -20,7 +20,7 @@ export function ProductSection() {
             문자 발송은 작은 입구, 중심은 학원 운영 기록입니다.
           </h2>
           <p className="mt-5 max-w-xl break-keep text-base leading-8 text-white/72">
-            Brightwheel이 보육기관 운영 전체를 보여주듯이, 우리도 학원에서 반복되는 학생 관리,
+            교육기관 운영 SaaS처럼 제품 범위를 크게 보여주되, 우리는 학원에서 반복되는 학생 관리,
             수업 후 처리, 학부모 소통을 하나의 운영 화면으로 묶습니다.
           </p>
         </div>

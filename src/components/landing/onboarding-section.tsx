@@ -12,7 +12,7 @@ export function OnboardingSection() {
             다른 프로그램을 한 번에 갈아엎지 않고 시작합니다.
           </h2>
           <p className="mt-5 max-w-xl break-keep text-base leading-8 text-[#60688e]">
-            Brightwheel의 전환 메시지처럼, 기존 방식이 있어도 빠르게 얹을 수 있어야 합니다.
+            이미 쓰는 방식이 있어도 빠르게 얹을 수 있어야 합니다.
             파일럿 반부터 세팅하고 후속 연락 업무를 먼저 검증합니다.
           </p>
           <Link
