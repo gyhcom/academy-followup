@@ -92,7 +92,7 @@ export function HeroSection() {
 
 function ResponsiveDeviceShowcase() {
   return (
-    <div className="relative mx-auto h-[29rem] w-full max-w-[42rem] min-w-0 overflow-hidden sm:h-[36rem] lg:overflow-visible">
+    <div className="relative mx-auto hidden h-[36rem] w-full max-w-[42rem] min-w-0 overflow-visible lg:block">
       <DesktopDevice />
       <TabletDevice />
       <PhoneDevice />
