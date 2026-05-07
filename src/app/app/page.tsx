@@ -46,6 +46,21 @@ type StudentRecord = {
   status: string;
 };
 
+type StudentScheduleRecord = {
+  id: string;
+  student_id: string;
+  class_id: string | null;
+  teacher_id: string | null;
+  schedule_type: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  subject: string | null;
+  title: string;
+  memo: string | null;
+  is_active: boolean;
+};
+
 type MemberRecord = {
   id: string;
   email: string;
@@ -116,7 +131,7 @@ export default async function AppPage() {
     );
   }
 
-  const [classesResult, studentsResult, membersResult] = await Promise.all([
+  const [classesResult, studentsResult, membersResult, schedulesResult] = await Promise.all([
     admin
       .from("classes")
       .select("id, name, subject, grade_label, teacher_id")
@@ -132,9 +147,17 @@ export default async function AppPage() {
       .select("id, email, name, role")
       .eq("academy_id", profile.academy_id)
       .order("name"),
+    admin
+      .from("student_schedules")
+      .select(
+        "id, student_id, class_id, teacher_id, schedule_type, day_of_week, start_time, end_time, subject, title, memo, is_active",
+      )
+      .eq("academy_id", profile.academy_id)
+      .order("day_of_week", { ascending: true })
+      .order("start_time", { ascending: true }),
   ]);
 
-  if (classesResult.error || studentsResult.error || membersResult.error) {
+  if (classesResult.error || studentsResult.error || membersResult.error || schedulesResult.error) {
     return (
       <AppShell email={user.email ?? ""}>
         <EmptyState
@@ -143,6 +166,7 @@ export default async function AppPage() {
             classesResult.error?.message ??
             studentsResult.error?.message ??
             membersResult.error?.message ??
+            schedulesResult.error?.message ??
             "반과 학생 정보를 가져오지 못했습니다."
           }
         />
@@ -153,6 +177,7 @@ export default async function AppPage() {
   const classes = (classesResult.data ?? []) as ClassRecord[];
   const students = (studentsResult.data ?? []) as StudentRecord[];
   const members = (membersResult.data ?? []) as MemberRecord[];
+  const schedules = (schedulesResult.data ?? []) as StudentScheduleRecord[];
   const operationsClasses = buildOperationsClasses({
     classes,
     students,
@@ -160,7 +185,7 @@ export default async function AppPage() {
     role: profile.role,
   });
   const managementClasses = buildManagementClasses({ classes, students, members });
-  const managementStudents = buildManagementStudents({ classes, students });
+  const managementStudents = buildManagementStudents({ classes, students, schedules });
   const managementMembers = buildManagementMembers({ classes, members });
 
   return (
@@ -319,9 +344,11 @@ function buildManagementClasses({
 function buildManagementStudents({
   classes,
   students,
+  schedules,
 }: {
   classes: ClassRecord[];
   students: StudentRecord[];
+  schedules: StudentScheduleRecord[];
 }): ManagementStudent[] {
   return students.map((student) => {
     const classItem = classes.find((item) => item.id === student.class_id);
@@ -337,6 +364,22 @@ function buildManagementStudents({
       parentPhone: student.parent_phone,
       maskedParentPhone: maskPhone(student.parent_phone),
       status: student.status,
+      schedules: schedules
+        .filter((schedule) => schedule.student_id === student.id)
+        .map((schedule) => ({
+          id: schedule.id,
+          studentId: schedule.student_id,
+          classId: schedule.class_id,
+          teacherId: schedule.teacher_id,
+          scheduleType: schedule.schedule_type,
+          dayOfWeek: schedule.day_of_week,
+          startTime: schedule.start_time.slice(0, 5),
+          endTime: schedule.end_time.slice(0, 5),
+          subject: schedule.subject,
+          title: schedule.title,
+          memo: schedule.memo,
+          isActive: schedule.is_active,
+        })),
     };
   });
 }

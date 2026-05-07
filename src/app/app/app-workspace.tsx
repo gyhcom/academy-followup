@@ -5,8 +5,10 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import {
   BookOpen,
+  CalendarDays,
   ChevronRight,
   ClipboardList,
+  Clock,
   Pencil,
   Plus,
   Save,
@@ -31,6 +33,21 @@ export type ManagementClass = {
   studentCount: number;
 };
 
+export type ManagementStudentSchedule = {
+  id: string;
+  studentId: string;
+  classId: string | null;
+  teacherId: string | null;
+  scheduleType: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  subject: string | null;
+  title: string;
+  memo: string | null;
+  isActive: boolean;
+};
+
 export type ManagementStudent = {
   id: string;
   classId: string | null;
@@ -42,6 +59,7 @@ export type ManagementStudent = {
   parentPhone: string;
   maskedParentPhone: string;
   status: string;
+  schedules: ManagementStudentSchedule[];
 };
 
 export type ManagementMember = {
@@ -88,6 +106,23 @@ type StudentFormState = {
   parentName: string;
   parentPhone: string;
   status: string;
+};
+type ScheduleFormMode = "create" | "edit";
+type ScheduleFormState = {
+  mode: ScheduleFormMode;
+  scheduleId: string;
+  studentId: string;
+  studentName: string;
+  classId: string;
+  teacherId: string;
+  scheduleType: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  subject: string;
+  title: string;
+  memo: string;
+  isActive: boolean;
 };
 
 export function AppWorkspace({
@@ -237,6 +272,11 @@ function ManagementHome({
     status: "idle",
     message: "",
   });
+  const [scheduleForm, setScheduleForm] = useState<ScheduleFormState | null>(null);
+  const [scheduleFormStatus, setScheduleFormStatus] = useState<FormStatus>({
+    status: "idle",
+    message: "",
+  });
   const activeStudents = useMemo(
     () => students.filter((student) => student.status === "active"),
     [students],
@@ -249,6 +289,8 @@ function ManagementHome({
   function openCreateClassForm() {
     setStudentForm(null);
     setStudentFormStatus({ status: "idle", message: "" });
+    setScheduleForm(null);
+    setScheduleFormStatus({ status: "idle", message: "" });
     setClassForm({
       mode: "create",
       classId: "",
@@ -263,6 +305,8 @@ function ManagementHome({
   function openEditClassForm(classItem: ManagementClass) {
     setStudentForm(null);
     setStudentFormStatus({ status: "idle", message: "" });
+    setScheduleForm(null);
+    setScheduleFormStatus({ status: "idle", message: "" });
     setClassForm({
       mode: "edit",
       classId: classItem.id,
@@ -318,6 +362,8 @@ function ManagementHome({
   function openCreateStudentForm() {
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
+    setScheduleForm(null);
+    setScheduleFormStatus({ status: "idle", message: "" });
     setStudentForm({
       mode: "create",
       studentId: "",
@@ -335,6 +381,8 @@ function ManagementHome({
   function openEditStudentForm(student: ManagementStudent) {
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
+    setScheduleForm(null);
+    setScheduleFormStatus({ status: "idle", message: "" });
     setStudentForm({
       mode: "edit",
       studentId: student.id,
@@ -392,6 +440,108 @@ function ManagementHome({
       setStudentFormStatus({
         status: "error",
         message: error instanceof Error ? error.message : "학생 정보를 저장하지 못했습니다.",
+      });
+    }
+  }
+
+  function openCreateScheduleForm(student: ManagementStudent) {
+    const classItem = classes.find((item) => item.id === student.classId);
+    const defaultTitle = student.className ?? "정규 수업";
+
+    setClassForm(null);
+    setClassFormStatus({ status: "idle", message: "" });
+    setStudentForm(null);
+    setStudentFormStatus({ status: "idle", message: "" });
+    setScheduleForm({
+      mode: "create",
+      scheduleId: "",
+      studentId: student.id,
+      studentName: student.name,
+      classId: student.classId ?? "",
+      teacherId: classItem?.teacherId ?? "",
+      scheduleType: "regular_class",
+      dayOfWeek: 1,
+      startTime: "16:30",
+      endTime: "18:00",
+      subject: classItem?.subject ?? "",
+      title: defaultTitle,
+      memo: "",
+      isActive: true,
+    });
+    setScheduleFormStatus({ status: "idle", message: "" });
+  }
+
+  function openEditScheduleForm(student: ManagementStudent, schedule: ManagementStudentSchedule) {
+    setClassForm(null);
+    setClassFormStatus({ status: "idle", message: "" });
+    setStudentForm(null);
+    setStudentFormStatus({ status: "idle", message: "" });
+    setScheduleForm({
+      mode: "edit",
+      scheduleId: schedule.id,
+      studentId: student.id,
+      studentName: student.name,
+      classId: schedule.classId ?? "",
+      teacherId: schedule.teacherId ?? "",
+      scheduleType: schedule.scheduleType,
+      dayOfWeek: schedule.dayOfWeek,
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
+      subject: schedule.subject ?? "",
+      title: schedule.title,
+      memo: schedule.memo ?? "",
+      isActive: schedule.isActive,
+    });
+    setScheduleFormStatus({ status: "idle", message: "" });
+  }
+
+  async function saveScheduleForm() {
+    if (!scheduleForm) {
+      return;
+    }
+
+    setScheduleFormStatus({ status: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/student-schedules", {
+        method: scheduleForm.mode === "create" ? "POST" : "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          scheduleId: scheduleForm.scheduleId,
+          studentId: scheduleForm.studentId,
+          classId: scheduleForm.classId,
+          teacherId: scheduleForm.teacherId,
+          scheduleType: scheduleForm.scheduleType,
+          dayOfWeek: scheduleForm.dayOfWeek,
+          startTime: scheduleForm.startTime,
+          endTime: scheduleForm.endTime,
+          subject: scheduleForm.subject,
+          title: scheduleForm.title,
+          memo: scheduleForm.memo,
+          isActive: scheduleForm.isActive,
+        }),
+      });
+      const payload = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "스케줄을 저장하지 못했습니다.");
+      }
+
+      setScheduleFormStatus({
+        status: "saved",
+        message:
+          scheduleForm.mode === "create"
+            ? "학생 스케줄을 등록했습니다."
+            : "학생 스케줄을 수정했습니다.",
+      });
+      setScheduleForm(null);
+      router.refresh();
+    } catch (error) {
+      setScheduleFormStatus({
+        status: "error",
+        message: error instanceof Error ? error.message : "스케줄을 저장하지 못했습니다.",
       });
     }
   }
@@ -567,6 +717,34 @@ function ManagementHome({
           </p>
         ) : null}
 
+        {scheduleForm ? (
+          <ScheduleForm
+            form={scheduleForm}
+            status={scheduleFormStatus}
+            classes={classes}
+            members={teacherOptions}
+            onChange={setScheduleForm}
+            onCancel={() => {
+              setScheduleForm(null);
+              setScheduleFormStatus({ status: "idle", message: "" });
+            }}
+            onSave={saveScheduleForm}
+          />
+        ) : null}
+
+        {scheduleFormStatus.status === "saved" || scheduleFormStatus.status === "error" ? (
+          <p
+            className={[
+              "mb-3 rounded-md border px-3 py-2 text-sm",
+              scheduleFormStatus.status === "saved"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-red-200 bg-red-50 text-red-900",
+            ].join(" ")}
+          >
+            {scheduleFormStatus.message}
+          </p>
+        ) : null}
+
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {students.slice(0, 12).map((student) => (
             <article key={student.id} className="rounded-lg border border-stone-200 bg-stone-50 p-3">
@@ -582,14 +760,28 @@ function ManagementHome({
               <p className="mt-3 truncate text-xs text-stone-500">
                 {student.parentName ?? "학부모"} · {student.maskedParentPhone}
               </p>
-              <button
-                type="button"
-                onClick={() => openEditStudentForm(student)}
-                className="mt-3 flex min-h-9 w-full items-center justify-center gap-1 rounded-md border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
-              >
-                <Pencil size={13} />
-                학생 정보 수정
-              </button>
+              <StudentScheduleList
+                schedules={student.schedules}
+                onEdit={(schedule) => openEditScheduleForm(student, schedule)}
+              />
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => openEditStudentForm(student)}
+                  className="flex min-h-9 items-center justify-center gap-1 rounded-md border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
+                >
+                  <Pencil size={13} />
+                  학생 수정
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openCreateScheduleForm(student)}
+                  className="flex min-h-9 items-center justify-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100"
+                >
+                  <CalendarDays size={13} />
+                  스케줄 추가
+                </button>
+              </div>
             </article>
           ))}
         </div>
@@ -948,6 +1140,305 @@ function StudentForm({
       </div>
     </div>
   );
+}
+
+function ScheduleForm({
+  form,
+  status,
+  classes,
+  members,
+  onChange,
+  onCancel,
+  onSave,
+}: {
+  form: ScheduleFormState;
+  status: FormStatus;
+  classes: ManagementClass[];
+  members: ManagementMember[];
+  onChange: (form: ScheduleFormState) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const canSave =
+    form.title.trim().length > 0 &&
+    form.startTime.trim().length > 0 &&
+    form.endTime.trim().length > 0 &&
+    status.status !== "saving";
+
+  function changeClass(classId: string) {
+    const classItem = classes.find((item) => item.id === classId);
+
+    onChange({
+      ...form,
+      classId,
+      teacherId: classItem?.teacherId ?? form.teacherId,
+      subject: classItem?.subject ?? form.subject,
+      title: classItem?.name ?? form.title,
+    });
+  }
+
+  return (
+    <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50/70 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-stone-950">
+            {form.mode === "create" ? "주간 스케줄 등록" : "주간 스케줄 수정"}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-stone-600">
+            {form.studentName} 학생의 반복 수업, 외부 일정, 보강 가능 시간을 관리합니다.
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label="스케줄 입력 닫기"
+          onClick={onCancel}
+          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          유형
+          <select
+            value={form.scheduleType}
+            onChange={(event) => onChange({ ...form, scheduleType: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          >
+            <option value="regular_class">정규 수업</option>
+            <option value="makeup">보강</option>
+            <option value="external">외부 일정</option>
+            <option value="consultation">상담</option>
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          요일
+          <select
+            value={form.dayOfWeek}
+            onChange={(event) => onChange({ ...form, dayOfWeek: Number(event.target.value) })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          >
+            {weekDayOptions.map((day) => (
+              <option key={day.value} value={day.value}>
+                {day.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          시작
+          <input
+            type="time"
+            value={form.startTime}
+            onChange={(event) => onChange({ ...form, startTime: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          종료
+          <input
+            type="time"
+            value={form.endTime}
+            onChange={(event) => onChange({ ...form, endTime: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2">
+          제목
+          <input
+            value={form.title}
+            onChange={(event) => onChange({ ...form, title: event.target.value })}
+            placeholder="예: 월수금 수학 정규 수업"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          연결 반
+          <select
+            value={form.classId}
+            onChange={(event) => changeClass(event.target.value)}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          >
+            <option value="">반 연결 없음</option>
+            {classes.map((classItem) => (
+              <option key={classItem.id} value={classItem.id}>
+                {classItem.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          담당
+          <select
+            value={form.teacherId}
+            onChange={(event) => onChange({ ...form, teacherId: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          >
+            <option value="">담당자 미지정</option>
+            {members.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          과목
+          <input
+            value={form.subject}
+            onChange={(event) => onChange({ ...form, subject: event.target.value })}
+            placeholder="예: 수학"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2 lg:col-span-3">
+          메모
+          <input
+            value={form.memo}
+            onChange={(event) => onChange({ ...form, memo: event.target.value })}
+            placeholder="예: 보강 후보에서 제외할 외부 일정"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="flex min-h-11 items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-800">
+          <input
+            type="checkbox"
+            checked={form.isActive}
+            onChange={(event) => onChange({ ...form, isActive: event.target.checked })}
+            className="size-4"
+          />
+          활성 일정
+        </label>
+      </div>
+
+      {status.status === "error" ? (
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+          {status.message}
+        </p>
+      ) : null}
+
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="min-h-11 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700"
+        >
+          취소
+        </button>
+        <button
+          type="button"
+          disabled={!canSave}
+          onClick={onSave}
+          className={[
+            "flex min-h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold",
+            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+          ].join(" ")}
+        >
+          <Save size={16} />
+          {status.status === "saving" ? "저장 중" : "저장"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StudentScheduleList({
+  schedules,
+  onEdit,
+}: {
+  schedules: ManagementStudentSchedule[];
+  onEdit: (schedule: ManagementStudentSchedule) => void;
+}) {
+  const sortedSchedules = schedules
+    .slice()
+    .sort((a, b) => {
+      if (a.isActive !== b.isActive) {
+        return a.isActive ? -1 : 1;
+      }
+
+      return daySortValue(a.dayOfWeek) - daySortValue(b.dayOfWeek) || a.startTime.localeCompare(b.startTime);
+    })
+    .slice(0, 4);
+
+  if (schedules.length === 0) {
+    return (
+      <div className="mt-3 rounded-md border border-dashed border-stone-300 bg-white px-3 py-2 text-xs leading-5 text-stone-500">
+        아직 등록된 주간 스케줄이 없습니다.
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3 space-y-2">
+      {sortedSchedules.map((schedule) => (
+        <button
+          key={schedule.id}
+          type="button"
+          onClick={() => onEdit(schedule)}
+          className={[
+            "grid w-full gap-1 rounded-md border bg-white px-3 py-2 text-left transition hover:border-stone-300 hover:bg-stone-50",
+            schedule.isActive ? "border-stone-200" : "border-stone-200 opacity-60",
+          ].join(" ")}
+        >
+          <span className="flex items-center justify-between gap-2">
+            <span className="min-w-0 truncate text-xs font-semibold text-stone-900">
+              {schedule.title}
+            </span>
+            <span className="shrink-0 rounded bg-stone-100 px-1.5 py-0.5 text-[11px] font-semibold text-stone-600">
+              {scheduleTypeLabel(schedule.scheduleType)}
+            </span>
+          </span>
+          <span className="flex items-center gap-1 text-xs text-stone-500">
+            <Clock size={12} />
+            {weekDayLabel(schedule.dayOfWeek)} {schedule.startTime}-{schedule.endTime}
+            {!schedule.isActive ? " · 비활성" : ""}
+          </span>
+        </button>
+      ))}
+      {schedules.length > sortedSchedules.length ? (
+        <p className="text-xs text-stone-500">추가 스케줄 {schedules.length - sortedSchedules.length}개</p>
+      ) : null}
+    </div>
+  );
+}
+
+const weekDayOptions = [
+  { value: 1, label: "월요일" },
+  { value: 2, label: "화요일" },
+  { value: 3, label: "수요일" },
+  { value: 4, label: "목요일" },
+  { value: 5, label: "금요일" },
+  { value: 6, label: "토요일" },
+  { value: 0, label: "일요일" },
+];
+
+function weekDayLabel(dayOfWeek: number) {
+  return weekDayOptions.find((day) => day.value === dayOfWeek)?.label ?? `${dayOfWeek}`;
+}
+
+function daySortValue(dayOfWeek: number) {
+  return dayOfWeek === 0 ? 7 : dayOfWeek;
+}
+
+function scheduleTypeLabel(scheduleType: string) {
+  const labels: Record<string, string> = {
+    regular_class: "정규",
+    makeup: "보강",
+    external: "외부",
+    consultation: "상담",
+  };
+
+  return labels[scheduleType] ?? scheduleType;
 }
 
 function StatusBadge({ status }: { status: string }) {
