@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BookOpen, ClipboardList, GraduationCap, Pencil, Plus, UsersRound } from "lucide-react";
 import type {
+  BulkScheduleFormState,
   ClassFormState,
   FormStatus,
   ManagementClass,
@@ -16,7 +17,12 @@ import type {
   StudentSortMode,
 } from "@/app/app/management-types";
 import { ManagementPanel, SummaryCard } from "@/app/app/management-common";
-import { ClassForm, ScheduleForm, StudentForm } from "@/app/app/management-forms";
+import {
+  BulkScheduleForm,
+  ClassForm,
+  ScheduleForm,
+  StudentForm,
+} from "@/app/app/management-forms";
 import { roleLabel } from "@/app/app/management-utils";
 import { StudentDirectory } from "@/app/app/student-directory";
 
@@ -47,6 +53,13 @@ export function ManagementHome({
     status: "idle",
     message: "",
   });
+  const [bulkScheduleForm, setBulkScheduleForm] = useState<BulkScheduleFormState | null>(
+    null,
+  );
+  const [bulkScheduleFormStatus, setBulkScheduleFormStatus] = useState<FormStatus>({
+    status: "idle",
+    message: "",
+  });
   const [studentSearch, setStudentSearch] = useState("");
   const [studentClassFilter, setStudentClassFilter] = useState("all");
   const [studentStatusFilter, setStudentStatusFilter] = useState("active");
@@ -70,6 +83,8 @@ export function ManagementHome({
     setStudentFormStatus({ status: "idle", message: "" });
     setScheduleForm(null);
     setScheduleFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
     setClassForm({
       mode: "create",
       classId: "",
@@ -86,6 +101,8 @@ export function ManagementHome({
     setStudentFormStatus({ status: "idle", message: "" });
     setScheduleForm(null);
     setScheduleFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
     setClassForm({
       mode: "edit",
       classId: classItem.id,
@@ -138,11 +155,91 @@ export function ManagementHome({
     }
   }
 
+  function openBulkScheduleForm(classItem: ManagementClass) {
+    setClassForm(null);
+    setClassFormStatus({ status: "idle", message: "" });
+    setStudentForm(null);
+    setStudentFormStatus({ status: "idle", message: "" });
+    setScheduleForm(null);
+    setScheduleFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm({
+      classId: classItem.id,
+      className: classItem.name,
+      teacherId: classItem.teacherId ?? "",
+      scheduleType: "regular_class",
+      dayOfWeek: 1,
+      startTime: "16:30",
+      endTime: "18:00",
+      subject: classItem.subject ?? "",
+      title: classItem.name,
+      memo: "",
+    });
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
+  }
+
+  async function saveBulkScheduleForm() {
+    if (!bulkScheduleForm) {
+      return;
+    }
+
+    setBulkScheduleFormStatus({ status: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/student-schedules/bulk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          classId: bulkScheduleForm.classId,
+          teacherId: bulkScheduleForm.teacherId,
+          scheduleType: bulkScheduleForm.scheduleType,
+          dayOfWeek: bulkScheduleForm.dayOfWeek,
+          startTime: bulkScheduleForm.startTime,
+          endTime: bulkScheduleForm.endTime,
+          subject: bulkScheduleForm.subject,
+          title: bulkScheduleForm.title,
+          memo: bulkScheduleForm.memo,
+        }),
+      });
+      const payload = (await response.json()) as {
+        error?: string;
+        insertedCount?: number;
+        skippedCount?: number;
+        totalStudents?: number;
+        message?: string;
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "반 스케줄을 일괄 등록하지 못했습니다.");
+      }
+
+      setBulkScheduleFormStatus({
+        status: "saved",
+        message:
+          payload.message ??
+          `등록 ${payload.insertedCount ?? 0}명 · 건너뜀 ${payload.skippedCount ?? 0}명`,
+      });
+      setBulkScheduleForm(null);
+      router.refresh();
+    } catch (error) {
+      setBulkScheduleFormStatus({
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "반 스케줄을 일괄 등록하지 못했습니다.",
+      });
+    }
+  }
+
   function openCreateStudentForm() {
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
     setScheduleForm(null);
     setScheduleFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
     setStudentForm({
       mode: "create",
       studentId: "",
@@ -163,6 +260,8 @@ export function ManagementHome({
     setClassFormStatus({ status: "idle", message: "" });
     setScheduleForm(null);
     setScheduleFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
     setStudentForm({
       mode: "edit",
       studentId: student.id,
@@ -234,6 +333,8 @@ export function ManagementHome({
     setClassFormStatus({ status: "idle", message: "" });
     setStudentForm(null);
     setStudentFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
     setScheduleForm({
       mode: "create",
       scheduleId: "",
@@ -260,6 +361,8 @@ export function ManagementHome({
     setClassFormStatus({ status: "idle", message: "" });
     setStudentForm(null);
     setStudentFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
     setScheduleForm({
       mode: "edit",
       scheduleId: schedule.id,
@@ -403,6 +506,20 @@ export function ManagementHome({
             />
           ) : null}
 
+          {bulkScheduleForm ? (
+            <BulkScheduleForm
+              form={bulkScheduleForm}
+              status={bulkScheduleFormStatus}
+              teacherOptions={teacherOptions}
+              onChange={setBulkScheduleForm}
+              onCancel={() => {
+                setBulkScheduleForm(null);
+                setBulkScheduleFormStatus({ status: "idle", message: "" });
+              }}
+              onSave={saveBulkScheduleForm}
+            />
+          ) : null}
+
           {classFormStatus.status === "saved" || classFormStatus.status === "error" ? (
             <p
               className={[
@@ -413,6 +530,20 @@ export function ManagementHome({
               ].join(" ")}
             >
               {classFormStatus.message}
+            </p>
+          ) : null}
+
+          {bulkScheduleFormStatus.status === "saved" ||
+          bulkScheduleFormStatus.status === "error" ? (
+            <p
+              className={[
+                "mb-3 rounded-md border px-3 py-2 text-sm",
+                bulkScheduleFormStatus.status === "saved"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  : "border-red-200 bg-red-50 text-red-900",
+              ].join(" ")}
+            >
+              {bulkScheduleFormStatus.message}
             </p>
           ) : null}
 
@@ -433,6 +564,14 @@ export function ManagementHome({
                   <span className="w-fit rounded-md bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700">
                     학생 {classItem.studentCount}명
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => openBulkScheduleForm(classItem)}
+                    className="flex min-h-8 items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2.5 text-xs font-semibold text-violet-900 transition hover:border-violet-300 hover:bg-violet-100"
+                  >
+                    <ClipboardList size={13} />
+                    스케줄
+                  </button>
                   <button
                     type="button"
                     onClick={() => openEditClassForm(classItem)}

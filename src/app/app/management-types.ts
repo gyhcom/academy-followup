@@ -101,6 +101,19 @@ export type ScheduleFormState = {
   sourceFollowupId: string;
 };
 
+export type BulkScheduleFormState = {
+  classId: string;
+  className: string;
+  teacherId: string;
+  scheduleType: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  subject: string;
+  title: string;
+  memo: string;
+};
+
 export type StudentSortMode = "time" | "name" | "class";
 
 export type StudentScheduleFilter =

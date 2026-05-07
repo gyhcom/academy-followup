@@ -382,6 +382,7 @@ POST /api/students
 PATCH /api/students
 POST /api/student-schedules
 PATCH /api/student-schedules
+POST /api/student-schedules/bulk
 POST /api/messages/preview
 POST /api/messages/send
 POST /api/followups
@@ -420,6 +421,7 @@ GET  /api/health/supabase
 - 학생 등록/수정 API와 관리 화면 폼
 - 학생별 주간 스케줄 DB 모델
 - 학생별 주간 스케줄 등록/수정 API와 관리 화면 폼
+- 반 전체 주간 반복 스케줄 일괄 등록과 중복 건너뛰기
 - 학생 관리 리스트/상세 패널과 시간 중심 정렬/필터
 - 운영 보드 선택 학생 주간 스케줄 패널
 - 보강 후보 시간 선택과 보강 안내 문자 초안
@@ -433,10 +435,9 @@ GET  /api/health/supabase
 
 ### 다음 구현 순서
 
-1. 스케줄 일괄 등록과 개인 스케줄 추가
-2. 서버 기준 중복 발송 차단
-3. 원장/선생님 권한 테스트
-4. SOLAPI 실제 SMS 발송 테스트
+1. 서버 기준 중복 발송 차단
+2. 원장/선생님 권한 테스트
+3. SOLAPI 실제 SMS 발송 테스트
 
 ## 14. 제품 기능 범위와 기술 경계
 

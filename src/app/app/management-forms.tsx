@@ -1,5 +1,6 @@
 import { Save, X } from "lucide-react";
 import type {
+  BulkScheduleFormState,
   ClassFormState,
   FormStatus,
   ManagementClass,
@@ -515,6 +516,175 @@ export function ScheduleForm({
         >
           <Save size={16} />
           {status.status === "saving" ? "저장 중" : "저장"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function BulkScheduleForm({
+  form,
+  status,
+  teacherOptions,
+  onChange,
+  onCancel,
+  onSave,
+}: {
+  form: BulkScheduleFormState;
+  status: FormStatus;
+  teacherOptions: ManagementMember[];
+  onChange: (form: BulkScheduleFormState) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const canSave =
+    form.title.trim().length > 0 &&
+    form.startTime.trim().length > 0 &&
+    form.endTime.trim().length > 0 &&
+    status.status !== "saving";
+
+  return (
+    <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50/70 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-stone-950">반 스케줄 일괄 등록</p>
+          <p className="mt-1 text-xs leading-5 text-stone-600">
+            {form.className} 재원 학생 전체에게 같은 주간 반복 스케줄을 등록합니다.
+            이미 같은 요일과 시간의 스케줄이 있으면 건너뜁니다.
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label="일괄 스케줄 입력 닫기"
+          onClick={onCancel}
+          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          유형
+          <select
+            value={form.scheduleType}
+            onChange={(event) => onChange({ ...form, scheduleType: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          >
+            <option value="regular_class">정규 수업</option>
+            <option value="makeup">보강</option>
+            <option value="external">외부 일정</option>
+            <option value="consultation">상담</option>
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          요일
+          <select
+            value={form.dayOfWeek}
+            onChange={(event) => onChange({ ...form, dayOfWeek: Number(event.target.value) })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          >
+            {weekDayOptions.map((day) => (
+              <option key={day.value} value={day.value}>
+                {day.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          시작
+          <input
+            type="time"
+            value={form.startTime}
+            onChange={(event) => onChange({ ...form, startTime: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          종료
+          <input
+            type="time"
+            value={form.endTime}
+            onChange={(event) => onChange({ ...form, endTime: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2">
+          제목
+          <input
+            value={form.title}
+            onChange={(event) => onChange({ ...form, title: event.target.value })}
+            placeholder="예: 월수금 수학 정규 수업"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          담당
+          <select
+            value={form.teacherId}
+            onChange={(event) => onChange({ ...form, teacherId: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          >
+            <option value="">반 담당자 사용</option>
+            {teacherOptions.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          과목
+          <input
+            value={form.subject}
+            onChange={(event) => onChange({ ...form, subject: event.target.value })}
+            placeholder="예: 수학"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2 lg:col-span-4">
+          메모
+          <input
+            value={form.memo}
+            onChange={(event) => onChange({ ...form, memo: event.target.value })}
+            placeholder="예: 반 전체 정규 스케줄"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+      </div>
+
+      {status.status === "error" ? (
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+          {status.message}
+        </p>
+      ) : null}
+
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="min-h-11 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700"
+        >
+          취소
+        </button>
+        <button
+          type="button"
+          disabled={!canSave}
+          onClick={onSave}
+          className={[
+            "flex min-h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold",
+            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+          ].join(" ")}
+        >
+          <Save size={16} />
+          {status.status === "saving" ? "등록 중" : "반 전체 등록"}
         </button>
       </div>
     </div>
