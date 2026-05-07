@@ -304,7 +304,11 @@ function StudentListRow({
         ].join(" ")}
       >
         <p className="text-[11px] font-semibold leading-none">
-          {primarySchedule ? weekDayShortLabel(primarySchedule.dayOfWeek) : "미등록"}
+          {primarySchedule
+            ? primarySchedule.scheduleDate
+              ? "1회"
+              : weekDayShortLabel(primarySchedule.dayOfWeek)
+            : "미등록"}
         </p>
         <p className="mt-1 text-base font-semibold leading-none">
           {primarySchedule ? primarySchedule.startTime : "--:--"}
@@ -333,7 +337,9 @@ function StudentListRow({
                 scheduleTypeChipClass(schedule.scheduleType),
               ].join(" ")}
             >
-              {weekDayShortLabel(schedule.dayOfWeek)} {schedule.startTime}
+              {schedule.scheduleDate
+                ? `${formatShortDate(schedule.scheduleDate)} ${schedule.startTime}`
+                : `${weekDayShortLabel(schedule.dayOfWeek)} ${schedule.startTime}`}
             </span>
           ))}
           {activeSchedules.length === 0 ? (
@@ -447,6 +453,11 @@ function StudentDetailPanel({
                         <span className="mt-1 block text-[11px] leading-none text-white/70">
                           {schedule.endTime}
                         </span>
+                        {schedule.scheduleDate ? (
+                          <span className="mt-1 block text-[10px] leading-none text-white/70">
+                            {formatShortDate(schedule.scheduleDate)}
+                          </span>
+                        ) : null}
                       </span>
                       <span className="min-w-0">
                         <span className="flex items-center gap-1">
@@ -484,3 +495,8 @@ function StudentDetailPanel({
   );
 }
 
+function formatShortDate(dateValue: string) {
+  const [, month, day] = dateValue.split("-");
+
+  return `${Number(month)}/${Number(day)}`;
+}

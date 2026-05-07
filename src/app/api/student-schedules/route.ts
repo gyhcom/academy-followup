@@ -15,6 +15,7 @@ type ScheduleRequest = {
   classId?: unknown;
   teacherId?: unknown;
   scheduleType?: unknown;
+  scheduleDate?: unknown;
   dayOfWeek?: unknown;
   startTime?: unknown;
   endTime?: unknown;
@@ -22,6 +23,7 @@ type ScheduleRequest = {
   title?: unknown;
   memo?: unknown;
   isActive?: unknown;
+  sourceFollowupId?: unknown;
 };
 
 type ProfileRecord = {
@@ -35,6 +37,7 @@ type SchedulePayload = {
   classId: string | null;
   teacherId: string | null;
   scheduleType: ScheduleType;
+  scheduleDate: string | null;
   dayOfWeek: number;
   startTime: string;
   endTime: string;
@@ -42,6 +45,7 @@ type SchedulePayload = {
   title: string;
   memo: string | null;
   isActive: boolean;
+  sourceFollowupId: string | null;
 };
 
 type ScheduleRecord = {
@@ -50,6 +54,7 @@ type ScheduleRecord = {
   class_id: string | null;
   teacher_id: string | null;
   schedule_type: string;
+  schedule_date: string | null;
   day_of_week: number;
   start_time: string;
   end_time: string;
@@ -57,6 +62,7 @@ type ScheduleRecord = {
   title: string;
   memo: string | null;
   is_active: boolean;
+  source_followup_id: string | null;
 };
 
 export async function POST(request: Request) {
@@ -82,6 +88,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
+  if (!canManageSchedule(workspace.profile.role, validation.classTeacherId, workspace.userId)) {
+    return NextResponse.json(
+      { error: "이 학생의 스케줄을 등록할 권한이 없습니다." },
+      { status: 403 },
+    );
+  }
+
+  const duplicate = await findDuplicateOneOffSchedule({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    payload: parsedRequest.data,
+  });
+
+  if (!duplicate.ok) {
+    return NextResponse.json({ error: duplicate.error }, { status: 500 });
+  }
+
+  if (duplicate.data) {
+    return NextResponse.json(
+      { error: "이미 같은 날짜와 시간의 보강 일정이 등록되어 있습니다." },
+      { status: 409 },
+    );
+  }
+
   const { data, error } = await workspace.admin
     .from("student_schedules")
     .insert({
@@ -90,6 +120,7 @@ export async function POST(request: Request) {
       class_id: parsedRequest.data.classId,
       teacher_id: parsedRequest.data.teacherId,
       schedule_type: parsedRequest.data.scheduleType,
+      schedule_date: parsedRequest.data.scheduleDate,
       day_of_week: parsedRequest.data.dayOfWeek,
       start_time: parsedRequest.data.startTime,
       end_time: parsedRequest.data.endTime,
@@ -97,9 +128,10 @@ export async function POST(request: Request) {
       title: parsedRequest.data.title,
       memo: parsedRequest.data.memo,
       is_active: parsedRequest.data.isActive,
+      source_followup_id: parsedRequest.data.sourceFollowupId,
     })
     .select(
-      "id, student_id, class_id, teacher_id, schedule_type, day_of_week, start_time, end_time, subject, title, memo, is_active",
+      "id, student_id, class_id, teacher_id, schedule_type, schedule_date, day_of_week, start_time, end_time, subject, title, memo, is_active, source_followup_id",
     )
     .single<ScheduleRecord>();
 
@@ -133,6 +165,13 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
+  if (!canManageSchedule(workspace.profile.role, validation.classTeacherId, workspace.userId)) {
+    return NextResponse.json(
+      { error: "이 학생의 스케줄을 수정할 권한이 없습니다." },
+      { status: 403 },
+    );
+  }
+
   const { data, error } = await workspace.admin
     .from("student_schedules")
     .update({
@@ -140,6 +179,7 @@ export async function PATCH(request: Request) {
       class_id: parsedRequest.data.classId,
       teacher_id: parsedRequest.data.teacherId,
       schedule_type: parsedRequest.data.scheduleType,
+      schedule_date: parsedRequest.data.scheduleDate,
       day_of_week: parsedRequest.data.dayOfWeek,
       start_time: parsedRequest.data.startTime,
       end_time: parsedRequest.data.endTime,
@@ -147,12 +187,13 @@ export async function PATCH(request: Request) {
       title: parsedRequest.data.title,
       memo: parsedRequest.data.memo,
       is_active: parsedRequest.data.isActive,
+      source_followup_id: parsedRequest.data.sourceFollowupId,
       updated_at: new Date().toISOString(),
     })
     .eq("id", parsedRequest.data.scheduleId)
     .eq("academy_id", workspace.profile.academy_id)
     .select(
-      "id, student_id, class_id, teacher_id, schedule_type, day_of_week, start_time, end_time, subject, title, memo, is_active",
+      "id, student_id, class_id, teacher_id, schedule_type, schedule_date, day_of_week, start_time, end_time, subject, title, memo, is_active, source_followup_id",
     )
     .maybeSingle<ScheduleRecord>();
 
@@ -172,6 +213,7 @@ async function getAuthorizedWorkspace(): Promise<
       ok: true;
       admin: ReturnType<typeof createSupabaseAdminClient>;
       profile: ProfileRecord;
+      userId: string;
     }
   | { ok: false; status: number; error: string }
 > {
@@ -207,11 +249,7 @@ async function getAuthorizedWorkspace(): Promise<
     return { ok: false, status: 403, error: "학원 워크스페이스 연결이 필요합니다." };
   }
 
-  if (profile.role !== "owner" && profile.role !== "manager") {
-    return { ok: false, status: 403, error: "스케줄 관리는 원장 또는 관리자만 할 수 있습니다." };
-  }
-
-  return { ok: true, admin, profile };
+  return { ok: true, admin, profile, userId: user.id };
 }
 
 async function parseScheduleRequest(
@@ -240,6 +278,13 @@ async function parseScheduleRequest(
 
   if (!isScheduleType(body.scheduleType)) {
     return { ok: false, error: "지원하지 않는 스케줄 유형입니다." };
+  }
+
+  const rawScheduleDate = optionalText(body.scheduleDate);
+  const scheduleDate = rawScheduleDate ? parseDate(rawScheduleDate) : null;
+
+  if (rawScheduleDate && !scheduleDate) {
+    return { ok: false, error: "스케줄 날짜는 YYYY-MM-DD 형식으로 입력해 주세요." };
   }
 
   const dayOfWeek = parseDayOfWeek(body.dayOfWeek);
@@ -288,6 +333,7 @@ async function parseScheduleRequest(
       classId: optionalText(body.classId),
       teacherId: optionalText(body.teacherId),
       scheduleType: body.scheduleType,
+      scheduleDate,
       dayOfWeek,
       startTime,
       endTime,
@@ -295,6 +341,7 @@ async function parseScheduleRequest(
       title,
       memo,
       isActive: typeof body.isActive === "boolean" ? body.isActive : true,
+      sourceFollowupId: optionalText(body.sourceFollowupId),
     },
   };
 }
@@ -307,8 +354,8 @@ async function validateScheduleRelations({
   admin: ReturnType<typeof createSupabaseAdminClient>;
   academyId: string;
   payload: SchedulePayload;
-}): Promise<{ ok: true } | { ok: false; error: string }> {
-  const [studentResult, classResult, teacherResult] = await Promise.all([
+}): Promise<{ ok: true; classTeacherId: string | null } | { ok: false; error: string }> {
+  const [studentResult, classResult, teacherResult, followupResult] = await Promise.all([
     admin
       .from("students")
       .select("id")
@@ -318,11 +365,11 @@ async function validateScheduleRelations({
     payload.classId
       ? admin
           .from("classes")
-          .select("id")
+          .select("id, teacher_id")
           .eq("id", payload.classId)
           .eq("academy_id", academyId)
-          .maybeSingle<{ id: string }>()
-      : Promise.resolve({ data: { id: "" }, error: null }),
+          .maybeSingle<{ id: string; teacher_id: string | null }>()
+      : Promise.resolve({ data: { id: "", teacher_id: null }, error: null }),
     payload.teacherId
       ? admin
           .from("profiles")
@@ -331,6 +378,14 @@ async function validateScheduleRelations({
           .eq("academy_id", academyId)
           .maybeSingle<{ id: string }>()
       : Promise.resolve({ data: { id: "" }, error: null }),
+    payload.sourceFollowupId
+      ? admin
+          .from("followups")
+          .select("id, student_id")
+          .eq("id", payload.sourceFollowupId)
+          .eq("academy_id", academyId)
+          .maybeSingle<{ id: string; student_id: string }>()
+      : Promise.resolve({ data: { id: "", student_id: payload.studentId }, error: null }),
   ]);
 
   if (studentResult.error) {
@@ -357,7 +412,23 @@ async function validateScheduleRelations({
     return { ok: false, error: "담당 선생님을 찾을 수 없습니다." };
   }
 
-  return { ok: true };
+  if (followupResult.error) {
+    return { ok: false, error: followupResult.error.message };
+  }
+
+  if (payload.sourceFollowupId && !followupResult.data) {
+    return { ok: false, error: "연결할 팔로업 기록을 찾을 수 없습니다." };
+  }
+
+  if (
+    payload.sourceFollowupId &&
+    followupResult.data &&
+    followupResult.data.student_id !== payload.studentId
+  ) {
+    return { ok: false, error: "팔로업 기록과 학생 정보가 일치하지 않습니다." };
+  }
+
+  return { ok: true, classTeacherId: classResult.data?.teacher_id ?? null };
 }
 
 function optionalText(value: unknown) {
@@ -393,8 +464,67 @@ function parseTime(value: unknown) {
   return trimmed;
 }
 
+function parseDate(value: unknown) {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return null;
+  }
+
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return value;
+}
+
 function isScheduleType(value: unknown): value is ScheduleType {
   return typeof value === "string" && scheduleTypes.includes(value as ScheduleType);
+}
+
+function canManageSchedule(role: string, classTeacherId: string | null, userId: string) {
+  return role === "owner" || role === "manager" || classTeacherId === userId;
+}
+
+async function findDuplicateOneOffSchedule({
+  admin,
+  academyId,
+  payload,
+}: {
+  admin: ReturnType<typeof createSupabaseAdminClient>;
+  academyId: string;
+  payload: SchedulePayload;
+}): Promise<{ ok: true; data: { id: string } | null } | { ok: false; error: string }> {
+  if (!payload.scheduleDate || payload.scheduleType !== "makeup" || !payload.isActive) {
+    return { ok: true, data: null };
+  }
+
+  const { data, error } = await admin
+    .from("student_schedules")
+    .select("id")
+    .eq("academy_id", academyId)
+    .eq("student_id", payload.studentId)
+    .eq("schedule_type", payload.scheduleType)
+    .eq("schedule_date", payload.scheduleDate)
+    .eq("start_time", payload.startTime)
+    .eq("end_time", payload.endTime)
+    .eq("is_active", true)
+    .maybeSingle<{ id: string }>();
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  return { ok: true, data: data ?? null };
 }
 
 function toScheduleResponse(schedule: ScheduleRecord) {
@@ -404,6 +534,7 @@ function toScheduleResponse(schedule: ScheduleRecord) {
     classId: schedule.class_id,
     teacherId: schedule.teacher_id,
     scheduleType: schedule.schedule_type,
+    scheduleDate: schedule.schedule_date,
     dayOfWeek: schedule.day_of_week,
     startTime: schedule.start_time.slice(0, 5),
     endTime: schedule.end_time.slice(0, 5),
@@ -411,5 +542,6 @@ function toScheduleResponse(schedule: ScheduleRecord) {
     title: schedule.title,
     memo: schedule.memo,
     isActive: schedule.is_active,
+    sourceFollowupId: schedule.source_followup_id,
   };
 }

@@ -32,6 +32,15 @@ supabase db push
 supabase db push --db-url '<pooler-connection-string>'
 ```
 
+현재 필요한 최신 migration:
+
+```text
+supabase/migrations/20260507030000_add_one_off_schedule_fields.sql
+```
+
+이 migration은 날짜 지정 보강을 위해 `student_schedules.schedule_date`,
+`student_schedules.source_followup_id`, 날짜별 조회/중복 방지 인덱스를 추가합니다.
+
 현재 프로젝트 ref:
 
 ```text

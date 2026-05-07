@@ -53,6 +53,7 @@ type StudentScheduleRecord = {
   class_id: string | null;
   teacher_id: string | null;
   schedule_type: string;
+  schedule_date: string | null;
   day_of_week: number;
   start_time: string;
   end_time: string;
@@ -60,6 +61,7 @@ type StudentScheduleRecord = {
   title: string;
   memo: string | null;
   is_active: boolean;
+  source_followup_id: string | null;
 };
 
 type AttendanceRecord = {
@@ -177,7 +179,7 @@ export default async function AppPage() {
     admin
       .from("student_schedules")
       .select(
-        "id, student_id, class_id, teacher_id, schedule_type, day_of_week, start_time, end_time, subject, title, memo, is_active",
+        "id, student_id, class_id, teacher_id, schedule_type, schedule_date, day_of_week, start_time, end_time, subject, title, memo, is_active, source_followup_id",
       )
       .eq("academy_id", profile.academy_id)
       .order("day_of_week", { ascending: true })
@@ -365,6 +367,7 @@ function buildOperationsClasses({
             id: schedule.id,
             classId: schedule.class_id,
             scheduleType: schedule.schedule_type,
+            scheduleDate: schedule.schedule_date,
             dayOfWeek: schedule.day_of_week,
             startTime: schedule.start_time.slice(0, 5),
             endTime: schedule.end_time.slice(0, 5),
@@ -372,6 +375,7 @@ function buildOperationsClasses({
             title: schedule.title,
             memo: schedule.memo,
             isActive: schedule.is_active,
+            sourceFollowupId: schedule.source_followup_id,
           })),
       })),
   }));
@@ -457,6 +461,7 @@ function buildManagementStudents({
           classId: schedule.class_id,
           teacherId: schedule.teacher_id,
           scheduleType: schedule.schedule_type,
+          scheduleDate: schedule.schedule_date,
           dayOfWeek: schedule.day_of_week,
           startTime: schedule.start_time.slice(0, 5),
           endTime: schedule.end_time.slice(0, 5),
@@ -464,6 +469,7 @@ function buildManagementStudents({
           title: schedule.title,
           memo: schedule.memo,
           isActive: schedule.is_active,
+          sourceFollowupId: schedule.source_followup_id,
         })),
     };
   });

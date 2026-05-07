@@ -46,7 +46,7 @@ export function compareStudents(
   }
 
   return (
-    daySortValue(firstSchedule.dayOfWeek) - daySortValue(secondSchedule.dayOfWeek) ||
+    compareScheduleOrder(firstSchedule, secondSchedule) ||
     firstSchedule.startTime.localeCompare(secondSchedule.startTime) ||
     first.name.localeCompare(second.name, "ko")
   );
@@ -57,8 +57,7 @@ export function getActiveSchedules(student: ManagementStudent) {
     .filter((schedule) => schedule.isActive)
     .sort(
       (first, second) =>
-        daySortValue(first.dayOfWeek) - daySortValue(second.dayOfWeek) ||
-        first.startTime.localeCompare(second.startTime),
+        compareScheduleOrder(first, second),
     );
 }
 
@@ -75,8 +74,7 @@ export function groupSchedulesByDay(schedules: ManagementStudentSchedule[]) {
     .slice()
     .sort(
       (first, second) =>
-        daySortValue(first.dayOfWeek) - daySortValue(second.dayOfWeek) ||
-        first.startTime.localeCompare(second.startTime),
+        compareScheduleOrder(first, second),
     );
   const grouped = new Map<number, ManagementStudentSchedule[]>();
 
@@ -112,6 +110,31 @@ export function weekDayShortLabel(dayOfWeek: number) {
 
 export function daySortValue(dayOfWeek: number) {
   return dayOfWeek === 0 ? 7 : dayOfWeek;
+}
+
+export function compareScheduleOrder(
+  first: Pick<ManagementStudentSchedule, "scheduleDate" | "dayOfWeek" | "startTime">,
+  second: Pick<ManagementStudentSchedule, "scheduleDate" | "dayOfWeek" | "startTime">,
+) {
+  if (first.scheduleDate || second.scheduleDate) {
+    if (!first.scheduleDate) {
+      return 1;
+    }
+
+    if (!second.scheduleDate) {
+      return -1;
+    }
+
+    return (
+      first.scheduleDate.localeCompare(second.scheduleDate) ||
+      first.startTime.localeCompare(second.startTime)
+    );
+  }
+
+  return (
+    daySortValue(first.dayOfWeek) - daySortValue(second.dayOfWeek) ||
+    first.startTime.localeCompare(second.startTime)
+  );
 }
 
 export function scheduleTypeLabel(scheduleType: string) {

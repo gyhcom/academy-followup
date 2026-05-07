@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
+  CalendarDays,
   CheckCircle2,
+  Clock3,
   MessageSquareText,
   RotateCcw,
   Send,
@@ -20,7 +22,11 @@ import {
   type OperationsStudentSchedule,
   WeeklySchedulePanel,
 } from "@/app/app/operations-schedule";
-import { scheduleTypeLabel, weekDayShortLabel } from "@/app/app/management-utils";
+import {
+  scheduleTypeChipClass,
+  scheduleTypeLabel,
+  weekDayShortLabel,
+} from "@/app/app/management-utils";
 
 export type OperationsStudent = {
   id: string;
@@ -94,6 +100,31 @@ type SendMessageResponse = {
   error?: string;
 };
 
+type MakeupCandidate = {
+  date: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  label: string;
+};
+
+type ScheduleCreateResponse = {
+  schedule?: {
+    id: string;
+    scheduleDate: string | null;
+    startTime: string;
+    endTime: string;
+  };
+  error?: string;
+};
+
+type MakeupScheduleSaveState = {
+  followupId: string;
+  status: "idle" | "saving" | "saved" | "error";
+  message: string;
+  scheduleId: string;
+};
+
 type FollowupHistoryResponse = {
   followups?: FollowupHistoryItem[];
   error?: string;
@@ -119,6 +150,15 @@ export function OperationsBoard({
   const [hasMobileFollowupSelection, setHasMobileFollowupSelection] = useState(false);
   const [isMobileComposerOpen, setIsMobileComposerOpen] = useState(false);
   const [makeupCandidateTime, setMakeupCandidateTime] = useState("");
+  const [selectedMakeupCandidate, setSelectedMakeupCandidate] =
+    useState<MakeupCandidate | null>(null);
+  const [makeupScheduleSave, setMakeupScheduleSave] =
+    useState<MakeupScheduleSaveState>({
+      followupId: "",
+      status: "idle",
+      message: "",
+      scheduleId: "",
+    });
 
   const selectedStudent = useMemo(() => {
     if (!selectedClass) {
@@ -366,6 +406,8 @@ export function OperationsBoard({
     setHasMobileFollowupSelection(false);
     setIsMobileComposerOpen(false);
     setMakeupCandidateTime("");
+    setSelectedMakeupCandidate(null);
+    setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
   }
 
   function handleStudentSelect(studentId: string) {
@@ -373,6 +415,8 @@ export function OperationsBoard({
     setHasMobileFollowupSelection(false);
     setIsMobileComposerOpen(false);
     setMakeupCandidateTime("");
+    setSelectedMakeupCandidate(null);
+    setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
   }
 
   function handleStudentReasonSelect(studentId: string, reasonId: FollowupReason) {
@@ -381,6 +425,8 @@ export function OperationsBoard({
     setHasMobileFollowupSelection(true);
     setIsMobileComposerOpen(false);
     setMakeupCandidateTime("");
+    setSelectedMakeupCandidate(null);
+    setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
   }
 
   function handleComposerReasonChange(reasonId: FollowupReason) {
@@ -388,6 +434,8 @@ export function OperationsBoard({
     setHasMobileFollowupSelection(Boolean(selectedStudent));
     if (reasonId !== "makeup") {
       setMakeupCandidateTime("");
+      setSelectedMakeupCandidate(null);
+      setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
     }
   }
 
@@ -396,6 +444,17 @@ export function OperationsBoard({
     setMakeupCandidateTime(
       `${weekDayShortLabel(schedule.dayOfWeek)} ${schedule.startTime}-${schedule.endTime}`,
     );
+    setSelectedMakeupCandidate(null);
+    setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
+    setHasMobileFollowupSelection(Boolean(selectedStudent));
+    setIsMobileComposerOpen(false);
+  }
+
+  function handleDateMakeupCandidateSelect(candidate: MakeupCandidate) {
+    setSelectedReason("makeup");
+    setSelectedMakeupCandidate(candidate);
+    setMakeupCandidateTime(candidate.label);
+    setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
     setHasMobileFollowupSelection(Boolean(selectedStudent));
     setIsMobileComposerOpen(false);
   }
@@ -455,6 +514,7 @@ export function OperationsBoard({
         message: "",
         error: "",
       });
+      setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
       setHistoryRefreshToken((value) => value + 1);
     } catch (error) {
       setFollowupSave({
@@ -517,6 +577,71 @@ export function OperationsBoard({
         message: "",
         error:
           error instanceof Error ? error.message : "문자를 발송하지 못했습니다.",
+      });
+    }
+  }
+
+  async function handleRegisterMakeupSchedule() {
+    if (
+      !selectedStudent ||
+      !selectedClass ||
+      !selectedMakeupCandidate ||
+      !savedFollowupId ||
+      makeupScheduleSave.status === "saving"
+    ) {
+      return;
+    }
+
+    setMakeupScheduleSave({
+      followupId: savedFollowupId,
+      status: "saving",
+      message: "",
+      scheduleId: "",
+    });
+
+    try {
+      const response = await fetch("/api/student-schedules", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId: selectedStudent.id,
+          classId: selectedClass.id,
+          teacherId: "",
+          scheduleType: "makeup",
+          scheduleDate: selectedMakeupCandidate.date,
+          dayOfWeek: selectedMakeupCandidate.dayOfWeek,
+          startTime: selectedMakeupCandidate.startTime,
+          endTime: selectedMakeupCandidate.endTime,
+          subject: selectedClass.subject ?? "",
+          title: `${selectedStudent.name} 보강`,
+          memo: `${selectedMakeupCandidate.label} 문자 발송 후 자동 등록`,
+          isActive: true,
+          sourceFollowupId: savedFollowupId,
+        }),
+      });
+      const payload = (await response.json()) as ScheduleCreateResponse;
+
+      if (!response.ok || !payload.schedule) {
+        throw new Error(payload.error ?? "보강 스케줄을 등록하지 못했습니다.");
+      }
+
+      setMakeupScheduleSave({
+        followupId: savedFollowupId,
+        status: "saved",
+        message: "보강 스케줄을 등록했습니다. 관리 탭에서 수정할 수 있습니다.",
+        scheduleId: payload.schedule.id,
+      });
+    } catch (error) {
+      setMakeupScheduleSave({
+        followupId: savedFollowupId,
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "보강 스케줄을 등록하지 못했습니다.",
+        scheduleId: "",
       });
     }
   }
@@ -711,6 +836,11 @@ export function OperationsBoard({
         </section>
 
         <div className="space-y-4">
+          <MakeupDateSelector
+            selectedStudent={selectedStudent}
+            selectedCandidate={selectedMakeupCandidate}
+            onCandidateSelect={handleDateMakeupCandidateSelect}
+          />
           <WeeklySchedulePanel
             selectedClassName={selectedClass?.name}
             selectedStudent={selectedStudent}
@@ -740,9 +870,18 @@ export function OperationsBoard({
           messageSend={messageSend}
           messageSendError={messageSendError}
           makeupCandidateTime={makeupCandidateTime}
+          makeupScheduleSave={makeupScheduleSave}
+          selectedMakeupCandidate={selectedMakeupCandidate}
           selectedReason={selectedReason}
           selectedStudent={selectedStudent}
+          canRegisterMakeupSchedule={
+            selectedReason === "makeup" &&
+            Boolean(selectedMakeupCandidate) &&
+            Boolean(savedFollowupId) &&
+            isMessageSent
+          }
           onReasonChange={handleComposerReasonChange}
+          onRegisterMakeupSchedule={handleRegisterMakeupSchedule}
           onRestorePreview={handleRestorePreview}
           onSaveFollowup={handleSaveFollowup}
           onSendMessage={handleSendMessage}
@@ -787,10 +926,19 @@ export function OperationsBoard({
               messageSend={messageSend}
               messageSendError={messageSendError}
               makeupCandidateTime={makeupCandidateTime}
+              makeupScheduleSave={makeupScheduleSave}
+              selectedMakeupCandidate={selectedMakeupCandidate}
               selectedReason={selectedReason}
               selectedStudent={selectedStudent}
+              canRegisterMakeupSchedule={
+                selectedReason === "makeup" &&
+                Boolean(selectedMakeupCandidate) &&
+                Boolean(savedFollowupId) &&
+                isMessageSent
+              }
               onClose={() => setIsMobileComposerOpen(false)}
               onReasonChange={handleComposerReasonChange}
+              onRegisterMakeupSchedule={handleRegisterMakeupSchedule}
               onRestorePreview={handleRestorePreview}
               onSaveFollowup={handleSaveFollowup}
               onSendMessage={handleSendMessage}
@@ -800,6 +948,165 @@ export function OperationsBoard({
         </div>
       ) : null}
     </div>
+  );
+}
+
+function MakeupDateSelector({
+  selectedStudent,
+  selectedCandidate,
+  onCandidateSelect,
+}: {
+  selectedStudent: OperationsStudent | undefined;
+  selectedCandidate: MakeupCandidate | null;
+  onCandidateSelect: (candidate: MakeupCandidate) => void;
+}) {
+  const [date, setDate] = useState(() => getTodayDateValue());
+  const [startTime, setStartTime] = useState("20:30");
+  const [endTime, setEndTime] = useState("21:30");
+  const dayOfWeek = getDayOfWeek(date);
+  const schedulesForDate = selectedStudent
+    ? getSortedActiveSchedules(selectedStudent.schedules).filter(
+        (schedule) =>
+          schedule.scheduleDate === date ||
+          (!schedule.scheduleDate && schedule.dayOfWeek === dayOfWeek),
+      )
+    : [];
+  const isTimeRangeValid = startTime < endTime;
+  const candidateLabel = `${formatDateForLabel(date)} ${startTime}-${endTime}`;
+  const isSelected =
+    Boolean(selectedCandidate) &&
+    selectedCandidate?.date === date &&
+    selectedCandidate.startTime === startTime &&
+    selectedCandidate.endTime === endTime;
+
+  return (
+    <section
+      aria-labelledby="makeup-date-title"
+      className="rounded-lg border border-stone-200 bg-white shadow-sm"
+    >
+      <div className="border-b border-stone-200 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="text-emerald-700" size={18} />
+          <h2 id="makeup-date-title" className="text-sm font-semibold text-stone-950">
+            날짜별 보강
+          </h2>
+        </div>
+        <p className="mt-1 text-xs leading-5 text-stone-500">
+          날짜를 고르면 해당일의 정규 수업과 외부 일정을 보고 보강 문자를 만들 수 있습니다.
+        </p>
+      </div>
+
+      <div className="space-y-3 p-4">
+        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_112px_112px]">
+          <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
+            날짜
+            <input
+              type="date"
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            />
+          </label>
+          <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
+            시작
+            <input
+              type="time"
+              value={startTime}
+              onChange={(event) => setStartTime(event.target.value)}
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            />
+          </label>
+          <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
+            종료
+            <input
+              type="time"
+              value={endTime}
+              onChange={(event) => setEndTime(event.target.value)}
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            />
+          </label>
+        </div>
+
+        {selectedStudent ? (
+          <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-stone-600">
+                {formatDateForLabel(date)} 일정
+              </p>
+              <span className="rounded-md bg-white px-2 py-0.5 text-xs font-semibold text-stone-500">
+                {schedulesForDate.length}개
+              </span>
+            </div>
+
+            {schedulesForDate.length > 0 ? (
+              <div className="mt-2 space-y-1.5">
+                {schedulesForDate.map((schedule) => (
+                  <div
+                    key={`${schedule.id}:${schedule.scheduleDate ?? "weekly"}`}
+                    className="grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-2 rounded-md bg-white px-2 py-2"
+                  >
+                    <span className="flex items-center gap-1 text-xs font-semibold tabular-nums text-stone-900">
+                      <Clock3 size={13} className="text-stone-400" />
+                      {schedule.startTime}
+                    </span>
+                    <span className="min-w-0 truncate text-xs font-medium text-stone-600">
+                      {schedule.title}
+                    </span>
+                    <span
+                      className={[
+                        "rounded px-1.5 py-0.5 text-[11px] font-semibold",
+                        scheduleTypeChipClass(schedule.scheduleType),
+                      ].join(" ")}
+                    >
+                      {scheduleTypeLabel(schedule.scheduleType)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 rounded-md bg-white px-3 py-2 text-xs leading-5 text-stone-500">
+                이 날짜에 겹치는 등록 일정이 없습니다.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-md border border-dashed border-stone-300 bg-stone-50 p-3 text-sm leading-6 text-stone-600">
+            학생을 선택하면 해당 날짜의 정규 수업과 외부 일정이 표시됩니다.
+          </div>
+        )}
+
+        <button
+          type="button"
+          disabled={!selectedStudent || !date || !isTimeRangeValid}
+          onClick={() =>
+            onCandidateSelect({
+              date,
+              dayOfWeek,
+              startTime,
+              endTime,
+              label: candidateLabel,
+            })
+          }
+          className={[
+            "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition",
+            selectedStudent && date && isTimeRangeValid
+              ? isSelected
+                ? "bg-emerald-800 text-white"
+                : "bg-emerald-700 text-white hover:bg-emerald-800"
+              : "bg-stone-300 text-stone-600",
+          ].join(" ")}
+        >
+          <Clock3 size={16} />
+          {isSelected ? "보강 후보 선택됨" : "이 날짜/시간으로 보강 문자"}
+        </button>
+
+        {!isTimeRangeValid ? (
+          <p className="rounded-md bg-red-50 px-3 py-2 text-xs font-semibold text-red-800">
+            종료 시간은 시작 시간보다 늦어야 합니다.
+          </p>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
@@ -821,10 +1128,14 @@ function MessageComposer({
   messageSend,
   messageSendError,
   makeupCandidateTime,
+  makeupScheduleSave,
+  selectedMakeupCandidate,
   selectedReason,
   selectedStudent,
+  canRegisterMakeupSchedule,
   onClose,
   onReasonChange,
+  onRegisterMakeupSchedule,
   onRestorePreview,
   onSaveFollowup,
   onSendMessage,
@@ -847,10 +1158,14 @@ function MessageComposer({
   messageSend: MessageSendState;
   messageSendError: string;
   makeupCandidateTime: string;
+  makeupScheduleSave: MakeupScheduleSaveState;
+  selectedMakeupCandidate: MakeupCandidate | null;
   selectedReason: FollowupReason;
   selectedStudent: OperationsStudent | undefined;
+  canRegisterMakeupSchedule: boolean;
   onClose?: () => void;
   onReasonChange: (reason: FollowupReason) => void;
+  onRegisterMakeupSchedule: () => void;
   onRestorePreview: () => void;
   onSaveFollowup: () => void;
   onSendMessage: () => void;
@@ -910,6 +1225,11 @@ function MessageComposer({
             {selectedReason === "makeup" && makeupCandidateTime ? (
               <p className="mt-2 rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800">
                 보강 후보 {makeupCandidateTime}
+              </p>
+            ) : null}
+            {selectedReason === "makeup" && !selectedMakeupCandidate && makeupCandidateTime ? (
+              <p className="mt-2 rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-900">
+                주간 반복 시간 기준입니다. 날짜별 보강 등록은 달력에서 날짜를 선택해야 합니다.
               </p>
             ) : null}
           </div>
@@ -1101,6 +1421,54 @@ function MessageComposer({
                 </div>
               </div>
             ) : null}
+
+            {selectedReason === "makeup" && selectedMakeupCandidate ? (
+              <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3">
+                <p className="text-sm font-semibold text-emerald-950">
+                  보강 스케줄 등록
+                </p>
+                <p className="mt-1 text-xs leading-5 text-emerald-900">
+                  {selectedMakeupCandidate.label} 일정으로 학생 스케줄에 1회성 보강을
+                  등록합니다.
+                </p>
+                <button
+                  type="button"
+                  disabled={
+                    !canRegisterMakeupSchedule ||
+                    makeupScheduleSave.status === "saving" ||
+                    makeupScheduleSave.status === "saved"
+                  }
+                  onClick={onRegisterMakeupSchedule}
+                  className={[
+                    "mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition",
+                    canRegisterMakeupSchedule &&
+                    makeupScheduleSave.status !== "saving" &&
+                    makeupScheduleSave.status !== "saved"
+                      ? "bg-emerald-700 text-white hover:bg-emerald-800"
+                      : "bg-emerald-200 text-emerald-950",
+                  ].join(" ")}
+                >
+                  <CalendarDays size={16} />
+                  {makeupScheduleSave.status === "saving"
+                    ? "등록 중"
+                    : makeupScheduleSave.status === "saved"
+                      ? "스케줄 등록 완료"
+                      : "스케줄에 입력"}
+                </button>
+                {makeupScheduleSave.message ? (
+                  <p
+                    className={[
+                      "mt-2 rounded-md px-2 py-2 text-xs font-semibold",
+                      makeupScheduleSave.status === "error"
+                        ? "bg-red-50 text-red-900"
+                        : "bg-white text-emerald-900",
+                    ].join(" ")}
+                  >
+                    {makeupScheduleSave.message}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -1165,4 +1533,30 @@ function reasonLabel(reasonId: FollowupReason) {
   return (
     followupReasons.find((reason) => reason.id === reasonId)?.label ?? reasonId
   );
+}
+
+function getTodayDateValue() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
+  const day = `${today.getDate()}`.padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function getDayOfWeek(dateValue: string) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (Number.isNaN(date.getTime())) {
+    return 1;
+  }
+
+  return date.getDay();
+}
+
+function formatDateForLabel(dateValue: string) {
+  const dayOfWeek = getDayOfWeek(dateValue);
+
+  return `${dateValue}(${weekDayShortLabel(dayOfWeek)})`;
 }

@@ -117,6 +117,7 @@ create table public.student_schedules (
   class_id uuid references public.classes(id) on delete set null,
   teacher_id uuid references public.profiles(id) on delete set null,
   schedule_type public.student_schedule_type not null default 'regular_class',
+  schedule_date date,
   day_of_week smallint not null,
   start_time time not null,
   end_time time not null,
@@ -156,6 +157,9 @@ create table public.followups (
   sent_at timestamptz,
   created_at timestamptz not null default now()
 );
+
+alter table public.student_schedules
+  add column source_followup_id uuid references public.followups(id) on delete set null;
 
 -- 반별 수업 날짜/시간 기준 출석부 기록입니다.
 -- 미도착 학생을 바로 결석 확정하지 않고 확인 필요/지각으로 수정할 수 있게 상태를 분리합니다.
@@ -209,12 +213,25 @@ create index student_schedules_student_day_idx
 create index student_schedules_academy_day_idx
   on public.student_schedules(academy_id, day_of_week, start_time)
   where is_active = true;
+create index student_schedules_student_date_idx
+  on public.student_schedules(student_id, schedule_date, start_time)
+  where is_active = true and schedule_date is not null;
 create index student_schedules_class_id_idx
   on public.student_schedules(class_id)
   where class_id is not null;
 create index student_schedules_teacher_id_idx
   on public.student_schedules(teacher_id)
   where teacher_id is not null;
+create unique index student_schedules_one_off_uidx
+  on public.student_schedules(
+    academy_id,
+    student_id,
+    schedule_type,
+    schedule_date,
+    start_time,
+    end_time
+  )
+  where is_active = true and schedule_date is not null;
 create unique index attendance_records_session_student_uidx
   on public.attendance_records(
     academy_id,

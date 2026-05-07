@@ -239,6 +239,7 @@ export function ManagementHome({
       classId: student.classId ?? "",
       teacherId: classItem?.teacherId ?? "",
       scheduleType: "regular_class",
+      scheduleDate: "",
       dayOfWeek: 1,
       startTime: "16:30",
       endTime: "18:00",
@@ -246,6 +247,7 @@ export function ManagementHome({
       title: defaultTitle,
       memo: "",
       isActive: true,
+      sourceFollowupId: "",
     });
     setScheduleFormStatus({ status: "idle", message: "" });
   }
@@ -263,6 +265,7 @@ export function ManagementHome({
       classId: schedule.classId ?? "",
       teacherId: schedule.teacherId ?? "",
       scheduleType: schedule.scheduleType,
+      scheduleDate: schedule.scheduleDate ?? "",
       dayOfWeek: schedule.dayOfWeek,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
@@ -270,6 +273,7 @@ export function ManagementHome({
       title: schedule.title,
       memo: schedule.memo ?? "",
       isActive: schedule.isActive,
+      sourceFollowupId: schedule.sourceFollowupId ?? "",
     });
     setScheduleFormStatus({ status: "idle", message: "" });
   }
@@ -293,6 +297,7 @@ export function ManagementHome({
           classId: scheduleForm.classId,
           teacherId: scheduleForm.teacherId,
           scheduleType: scheduleForm.scheduleType,
+          scheduleDate: scheduleForm.scheduleDate,
           dayOfWeek: scheduleForm.dayOfWeek,
           startTime: scheduleForm.startTime,
           endTime: scheduleForm.endTime,
@@ -300,6 +305,7 @@ export function ManagementHome({
           title: scheduleForm.title,
           memo: scheduleForm.memo,
           isActive: scheduleForm.isActive,
+          sourceFollowupId: scheduleForm.sourceFollowupId,
         }),
       });
       const payload = (await response.json()) as { error?: string };

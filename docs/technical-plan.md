@@ -210,6 +210,7 @@ Supabase Auth 사용자와 학원 권한을 연결합니다.
 - `class_id`
 - `teacher_id`
 - `schedule_type`: `regular_class`, `makeup`, `external`, `consultation`
+- `schedule_date`: 날짜 지정 1회 일정인 경우 사용
 - `day_of_week`: 0~6
 - `start_time`
 - `end_time`
@@ -217,6 +218,7 @@ Supabase Auth 사용자와 학원 권한을 연결합니다.
 - `title`
 - `memo`
 - `is_active`
+- `source_followup_id`: 보강 문자 발송 후 자동 등록된 일정이면 연결되는 팔로업 ID
 - `created_at`
 - `updated_at`
 
@@ -225,10 +227,13 @@ Supabase Auth 사용자와 학원 권한을 연결합니다.
 - `day_of_week`는 0=일요일, 1=월요일, ... 6=토요일로 저장합니다.
 - `start_time < end_time` 제약으로 잘못된 시간 범위를 막습니다.
 - 학생 상세 화면은 `student_id, day_of_week, start_time` 인덱스를 기준으로 조회합니다.
+- 날짜 지정 일정은 `student_id, schedule_date, start_time` 인덱스를 기준으로 조회합니다.
 - 원장용 전체 주간표는 `academy_id, day_of_week, start_time` 인덱스를 기준으로 조회합니다.
 - `class_id`, `teacher_id`는 선택 연결입니다. 외부 일정은 반 없이 저장할 수 있습니다.
+- 같은 학생, 같은 날짜, 같은 시간대의 활성 보강 일정은 중복 등록하지 않습니다.
 
-초기에는 주간 반복 스케줄만 지원하고, 날짜별 예외/드래그 캘린더는 후속으로 둡니다.
+초기에는 드래그 캘린더가 아니라 `date input + 직접 시간 입력`으로 날짜별 보강을 지원합니다.
+날짜가 없는 일정은 주간 반복, 날짜가 있는 일정은 1회성 일정으로 처리합니다.
 
 ### attendance_records
 

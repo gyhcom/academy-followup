@@ -320,10 +320,10 @@ export function ScheduleForm({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-stone-950">
-            {form.mode === "create" ? "주간 스케줄 등록" : "주간 스케줄 수정"}
+            {form.mode === "create" ? "스케줄 등록" : "스케줄 수정"}
           </p>
           <p className="mt-1 text-xs leading-5 text-stone-600">
-            {form.studentName} 학생의 반복 수업, 외부 일정, 보강 가능 시간을 관리합니다.
+            {form.studentName} 학생의 반복 수업, 날짜 지정 보강, 외부 일정을 관리합니다.
           </p>
         </div>
         <button
@@ -349,6 +349,26 @@ export function ScheduleForm({
             <option value="external">외부 일정</option>
             <option value="consultation">상담</option>
           </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          날짜
+          <input
+            type="date"
+            value={form.scheduleDate}
+            onChange={(event) => {
+              const value = event.target.value;
+              onChange({
+                ...form,
+                scheduleDate: value,
+                dayOfWeek: value ? getDayOfWeek(value) : form.dayOfWeek,
+              });
+            }}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+          <span className="text-xs font-normal leading-5 text-stone-500">
+            비워두면 주간 반복, 입력하면 해당 날짜 1회 일정입니다.
+          </span>
         </label>
 
         <label className="grid gap-1.5 text-sm font-medium text-stone-800">
@@ -490,3 +510,7 @@ export function ScheduleForm({
   );
 }
 
+function getDayOfWeek(dateString: string) {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day).getDay();
+}

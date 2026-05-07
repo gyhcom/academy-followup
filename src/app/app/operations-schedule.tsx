@@ -12,6 +12,7 @@ export type OperationsStudentSchedule = {
   id: string;
   classId: string | null;
   scheduleType: string;
+  scheduleDate: string | null;
   dayOfWeek: number;
   startTime: string;
   endTime: string;
@@ -19,6 +20,7 @@ export type OperationsStudentSchedule = {
   title: string;
   memo: string | null;
   isActive: boolean;
+  sourceFollowupId: string | null;
 };
 
 type WeeklySchedulePanelProps = {
@@ -39,6 +41,7 @@ export function getSortedActiveSchedules(schedules: OperationsStudentSchedule[])
     .filter((schedule) => schedule.isActive)
     .sort(
       (first, second) =>
+        compareScheduleDate(first.scheduleDate, second.scheduleDate) ||
         daySortValue(first.dayOfWeek) - daySortValue(second.dayOfWeek) ||
         first.startTime.localeCompare(second.startTime),
     );
@@ -171,6 +174,11 @@ function ScheduleRow({
           <p className="mt-1 truncate text-sm font-semibold text-stone-800">
             {schedule.title}
           </p>
+          {schedule.scheduleDate ? (
+            <p className="mt-1 text-xs font-semibold text-emerald-700">
+              {schedule.scheduleDate} 1회 일정
+            </p>
+          ) : null}
         </div>
         <span
           className={[
@@ -203,4 +211,20 @@ function ScheduleRow({
       )}
     </div>
   );
+}
+
+function compareScheduleDate(firstDate: string | null, secondDate: string | null) {
+  if (!firstDate && !secondDate) {
+    return 0;
+  }
+
+  if (!firstDate) {
+    return 1;
+  }
+
+  if (!secondDate) {
+    return -1;
+  }
+
+  return firstDate.localeCompare(secondDate);
 }

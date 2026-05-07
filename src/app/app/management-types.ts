@@ -14,6 +14,7 @@ export type ManagementStudentSchedule = {
   classId: string | null;
   teacherId: string | null;
   scheduleType: string;
+  scheduleDate: string | null;
   dayOfWeek: number;
   startTime: string;
   endTime: string;
@@ -21,6 +22,7 @@ export type ManagementStudentSchedule = {
   title: string;
   memo: string | null;
   isActive: boolean;
+  sourceFollowupId: string | null;
 };
 
 export type ManagementStudent = {
@@ -85,6 +87,7 @@ export type ScheduleFormState = {
   classId: string;
   teacherId: string;
   scheduleType: string;
+  scheduleDate: string;
   dayOfWeek: number;
   startTime: string;
   endTime: string;
@@ -92,6 +95,7 @@ export type ScheduleFormState = {
   title: string;
   memo: string;
   isActive: boolean;
+  sourceFollowupId: string;
 };
 
 export type StudentSortMode = "time" | "name" | "class";
