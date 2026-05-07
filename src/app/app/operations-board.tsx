@@ -92,6 +92,7 @@ export function OperationsBoard({
   const [selectedReason, setSelectedReason] = useState<FollowupReason>("absence");
   const [hasMobileFollowupSelection, setHasMobileFollowupSelection] = useState(false);
   const [isMobileComposerOpen, setIsMobileComposerOpen] = useState(false);
+  const [makeupCandidateTime, setMakeupCandidateTime] = useState("");
 
   const selectedStudent = useMemo(() => {
     if (!selectedClass) {
@@ -104,7 +105,7 @@ export function OperationsBoard({
     );
   }, [selectedClass, selectedStudentId]);
 
-  const messageKey = `${selectedClass?.id ?? ""}:${selectedStudent?.id ?? ""}:${selectedReason}`;
+  const messageKey = `${selectedClass?.id ?? ""}:${selectedStudent?.id ?? ""}:${selectedReason}:${makeupCandidateTime}`;
   const selectedStudentIdForPreview = selectedStudent?.id ?? "";
   const [messagePreview, setMessagePreview] = useState<MessagePreviewState>({
     key: "",
@@ -175,6 +176,7 @@ export function OperationsBoard({
           body: JSON.stringify({
             studentId: selectedStudentIdForPreview,
             reason: selectedReason,
+            makeupCandidateTime,
           }),
           signal: controller.signal,
         });
@@ -216,7 +218,7 @@ export function OperationsBoard({
     return () => {
       controller.abort();
     };
-  }, [messageKey, selectedReason, selectedStudentIdForPreview]);
+  }, [makeupCandidateTime, messageKey, selectedReason, selectedStudentIdForPreview]);
 
   useEffect(() => {
     if (!isMobileComposerOpen) {
@@ -246,12 +248,14 @@ export function OperationsBoard({
     setSelectedStudentId(nextClass?.students[0]?.id ?? "");
     setHasMobileFollowupSelection(false);
     setIsMobileComposerOpen(false);
+    setMakeupCandidateTime("");
   }
 
   function handleStudentSelect(studentId: string) {
     setSelectedStudentId(studentId);
     setHasMobileFollowupSelection(false);
     setIsMobileComposerOpen(false);
+    setMakeupCandidateTime("");
   }
 
   function handleStudentReasonSelect(studentId: string, reasonId: FollowupReason) {
@@ -259,11 +263,24 @@ export function OperationsBoard({
     setSelectedReason(reasonId);
     setHasMobileFollowupSelection(true);
     setIsMobileComposerOpen(false);
+    setMakeupCandidateTime("");
   }
 
   function handleComposerReasonChange(reasonId: FollowupReason) {
     setSelectedReason(reasonId);
     setHasMobileFollowupSelection(Boolean(selectedStudent));
+    if (reasonId !== "makeup") {
+      setMakeupCandidateTime("");
+    }
+  }
+
+  function handleMakeupCandidateSelect(schedule: OperationsStudentSchedule) {
+    setSelectedReason("makeup");
+    setMakeupCandidateTime(
+      `${weekDayShortLabel(schedule.dayOfWeek)} ${schedule.startTime}-${schedule.endTime}`,
+    );
+    setHasMobileFollowupSelection(Boolean(selectedStudent));
+    setIsMobileComposerOpen(false);
   }
 
   function handleRestorePreview() {
@@ -520,6 +537,7 @@ export function OperationsBoard({
         <WeeklySchedulePanel
           selectedClassName={selectedClass?.name}
           selectedStudent={selectedStudent}
+          onMakeupCandidateSelect={handleMakeupCandidateSelect}
         />
 
         <MessageComposer
@@ -535,6 +553,7 @@ export function OperationsBoard({
           followupSaveError={followupSaveError}
           messageBody={messageBody}
           messagePreview={messagePreview}
+          makeupCandidateTime={makeupCandidateTime}
           selectedReason={selectedReason}
           selectedStudent={selectedStudent}
           onReasonChange={handleComposerReasonChange}
@@ -576,6 +595,7 @@ export function OperationsBoard({
               followupSaveError={followupSaveError}
               messageBody={messageBody}
               messagePreview={messagePreview}
+              makeupCandidateTime={makeupCandidateTime}
               selectedReason={selectedReason}
               selectedStudent={selectedStudent}
               onClose={() => setIsMobileComposerOpen(false)}
@@ -604,6 +624,7 @@ function MessageComposer({
   followupSaveError,
   messageBody,
   messagePreview,
+  makeupCandidateTime,
   selectedReason,
   selectedStudent,
   onClose,
@@ -624,6 +645,7 @@ function MessageComposer({
   followupSaveError: string;
   messageBody: string;
   messagePreview: MessagePreviewState;
+  makeupCandidateTime: string;
   selectedReason: FollowupReason;
   selectedStudent: OperationsStudent | undefined;
   onClose?: () => void;
@@ -682,6 +704,11 @@ function MessageComposer({
             <p className="mt-1 text-xs text-stone-500">
               {selectedStudent.parentName ?? "학부모"} · {selectedStudent.maskedParentPhone}
             </p>
+            {selectedReason === "makeup" && makeupCandidateTime ? (
+              <p className="mt-2 rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800">
+                보강 후보 {makeupCandidateTime}
+              </p>
+            ) : null}
           </div>
         ) : null}
 

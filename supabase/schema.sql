@@ -11,6 +11,7 @@ create type public.followup_reason as enum (
   'late',
   'homework_missing',
   'retest',
+  'makeup',
   'materials_missing',
   'class_attitude',
   'consultation'

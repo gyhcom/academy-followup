@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import {
+  getDefaultFollowupTemplate,
+  getDefaultFollowupTitle,
   isFollowupReason,
   renderFollowupTemplate,
   type FollowupReason,
@@ -13,6 +15,7 @@ import {
 type PreviewMessageRequest = {
   studentId?: unknown;
   reason?: unknown;
+  makeupCandidateTime?: unknown;
 };
 
 type ProfileWithAcademy = {
@@ -132,13 +135,6 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!templateResult.data) {
-    return NextResponse.json(
-      { error: "선택한 사유의 활성 문자 템플릿이 없습니다." },
-      { status: 404 },
-    );
-  }
-
   const classRecord = await getStudentClass({
     admin,
     academyId: profile.academy_id,
@@ -156,17 +152,22 @@ export async function POST(request: Request) {
     );
   }
 
+  const templateBody =
+    templateResult.data?.body ?? getDefaultFollowupTemplate(parsedRequest.reason);
+  const templateTitle =
+    templateResult.data?.title ?? getDefaultFollowupTitle(parsedRequest.reason);
   const senderName = profile.academies.sender_name ?? profile.academies.name;
-  const body = renderFollowupTemplate(templateResult.data.body, {
+  const body = renderFollowupTemplate(templateBody, {
     academyName: senderName,
     studentName: studentResult.data.name,
     teacherName: profile.name,
     className: classRecord.data?.name,
+    makeupCandidateTime: parsedRequest.makeupCandidateTime,
   });
 
   return NextResponse.json({
-    templateId: templateResult.data.id,
-    title: templateResult.data.title,
+    templateId: templateResult.data?.id ?? null,
+    title: templateTitle,
     body,
     reason: parsedRequest.reason,
     student: {
@@ -177,7 +178,12 @@ export async function POST(request: Request) {
 }
 
 async function parsePreviewRequest(request: Request): Promise<
-  | { ok: true; studentId: string; reason: FollowupReason }
+  | {
+      ok: true;
+      studentId: string;
+      reason: FollowupReason;
+      makeupCandidateTime?: string;
+    }
   | { ok: false; error: string }
 > {
   let body: PreviewMessageRequest;
@@ -196,10 +202,19 @@ async function parsePreviewRequest(request: Request): Promise<
     return { ok: false, error: "지원하지 않는 팔로업 사유입니다." };
   }
 
+  if (
+    body.makeupCandidateTime !== undefined &&
+    (typeof body.makeupCandidateTime !== "string" ||
+      body.makeupCandidateTime.length > 80)
+  ) {
+    return { ok: false, error: "보강 후보 시간 형식이 올바르지 않습니다." };
+  }
+
   return {
     ok: true,
     studentId: body.studentId,
     reason: body.reason,
+    makeupCandidateTime: body.makeupCandidateTime?.trim() || undefined,
   };
 }
 
