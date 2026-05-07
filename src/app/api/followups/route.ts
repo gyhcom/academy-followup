@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { isFollowupReason, type FollowupReason } from "@/lib/followup-templates";
+import {
+  isMessageRecipientType,
+  type MessageRecipientType,
+} from "@/lib/message-recipients";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -11,6 +15,7 @@ type CreateFollowupRequest = {
   reason?: unknown;
   messageBody?: unknown;
   attendanceRecordId?: unknown;
+  recipientType?: unknown;
 };
 
 type ProfileRecord = {
@@ -50,6 +55,7 @@ type FollowupHistoryRecord = {
   id: string;
   reason: string;
   message_body: string;
+  recipient_type: string;
   status: string;
   sent_at: string | null;
   created_at: string;
@@ -140,7 +146,7 @@ export async function GET(request: Request) {
 
   const { data: followups, error: followupsError } = await admin
     .from("followups")
-    .select("id, reason, message_body, status, sent_at, created_at")
+    .select("id, reason, message_body, recipient_type, status, sent_at, created_at")
     .eq("academy_id", profile.academy_id)
     .eq("student_id", student.id)
     .order("created_at", { ascending: false })
@@ -156,6 +162,7 @@ export async function GET(request: Request) {
       id: followup.id,
       reason: followup.reason,
       messageBody: followup.message_body,
+      recipientType: followup.recipient_type,
       status: followup.status,
       sentAt: followup.sent_at,
       createdAt: followup.created_at,
@@ -286,6 +293,7 @@ export async function POST(request: Request) {
       teacher_id: user.id,
       reason: parsedRequest.reason,
       message_body: parsedRequest.messageBody,
+      recipient_type: parsedRequest.recipientType,
       status: "draft",
     })
     .select("id, status, created_at")
@@ -326,6 +334,7 @@ async function parseCreateFollowupRequest(request: Request): Promise<
       studentId: string;
       reason: FollowupReason;
       messageBody: string;
+      recipientType: MessageRecipientType;
       attendanceRecordId: string | null;
     }
   | { ok: false; error: string }
@@ -350,6 +359,13 @@ async function parseCreateFollowupRequest(request: Request): Promise<
     return { ok: false, error: "저장할 문자 본문이 필요합니다." };
   }
 
+  const recipientType =
+    body.recipientType === undefined ? "parent" : body.recipientType;
+
+  if (!isMessageRecipientType(recipientType)) {
+    return { ok: false, error: "지원하지 않는 문자 수신자입니다." };
+  }
+
   if (
     body.attendanceRecordId !== undefined &&
     (typeof body.attendanceRecordId !== "string" ||
@@ -366,6 +382,7 @@ async function parseCreateFollowupRequest(request: Request): Promise<
     studentId: body.studentId,
     reason: body.reason,
     messageBody: body.messageBody.trim(),
+    recipientType,
     attendanceRecordId,
   };
 }

@@ -247,6 +247,17 @@ export function StudentForm({
             className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
           />
         </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2 lg:col-span-1">
+          학생 연락처
+          <input
+            value={form.studentPhone}
+            onChange={(event) => onChange({ ...form, studentPhone: event.target.value })}
+            inputMode="tel"
+            placeholder="선택 입력"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+          />
+        </label>
       </div>
 
       {status.status === "error" ? (

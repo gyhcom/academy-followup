@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { MessageRecipientType } from "@/lib/message-recipients";
 import { sendSms } from "@/lib/sms/solapi";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
@@ -21,9 +22,11 @@ type FollowupRecord = {
   student_id: string;
   class_id: string | null;
   message_body: string;
+  recipient_type: MessageRecipientType;
   status: string;
   students: {
     parent_phone: string;
+    student_phone: string | null;
     status: string;
   } | null;
   classes: {
@@ -81,7 +84,7 @@ export async function POST(request: Request) {
   const { data: followup, error: followupError } = await admin
     .from("followups")
     .select(
-      "id, academy_id, student_id, class_id, message_body, status, students(parent_phone, status), classes(teacher_id)",
+      "id, academy_id, student_id, class_id, message_body, recipient_type, status, students(parent_phone, student_phone, status), classes(teacher_id)",
     )
     .eq("id", parsedRequest.followupId)
     .eq("academy_id", profile.academy_id)
@@ -112,11 +115,15 @@ export async function POST(request: Request) {
     );
   }
 
-  const recipientPhone = normalizePhone(followup.students.parent_phone);
+  const recipients = getMessageRecipients({
+    recipientType: followup.recipient_type,
+    parentPhone: followup.students.parent_phone,
+    studentPhone: followup.students.student_phone,
+  });
 
-  if (!recipientPhone) {
+  if (recipients.length === 0) {
     return NextResponse.json(
-      { error: "학부모 연락처 형식이 올바르지 않습니다." },
+      { error: "발송 가능한 수신자 연락처가 없습니다." },
       { status: 400 },
     );
   }
@@ -128,40 +135,51 @@ export async function POST(request: Request) {
       admin,
       academyId: profile.academy_id,
       followupId: followup.id,
-      recipientPhone,
+      recipients,
       status: "dry_run",
     });
 
     return NextResponse.json({
       dryRun: true,
       message: "SMS_DRY_RUN이 활성화되어 실제 문자를 발송하지 않았습니다.",
-      recipientPhone: maskPhone(recipientPhone),
+      recipientPhone: recipients.map((recipient) => maskPhone(recipient.phone)).join(", "),
+      recipientCount: recipients.length,
       followupId: followup.id,
     });
   }
 
   try {
-    const result = await sendSms({
-      to: recipientPhone,
-      text: followup.message_body,
-    });
-    const providerMessageId = getProviderMessageId(result);
+    const sentResults = [];
+
+    for (const recipient of recipients) {
+      const result = await sendSms({
+        to: recipient.phone,
+        text: followup.message_body,
+      });
+
+      sentResults.push({
+        recipient,
+        providerMessageId: getProviderMessageId(result),
+      });
+    }
 
     await saveMessageResult({
       admin,
       academyId: profile.academy_id,
       followupId: followup.id,
-      recipientPhone,
+      recipients: sentResults.map((result) => ({
+        ...result.recipient,
+        providerMessageId: result.providerMessageId,
+      })),
       status: "sent",
-      providerMessageId,
     });
 
     return NextResponse.json({
       dryRun: false,
       message: "문자를 발송했습니다.",
-      recipientPhone: maskPhone(recipientPhone),
+      recipientPhone: recipients.map((recipient) => maskPhone(recipient.phone)).join(", "),
+      recipientCount: recipients.length,
       followupId: followup.id,
-      providerMessageId,
     });
   } catch (error) {
     const errorMessage =
@@ -171,7 +189,7 @@ export async function POST(request: Request) {
       admin,
       academyId: profile.academy_id,
       followupId: followup.id,
-      recipientPhone,
+      recipients,
       status: "failed",
       errorMessage,
     });
@@ -215,32 +233,37 @@ async function saveMessageResult({
   admin,
   academyId,
   followupId,
-  recipientPhone,
+  recipients,
   status,
-  providerMessageId,
   errorMessage,
 }: {
   admin: ReturnType<typeof createSupabaseAdminClient>;
   academyId: string;
   followupId: string;
-  recipientPhone: string;
+  recipients: Array<{
+    recipientType: MessageRecipientType;
+    phone: string;
+    providerMessageId?: string;
+  }>;
   status: "dry_run" | "sent" | "failed";
-  providerMessageId?: string;
   errorMessage?: string;
 }) {
   const followupStatus = status === "failed" ? "failed" : "sent";
   const sentAt = status === "failed" ? null : new Date().toISOString();
 
   const [logResult, followupResult] = await Promise.all([
-    admin.from("message_logs").insert({
-      academy_id: academyId,
-      followup_id: followupId,
-      provider: "solapi",
-      provider_message_id: providerMessageId ?? null,
-      recipient_phone: recipientPhone,
-      status,
-      error_message: errorMessage ?? null,
-    }),
+    admin.from("message_logs").insert(
+      recipients.map((recipient) => ({
+        academy_id: academyId,
+        followup_id: followupId,
+        provider: "solapi",
+        provider_message_id: recipient.providerMessageId ?? null,
+        recipient_phone: recipient.phone,
+        recipient_type: recipient.recipientType,
+        status,
+        error_message: errorMessage ?? null,
+      })),
+    ),
     admin
       .from("followups")
       .update({
@@ -258,6 +281,30 @@ async function saveMessageResult({
   if (followupResult.error) {
     throw new Error(followupResult.error.message);
   }
+}
+
+function getMessageRecipients({
+  recipientType,
+  parentPhone,
+  studentPhone,
+}: {
+  recipientType: MessageRecipientType;
+  parentPhone: string;
+  studentPhone: string | null;
+}) {
+  const recipients: Array<{ recipientType: MessageRecipientType; phone: string }> = [];
+  const normalizedParentPhone = normalizePhone(parentPhone);
+  const normalizedStudentPhone = normalizePhone(studentPhone ?? "");
+
+  if ((recipientType === "parent" || recipientType === "both") && normalizedParentPhone) {
+    recipients.push({ recipientType: "parent", phone: normalizedParentPhone });
+  }
+
+  if ((recipientType === "student" || recipientType === "both") && normalizedStudentPhone) {
+    recipients.push({ recipientType: "student", phone: normalizedStudentPhone });
+  }
+
+  return recipients;
 }
 
 function normalizePhone(phone: string) {

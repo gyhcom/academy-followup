@@ -12,6 +12,11 @@ import {
 } from "lucide-react";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 import {
+  messageRecipientLabels,
+  messageRecipientTypes,
+  type MessageRecipientType,
+} from "@/lib/message-recipients";
+import {
   type FollowupHistoryItem,
   type FollowupHistoryState,
   StudentFollowupHistory,
@@ -32,6 +37,7 @@ export type OperationsStudent = {
   gradeLabel: string | null;
   parentName: string | null;
   maskedParentPhone: string;
+  maskedStudentPhone: string | null;
   schedules: OperationsStudentSchedule[];
 };
 
@@ -136,6 +142,8 @@ export function OperationsBoard({
     selectedClass?.students[0]?.id ?? "",
   );
   const [selectedReason, setSelectedReason] = useState<FollowupReason>("absence");
+  const [selectedRecipientType, setSelectedRecipientType] =
+    useState<MessageRecipientType>("parent");
   const [hasMobileFollowupSelection, setHasMobileFollowupSelection] = useState(false);
   const [isMobileComposerOpen, setIsMobileComposerOpen] = useState(false);
   const [makeupCandidateTime, setMakeupCandidateTime] = useState("");
@@ -160,8 +168,11 @@ export function OperationsBoard({
     );
   }, [selectedClass, selectedStudentId]);
 
-  const messageKey = `${selectedClass?.id ?? ""}:${selectedStudent?.id ?? ""}:${selectedReason}:${makeupCandidateTime}`;
   const selectedStudentIdForPreview = selectedStudent?.id ?? "";
+  const effectiveRecipientType =
+    selectedStudent?.maskedStudentPhone ? selectedRecipientType : "parent";
+  const messageKey = `${selectedClass?.id ?? ""}:${selectedStudent?.id ?? ""}:${selectedReason}:${makeupCandidateTime}:${effectiveRecipientType}`;
+
   const [messagePreview, setMessagePreview] = useState<MessagePreviewState>({
     key: "",
     status: "idle",
@@ -481,6 +492,7 @@ export function OperationsBoard({
           studentId: selectedStudent.id,
           reason: selectedReason,
           messageBody: bodyToSave,
+          recipientType: effectiveRecipientType,
         }),
       });
       const payload = (await response.json()) as CreateFollowupResponse;
@@ -863,6 +875,7 @@ export function OperationsBoard({
           selectedMakeupCandidate={selectedMakeupCandidate}
           selectedReason={selectedReason}
           selectedStudent={selectedStudent}
+          selectedRecipientType={effectiveRecipientType}
           canRegisterMakeupSchedule={
             selectedReason === "makeup" &&
             Boolean(selectedMakeupCandidate) &&
@@ -870,6 +883,7 @@ export function OperationsBoard({
             isMessageSent
           }
           onReasonChange={handleComposerReasonChange}
+          onRecipientTypeChange={setSelectedRecipientType}
           onRegisterMakeupSchedule={handleRegisterMakeupSchedule}
           onRestorePreview={handleRestorePreview}
           onSaveFollowup={handleSaveFollowup}
@@ -919,6 +933,7 @@ export function OperationsBoard({
               selectedMakeupCandidate={selectedMakeupCandidate}
               selectedReason={selectedReason}
               selectedStudent={selectedStudent}
+              selectedRecipientType={effectiveRecipientType}
               canRegisterMakeupSchedule={
                 selectedReason === "makeup" &&
                 Boolean(selectedMakeupCandidate) &&
@@ -927,6 +942,7 @@ export function OperationsBoard({
               }
               onClose={() => setIsMobileComposerOpen(false)}
               onReasonChange={handleComposerReasonChange}
+              onRecipientTypeChange={setSelectedRecipientType}
               onRegisterMakeupSchedule={handleRegisterMakeupSchedule}
               onRestorePreview={handleRestorePreview}
               onSaveFollowup={handleSaveFollowup}
@@ -962,9 +978,11 @@ function MessageComposer({
   selectedMakeupCandidate,
   selectedReason,
   selectedStudent,
+  selectedRecipientType,
   canRegisterMakeupSchedule,
   onClose,
   onReasonChange,
+  onRecipientTypeChange,
   onRegisterMakeupSchedule,
   onRestorePreview,
   onSaveFollowup,
@@ -992,9 +1010,11 @@ function MessageComposer({
   selectedMakeupCandidate: MakeupCandidate | null;
   selectedReason: FollowupReason;
   selectedStudent: OperationsStudent | undefined;
+  selectedRecipientType: MessageRecipientType;
   canRegisterMakeupSchedule: boolean;
   onClose?: () => void;
   onReasonChange: (reason: FollowupReason) => void;
+  onRecipientTypeChange: (recipientType: MessageRecipientType) => void;
   onRegisterMakeupSchedule: () => void;
   onRestorePreview: () => void;
   onSaveFollowup: () => void;
@@ -1088,6 +1108,40 @@ function MessageComposer({
               );
             })}
           </div>
+        </fieldset>
+
+        <fieldset>
+          <legend className="text-sm font-semibold text-stone-800">수신자</legend>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {messageRecipientTypes.map((recipientType) => {
+              const needsStudentPhone = recipientType !== "parent";
+              const isDisabled =
+                needsStudentPhone && !selectedStudent?.maskedStudentPhone;
+              const isSelected = selectedRecipientType === recipientType;
+
+              return (
+                <button
+                  key={recipientType}
+                  type="button"
+                  disabled={isDisabled}
+                  aria-pressed={isSelected}
+                  onClick={() => onRecipientTypeChange(recipientType)}
+                  className={[
+                    "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                    isSelected
+                      ? "border-stone-950 bg-stone-950 text-white"
+                      : "border-stone-200 bg-white text-stone-700 hover:border-emerald-300 hover:bg-emerald-50",
+                    isDisabled ? "cursor-not-allowed opacity-45" : "",
+                  ].join(" ")}
+                >
+                  {messageRecipientLabels[recipientType]}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-xs leading-5 text-stone-500">
+            학생 연락처: {selectedStudent?.maskedStudentPhone ?? "미등록"}
+          </p>
         </fieldset>
 
         <div>

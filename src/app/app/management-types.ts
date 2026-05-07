@@ -35,6 +35,8 @@ export type ManagementStudent = {
   parentName: string | null;
   parentPhone: string;
   maskedParentPhone: string;
+  studentPhone: string | null;
+  maskedStudentPhone: string | null;
   status: string;
   schedules: ManagementStudentSchedule[];
 };
@@ -74,6 +76,7 @@ export type StudentFormState = {
   gradeLabel: string;
   parentName: string;
   parentPhone: string;
+  studentPhone: string;
   status: string;
 };
 

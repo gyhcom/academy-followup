@@ -17,6 +17,7 @@ type StudentRequest = {
   gradeLabel?: unknown;
   parentName?: unknown;
   parentPhone?: unknown;
+  studentPhone?: unknown;
   status?: unknown;
 };
 
@@ -33,6 +34,7 @@ type StudentPayload = {
   gradeLabel: string | null;
   parentName: string | null;
   parentPhone: string;
+  studentPhone: string | null;
   status: StudentStatus;
 };
 
@@ -44,6 +46,7 @@ type StudentRecord = {
   grade_label: string | null;
   parent_name: string | null;
   parent_phone: string;
+  student_phone: string | null;
   status: string;
 };
 
@@ -80,9 +83,12 @@ export async function POST(request: Request) {
       grade_label: parsedRequest.data.gradeLabel,
       parent_name: parsedRequest.data.parentName,
       parent_phone: parsedRequest.data.parentPhone,
+      student_phone: parsedRequest.data.studentPhone,
       status: parsedRequest.data.status,
     })
-    .select("id, class_id, name, school_name, grade_label, parent_name, parent_phone, status")
+    .select(
+      "id, class_id, name, school_name, grade_label, parent_name, parent_phone, student_phone, status",
+    )
     .single<StudentRecord>();
 
   if (error) {
@@ -124,11 +130,14 @@ export async function PATCH(request: Request) {
       grade_label: parsedRequest.data.gradeLabel,
       parent_name: parsedRequest.data.parentName,
       parent_phone: parsedRequest.data.parentPhone,
+      student_phone: parsedRequest.data.studentPhone,
       status: parsedRequest.data.status,
     })
     .eq("id", parsedRequest.data.studentId)
     .eq("academy_id", workspace.profile.academy_id)
-    .select("id, class_id, name, school_name, grade_label, parent_name, parent_phone, status")
+    .select(
+      "id, class_id, name, school_name, grade_label, parent_name, parent_phone, student_phone, status",
+    )
     .maybeSingle<StudentRecord>();
 
   if (error) {
@@ -223,6 +232,12 @@ async function parseStudentRequest(
     return { ok: false, error: "학부모 연락처가 필요합니다." };
   }
 
+  const studentPhone = normalizeOptionalPhone(body.studentPhone);
+
+  if (studentPhone === undefined) {
+    return { ok: false, error: "학생 연락처 형식이 올바르지 않습니다." };
+  }
+
   if (!isStudentStatus(body.status)) {
     return { ok: false, error: "지원하지 않는 학생 상태입니다." };
   }
@@ -237,6 +252,7 @@ async function parseStudentRequest(
       gradeLabel: optionalText(body.gradeLabel),
       parentName: optionalText(body.parentName),
       parentPhone,
+      studentPhone,
       status: body.status,
     },
   };
@@ -296,6 +312,16 @@ function normalizePhone(value: unknown) {
   return digits;
 }
 
+function normalizeOptionalPhone(value: unknown) {
+  const text = optionalText(value);
+
+  if (!text) {
+    return null;
+  }
+
+  return normalizePhone(text) ?? undefined;
+}
+
 function isStudentStatus(value: unknown): value is StudentStatus {
   return typeof value === "string" && studentStatuses.includes(value as StudentStatus);
 }
@@ -309,6 +335,7 @@ function toStudentResponse(student: StudentRecord) {
     gradeLabel: student.grade_label,
     parentName: student.parent_name,
     parentPhone: student.parent_phone,
+    studentPhone: student.student_phone,
     status: student.status,
   };
 }

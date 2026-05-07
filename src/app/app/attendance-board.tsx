@@ -20,6 +20,11 @@ import {
 } from "@/lib/attendance";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 import {
+  messageRecipientLabels,
+  messageRecipientTypes,
+  type MessageRecipientType,
+} from "@/lib/message-recipients";
+import {
   getSortedActiveSchedules,
   type OperationsStudentSchedule,
 } from "@/app/app/operations-schedule";
@@ -30,6 +35,7 @@ export type AttendanceStudent = {
   schoolName: string | null;
   gradeLabel: string | null;
   maskedParentPhone: string;
+  maskedStudentPhone: string | null;
   schedules: OperationsStudentSchedule[];
 };
 
@@ -217,6 +223,8 @@ export function AttendanceBoard({
     error: "",
   });
   const [messageDraft, setMessageDraft] = useState({ key: "", body: "" });
+  const [selectedRecipientType, setSelectedRecipientType] =
+    useState<MessageRecipientType>("parent");
   const [followupSave, setFollowupSave] = useState<FollowupSaveState>({
     key: "",
     body: "",
@@ -272,7 +280,11 @@ export function AttendanceBoard({
           "needs_check",
       )
     : [];
-  const followupTargetKey = followupTarget?.key ?? "";
+  const effectiveRecipientType =
+    followupTarget?.student.maskedStudentPhone ? selectedRecipientType : "parent";
+  const followupTargetKey = followupTarget
+    ? `${followupTarget.key}:${effectiveRecipientType}`
+    : "";
   const messageBody =
     messageDraft.key === followupTargetKey
       ? messageDraft.body
@@ -360,7 +372,7 @@ export function AttendanceBoard({
 
     const target = followupTarget;
     const controller = new AbortController();
-    const nextKey = target.key;
+    const nextKey = `${target.key}:${effectiveRecipientType}`;
 
     async function loadPreview() {
       try {
@@ -434,7 +446,7 @@ export function AttendanceBoard({
     return () => {
       controller.abort();
     };
-  }, [followupTarget]);
+  }, [followupTarget, effectiveRecipientType]);
 
   async function handleStatusChange(student: AttendanceStudent, status: AttendanceStatus) {
     if (!selectedSession) {
@@ -536,6 +548,7 @@ export function AttendanceBoard({
           reason: followupTarget.reason,
           messageBody: bodyToSave,
           attendanceRecordId: followupTarget.record.id,
+          recipientType: effectiveRecipientType,
         }),
       });
       const payload = (await response.json()) as CreateFollowupResponse;
@@ -773,6 +786,7 @@ export function AttendanceBoard({
           duplicateWarning={duplicateWarning}
           followupSaveError={followupSaveError}
           followupTarget={followupTarget}
+          selectedRecipientType={effectiveRecipientType}
           isDraftEdited={isDraftEdited}
           isFollowupSaved={isFollowupSaved}
           isFollowupSaving={isFollowupSaving}
@@ -792,6 +806,7 @@ export function AttendanceBoard({
             setFollowupTarget(null);
           }}
           onMessageChange={(body) => setMessageDraft({ key: followupTargetKey, body })}
+          onRecipientTypeChange={setSelectedRecipientType}
           onRestorePreview={handleRestorePreview}
           onSaveFollowup={handleSaveAttendanceFollowup}
           onSendMessage={handleSendAttendanceMessage}
@@ -1141,8 +1156,10 @@ function AttendanceFollowupPanel({
   messageSend,
   messageSendError,
   needsCheckStudents,
+  selectedRecipientType,
   onDismiss,
   onMessageChange,
+  onRecipientTypeChange,
   onRestorePreview,
   onSaveFollowup,
   onSendMessage,
@@ -1165,8 +1182,10 @@ function AttendanceFollowupPanel({
   messageSend: MessageSendState;
   messageSendError: string;
   needsCheckStudents: AttendanceStudent[];
+  selectedRecipientType: MessageRecipientType;
   onDismiss: () => void;
   onMessageChange: (body: string) => void;
+  onRecipientTypeChange: (recipientType: MessageRecipientType) => void;
   onRestorePreview: () => void;
   onSaveFollowup: () => void;
   onSendMessage: () => void;
@@ -1238,6 +1257,40 @@ function AttendanceFollowupPanel({
               {reasonLabel(followupTarget.reason)} 안내
             </p>
           </div>
+
+          <fieldset>
+            <legend className="text-sm font-semibold text-stone-800">수신자</legend>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {messageRecipientTypes.map((recipientType) => {
+                const needsStudentPhone = recipientType !== "parent";
+                const isDisabled =
+                  needsStudentPhone && !followupTarget.student.maskedStudentPhone;
+                const isSelected = selectedRecipientType === recipientType;
+
+                return (
+                  <button
+                    key={recipientType}
+                    type="button"
+                    disabled={isDisabled}
+                    aria-pressed={isSelected}
+                    onClick={() => onRecipientTypeChange(recipientType)}
+                    className={[
+                      "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                      isSelected
+                        ? "border-stone-950 bg-stone-950 text-white"
+                        : "border-stone-200 bg-white text-stone-700 hover:border-emerald-300 hover:bg-emerald-50",
+                      isDisabled ? "cursor-not-allowed opacity-45" : "",
+                    ].join(" ")}
+                  >
+                    {messageRecipientLabels[recipientType]}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-xs leading-5 text-stone-500">
+              학생 연락처: {followupTarget.student.maskedStudentPhone ?? "미등록"}
+            </p>
+          </fieldset>
 
           {duplicateWarning ? (
             <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-950">

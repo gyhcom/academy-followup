@@ -104,6 +104,7 @@ create table public.students (
   grade_label text,
   parent_name text,
   parent_phone text not null,
+  student_phone text,
   status text not null default 'active',
   created_at timestamptz not null default now()
 );
@@ -153,9 +154,12 @@ create table public.followups (
   teacher_id uuid references public.profiles(id) on delete set null,
   reason public.followup_reason not null,
   message_body text not null,
+  recipient_type text not null default 'parent',
   status public.followup_status not null default 'draft',
   sent_at timestamptz,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint followups_recipient_type_check
+    check (recipient_type in ('parent', 'student', 'both'))
 );
 
 alter table public.student_schedules
@@ -195,9 +199,12 @@ create table public.message_logs (
   provider text not null default 'solapi',
   provider_message_id text,
   recipient_phone text not null,
+  recipient_type text not null default 'parent',
   status text not null,
   error_message text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint message_logs_recipient_type_check
+    check (recipient_type in ('parent', 'student', 'both'))
 );
 
 create index platform_admins_role_idx on public.platform_admins(role);

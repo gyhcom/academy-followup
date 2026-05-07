@@ -152,6 +152,7 @@ export function ManagementHome({
       gradeLabel: "",
       parentName: "",
       parentPhone: "",
+      studentPhone: "",
       status: "active",
     });
     setStudentFormStatus({ status: "idle", message: "" });
@@ -171,6 +172,7 @@ export function ManagementHome({
       gradeLabel: student.gradeLabel ?? "",
       parentName: student.parentName ?? "",
       parentPhone: student.parentPhone,
+      studentPhone: student.studentPhone ?? "",
       status: student.status,
     });
     setStudentFormStatus({ status: "idle", message: "" });
@@ -197,6 +199,7 @@ export function ManagementHome({
           gradeLabel: studentForm.gradeLabel,
           parentName: studentForm.parentName,
           parentPhone: studentForm.parentPhone,
+          studentPhone: studentForm.studentPhone,
           status: studentForm.status,
         }),
       });

@@ -41,6 +41,16 @@
 - 비로그인 `POST /api/classes`: 401
 - 비로그인 `POST /api/student-schedules`: 401
 
+2026-05-08 T-223 수신자 선택 검증 결과:
+
+- `npm run lint`: 통과
+- `npx tsc --noEmit`: 통과
+- `npm run build`: 통과
+- `git diff --check`: 통과
+- 비로그인 `POST /api/followups` with `recipientType=student`: 401
+- 비로그인 `POST /api/messages/send`: 401
+- 비로그인 `POST /api/students` with `studentPhone`: 401
+
 ## 3. 파일럿 시연 핵심 시나리오
 
 시연 목표는 "출석부에서 미도착 학생 체크 -> 결석/지각 문자 초안 -> dry-run 발송 -> 기록 확인"입니다.
@@ -80,6 +90,9 @@
 - 학원명, 학생명, 선생님명이 템플릿에 치환됨
 - 템플릿이 없으면 명확한 오류 표시
 - 본문 수정 후 발송 요청에는 수정본이 사용됨
+- 수신자를 학부모, 학생, 학부모+학생 중 선택할 수 있음
+- 학생 연락처가 없는 학생은 학생 발송 옵션이 비활성화됨
+- dry-run 발송 로그에는 실제 선택된 수신자 유형이 저장됨
 
 ## 7. 출석부 테스트
 
@@ -116,6 +129,7 @@
 
 - `sms_dry_run=true`인 학원에서는 실제 SOLAPI 호출 금지
 - dry-run도 `followups`와 `message_logs`에 기록
+- 학부모+학생 발송은 수신자별로 `message_logs`가 분리 저장됨
 - 같은 학생/같은 사유 중복 발송 경고
 - 발송 실패 시 `failed` 상태와 오류 메시지 저장
 - 서버 로그에 secret key나 학부모 전화번호 원문을 과도하게 남기지 않음

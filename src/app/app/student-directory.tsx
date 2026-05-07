@@ -97,6 +97,7 @@ export function StudentDirectory({
           student.schoolName,
           student.gradeLabel,
           student.parentName,
+          student.studentPhone,
         ]
           .filter(Boolean)
           .join(" ")

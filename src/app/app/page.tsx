@@ -44,6 +44,7 @@ type StudentRecord = {
   grade_label: string | null;
   parent_name: string | null;
   parent_phone: string;
+  student_phone: string | null;
   status: string;
 };
 
@@ -168,7 +169,7 @@ export default async function AppPage() {
       .order("name"),
     admin
       .from("students")
-      .select("id, class_id, name, school_name, grade_label, parent_name, parent_phone, status")
+      .select("id, class_id, name, school_name, grade_label, parent_name, parent_phone, student_phone, status")
       .eq("academy_id", profile.academy_id)
       .order("name"),
     admin
@@ -361,6 +362,7 @@ function buildOperationsClasses({
         gradeLabel: student.grade_label,
         parentName: student.parent_name,
         maskedParentPhone: maskPhone(student.parent_phone),
+        maskedStudentPhone: student.student_phone ? maskPhone(student.student_phone) : null,
         schedules: schedules
           .filter((schedule) => schedule.student_id === student.id)
           .map((schedule) => ({
@@ -452,6 +454,8 @@ function buildManagementStudents({
       parentName: student.parent_name,
       parentPhone: student.parent_phone,
       maskedParentPhone: maskPhone(student.parent_phone),
+      studentPhone: student.student_phone,
+      maskedStudentPhone: student.student_phone ? maskPhone(student.student_phone) : null,
       status: student.status,
       schedules: schedules
         .filter((schedule) => schedule.student_id === student.id)

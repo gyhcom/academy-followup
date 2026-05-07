@@ -197,6 +197,7 @@ Supabase Auth 사용자와 학원 권한을 연결합니다.
 - `grade_label`
 - `parent_name`
 - `parent_phone`
+- `student_phone`
 - `status`
 - `created_at`
 
@@ -294,6 +295,7 @@ React 컴포넌트 안에 날짜 계산 규칙을 직접 쌓지 않고, `MakeupS
 - `teacher_id`
 - `reason`
 - `message_body`
+- `recipient_type`: `parent`, `student`, `both`
 - `status`
 - `sent_at`
 - `created_at`
@@ -308,6 +310,7 @@ React 컴포넌트 안에 날짜 계산 규칙을 직접 쌓지 않고, `MakeupS
 - `provider`
 - `provider_message_id`
 - `recipient_phone`
+- `recipient_type`: 실제 로그 수신자 유형
 - `status`
 - `error_message`
 - `created_at`
@@ -421,6 +424,7 @@ GET  /api/health/supabase
 - 운영 보드 선택 학생 주간 스케줄 패널
 - 보강 후보 시간 선택과 보강 안내 문자 초안
 - 저장된 팔로업 기준 dry-run 발송 API와 message log 저장
+- 학부모/학생/학부모+학생 수신자 선택과 수신자별 발송 로그
 - 학생별 최근 팔로업 히스토리 API와 운영 보드 패널
 - 출석부 DB 모델과 수업 세션 기준
 - 반별 출석부 화면과 `/api/attendance` 조회/저장 API
@@ -429,11 +433,10 @@ GET  /api/health/supabase
 
 ### 다음 구현 순서
 
-1. 학부모/학생 수신자 선택
-2. 스케줄 일괄 등록과 개인 스케줄 추가
-3. 서버 기준 중복 발송 차단
-4. 원장/선생님 권한 테스트
-5. SOLAPI 실제 SMS 발송 테스트
+1. 스케줄 일괄 등록과 개인 스케줄 추가
+2. 서버 기준 중복 발송 차단
+3. 원장/선생님 권한 테스트
+4. SOLAPI 실제 SMS 발송 테스트
 
 ## 14. 제품 기능 범위와 기술 경계
 
