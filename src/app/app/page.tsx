@@ -75,6 +75,10 @@ type AttendanceRecord = {
   arrived_at: string | null;
   note: string | null;
   followup_id: string | null;
+  followups: Array<{
+    status: string;
+    sent_at: string | null;
+  }> | null;
 };
 
 type MemberRecord = {
@@ -181,7 +185,7 @@ export default async function AppPage() {
     admin
       .from("attendance_records")
       .select(
-        "id, student_id, class_id, teacher_id, attendance_date, scheduled_start_time, scheduled_end_time, status, checked_at, arrived_at, note, followup_id",
+        "id, student_id, class_id, teacher_id, attendance_date, scheduled_start_time, scheduled_end_time, status, checked_at, arrived_at, note, followup_id, followups(status, sent_at)",
       )
       .eq("academy_id", profile.academy_id)
       .eq("attendance_date", attendanceDate)
@@ -400,20 +404,26 @@ function buildManagementClasses({
 }
 
 function buildAttendanceRecords(records: AttendanceRecord[]): AttendanceRecordItem[] {
-  return records.map((record) => ({
-    id: record.id,
-    studentId: record.student_id,
-    classId: record.class_id,
-    teacherId: record.teacher_id,
-    attendanceDate: record.attendance_date,
-    scheduledStartTime: record.scheduled_start_time.slice(0, 5),
-    scheduledEndTime: record.scheduled_end_time.slice(0, 5),
-    status: record.status,
-    checkedAt: record.checked_at,
-    arrivedAt: record.arrived_at,
-    note: record.note,
-    followupId: record.followup_id,
-  }));
+  return records.map((record) => {
+    const followup = record.followups?.[0] ?? null;
+
+    return {
+      id: record.id,
+      studentId: record.student_id,
+      classId: record.class_id,
+      teacherId: record.teacher_id,
+      attendanceDate: record.attendance_date,
+      scheduledStartTime: record.scheduled_start_time.slice(0, 5),
+      scheduledEndTime: record.scheduled_end_time.slice(0, 5),
+      status: record.status,
+      checkedAt: record.checked_at,
+      arrivedAt: record.arrived_at,
+      note: record.note,
+      followupId: record.followup_id,
+      followupStatus: followup?.status ?? null,
+      followupSentAt: followup?.sent_at ?? null,
+    };
+  });
 }
 
 function buildManagementStudents({

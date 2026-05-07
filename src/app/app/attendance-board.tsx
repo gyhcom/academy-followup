@@ -54,6 +54,8 @@ export type AttendanceRecordItem = {
   arrivedAt: string | null;
   note: string | null;
   followupId: string | null;
+  followupStatus: string | null;
+  followupSentAt: string | null;
 };
 
 type AttendanceBoardProps = {
@@ -87,6 +89,35 @@ type AttendanceFollowupTarget = {
   session: AttendanceSession;
   record: AttendanceRecordItem;
   reason: FollowupReason;
+};
+
+type AttendanceActionItem = {
+  key: string;
+  studentName: string;
+  className: string;
+  startTime: string;
+  endTime: string;
+  status: AttendanceStatus;
+  followupId: string | null;
+  followupStatus: string | null;
+  followupSentAt: string | null;
+};
+
+type AttendanceClassSummary = {
+  key: string;
+  className: string;
+  startTime: string;
+  endTime: string;
+  studentCount: number;
+  counts: Record<AttendanceStatus, number>;
+};
+
+type AttendanceOverview = {
+  totalSessions: number;
+  totalStudents: number;
+  counts: Record<AttendanceStatus, number>;
+  actionItems: AttendanceActionItem[];
+  classSummaries: AttendanceClassSummary[];
 };
 
 type MessagePreviewState = {
@@ -202,24 +233,27 @@ export function AttendanceBoard({
   });
   const [duplicateWarning, setDuplicateWarning] = useState("");
   const selectedDayOfWeek = getDayOfWeek(selectedDate);
+  const dateAttendanceRecords = useMemo(
+    () => attendanceRecords.filter((record) => record.attendanceDate === selectedDate),
+    [attendanceRecords, selectedDate],
+  );
   const sessions = useMemo(
-    () => buildAttendanceSessions(classes, attendanceRecords, selectedDayOfWeek),
-    [attendanceRecords, classes, selectedDayOfWeek],
+    () => buildAttendanceSessions(classes, dateAttendanceRecords, selectedDayOfWeek),
+    [classes, dateAttendanceRecords, selectedDayOfWeek],
   );
   const selectedSession =
     sessions.find((session) => session.key === selectedSessionKey) ?? sessions[0];
   const selectedSessionRecords = useMemo(
     () =>
       selectedSession
-        ? attendanceRecords.filter(
+        ? dateAttendanceRecords.filter(
             (record) =>
               record.classId === selectedSession.classId &&
-              record.attendanceDate === selectedDate &&
               record.scheduledStartTime === selectedSession.startTime &&
               record.scheduledEndTime === selectedSession.endTime,
           )
         : [],
-    [attendanceRecords, selectedDate, selectedSession],
+    [dateAttendanceRecords, selectedSession],
   );
   const recordsByStudent = new Map(
     selectedSessionRecords.map((record) => [record.studentId, record]),
@@ -227,6 +261,10 @@ export function AttendanceBoard({
   const summary = selectedSession
     ? summarizeSession(selectedSession.students, recordsByStudent)
     : null;
+  const overview = useMemo(
+    () => buildAttendanceOverview(sessions, dateAttendanceRecords),
+    [dateAttendanceRecords, sessions],
+  );
   const needsCheckStudents = selectedSession
     ? selectedSession.students.filter(
         (student) =>
@@ -523,7 +561,12 @@ export function AttendanceBoard({
       setAttendanceRecords((current) =>
         current.map((record) =>
           record.id === followupTarget.record.id
-            ? { ...record, followupId: payload.followup?.id ?? record.followupId }
+            ? {
+                ...record,
+                followupId: payload.followup?.id ?? record.followupId,
+                followupStatus: payload.followup?.status ?? record.followupStatus,
+                followupSentAt: null,
+              }
             : record,
         ),
       );
@@ -579,6 +622,17 @@ export function AttendanceBoard({
           (payload.dryRun ? "dry-run 발송을 기록했습니다." : "문자를 발송했습니다."),
         error: "",
       });
+      setAttendanceRecords((current) =>
+        current.map((record) =>
+          record.followupId === savedFollowupId
+            ? {
+                ...record,
+                followupStatus: "sent",
+                followupSentAt: new Date().toISOString(),
+              }
+            : record,
+        ),
+      );
     } catch (error) {
       setMessageSend({
         followupId: savedFollowupId,
@@ -601,8 +655,8 @@ export function AttendanceBoard({
               반별 출석부
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-              {teacherName}님이 수업별 도착 여부를 확인합니다. 결석 문자는 다음 단계에서
-              이 상태와 연결합니다.
+              {teacherName}님이 수업별 도착 여부를 확인합니다. 원장/데스크는 아래
+              현황에서 연락 대상과 체크 누락을 바로 확인합니다.
             </p>
           </div>
 
@@ -622,6 +676,8 @@ export function AttendanceBoard({
           </label>
         </div>
       </section>
+
+      <AttendanceOverviewPanel overview={overview} />
 
       <section className="grid gap-4 lg:grid-cols-[17rem_minmax(0,1fr)_22rem] lg:items-start">
         <SessionList
@@ -826,6 +882,164 @@ function AttendanceSummary({
         </div>
       ))}
     </dl>
+  );
+}
+
+function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview }) {
+  const uncheckedCount = overview.counts.pending;
+  const needsAttentionCount =
+    overview.counts.absent + overview.counts.late + overview.counts.needs_check;
+
+  return (
+    <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+      <div className="rounded-lg border border-stone-200 bg-white shadow-sm">
+        <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-emerald-700">오늘 출석 현황</p>
+              <h3 className="mt-1 text-lg font-semibold text-stone-950">
+                연락 대상 {needsAttentionCount}명 · 미체크 {uncheckedCount}명
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-stone-600">
+                카톡방을 훑지 않고도 결석/지각/확인 필요 학생과 반별 체크 누락을 봅니다.
+              </p>
+            </div>
+
+            <dl className="grid grid-cols-3 gap-2 text-center text-xs sm:min-w-72">
+              <OverviewMetric label="수업" value={`${overview.totalSessions}개`} />
+              <OverviewMetric label="학생" value={`${overview.totalStudents}명`} />
+              <OverviewMetric label="미체크" value={`${uncheckedCount}명`} />
+            </dl>
+          </div>
+        </div>
+
+        <div className="grid gap-3 p-4 sm:grid-cols-5 sm:px-5">
+          {(["present", "late", "absent", "needs_check", "pending"] as AttendanceStatus[]).map(
+            (status) => (
+              <div
+                key={status}
+                className="rounded-md border border-stone-200 bg-stone-50 px-3 py-3"
+              >
+                <p className="text-xs font-semibold text-stone-500">
+                  {attendanceStatusLabels[status]}
+                </p>
+                <p className="mt-1 text-2xl font-semibold tabular-nums text-stone-950">
+                  {overview.counts[status]}
+                </p>
+              </div>
+            ),
+          )}
+        </div>
+
+        <div className="border-t border-stone-200">
+          <div className="hidden grid-cols-[minmax(9rem,1fr)_8rem_8rem_8rem_8rem_8rem] gap-3 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5">
+            <span>수업</span>
+            <span>시간</span>
+            <span>출석</span>
+            <span>지각</span>
+            <span>결석</span>
+            <span>미체크</span>
+          </div>
+          <div className="divide-y divide-stone-200">
+            {overview.classSummaries.length > 0 ? (
+              overview.classSummaries.map((summary) => (
+                <div
+                  key={summary.key}
+                  className="grid gap-2 px-4 py-3 text-sm sm:grid-cols-[minmax(9rem,1fr)_8rem_8rem_8rem_8rem_8rem] sm:items-center sm:px-5"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold text-stone-950">{summary.className}</p>
+                    <p className="mt-0.5 text-xs text-stone-500">
+                      대상 {summary.studentCount}명
+                    </p>
+                  </div>
+                  <p className="font-semibold tabular-nums text-stone-700">
+                    {summary.startTime}
+                  </p>
+                  <StatusCount status="present" value={summary.counts.present} />
+                  <StatusCount status="late" value={summary.counts.late} />
+                  <StatusCount status="absent" value={summary.counts.absent} />
+                  <StatusCount status="pending" value={summary.counts.pending} />
+                </div>
+              ))
+            ) : (
+              <div className="px-4 py-5 text-sm leading-6 text-stone-600 sm:px-5">
+                선택한 날짜에 표시할 수업이 없습니다.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-stone-200 bg-white shadow-sm">
+        <div className="border-b border-stone-200 px-4 py-4">
+          <h3 className="text-sm font-semibold text-stone-950">오늘 연락/확인 대상</h3>
+          <p className="mt-1 text-xs leading-5 text-stone-500">
+            결석/지각은 팔로업 저장 또는 발송 상태를 함께 표시합니다.
+          </p>
+        </div>
+
+        <div className="divide-y divide-stone-200">
+          {overview.actionItems.length > 0 ? (
+            overview.actionItems.map((item) => (
+              <div key={item.key} className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-stone-950">{item.studentName}</p>
+                    <p className="mt-1 text-xs text-stone-500">
+                      {item.className} · {item.startTime}-{item.endTime}
+                    </p>
+                  </div>
+                  <span
+                    className={[
+                      "shrink-0 rounded-md px-2 py-1 text-xs font-semibold",
+                      attendanceStatusClass(item.status),
+                    ].join(" ")}
+                  >
+                    {attendanceStatusLabels[item.status]}
+                  </span>
+                </div>
+
+                <p
+                  className={[
+                    "mt-3 rounded-md px-2 py-2 text-xs font-semibold",
+                    contactStatusClass(item),
+                  ].join(" ")}
+                >
+                  {contactStatusLabel(item)}
+                </p>
+              </div>
+            ))
+          ) : (
+            <div className="p-4 text-sm leading-6 text-stone-600">
+              현재 연락하거나 확인할 학생이 없습니다.
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function OverviewMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-md border border-stone-200 bg-stone-50 px-3 py-2">
+      <dt className="font-medium text-stone-500">{label}</dt>
+      <dd className="mt-1 text-base font-semibold text-stone-950">{value}</dd>
+    </div>
+  );
+}
+
+function StatusCount({ status, value }: { status: AttendanceStatus; value: number }) {
+  return (
+    <span
+      className={[
+        "inline-flex min-h-8 w-fit items-center rounded-md px-2.5 text-xs font-semibold sm:w-auto sm:justify-center",
+        attendanceStatusClass(status),
+      ].join(" ")}
+    >
+      {attendanceStatusLabels[status]} {value}
+    </span>
   );
 }
 
@@ -1350,6 +1564,102 @@ function summarizeSession(
   return summary;
 }
 
+function buildAttendanceOverview(
+  sessions: AttendanceSession[],
+  records: AttendanceRecordItem[],
+): AttendanceOverview {
+  const counts = createEmptyAttendanceCounts();
+  const actionItems: AttendanceActionItem[] = [];
+  const classSummaries: AttendanceClassSummary[] = [];
+
+  sessions.forEach((session) => {
+    const recordsByStudent = new Map(
+      records
+        .filter(
+          (record) =>
+            record.classId === session.classId &&
+            record.scheduledStartTime === session.startTime &&
+            record.scheduledEndTime === session.endTime,
+        )
+        .map((record) => [record.studentId, record]),
+    );
+    const sessionCounts = summarizeSession(session.students, recordsByStudent);
+
+    Object.keys(sessionCounts).forEach((key) => {
+      const status = key as AttendanceStatus;
+      counts[status] += sessionCounts[status];
+    });
+
+    classSummaries.push({
+      key: session.key,
+      className: session.className,
+      startTime: session.startTime,
+      endTime: session.endTime,
+      studentCount: session.students.length,
+      counts: sessionCounts,
+    });
+
+    session.students.forEach((student) => {
+      const record = recordsByStudent.get(student.id);
+      const status = normalizeAttendanceStatus(record?.status);
+
+      if (
+        !record ||
+        (status !== "absent" && status !== "late" && status !== "needs_check")
+      ) {
+        return;
+      }
+
+      actionItems.push({
+        key: `${session.key}:${student.id}:${status}`,
+        studentName: student.name,
+        className: session.className,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        status,
+        followupId: record.followupId,
+        followupStatus: record.followupStatus,
+        followupSentAt: record.followupSentAt,
+      });
+    });
+  });
+
+  return {
+    totalSessions: sessions.length,
+    totalStudents: sessions.reduce((total, session) => total + session.students.length, 0),
+    counts,
+    actionItems: actionItems.sort(
+      (first, second) =>
+        statusActionSortValue(first.status) - statusActionSortValue(second.status) ||
+        first.startTime.localeCompare(second.startTime) ||
+        first.studentName.localeCompare(second.studentName, "ko"),
+    ),
+    classSummaries,
+  };
+}
+
+function createEmptyAttendanceCounts(): Record<AttendanceStatus, number> {
+  return {
+    pending: 0,
+    present: 0,
+    late: 0,
+    absent: 0,
+    makeup: 0,
+    excused: 0,
+    needs_check: 0,
+  };
+}
+
+function statusActionSortValue(status: AttendanceStatus) {
+  const sortMap: Partial<Record<AttendanceStatus, number>> = {
+    absent: 0,
+    needs_check: 1,
+    late: 2,
+  };
+
+  return sortMap[status] ?? 9;
+}
+
 function normalizeAttendanceStatus(status: string | undefined): AttendanceStatus {
   if (
     status === "present" ||
@@ -1461,6 +1771,48 @@ function attendanceStatusClass(status: AttendanceStatus) {
   };
 
   return classes[status];
+}
+
+function contactStatusLabel(item: AttendanceActionItem) {
+  if (item.status === "needs_check") {
+    return "확인 대기: 결석 확정 전입니다.";
+  }
+
+  if (!item.followupId) {
+    return "연락 필요: 아직 문자 기록이 없습니다.";
+  }
+
+  if (item.followupStatus === "sent") {
+    return item.followupSentAt
+      ? `발송 기록 완료: ${formatTime(item.followupSentAt)}`
+      : "발송 기록 완료";
+  }
+
+  if (item.followupStatus === "failed") {
+    return "발송 실패: 다시 확인이 필요합니다.";
+  }
+
+  return "초안 저장됨: 발송 확인이 필요합니다.";
+}
+
+function contactStatusClass(item: AttendanceActionItem) {
+  if (item.status === "needs_check") {
+    return "bg-orange-50 text-orange-900";
+  }
+
+  if (!item.followupId) {
+    return "bg-red-50 text-red-900";
+  }
+
+  if (item.followupStatus === "sent") {
+    return "bg-emerald-50 text-emerald-900";
+  }
+
+  if (item.followupStatus === "failed") {
+    return "bg-red-50 text-red-900";
+  }
+
+  return "bg-amber-50 text-amber-900";
 }
 
 function reasonLabel(reasonId: FollowupReason) {
