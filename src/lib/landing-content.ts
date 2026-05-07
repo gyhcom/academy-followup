@@ -4,7 +4,7 @@ export const landingNavItems = [
   { label: "대상", href: "#audiences" },
   { label: "기능", href: "#features" },
   { label: "도입", href: "#onboarding" },
-  { label: "가격", href: "#demo" },
+  { label: "가격", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -161,6 +161,14 @@ export const onboardingSteps = [
     title: "후속 연락부터 검증",
     body: "문자 초안, 수정, 기록 저장, 원장 확인까지 한 흐름으로 확인합니다.",
   },
+];
+
+export const pricingFeatures = [
+  "학생 300명 이하 파일럿 운영",
+  "원장/선생님 계정 20명까지",
+  "학생·반·스케줄 관리",
+  "문자 초안, dry-run 발송 로그, 학생별 히스토리",
+  "초기 데이터 세팅 지원",
 ];
 
 export const followupRows = [

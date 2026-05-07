@@ -17,6 +17,15 @@ import { heroStats, roleCards } from "@/lib/landing-content";
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-[#5862d9] text-white">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[min(46rem,100%)] opacity-[0.18] [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,#000_45%,transparent_100%)]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right,#ffffff 1px,transparent 1px),linear-gradient(to bottom,#ffffff 1px,transparent 1px)",
+          backgroundSize: "3rem 3rem",
+        }}
+      />
       <MobileHeroContent />
       <DesktopHeroContent />
       <HeroStatsStrip />

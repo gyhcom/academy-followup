@@ -7,6 +7,7 @@ import { LandingHeader } from "@/components/landing/landing-header";
 import { OnboardingSection } from "@/components/landing/onboarding-section";
 import { OutcomesSection } from "@/components/landing/outcomes-section";
 import { PilotProofSection } from "@/components/landing/pilot-proof-section";
+import { PricingSection } from "@/components/landing/pricing-section";
 import { RoleSection } from "@/components/landing/role-section";
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
       <FeatureTabsSection />
       <OnboardingSection />
       <PilotProofSection />
+      <PricingSection />
       <FaqSection />
       <FinalCtaSection />
       <LandingFooter />
