@@ -10,6 +10,7 @@ type CreateFollowupRequest = {
   studentId?: unknown;
   reason?: unknown;
   messageBody?: unknown;
+  attendanceRecordId?: unknown;
 };
 
 type ProfileRecord = {
@@ -34,6 +35,15 @@ type CreatedFollowupRecord = {
   id: string;
   status: string;
   created_at: string;
+};
+
+type AttendanceRecordForFollowup = {
+  id: string;
+  academy_id: string;
+  student_id: string;
+  class_id: string;
+  status: string;
+  followup_id: string | null;
 };
 
 type FollowupHistoryRecord = {
@@ -243,6 +253,30 @@ export async function POST(request: Request) {
     );
   }
 
+  const attendanceRecord = await getAttendanceRecordForFollowup({
+    admin,
+    academyId: profile.academy_id,
+    attendanceRecordId: parsedRequest.attendanceRecordId,
+  });
+
+  if (!attendanceRecord.ok) {
+    return NextResponse.json(
+      { error: attendanceRecord.error },
+      { status: attendanceRecord.status },
+    );
+  }
+
+  if (
+    attendanceRecord.data &&
+    (attendanceRecord.data.student_id !== student.id ||
+      attendanceRecord.data.class_id !== student.class_id)
+  ) {
+    return NextResponse.json(
+      { error: "출석 기록과 팔로업 대상 학생 정보가 일치하지 않습니다." },
+      { status: 400 },
+    );
+  }
+
   const { data: followup, error: followupError } = await admin
     .from("followups")
     .insert({
@@ -261,11 +295,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: followupError.message }, { status: 500 });
   }
 
+  if (attendanceRecord.data) {
+    const { error: attendanceUpdateError } = await admin
+      .from("attendance_records")
+      .update({
+        followup_id: followup.id,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", attendanceRecord.data.id)
+      .eq("academy_id", profile.academy_id);
+
+    if (attendanceUpdateError) {
+      return NextResponse.json({ error: attendanceUpdateError.message }, { status: 500 });
+    }
+  }
+
   return NextResponse.json({
     followup: {
       id: followup.id,
       status: followup.status,
       createdAt: followup.created_at,
+      attendanceRecordId: attendanceRecord.data?.id ?? null,
     },
   });
 }
@@ -276,6 +326,7 @@ async function parseCreateFollowupRequest(request: Request): Promise<
       studentId: string;
       reason: FollowupReason;
       messageBody: string;
+      attendanceRecordId: string | null;
     }
   | { ok: false; error: string }
 > {
@@ -299,12 +350,66 @@ async function parseCreateFollowupRequest(request: Request): Promise<
     return { ok: false, error: "저장할 문자 본문이 필요합니다." };
   }
 
+  if (
+    body.attendanceRecordId !== undefined &&
+    (typeof body.attendanceRecordId !== "string" ||
+      body.attendanceRecordId.trim().length === 0)
+  ) {
+    return { ok: false, error: "출석 기록 ID 형식이 올바르지 않습니다." };
+  }
+
+  const attendanceRecordId =
+    typeof body.attendanceRecordId === "string" ? body.attendanceRecordId.trim() : null;
+
   return {
     ok: true,
     studentId: body.studentId,
     reason: body.reason,
     messageBody: body.messageBody.trim(),
+    attendanceRecordId,
   };
+}
+
+async function getAttendanceRecordForFollowup({
+  admin,
+  academyId,
+  attendanceRecordId,
+}: {
+  admin: ReturnType<typeof createSupabaseAdminClient>;
+  academyId: string;
+  attendanceRecordId: string | null;
+}): Promise<
+  | { ok: true; data: AttendanceRecordForFollowup | null }
+  | { ok: false; status: number; error: string }
+> {
+  if (!attendanceRecordId) {
+    return { ok: true, data: null };
+  }
+
+  const { data, error } = await admin
+    .from("attendance_records")
+    .select("id, academy_id, student_id, class_id, status, followup_id")
+    .eq("id", attendanceRecordId)
+    .eq("academy_id", academyId)
+    .maybeSingle<AttendanceRecordForFollowup>();
+
+  if (error) {
+    return { ok: false, status: 500, error: error.message };
+  }
+
+  if (!data) {
+    return { ok: false, status: 404, error: "연결할 출석 기록을 찾을 수 없습니다." };
+  }
+
+  if (data.status !== "absent" && data.status !== "late") {
+    return {
+      ok: false,
+      status: 400,
+      error: "결석 또는 지각 출석 기록만 문자 팔로업과 연결할 수 있습니다.",
+    };
+  }
+
+  return { ok: true, data };
 }
 
 async function getStudentClass({

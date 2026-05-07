@@ -5,14 +5,20 @@ import {
   AlertCircle,
   CalendarDays,
   Check,
+  CheckCircle2,
   Clock3,
   Loader2,
+  MessageSquareText,
+  RotateCcw,
+  Send,
   UserCheck,
 } from "lucide-react";
 import {
   attendanceStatusLabels,
+  getFollowupReasonForAttendanceStatus,
   type AttendanceStatus,
 } from "@/lib/attendance";
+import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 import {
   getSortedActiveSchedules,
   type OperationsStudentSchedule,
@@ -47,6 +53,7 @@ export type AttendanceRecordItem = {
   checkedAt: string | null;
   arrivedAt: string | null;
   note: string | null;
+  followupId: string | null;
 };
 
 type AttendanceBoardProps = {
@@ -72,6 +79,73 @@ type AttendanceSession = {
   startTime: string;
   endTime: string;
   students: AttendanceStudent[];
+};
+
+type AttendanceFollowupTarget = {
+  key: string;
+  student: AttendanceStudent;
+  session: AttendanceSession;
+  record: AttendanceRecordItem;
+  reason: FollowupReason;
+};
+
+type MessagePreviewState = {
+  key: string;
+  status: "idle" | "ready" | "error";
+  title: string;
+  body: string;
+  error: string;
+};
+
+type FollowupSaveState = {
+  key: string;
+  body: string;
+  status: "idle" | "saving" | "saved" | "error";
+  error: string;
+  followupId: string;
+};
+
+type MessageSendState = {
+  followupId: string;
+  status: "idle" | "sending" | "sent" | "error";
+  dryRun: boolean;
+  message: string;
+  error: string;
+};
+
+type MessagePreviewResponse = {
+  title?: string;
+  body?: string;
+  error?: string;
+};
+
+type CreateFollowupResponse = {
+  followup?: {
+    id: string;
+    status: string;
+    createdAt: string;
+    attendanceRecordId?: string | null;
+  };
+  error?: string;
+};
+
+type SendMessageResponse = {
+  dryRun?: boolean;
+  message?: string;
+  recipientPhone?: string;
+  followupId?: string;
+  error?: string;
+};
+
+type FollowupHistoryResponse = {
+  followups?: Array<{
+    id: string;
+    reason: string;
+    status: string;
+    sentAt: string | null;
+    createdAt: string;
+  }>;
+  error?: string;
 };
 
 const editableStatuses: AttendanceStatus[] = [
@@ -101,6 +175,32 @@ export function AttendanceBoard({
     status: "idle" | "saving" | "saved" | "error";
     error: string;
   }>({ key: "", status: "idle", error: "" });
+  const [followupTarget, setFollowupTarget] = useState<AttendanceFollowupTarget | null>(
+    null,
+  );
+  const [messagePreview, setMessagePreview] = useState<MessagePreviewState>({
+    key: "",
+    status: "idle",
+    title: "",
+    body: "",
+    error: "",
+  });
+  const [messageDraft, setMessageDraft] = useState({ key: "", body: "" });
+  const [followupSave, setFollowupSave] = useState<FollowupSaveState>({
+    key: "",
+    body: "",
+    status: "idle",
+    error: "",
+    followupId: "",
+  });
+  const [messageSend, setMessageSend] = useState<MessageSendState>({
+    followupId: "",
+    status: "idle",
+    dryRun: true,
+    message: "",
+    error: "",
+  });
+  const [duplicateWarning, setDuplicateWarning] = useState("");
   const selectedDayOfWeek = getDayOfWeek(selectedDate);
   const sessions = useMemo(
     () => buildAttendanceSessions(classes, attendanceRecords, selectedDayOfWeek),
@@ -127,6 +227,53 @@ export function AttendanceBoard({
   const summary = selectedSession
     ? summarizeSession(selectedSession.students, recordsByStudent)
     : null;
+  const needsCheckStudents = selectedSession
+    ? selectedSession.students.filter(
+        (student) =>
+          normalizeAttendanceStatus(recordsByStudent.get(student.id)?.status) ===
+          "needs_check",
+      )
+    : [];
+  const followupTargetKey = followupTarget?.key ?? "";
+  const messageBody =
+    messageDraft.key === followupTargetKey
+      ? messageDraft.body
+      : messagePreview.key === followupTargetKey
+        ? messagePreview.body
+        : "";
+  const isPreviewLoading =
+    Boolean(followupTarget) && messagePreview.key !== followupTargetKey;
+  const isPreviewReady =
+    messagePreview.key === followupTargetKey && messagePreview.status === "ready";
+  const isPreviewError =
+    messagePreview.key === followupTargetKey && messagePreview.status === "error";
+  const isDraftEdited = isPreviewReady && messageBody !== messagePreview.body;
+  const isMessageBlank = isPreviewReady && messageBody.trim().length === 0;
+  const isFollowupSaving =
+    followupSave.key === followupTargetKey &&
+    followupSave.body === messageBody &&
+    followupSave.status === "saving";
+  const isFollowupSaved =
+    followupSave.key === followupTargetKey &&
+    followupSave.body === messageBody &&
+    followupSave.status === "saved";
+  const savedFollowupId = isFollowupSaved ? followupSave.followupId : "";
+  const isMessageSending =
+    messageSend.followupId === savedFollowupId && messageSend.status === "sending";
+  const isMessageSent =
+    Boolean(savedFollowupId) &&
+    messageSend.followupId === savedFollowupId &&
+    messageSend.status === "sent";
+  const followupSaveError =
+    followupSave.key === followupTargetKey && followupSave.status === "error"
+      ? followupSave.error
+      : "";
+  const messageSendError =
+    Boolean(savedFollowupId) &&
+    messageSend.followupId === savedFollowupId &&
+    messageSend.status === "error"
+      ? messageSend.error
+      : "";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -168,6 +315,89 @@ export function AttendanceBoard({
     };
   }, [selectedDate]);
 
+  useEffect(() => {
+    if (!followupTarget) {
+      return;
+    }
+
+    const target = followupTarget;
+    const controller = new AbortController();
+    const nextKey = target.key;
+
+    async function loadPreview() {
+      try {
+        const response = await fetch("/api/messages/preview", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            studentId: target.student.id,
+            reason: target.reason,
+          }),
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as MessagePreviewResponse;
+
+        if (!response.ok || !payload.body) {
+          throw new Error(payload.error ?? "문자 초안을 만들지 못했습니다.");
+        }
+
+        setMessagePreview({
+          key: nextKey,
+          status: "ready",
+          title: payload.title ?? "문자 미리보기",
+          body: payload.body,
+          error: "",
+        });
+        setMessageDraft({ key: nextKey, body: payload.body });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setMessagePreview({
+          key: nextKey,
+          status: "error",
+          title: "",
+          body: "",
+          error: error instanceof Error ? error.message : "문자 초안을 만들지 못했습니다.",
+        });
+        setMessageDraft({ key: "", body: "" });
+      }
+    }
+
+    async function loadDuplicateWarning() {
+      try {
+        const response = await fetch(`/api/followups?studentId=${target.student.id}`, {
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as FollowupHistoryResponse;
+
+        if (!response.ok) {
+          return;
+        }
+
+        const warning = getRecentDuplicateWarning({
+          followups: payload.followups ?? [],
+          reason: target.reason,
+        });
+        setDuplicateWarning(warning);
+      } catch {
+        if (!controller.signal.aborted) {
+          setDuplicateWarning("");
+        }
+      }
+    }
+
+    void loadPreview();
+    void loadDuplicateWarning();
+
+    return () => {
+      controller.abort();
+    };
+  }, [followupTarget]);
+
   async function handleStatusChange(student: AttendanceStudent, status: AttendanceStatus) {
     if (!selectedSession) {
       return;
@@ -205,14 +435,158 @@ export function AttendanceBoard({
         throw new Error(payload.error ?? "출석 상태를 저장하지 못했습니다.");
       }
 
-      setAttendanceRecords((current) => mergeAttendanceRecord(current, payload.record!));
+      const savedRecord = payload.record;
+      const followupReason = getFollowupReasonForAttendanceStatus(status);
+
+      setAttendanceRecords((current) => mergeAttendanceRecord(current, savedRecord));
       setSaveState({ key: updateKey, status: "saved", error: "" });
+
+      if (followupReason) {
+        setDuplicateWarning("");
+        setFollowupTarget({
+          key: `${savedRecord.id}:${followupReason}`,
+          student,
+          session: selectedSession,
+          record: savedRecord,
+          reason: followupReason,
+        });
+      } else if (followupTarget?.record.id === savedRecord.id) {
+        setDuplicateWarning("");
+        setFollowupTarget(null);
+      }
     } catch (error) {
       setSaveState({
         key: updateKey,
         status: "error",
         error:
           error instanceof Error ? error.message : "출석 상태를 저장하지 못했습니다.",
+      });
+    }
+  }
+
+  function handleRestorePreview() {
+    if (!isPreviewReady) {
+      return;
+    }
+
+    setMessageDraft({ key: followupTargetKey, body: messagePreview.body });
+  }
+
+  async function handleSaveAttendanceFollowup() {
+    if (!followupTarget || !isPreviewReady || isMessageBlank || isFollowupSaving) {
+      return;
+    }
+
+    const bodyToSave = messageBody.trim();
+
+    setFollowupSave({
+      key: followupTargetKey,
+      body: bodyToSave,
+      status: "saving",
+      error: "",
+      followupId: "",
+    });
+
+    try {
+      const response = await fetch("/api/followups", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId: followupTarget.student.id,
+          reason: followupTarget.reason,
+          messageBody: bodyToSave,
+          attendanceRecordId: followupTarget.record.id,
+        }),
+      });
+      const payload = (await response.json()) as CreateFollowupResponse;
+
+      if (!response.ok || !payload.followup) {
+        throw new Error(payload.error ?? "팔로업 기록을 저장하지 못했습니다.");
+      }
+
+      setFollowupSave({
+        key: followupTargetKey,
+        body: bodyToSave,
+        status: "saved",
+        error: "",
+        followupId: payload.followup.id,
+      });
+      setMessageSend({
+        followupId: "",
+        status: "idle",
+        dryRun: true,
+        message: "",
+        error: "",
+      });
+      setAttendanceRecords((current) =>
+        current.map((record) =>
+          record.id === followupTarget.record.id
+            ? { ...record, followupId: payload.followup?.id ?? record.followupId }
+            : record,
+        ),
+      );
+    } catch (error) {
+      setFollowupSave({
+        key: followupTargetKey,
+        body: bodyToSave,
+        status: "error",
+        error:
+          error instanceof Error
+            ? error.message
+            : "팔로업 기록을 저장하지 못했습니다.",
+        followupId: "",
+      });
+    }
+  }
+
+  async function handleSendAttendanceMessage() {
+    if (!savedFollowupId || isMessageSending) {
+      return;
+    }
+
+    setMessageSend({
+      followupId: savedFollowupId,
+      status: "sending",
+      dryRun: true,
+      message: "",
+      error: "",
+    });
+
+    try {
+      const response = await fetch("/api/messages/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          followupId: savedFollowupId,
+        }),
+      });
+      const payload = (await response.json()) as SendMessageResponse;
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "문자를 발송하지 못했습니다.");
+      }
+
+      setMessageSend({
+        followupId: savedFollowupId,
+        status: "sent",
+        dryRun: payload.dryRun ?? true,
+        message:
+          payload.message ??
+          (payload.dryRun ? "dry-run 발송을 기록했습니다." : "문자를 발송했습니다."),
+        error: "",
+      });
+    } catch (error) {
+      setMessageSend({
+        followupId: savedFollowupId,
+        status: "error",
+        dryRun: true,
+        message: "",
+        error:
+          error instanceof Error ? error.message : "문자를 발송하지 못했습니다.",
       });
     }
   }
@@ -249,7 +623,7 @@ export function AttendanceBoard({
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start">
+      <section className="grid gap-4 lg:grid-cols-[17rem_minmax(0,1fr)_22rem] lg:items-start">
         <SessionList
           sessions={sessions}
           selectedSessionKey={selectedSession?.key ?? ""}
@@ -337,6 +711,34 @@ export function AttendanceBoard({
             </div>
           )}
         </section>
+
+        <AttendanceFollowupPanel
+          duplicateWarning={duplicateWarning}
+          followupSaveError={followupSaveError}
+          followupTarget={followupTarget}
+          isDraftEdited={isDraftEdited}
+          isFollowupSaved={isFollowupSaved}
+          isFollowupSaving={isFollowupSaving}
+          isMessageBlank={isMessageBlank}
+          isMessageSending={isMessageSending}
+          isMessageSent={isMessageSent}
+          isPreviewError={isPreviewError}
+          isPreviewLoading={isPreviewLoading}
+          isPreviewReady={isPreviewReady}
+          messageBody={messageBody}
+          messagePreview={messagePreview}
+          messageSend={messageSend}
+          messageSendError={messageSendError}
+          needsCheckStudents={needsCheckStudents}
+          onDismiss={() => {
+            setDuplicateWarning("");
+            setFollowupTarget(null);
+          }}
+          onMessageChange={(body) => setMessageDraft({ key: followupTargetKey, body })}
+          onRestorePreview={handleRestorePreview}
+          onSaveFollowup={handleSaveAttendanceFollowup}
+          onSendMessage={handleSendAttendanceMessage}
+        />
       </section>
     </div>
   );
@@ -502,6 +904,297 @@ function AttendanceStudentRow({
         ) : null}
       </div>
     </article>
+  );
+}
+
+function AttendanceFollowupPanel({
+  duplicateWarning,
+  followupSaveError,
+  followupTarget,
+  isDraftEdited,
+  isFollowupSaved,
+  isFollowupSaving,
+  isMessageBlank,
+  isMessageSending,
+  isMessageSent,
+  isPreviewError,
+  isPreviewLoading,
+  isPreviewReady,
+  messageBody,
+  messagePreview,
+  messageSend,
+  messageSendError,
+  needsCheckStudents,
+  onDismiss,
+  onMessageChange,
+  onRestorePreview,
+  onSaveFollowup,
+  onSendMessage,
+}: {
+  duplicateWarning: string;
+  followupSaveError: string;
+  followupTarget: AttendanceFollowupTarget | null;
+  isDraftEdited: boolean;
+  isFollowupSaved: boolean;
+  isFollowupSaving: boolean;
+  isMessageBlank: boolean;
+  isMessageSending: boolean;
+  isMessageSent: boolean;
+  isPreviewError: boolean;
+  isPreviewLoading: boolean;
+  isPreviewReady: boolean;
+  messageBody: string;
+  messagePreview: MessagePreviewState;
+  messageSend: MessageSendState;
+  messageSendError: string;
+  needsCheckStudents: AttendanceStudent[];
+  onDismiss: () => void;
+  onMessageChange: (body: string) => void;
+  onRestorePreview: () => void;
+  onSaveFollowup: () => void;
+  onSendMessage: () => void;
+}) {
+  const canSaveFollowup = isPreviewReady && !isMessageBlank && !isFollowupSaving;
+  const canSendMessage = isFollowupSaved && !isMessageSending;
+
+  return (
+    <section className="rounded-lg border border-stone-200 bg-white shadow-sm lg:sticky lg:top-5">
+      <div className="border-b border-stone-200 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <MessageSquareText className="text-emerald-700" size={18} />
+          <h3 className="text-sm font-semibold text-stone-950">결석/지각 문자</h3>
+          {followupTarget ? (
+            <button
+              type="button"
+              onClick={onDismiss}
+              className="ml-auto rounded-md border border-stone-200 px-2 py-1 text-xs font-semibold text-stone-600"
+            >
+              닫기
+            </button>
+          ) : null}
+        </div>
+        <p className="mt-1 text-xs leading-5 text-stone-500">
+          결석 또는 지각으로 체크하면 학부모 문자 초안이 여기서 바로 준비됩니다.
+        </p>
+      </div>
+
+      {!followupTarget ? (
+        <div className="space-y-3 p-4">
+          <div className="rounded-md border border-stone-200 bg-stone-50 p-3 text-sm leading-6 text-stone-600">
+            <p className="font-semibold text-stone-900">대기 상태</p>
+            <p className="mt-1">
+              `확인 필요`는 바로 문자를 만들지 않습니다. 미도착 학생을 잠시 대기시킨
+              뒤 결석이나 지각으로 확정하면 문자 초안이 생성됩니다.
+            </p>
+          </div>
+
+          {needsCheckStudents.length > 0 ? (
+            <div className="rounded-md border border-orange-200 bg-orange-50 p-3">
+              <p className="text-sm font-semibold text-orange-950">
+                확인 필요 {needsCheckStudents.length}명
+              </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {needsCheckStudents.map((student) => (
+                  <span
+                    key={student.id}
+                    className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-orange-900"
+                  >
+                    {student.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <div className="space-y-4 p-4">
+          <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
+            <p className="text-xs font-medium text-stone-500">선택 학생</p>
+            <p className="mt-1 text-base font-semibold text-stone-950">
+              {followupTarget.student.name}
+            </p>
+            <p className="mt-1 text-xs text-stone-500">
+              {followupTarget.session.className} · {followupTarget.session.startTime}-
+              {followupTarget.session.endTime}
+            </p>
+            <p className="mt-2 inline-flex rounded-md bg-red-50 px-2 py-1 text-xs font-semibold text-red-800">
+              {reasonLabel(followupTarget.reason)} 안내
+            </p>
+          </div>
+
+          {duplicateWarning ? (
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-950">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="mt-0.5 shrink-0" size={17} />
+                <p>{duplicateWarning}</p>
+              </div>
+            </div>
+          ) : null}
+
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <label
+                htmlFor="attendance-followup-message"
+                className="truncate text-sm font-semibold text-stone-800"
+              >
+                {isPreviewReady ? messagePreview.title : "문자 미리보기"}
+              </label>
+              <button
+                type="button"
+                aria-label="원문으로 되돌리기"
+                title="원문으로 되돌리기"
+                disabled={!isDraftEdited}
+                onClick={onRestorePreview}
+                className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <RotateCcw size={15} />
+              </button>
+            </div>
+            <textarea
+              id="attendance-followup-message"
+              value={messageBody}
+              onChange={(event) => onMessageChange(event.target.value)}
+              disabled={!isPreviewReady}
+              aria-busy={isPreviewLoading}
+              placeholder={
+                isPreviewLoading
+                  ? "문자 초안을 불러오는 중입니다."
+                  : "결석 또는 지각 학생을 선택하면 문자 초안이 표시됩니다."
+              }
+              rows={8}
+              className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition disabled:bg-stone-50 disabled:text-stone-500 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            />
+            <p
+              className={[
+                "mt-2 text-xs",
+                isMessageBlank ? "text-red-700" : "text-stone-500",
+              ].join(" ")}
+            >
+              {messageBody.length}자 ·{" "}
+              {isMessageBlank
+                ? "본문이 비어 있으면 발송할 수 없습니다."
+                : "발송 전 문구를 직접 수정할 수 있습니다."}
+            </p>
+          </div>
+
+          <div
+            className={[
+              "rounded-md border p-3 text-sm leading-6",
+              isPreviewError
+                ? "border-red-200 bg-red-50 text-red-900"
+                : "border-stone-200 bg-stone-50 text-stone-700",
+            ].join(" ")}
+          >
+            <div className="flex items-start gap-2">
+              {isPreviewReady && !isPreviewError ? (
+                <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-700" size={17} />
+              ) : (
+                <AlertCircle className="mt-0.5 shrink-0" size={17} />
+              )}
+              <p>
+                {isPreviewLoading
+                  ? "학원별 문자 템플릿을 불러오는 중입니다."
+                  : isPreviewError
+                    ? messagePreview.error
+                    : "저장하면 출석 기록과 팔로업 기록이 연결됩니다."}
+              </p>
+            </div>
+          </div>
+
+          {followupSaveError || isFollowupSaved ? (
+            <div
+              className={[
+                "rounded-md border p-3 text-sm leading-6",
+                followupSaveError
+                  ? "border-red-200 bg-red-50 text-red-900"
+                  : "border-emerald-200 bg-emerald-50 text-emerald-900",
+              ].join(" ")}
+            >
+              <div className="flex items-start gap-2">
+                {followupSaveError ? (
+                  <AlertCircle className="mt-0.5 shrink-0" size={17} />
+                ) : (
+                  <CheckCircle2 className="mt-0.5 shrink-0" size={17} />
+                )}
+                <p>
+                  {followupSaveError ||
+                    "팔로업 기록을 저장했고 출석 기록과 연결했습니다."}
+                </p>
+              </div>
+            </div>
+          ) : null}
+
+          <button
+            type="button"
+            disabled={!canSaveFollowup}
+            onClick={onSaveFollowup}
+            className={[
+              "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+              canSaveFollowup
+                ? "bg-stone-950 text-white hover:bg-stone-800"
+                : "bg-stone-300 text-stone-600",
+            ].join(" ")}
+          >
+            <Send size={17} />
+            {isFollowupSaving
+              ? "저장 중"
+              : isFollowupSaved
+                ? "저장 완료"
+                : "팔로업 기록 저장"}
+          </button>
+
+          {isFollowupSaved ? (
+            <div className="space-y-2">
+              <button
+                type="button"
+                disabled={!canSendMessage}
+                onClick={onSendMessage}
+                className={[
+                  "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+                  canSendMessage
+                    ? "bg-emerald-700 text-white hover:bg-emerald-800"
+                    : "bg-emerald-200 text-emerald-900",
+                ].join(" ")}
+              >
+                <Send size={17} />
+                {isMessageSending
+                  ? "발송 처리 중"
+                  : isMessageSent
+                    ? messageSend.dryRun
+                      ? "dry-run 기록 완료"
+                      : "문자 발송 완료"
+                    : "문자 발송 테스트"}
+              </button>
+
+              {messageSendError || isMessageSent ? (
+                <div
+                  className={[
+                    "rounded-md border p-3 text-sm leading-6",
+                    messageSendError
+                      ? "border-red-200 bg-red-50 text-red-900"
+                      : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                  ].join(" ")}
+                >
+                  <div className="flex items-start gap-2">
+                    {messageSendError ? (
+                      <AlertCircle className="mt-0.5 shrink-0" size={17} />
+                    ) : (
+                      <CheckCircle2 className="mt-0.5 shrink-0" size={17} />
+                    )}
+                    <p>
+                      {messageSendError ||
+                        (messageSend.dryRun
+                          ? "실제 문자는 보내지 않고 발송 로그만 저장했습니다."
+                          : messageSend.message)}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -768,6 +1461,35 @@ function attendanceStatusClass(status: AttendanceStatus) {
   };
 
   return classes[status];
+}
+
+function reasonLabel(reasonId: FollowupReason) {
+  return followupReasons.find((reason) => reason.id === reasonId)?.label ?? reasonId;
+}
+
+function getRecentDuplicateWarning({
+  followups,
+  reason,
+}: {
+  followups: NonNullable<FollowupHistoryResponse["followups"]>;
+  reason: FollowupReason;
+}) {
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000;
+  const recentFollowup = followups.find((followup) => {
+    if (followup.reason !== reason) {
+      return false;
+    }
+
+    const createdAt = new Date(followup.createdAt).getTime();
+    return Number.isFinite(createdAt) && now - createdAt < oneDay;
+  });
+
+  if (!recentFollowup) {
+    return "";
+  }
+
+  return `최근 24시간 안에 같은 학생에게 ${reasonLabel(reason)} 기록이 있습니다. 발송 전 중복 여부를 확인해 주세요.`;
 }
 
 function formatTime(value: string) {

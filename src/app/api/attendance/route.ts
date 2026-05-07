@@ -34,6 +34,7 @@ type AttendanceRecord = {
   checked_at: string | null;
   arrived_at: string | null;
   note: string | null;
+  followup_id: string | null;
 };
 
 type AttendanceRequest = {
@@ -72,7 +73,7 @@ export async function GET(request: Request) {
   let query = workspace.admin
     .from("attendance_records")
     .select(
-      "id, student_id, class_id, teacher_id, attendance_date, scheduled_start_time, scheduled_end_time, status, checked_at, arrived_at, note",
+      "id, student_id, class_id, teacher_id, attendance_date, scheduled_start_time, scheduled_end_time, status, checked_at, arrived_at, note, followup_id",
     )
     .eq("academy_id", workspace.profile.academy_id)
     .eq("attendance_date", attendanceDate)
@@ -164,7 +165,7 @@ export async function PATCH(request: Request) {
       },
     )
     .select(
-      "id, student_id, class_id, teacher_id, attendance_date, scheduled_start_time, scheduled_end_time, status, checked_at, arrived_at, note",
+      "id, student_id, class_id, teacher_id, attendance_date, scheduled_start_time, scheduled_end_time, status, checked_at, arrived_at, note, followup_id",
     )
     .single<AttendanceRecord>();
 
@@ -401,5 +402,6 @@ function toAttendanceResponse(record: AttendanceRecord) {
     checkedAt: record.checked_at,
     arrivedAt: record.arrived_at,
     note: record.note,
+    followupId: record.followup_id,
   };
 }

@@ -1,3 +1,5 @@
+import type { FollowupReason } from "@/lib/followup-templates";
+
 export const attendanceStatuses = [
   "pending",
   "present",
@@ -25,4 +27,18 @@ export function isAttendanceStatus(value: unknown): value is AttendanceStatus {
     typeof value === "string" &&
     attendanceStatuses.includes(value as AttendanceStatus)
   );
+}
+
+export function getFollowupReasonForAttendanceStatus(
+  status: AttendanceStatus,
+): FollowupReason | null {
+  if (status === "absent") {
+    return "absence";
+  }
+
+  if (status === "late") {
+    return "late";
+  }
+
+  return null;
 }
