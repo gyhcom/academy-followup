@@ -11,6 +11,11 @@ import {
 } from "lucide-react";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 import {
+  type FollowupHistoryItem,
+  type FollowupHistoryState,
+  StudentFollowupHistory,
+} from "@/app/app/operations-history";
+import {
   getSortedActiveSchedules,
   type OperationsStudentSchedule,
   WeeklySchedulePanel,
@@ -89,6 +94,11 @@ type SendMessageResponse = {
   error?: string;
 };
 
+type FollowupHistoryResponse = {
+  followups?: FollowupHistoryItem[];
+  error?: string;
+};
+
 const quickReasonIds: FollowupReason[] = ["absence", "retest", "homework_missing"];
 
 export function OperationsBoard({
@@ -145,6 +155,13 @@ export function OperationsBoard({
     message: "",
     error: "",
   });
+  const [historyRefreshToken, setHistoryRefreshToken] = useState(0);
+  const [followupHistory, setFollowupHistory] = useState<FollowupHistoryState>({
+    studentId: "",
+    status: "idle",
+    items: [],
+    error: "",
+  });
   const messageBody =
     messageDraft.key === messageKey
       ? messageDraft.body
@@ -193,6 +210,14 @@ export function OperationsBoard({
   const activeScheduleCount = selectedStudent
     ? getSortedActiveSchedules(selectedStudent.schedules).length
     : 0;
+  const visibleFollowupHistory = selectedStudentIdForPreview
+    ? followupHistory
+    : {
+        studentId: "",
+        status: "idle" as const,
+        items: [],
+        error: "",
+      };
 
   useEffect(() => {
     if (!selectedStudentIdForPreview) {
@@ -255,6 +280,62 @@ export function OperationsBoard({
       controller.abort();
     };
   }, [makeupCandidateTime, messageKey, selectedReason, selectedStudentIdForPreview]);
+
+  useEffect(() => {
+    if (!selectedStudentIdForPreview) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const studentId = selectedStudentIdForPreview;
+
+    async function loadHistory() {
+      setFollowupHistory((current) => ({
+        studentId,
+        status: "loading",
+        items: current.studentId === studentId ? current.items : [],
+        error: "",
+      }));
+
+      try {
+        const response = await fetch(`/api/followups?studentId=${studentId}`, {
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as FollowupHistoryResponse;
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "팔로업 기록을 불러오지 못했습니다.");
+        }
+
+        setFollowupHistory({
+          studentId,
+          status: "ready",
+          items: payload.followups ?? [],
+          error: "",
+        });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setFollowupHistory({
+          studentId,
+          status: "error",
+          items: [],
+          error:
+            error instanceof Error
+              ? error.message
+              : "팔로업 기록을 불러오지 못했습니다.",
+        });
+      }
+    }
+
+    void loadHistory();
+
+    return () => {
+      controller.abort();
+    };
+  }, [historyRefreshToken, selectedStudentIdForPreview]);
 
   useEffect(() => {
     if (!isMobileComposerOpen) {
@@ -374,6 +455,7 @@ export function OperationsBoard({
         message: "",
         error: "",
       });
+      setHistoryRefreshToken((value) => value + 1);
     } catch (error) {
       setFollowupSave({
         key: messageKey,
@@ -426,6 +508,7 @@ export function OperationsBoard({
           (payload.dryRun ? "dry-run 발송을 기록했습니다." : "문자를 발송했습니다."),
         error: "",
       });
+      setHistoryRefreshToken((value) => value + 1);
     } catch (error) {
       setMessageSend({
         followupId: savedFollowupId,
@@ -627,11 +710,17 @@ export function OperationsBoard({
           </div>
         </section>
 
-        <WeeklySchedulePanel
-          selectedClassName={selectedClass?.name}
-          selectedStudent={selectedStudent}
-          onMakeupCandidateSelect={handleMakeupCandidateSelect}
-        />
+        <div className="space-y-4">
+          <WeeklySchedulePanel
+            selectedClassName={selectedClass?.name}
+            selectedStudent={selectedStudent}
+            onMakeupCandidateSelect={handleMakeupCandidateSelect}
+          />
+          <StudentFollowupHistory
+            selectedStudentName={selectedStudent?.name}
+            history={visibleFollowupHistory}
+          />
+        </div>
 
         <MessageComposer
           className="hidden lg:block"

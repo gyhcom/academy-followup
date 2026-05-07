@@ -36,6 +36,123 @@ type CreatedFollowupRecord = {
   created_at: string;
 };
 
+type FollowupHistoryRecord = {
+  id: string;
+  reason: string;
+  message_body: string;
+  status: string;
+  sent_at: string | null;
+  created_at: string;
+};
+
+export async function GET(request: Request) {
+  const studentId = new URL(request.url).searchParams.get("studentId");
+
+  if (!studentId) {
+    return NextResponse.json({ error: "학생 ID가 필요합니다." }, { status: 400 });
+  }
+
+  if (!hasSupabaseServerEnv()) {
+    return NextResponse.json(
+      { error: "Supabase 세션 환경변수가 설정되지 않았습니다." },
+      { status: 500 },
+    );
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+  }
+
+  if (!hasSupabaseAdminEnv()) {
+    return NextResponse.json(
+      { error: "서버 전용 Supabase 키가 설정되지 않았습니다." },
+      { status: 500 },
+    );
+  }
+
+  const admin = createSupabaseAdminClient();
+  const { data: profile, error: profileError } = await admin
+    .from("profiles")
+    .select("role, academy_id")
+    .eq("id", user.id)
+    .maybeSingle<ProfileRecord>();
+
+  if (profileError) {
+    return NextResponse.json({ error: profileError.message }, { status: 500 });
+  }
+
+  if (!profile) {
+    return NextResponse.json(
+      { error: "학원 워크스페이스 연결이 필요합니다." },
+      { status: 403 },
+    );
+  }
+
+  const { data: student, error: studentError } = await admin
+    .from("students")
+    .select("id, academy_id, class_id, status")
+    .eq("id", studentId)
+    .eq("academy_id", profile.academy_id)
+    .maybeSingle<StudentRecord>();
+
+  if (studentError) {
+    return NextResponse.json({ error: studentError.message }, { status: 500 });
+  }
+
+  if (!student) {
+    return NextResponse.json(
+      { error: "선택한 학생을 찾을 수 없습니다." },
+      { status: 404 },
+    );
+  }
+
+  const classRecord = await getStudentClass({
+    admin,
+    academyId: profile.academy_id,
+    classId: student.class_id,
+  });
+
+  if (classRecord.error) {
+    return NextResponse.json({ error: classRecord.error }, { status: 500 });
+  }
+
+  if (!canCreateFollowup(profile.role, classRecord.data, user.id)) {
+    return NextResponse.json(
+      { error: "이 학생의 팔로업 기록을 볼 권한이 없습니다." },
+      { status: 403 },
+    );
+  }
+
+  const { data: followups, error: followupsError } = await admin
+    .from("followups")
+    .select("id, reason, message_body, status, sent_at, created_at")
+    .eq("academy_id", profile.academy_id)
+    .eq("student_id", student.id)
+    .order("created_at", { ascending: false })
+    .limit(8)
+    .returns<FollowupHistoryRecord[]>();
+
+  if (followupsError) {
+    return NextResponse.json({ error: followupsError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    followups: (followups ?? []).map((followup) => ({
+      id: followup.id,
+      reason: followup.reason,
+      messageBody: followup.message_body,
+      status: followup.status,
+      sentAt: followup.sent_at,
+      createdAt: followup.created_at,
+    })),
+  });
+}
+
 export async function POST(request: Request) {
   const parsedRequest = await parseCreateFollowupRequest(request);
 
