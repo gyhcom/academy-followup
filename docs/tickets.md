@@ -422,21 +422,28 @@
 
 ### T-215 학생 스케줄 DB 모델
 
-상태: 예정
+상태: 완료
 
 목표:
 - 학생별 정규 수업, 보강, 외부 일정, 상담 일정을 저장할 수 있는 테이블을 추가
 
 작업:
-- `student_schedules` 테이블 추가
-- `schedule_type` 설계: `regular_class`, `makeup`, `external`, `consultation`
-- 요일, 시작 시간, 종료 시간, 제목, 과목, 메모 필드 추가
-- `academy_id`, `student_id`, `class_id`, `teacher_id` 기준 인덱스 추가
-- 기존 `classes`와 `students`와의 관계 정리
+- `student_schedules` 테이블 추가: 완료
+- `schedule_type` 설계: `regular_class`, `makeup`, `external`, `consultation`: 완료
+- 요일, 시작 시간, 종료 시간, 제목, 과목, 메모 필드 추가: 완료
+- `academy_id`, `student_id`, `class_id`, `teacher_id` 기준 인덱스 추가: 완료
+- 기존 `classes`와 `students`와의 관계 정리: 완료
 
 완료 기준:
 - 학생별 주간 반복 스케줄을 DB에 저장할 수 있음
 - 학원 간 데이터가 `academy_id`로 분리됨
+
+메모:
+- `day_of_week`는 0=일요일, 1=월요일, ... 6=토요일로 저장합니다. 화면에서는 월~일 순서로 정렬해 보여줍니다.
+- `start_time < end_time` 제약으로 잘못된 시간 범위를 DB에서 차단합니다.
+- 활성 일정 조회는 `student_id/day_of_week/start_time`, `academy_id/day_of_week/start_time` 부분 인덱스를 사용합니다.
+- 파일럿 seed에는 김민준 학생의 월수금 정규 수업과 화요일 외부 논술학원 예시를 넣었습니다.
+- 실제 등록/수정 화면과 API는 `T-216`에서 구현합니다.
 
 ### T-216 학생별 주간 스케줄 등록/수정
 

@@ -16,6 +16,12 @@ create type public.followup_reason as enum (
   'consultation'
 );
 create type public.followup_status as enum ('draft', 'sent', 'failed');
+create type public.student_schedule_type as enum (
+  'regular_class',
+  'makeup',
+  'external',
+  'consultation'
+);
 
 -- 플랫폼 운영자 권한입니다.
 -- 특정 학원 소속 권한이 아니라, 전체 SaaS 운영/지원 용도로만 사용합니다.
@@ -92,6 +98,28 @@ create table public.students (
   created_at timestamptz not null default now()
 );
 
+-- 학생별 주간 반복 스케줄입니다.
+-- 원장 요청의 핵심인 "학생이 언제 학원/외부 일정에 있는지"를 먼저 저장합니다.
+create table public.student_schedules (
+  id uuid primary key default gen_random_uuid(),
+  academy_id uuid not null references public.academies(id) on delete cascade,
+  student_id uuid not null references public.students(id) on delete cascade,
+  class_id uuid references public.classes(id) on delete set null,
+  teacher_id uuid references public.profiles(id) on delete set null,
+  schedule_type public.student_schedule_type not null default 'regular_class',
+  day_of_week smallint not null,
+  start_time time not null,
+  end_time time not null,
+  subject text,
+  title text not null,
+  memo text,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint student_schedules_day_of_week_check check (day_of_week between 0 and 6),
+  constraint student_schedules_time_order_check check (start_time < end_time)
+);
+
 -- 학원별 문자 템플릿입니다.
 -- 같은 사유라도 학원마다 말투가 다르므로 academy_id 기준으로 관리합니다.
 create table public.message_templates (
@@ -139,6 +167,19 @@ create index academies_status_idx on public.academies(status);
 create index classes_academy_id_idx on public.classes(academy_id);
 create index students_academy_id_idx on public.students(academy_id);
 create index students_class_id_idx on public.students(class_id);
+create index student_schedules_academy_id_idx on public.student_schedules(academy_id);
+create index student_schedules_student_day_idx
+  on public.student_schedules(student_id, day_of_week, start_time)
+  where is_active = true;
+create index student_schedules_academy_day_idx
+  on public.student_schedules(academy_id, day_of_week, start_time)
+  where is_active = true;
+create index student_schedules_class_id_idx
+  on public.student_schedules(class_id)
+  where class_id is not null;
+create index student_schedules_teacher_id_idx
+  on public.student_schedules(teacher_id)
+  where teacher_id is not null;
 create index followups_academy_id_idx on public.followups(academy_id);
 create index followups_student_id_idx on public.followups(student_id);
 create index message_logs_academy_id_idx on public.message_logs(academy_id);
@@ -151,6 +192,7 @@ alter table public.academy_settings enable row level security;
 alter table public.profiles enable row level security;
 alter table public.classes enable row level security;
 alter table public.students enable row level security;
+alter table public.student_schedules enable row level security;
 alter table public.message_templates enable row level security;
 alter table public.followups enable row level security;
 alter table public.message_logs enable row level security;

@@ -87,6 +87,83 @@ on conflict (id) do update set
   parent_name = excluded.parent_name,
   parent_phone = excluded.parent_phone;
 
+insert into public.student_schedules (
+  id,
+  academy_id,
+  student_id,
+  class_id,
+  schedule_type,
+  day_of_week,
+  start_time,
+  end_time,
+  subject,
+  title,
+  memo
+) values
+  (
+    '44444444-4444-4444-8444-444444444441',
+    '11111111-1111-4111-8111-111111111111',
+    '33333333-3333-4333-8333-333333333331',
+    '22222222-2222-4222-8222-222222222221',
+    'regular_class',
+    1,
+    '16:30',
+    '19:00',
+    '수학',
+    '중2 수학 A반',
+    '월수금 정규 수업'
+  ),
+  (
+    '44444444-4444-4444-8444-444444444442',
+    '11111111-1111-4111-8111-111111111111',
+    '33333333-3333-4333-8333-333333333331',
+    '22222222-2222-4222-8222-222222222221',
+    'regular_class',
+    3,
+    '16:30',
+    '19:00',
+    '수학',
+    '중2 수학 A반',
+    '월수금 정규 수업'
+  ),
+  (
+    '44444444-4444-4444-8444-444444444443',
+    '11111111-1111-4111-8111-111111111111',
+    '33333333-3333-4333-8333-333333333331',
+    '22222222-2222-4222-8222-222222222221',
+    'regular_class',
+    5,
+    '16:30',
+    '19:00',
+    '수학',
+    '중2 수학 A반',
+    '월수금 정규 수업'
+  ),
+  (
+    '44444444-4444-4444-8444-444444444444',
+    '11111111-1111-4111-8111-111111111111',
+    '33333333-3333-4333-8333-333333333331',
+    null,
+    'external',
+    2,
+    '19:30',
+    '20:30',
+    null,
+    '논술학원',
+    '보강 후보에서 제외할 외부 일정'
+  )
+on conflict (id) do update set
+  class_id = excluded.class_id,
+  schedule_type = excluded.schedule_type,
+  day_of_week = excluded.day_of_week,
+  start_time = excluded.start_time,
+  end_time = excluded.end_time,
+  subject = excluded.subject,
+  title = excluded.title,
+  memo = excluded.memo,
+  is_active = true,
+  updated_at = now();
+
 insert into public.message_templates (
   academy_id,
   reason,
