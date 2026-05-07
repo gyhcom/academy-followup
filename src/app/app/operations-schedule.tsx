@@ -10,6 +10,7 @@ import {
 
 export type OperationsStudentSchedule = {
   id: string;
+  classId: string | null;
   scheduleType: string;
   dayOfWeek: number;
   startTime: string;

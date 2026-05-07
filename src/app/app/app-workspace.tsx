@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { LayoutDashboard, Settings } from "lucide-react";
+import { ClipboardCheck, LayoutDashboard, Settings } from "lucide-react";
+import {
+  AttendanceBoard,
+  type AttendanceRecordItem,
+} from "@/app/app/attendance-board";
 import { ManagementHome } from "@/app/app/management-home";
 import type {
   ManagementClass,
@@ -28,12 +32,14 @@ type AppWorkspaceProps = {
   role: string;
   roleLabel: string;
   classes: OperationsClass[];
+  attendanceDate: string;
+  attendanceRecords: AttendanceRecordItem[];
   managementClasses: ManagementClass[];
   managementStudents: ManagementStudent[];
   managementMembers: ManagementMember[];
 };
 
-type WorkspaceView = "operations" | "management";
+type WorkspaceView = "operations" | "attendance" | "management";
 
 export function AppWorkspace({
   academyName,
@@ -41,13 +47,15 @@ export function AppWorkspace({
   role,
   roleLabel,
   classes,
+  attendanceDate,
+  attendanceRecords,
   managementClasses,
   managementStudents,
   managementMembers,
 }: AppWorkspaceProps) {
   const canManage = role === "owner" || role === "manager";
   const [activeView, setActiveView] = useState<WorkspaceView>("operations");
-  const visibleView = canManage ? activeView : "operations";
+  const visibleView = !canManage && activeView === "management" ? "operations" : activeView;
 
   return (
     <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
@@ -63,6 +71,14 @@ export function AppWorkspace({
           teacherName={teacherName}
           roleLabel={roleLabel}
           classes={classes}
+        />
+      ) : visibleView === "attendance" ? (
+        <AttendanceBoard
+          academyName={academyName}
+          teacherName={teacherName}
+          classes={classes}
+          initialDate={attendanceDate}
+          initialRecords={attendanceRecords}
         />
       ) : (
         <ManagementHome
@@ -87,7 +103,7 @@ function WorkspaceNavigation({
 }) {
   return (
     <section className="rounded-xl border border-stone-200 bg-white p-2 shadow-sm">
-      <div className="grid grid-cols-2 gap-2">
+      <div className={["grid gap-2", canManage ? "grid-cols-3" : "grid-cols-2"].join(" ")}>
         <WorkspaceNavButton
           icon={<LayoutDashboard size={17} />}
           label="운영 보드"
@@ -96,13 +112,21 @@ function WorkspaceNavigation({
           onClick={() => onChange("operations")}
         />
         <WorkspaceNavButton
-          icon={<Settings size={17} />}
-          label="관리"
-          description={canManage ? "학생·반·구성원" : "원장/관리자 권한"}
-          isActive={activeView === "management"}
-          disabled={!canManage}
-          onClick={() => onChange("management")}
+          icon={<ClipboardCheck size={17} />}
+          label="출석부"
+          description="도착·지각 체크"
+          isActive={activeView === "attendance"}
+          onClick={() => onChange("attendance")}
         />
+        {canManage ? (
+          <WorkspaceNavButton
+            icon={<Settings size={17} />}
+            label="관리"
+            description="학생·반·구성원"
+            isActive={activeView === "management"}
+            onClick={() => onChange("management")}
+          />
+        ) : null}
       </div>
     </section>
   );

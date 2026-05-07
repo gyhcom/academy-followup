@@ -7,6 +7,7 @@ import {
   type ManagementMember,
   type ManagementStudent,
 } from "@/app/app/app-workspace";
+import type { AttendanceRecordItem } from "@/app/app/attendance-board";
 import { LogoutButton } from "@/app/app/logout-button";
 import type { OperationsClass } from "@/app/app/operations-board";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -59,6 +60,20 @@ type StudentScheduleRecord = {
   title: string;
   memo: string | null;
   is_active: boolean;
+};
+
+type AttendanceRecord = {
+  id: string;
+  student_id: string;
+  class_id: string;
+  teacher_id: string | null;
+  attendance_date: string;
+  scheduled_start_time: string;
+  scheduled_end_time: string;
+  status: string;
+  checked_at: string | null;
+  arrived_at: string | null;
+  note: string | null;
 };
 
 type MemberRecord = {
@@ -131,7 +146,14 @@ export default async function AppPage() {
     );
   }
 
-  const [classesResult, studentsResult, membersResult, schedulesResult] = await Promise.all([
+  const attendanceDate = getTodayDateInTimeZone("Asia/Seoul");
+  const [
+    classesResult,
+    studentsResult,
+    membersResult,
+    schedulesResult,
+    attendanceResult,
+  ] = await Promise.all([
     admin
       .from("classes")
       .select("id, name, subject, grade_label, teacher_id")
@@ -155,9 +177,23 @@ export default async function AppPage() {
       .eq("academy_id", profile.academy_id)
       .order("day_of_week", { ascending: true })
       .order("start_time", { ascending: true }),
+    admin
+      .from("attendance_records")
+      .select(
+        "id, student_id, class_id, teacher_id, attendance_date, scheduled_start_time, scheduled_end_time, status, checked_at, arrived_at, note",
+      )
+      .eq("academy_id", profile.academy_id)
+      .eq("attendance_date", attendanceDate)
+      .order("scheduled_start_time", { ascending: true }),
   ]);
 
-  if (classesResult.error || studentsResult.error || membersResult.error || schedulesResult.error) {
+  if (
+    classesResult.error ||
+    studentsResult.error ||
+    membersResult.error ||
+    schedulesResult.error ||
+    attendanceResult.error
+  ) {
     return (
       <AppShell email={user.email ?? ""}>
         <EmptyState
@@ -167,6 +203,7 @@ export default async function AppPage() {
             studentsResult.error?.message ??
             membersResult.error?.message ??
             schedulesResult.error?.message ??
+            attendanceResult.error?.message ??
             "반과 학생 정보를 가져오지 못했습니다."
           }
         />
@@ -178,6 +215,7 @@ export default async function AppPage() {
   const students = (studentsResult.data ?? []) as StudentRecord[];
   const members = (membersResult.data ?? []) as MemberRecord[];
   const schedules = (schedulesResult.data ?? []) as StudentScheduleRecord[];
+  const attendanceRecords = (attendanceResult.data ?? []) as AttendanceRecord[];
   const operationsClasses = buildOperationsClasses({
     classes,
     students,
@@ -201,6 +239,8 @@ export default async function AppPage() {
         role={profile.role}
         roleLabel={roleLabel(profile.role)}
         classes={operationsClasses}
+        attendanceDate={attendanceDate}
+        attendanceRecords={buildAttendanceRecords(attendanceRecords)}
         managementClasses={managementClasses}
         managementStudents={managementStudents}
         managementMembers={managementMembers}
@@ -318,6 +358,7 @@ function buildOperationsClasses({
           .filter((schedule) => schedule.student_id === student.id)
           .map((schedule) => ({
             id: schedule.id,
+            classId: schedule.class_id,
             scheduleType: schedule.schedule_type,
             dayOfWeek: schedule.day_of_week,
             startTime: schedule.start_time.slice(0, 5),
@@ -355,6 +396,22 @@ function buildManagementClasses({
       ).length,
     };
   });
+}
+
+function buildAttendanceRecords(records: AttendanceRecord[]): AttendanceRecordItem[] {
+  return records.map((record) => ({
+    id: record.id,
+    studentId: record.student_id,
+    classId: record.class_id,
+    teacherId: record.teacher_id,
+    attendanceDate: record.attendance_date,
+    scheduledStartTime: record.scheduled_start_time.slice(0, 5),
+    scheduledEndTime: record.scheduled_end_time.slice(0, 5),
+    status: record.status,
+    checkedAt: record.checked_at,
+    arrivedAt: record.arrived_at,
+    note: record.note,
+  }));
 }
 
 function buildManagementStudents({
@@ -428,4 +485,18 @@ function maskPhone(phone: string) {
   }
 
   return `${digits.slice(0, 3)}-****-${digits.slice(-4)}`;
+}
+
+function getTodayDateInTimeZone(timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const year = parts.find((part) => part.type === "year")?.value ?? "1970";
+  const month = parts.find((part) => part.type === "month")?.value ?? "01";
+  const day = parts.find((part) => part.type === "day")?.value ?? "01";
+
+  return `${year}-${month}-${day}`;
 }
