@@ -2,14 +2,19 @@
 
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import {
   BookOpen,
   ChevronRight,
   ClipboardList,
+  Pencil,
+  Plus,
+  Save,
   GraduationCap,
   LayoutDashboard,
   Settings,
   UsersRound,
+  X,
 } from "lucide-react";
 import {
   OperationsBoard,
@@ -21,6 +26,7 @@ export type ManagementClass = {
   name: string;
   subject: string | null;
   gradeLabel: string | null;
+  teacherId: string | null;
   teacherName: string | null;
   studentCount: number;
 };
@@ -56,6 +62,15 @@ type AppWorkspaceProps = {
 };
 
 type WorkspaceView = "operations" | "management";
+type ClassFormMode = "create" | "edit";
+type ClassFormState = {
+  mode: ClassFormMode;
+  classId: string;
+  name: string;
+  subject: string;
+  gradeLabel: string;
+  teacherId: string;
+};
 
 export function AppWorkspace({
   academyName,
@@ -193,11 +208,85 @@ function ManagementHome({
   members: ManagementMember[];
   students: ManagementStudent[];
 }) {
+  const router = useRouter();
+  const [classForm, setClassForm] = useState<ClassFormState | null>(null);
+  const [classFormStatus, setClassFormStatus] = useState<{
+    status: "idle" | "saving" | "saved" | "error";
+    message: string;
+  }>({ status: "idle", message: "" });
   const activeStudents = useMemo(
     () => students.filter((student) => student.status === "active"),
     [students],
   );
   const inactiveStudents = students.length - activeStudents.length;
+  const teacherOptions = members.filter((member) =>
+    ["owner", "manager", "teacher", "assistant"].includes(member.role),
+  );
+
+  function openCreateClassForm() {
+    setClassForm({
+      mode: "create",
+      classId: "",
+      name: "",
+      subject: "",
+      gradeLabel: "",
+      teacherId: "",
+    });
+    setClassFormStatus({ status: "idle", message: "" });
+  }
+
+  function openEditClassForm(classItem: ManagementClass) {
+    setClassForm({
+      mode: "edit",
+      classId: classItem.id,
+      name: classItem.name,
+      subject: classItem.subject ?? "",
+      gradeLabel: classItem.gradeLabel ?? "",
+      teacherId: classItem.teacherId ?? "",
+    });
+    setClassFormStatus({ status: "idle", message: "" });
+  }
+
+  async function saveClassForm() {
+    if (!classForm) {
+      return;
+    }
+
+    setClassFormStatus({ status: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/classes", {
+        method: classForm.mode === "create" ? "POST" : "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          classId: classForm.classId,
+          name: classForm.name,
+          subject: classForm.subject,
+          gradeLabel: classForm.gradeLabel,
+          teacherId: classForm.teacherId,
+        }),
+      });
+      const payload = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "반 정보를 저장하지 못했습니다.");
+      }
+
+      setClassFormStatus({
+        status: "saved",
+        message: classForm.mode === "create" ? "반을 등록했습니다." : "반 정보를 수정했습니다.",
+      });
+      setClassForm(null);
+      router.refresh();
+    } catch (error) {
+      setClassFormStatus({
+        status: "error",
+        message: error instanceof Error ? error.message : "반 정보를 저장하지 못했습니다.",
+      });
+    }
+  }
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -249,9 +338,38 @@ function ManagementHome({
       <section className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
         <ManagementPanel
           title="반 관리"
-          description="반 이름, 과목, 학년, 담당 선생님을 확인합니다."
-          actionLabel="반 등록 폼 예정"
+          description="반 이름, 과목, 학년, 담당 선생님을 등록하고 수정합니다."
+          actionLabel="반 등록"
+          actionIcon={<Plus size={14} />}
+          onAction={openCreateClassForm}
         >
+          {classForm ? (
+            <ClassForm
+              form={classForm}
+              status={classFormStatus}
+              teacherOptions={teacherOptions}
+              onChange={setClassForm}
+              onCancel={() => {
+                setClassForm(null);
+                setClassFormStatus({ status: "idle", message: "" });
+              }}
+              onSave={saveClassForm}
+            />
+          ) : null}
+
+          {classFormStatus.status === "saved" || classFormStatus.status === "error" ? (
+            <p
+              className={[
+                "mb-3 rounded-md border px-3 py-2 text-sm",
+                classFormStatus.status === "saved"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  : "border-red-200 bg-red-50 text-red-900",
+              ].join(" ")}
+            >
+              {classFormStatus.message}
+            </p>
+          ) : null}
+
           <div className="divide-y divide-stone-100">
             {classes.map((classItem) => (
               <div key={classItem.id} className="grid gap-3 py-3 sm:grid-cols-[1fr_auto] sm:items-center">
@@ -265,9 +383,19 @@ function ManagementHome({
                     담당: {classItem.teacherName ?? "미지정"}
                   </p>
                 </div>
-                <span className="w-fit rounded-md bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700">
-                  학생 {classItem.studentCount}명
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="w-fit rounded-md bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700">
+                    학생 {classItem.studentCount}명
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => openEditClassForm(classItem)}
+                    className="flex min-h-8 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
+                  >
+                    <Pencil size={13} />
+                    수정
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -361,11 +489,15 @@ function ManagementPanel({
   title,
   description,
   actionLabel,
+  actionIcon,
+  onAction,
   children,
 }: {
   title: string;
   description: string;
   actionLabel: string;
+  actionIcon?: ReactNode;
+  onAction?: () => void;
   children: ReactNode;
 }) {
   return (
@@ -377,15 +509,139 @@ function ManagementPanel({
         </div>
         <button
           type="button"
-          disabled
-          className="hidden min-h-10 shrink-0 cursor-not-allowed items-center gap-1 rounded-md border border-stone-200 bg-stone-50 px-3 text-xs font-semibold text-stone-500 sm:flex"
+          disabled={!onAction}
+          onClick={onAction}
+          className={[
+            "hidden min-h-10 shrink-0 items-center gap-1 rounded-md border px-3 text-xs font-semibold sm:flex",
+            onAction
+              ? "border-stone-300 bg-white text-stone-800 transition hover:border-stone-400 hover:bg-stone-50"
+              : "cursor-not-allowed border-stone-200 bg-stone-50 text-stone-500",
+          ].join(" ")}
         >
+          {actionIcon}
           {actionLabel}
           <ChevronRight size={14} />
         </button>
       </div>
       <div className="pt-3">{children}</div>
     </section>
+  );
+}
+
+function ClassForm({
+  form,
+  status,
+  teacherOptions,
+  onChange,
+  onCancel,
+  onSave,
+}: {
+  form: ClassFormState;
+  status: { status: "idle" | "saving" | "saved" | "error"; message: string };
+  teacherOptions: ManagementMember[];
+  onChange: (form: ClassFormState) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const canSave = form.name.trim().length > 0 && status.status !== "saving";
+
+  return (
+    <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-stone-950">
+            {form.mode === "create" ? "새 반 등록" : "반 정보 수정"}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-stone-600">
+            반 이름은 필수이고, 과목·학년·담당자는 나중에 바꿀 수 있습니다.
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label="반 입력 닫기"
+          onClick={onCancel}
+          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          반 이름
+          <input
+            value={form.name}
+            onChange={(event) => onChange({ ...form, name: event.target.value })}
+            placeholder="예: 중2 수학 A반"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          담당 선생님
+          <select
+            value={form.teacherId}
+            onChange={(event) => onChange({ ...form, teacherId: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          >
+            <option value="">담당자 미지정</option>
+            {teacherOptions.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name} · {roleLabel(member.role)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          과목
+          <input
+            value={form.subject}
+            onChange={(event) => onChange({ ...form, subject: event.target.value })}
+            placeholder="예: 수학"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          학년
+          <input
+            value={form.gradeLabel}
+            onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
+            placeholder="예: 중2"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          />
+        </label>
+      </div>
+
+      {status.status === "error" ? (
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+          {status.message}
+        </p>
+      ) : null}
+
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="min-h-11 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700"
+        >
+          취소
+        </button>
+        <button
+          type="button"
+          disabled={!canSave}
+          onClick={onSave}
+          className={[
+            "flex min-h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold",
+            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+          ].join(" ")}
+        >
+          <Save size={16} />
+          {status.status === "saving" ? "저장 중" : "저장"}
+        </button>
+      </div>
+    </div>
   );
 }
 

@@ -307,6 +307,7 @@ function buildManagementClasses({
       name: classItem.name,
       subject: classItem.subject,
       gradeLabel: classItem.grade_label,
+      teacherId: classItem.teacher_id,
       teacherName: teacher?.name ?? null,
       studentCount: students.filter(
         (student) => student.class_id === classItem.id && student.status === "active",
