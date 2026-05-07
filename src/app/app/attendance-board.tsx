@@ -1026,25 +1026,21 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-5 sm:px-5">
-          {(["present", "late", "absent", "needs_check", "pending"] as AttendanceStatus[]).map(
-            (status) => (
-              <div
-                key={status}
-                className="rounded-md border border-stone-200 bg-stone-50 px-3 py-3"
-              >
-                <p className="text-xs font-semibold text-stone-500">
-                  {attendanceStatusLabels[status]}
-                </p>
-                <p className="mt-1 text-2xl font-semibold tabular-nums text-stone-950">
-                  {overview.counts[status]}
-                </p>
-              </div>
-            ),
-          )}
+        <div className="border-b border-stone-200 px-4 py-3 sm:px-5">
+          <dl className="grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-5">
+            {(["present", "late", "absent", "needs_check", "pending"] as AttendanceStatus[]).map(
+              (status) => (
+                <CompactStatusMetric
+                  key={status}
+                  status={status}
+                  value={overview.counts[status]}
+                />
+              ),
+            )}
+          </dl>
         </div>
 
-        <div className="border-t border-stone-200">
+        <div>
           <div className="hidden grid-cols-[minmax(8rem,1fr)_5.5rem_repeat(4,4.75rem)] gap-2 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 md:grid sm:px-5">
             <span>수업</span>
             <span>시간</span>
@@ -1136,9 +1132,33 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
 
 function OverviewMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-stone-200 bg-stone-50 px-3 py-2">
+    <div className="rounded-md border border-stone-200 bg-stone-50 px-2.5 py-2">
       <dt className="font-medium text-stone-500">{label}</dt>
       <dd className="mt-1 text-base font-semibold text-stone-950">{value}</dd>
+    </div>
+  );
+}
+
+function CompactStatusMetric({
+  status,
+  value,
+}: {
+  status: AttendanceStatus;
+  value: number;
+}) {
+  return (
+    <div
+      className={[
+        "flex min-h-9 items-center justify-between gap-2 rounded-md border px-2.5 text-sm",
+        value > 0 ? compactStatusActiveClass(status) : "border-stone-200 bg-stone-50",
+      ].join(" ")}
+    >
+      <dt className="min-w-0 truncate text-xs font-semibold text-stone-600">
+        {attendanceStatusLabels[status]}
+      </dt>
+      <dd className="shrink-0 text-base font-semibold tabular-nums text-stone-950">
+        {value}
+      </dd>
     </div>
   );
 }
@@ -1949,6 +1969,20 @@ function attendanceStatusClass(status: AttendanceStatus) {
     makeup: "bg-blue-50 text-blue-800",
     excused: "bg-purple-50 text-purple-800",
     needs_check: "bg-orange-50 text-orange-800",
+  };
+
+  return classes[status];
+}
+
+function compactStatusActiveClass(status: AttendanceStatus) {
+  const classes: Record<AttendanceStatus, string> = {
+    pending: "border-stone-300 bg-stone-100",
+    present: "border-emerald-200 bg-emerald-50",
+    late: "border-amber-200 bg-amber-50",
+    absent: "border-red-200 bg-red-50",
+    makeup: "border-blue-200 bg-blue-50",
+    excused: "border-purple-200 bg-purple-50",
+    needs_check: "border-orange-200 bg-orange-50",
   };
 
   return classes[status];
