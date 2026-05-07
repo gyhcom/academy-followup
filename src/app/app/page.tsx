@@ -328,11 +328,13 @@ function buildManagementStudents({
 
     return {
       id: student.id,
+      classId: student.class_id,
       name: student.name,
       className: classItem?.name ?? null,
       schoolName: student.school_name,
       gradeLabel: student.grade_label,
       parentName: student.parent_name,
+      parentPhone: student.parent_phone,
       maskedParentPhone: maskPhone(student.parent_phone),
       status: student.status,
     };

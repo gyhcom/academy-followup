@@ -310,6 +310,8 @@ GET  /api/students?classId=
 ```text
 POST /api/classes
 PATCH /api/classes
+POST /api/students
+PATCH /api/students
 POST /api/messages/preview
 POST /api/messages/send
 POST /api/followups
@@ -340,17 +342,18 @@ GET  /api/health/supabase
 - 테스트 계정 profile/academy 연결
 - 앱 내부 운영/관리 탭 분리
 - 반 등록/수정 API와 관리 화면 폼
+- 학생 등록/수정 API와 관리 화면 폼
 
 ### 다음 구현 순서
 
-1. 반 등록/수정 마무리와 비활성화 스키마 결정
-2. 학생 등록/수정
-3. 학생별 주간 스케줄 스키마 추가
-4. 학생 상세/스케줄 보드
-5. 보강 문자 생성
-6. 문자 발송 dry-run
-7. 중복 발송 방지
-8. 학생별 팔로업 히스토리
+1. 학생별 주간 스케줄 스키마 추가
+2. 학생별 주간 스케줄 등록/수정
+3. 학생 상세/스케줄 보드
+4. 보강 문자 생성
+5. 문자 발송 dry-run
+6. 중복 발송 방지
+7. 학생별 팔로업 히스토리
+8. 선생님/구성원 초대
 
 ## 14. 제품 기능 범위와 기술 경계
 
@@ -450,12 +453,12 @@ local main
 
 다음 우선순위:
 
-1. T-208 반 등록/수정/비활성화
-2. T-209 학생 등록/수정/비활성화
-3. T-215 학생 스케줄 DB 모델
-4. T-216 학생별 주간 스케줄 등록/수정
-5. T-217 학생 스케줄 보드
-6. T-218 보강 문자 생성
-7. T-308 문자 발송 dry-run
+1. T-215 학생 스케줄 DB 모델
+2. T-216 학생별 주간 스케줄 등록/수정
+3. T-217 학생 스케줄 보드
+4. T-218 보강 문자 생성
+5. T-308 문자 발송 dry-run
+6. T-208 반 비활성화 스키마 결정
+7. T-206 선생님/구성원 초대
 
 Supabase 연결 절차는 [Supabase 연결 가이드](./supabase-setup.md)를 따릅니다.

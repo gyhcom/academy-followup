@@ -33,11 +33,13 @@ export type ManagementClass = {
 
 export type ManagementStudent = {
   id: string;
+  classId: string | null;
   name: string;
   className: string | null;
   schoolName: string | null;
   gradeLabel: string | null;
   parentName: string | null;
+  parentPhone: string;
   maskedParentPhone: string;
   status: string;
 };
@@ -63,6 +65,10 @@ type AppWorkspaceProps = {
 
 type WorkspaceView = "operations" | "management";
 type ClassFormMode = "create" | "edit";
+type FormStatus = {
+  status: "idle" | "saving" | "saved" | "error";
+  message: string;
+};
 type ClassFormState = {
   mode: ClassFormMode;
   classId: string;
@@ -70,6 +76,18 @@ type ClassFormState = {
   subject: string;
   gradeLabel: string;
   teacherId: string;
+};
+type StudentFormMode = "create" | "edit";
+type StudentFormState = {
+  mode: StudentFormMode;
+  studentId: string;
+  classId: string;
+  name: string;
+  schoolName: string;
+  gradeLabel: string;
+  parentName: string;
+  parentPhone: string;
+  status: string;
 };
 
 export function AppWorkspace({
@@ -210,10 +228,15 @@ function ManagementHome({
 }) {
   const router = useRouter();
   const [classForm, setClassForm] = useState<ClassFormState | null>(null);
-  const [classFormStatus, setClassFormStatus] = useState<{
-    status: "idle" | "saving" | "saved" | "error";
-    message: string;
-  }>({ status: "idle", message: "" });
+  const [classFormStatus, setClassFormStatus] = useState<FormStatus>({
+    status: "idle",
+    message: "",
+  });
+  const [studentForm, setStudentForm] = useState<StudentFormState | null>(null);
+  const [studentFormStatus, setStudentFormStatus] = useState<FormStatus>({
+    status: "idle",
+    message: "",
+  });
   const activeStudents = useMemo(
     () => students.filter((student) => student.status === "active"),
     [students],
@@ -224,6 +247,8 @@ function ManagementHome({
   );
 
   function openCreateClassForm() {
+    setStudentForm(null);
+    setStudentFormStatus({ status: "idle", message: "" });
     setClassForm({
       mode: "create",
       classId: "",
@@ -236,6 +261,8 @@ function ManagementHome({
   }
 
   function openEditClassForm(classItem: ManagementClass) {
+    setStudentForm(null);
+    setStudentFormStatus({ status: "idle", message: "" });
     setClassForm({
       mode: "edit",
       classId: classItem.id,
@@ -288,6 +315,87 @@ function ManagementHome({
     }
   }
 
+  function openCreateStudentForm() {
+    setClassForm(null);
+    setClassFormStatus({ status: "idle", message: "" });
+    setStudentForm({
+      mode: "create",
+      studentId: "",
+      classId: "",
+      name: "",
+      schoolName: "",
+      gradeLabel: "",
+      parentName: "",
+      parentPhone: "",
+      status: "active",
+    });
+    setStudentFormStatus({ status: "idle", message: "" });
+  }
+
+  function openEditStudentForm(student: ManagementStudent) {
+    setClassForm(null);
+    setClassFormStatus({ status: "idle", message: "" });
+    setStudentForm({
+      mode: "edit",
+      studentId: student.id,
+      classId: student.classId ?? "",
+      name: student.name,
+      schoolName: student.schoolName ?? "",
+      gradeLabel: student.gradeLabel ?? "",
+      parentName: student.parentName ?? "",
+      parentPhone: student.parentPhone,
+      status: student.status,
+    });
+    setStudentFormStatus({ status: "idle", message: "" });
+  }
+
+  async function saveStudentForm() {
+    if (!studentForm) {
+      return;
+    }
+
+    setStudentFormStatus({ status: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/students", {
+        method: studentForm.mode === "create" ? "POST" : "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId: studentForm.studentId,
+          classId: studentForm.classId,
+          name: studentForm.name,
+          schoolName: studentForm.schoolName,
+          gradeLabel: studentForm.gradeLabel,
+          parentName: studentForm.parentName,
+          parentPhone: studentForm.parentPhone,
+          status: studentForm.status,
+        }),
+      });
+      const payload = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "학생 정보를 저장하지 못했습니다.");
+      }
+
+      setStudentFormStatus({
+        status: "saved",
+        message:
+          studentForm.mode === "create"
+            ? "학생을 등록했습니다. 다음 단계에서 주간 스케줄을 이어서 입력합니다."
+            : "학생 정보를 수정했습니다.",
+      });
+      setStudentForm(null);
+      router.refresh();
+    } catch (error) {
+      setStudentFormStatus({
+        status: "error",
+        message: error instanceof Error ? error.message : "학생 정보를 저장하지 못했습니다.",
+      });
+    }
+  }
+
   return (
     <div className="space-y-4 sm:space-y-5">
       <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
@@ -303,7 +411,7 @@ function ManagementHome({
             </p>
           </div>
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-900">
-            다음 티켓에서 등록/수정 폼을 이 화면에 연결합니다.
+            학생 등록 후 주간 스케줄 입력 화면으로 이어지게 확장합니다.
           </div>
         </div>
       </section>
@@ -428,8 +536,37 @@ function ManagementHome({
       <ManagementPanel
         title="학생 관리"
         description="학생과 학부모 연락처는 팔로업 발송의 기준 데이터입니다."
-        actionLabel="학생 등록 폼 예정"
+        actionLabel="학생 등록"
+        actionIcon={<Plus size={14} />}
+        onAction={openCreateStudentForm}
       >
+        {studentForm ? (
+          <StudentForm
+            form={studentForm}
+            status={studentFormStatus}
+            classes={classes}
+            onChange={setStudentForm}
+            onCancel={() => {
+              setStudentForm(null);
+              setStudentFormStatus({ status: "idle", message: "" });
+            }}
+            onSave={saveStudentForm}
+          />
+        ) : null}
+
+        {studentFormStatus.status === "saved" || studentFormStatus.status === "error" ? (
+          <p
+            className={[
+              "mb-3 rounded-md border px-3 py-2 text-sm",
+              studentFormStatus.status === "saved"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-red-200 bg-red-50 text-red-900",
+            ].join(" ")}
+          >
+            {studentFormStatus.message}
+          </p>
+        ) : null}
+
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {students.slice(0, 12).map((student) => (
             <article key={student.id} className="rounded-lg border border-stone-200 bg-stone-50 p-3">
@@ -445,9 +582,23 @@ function ManagementHome({
               <p className="mt-3 truncate text-xs text-stone-500">
                 {student.parentName ?? "학부모"} · {student.maskedParentPhone}
               </p>
+              <button
+                type="button"
+                onClick={() => openEditStudentForm(student)}
+                className="mt-3 flex min-h-9 w-full items-center justify-center gap-1 rounded-md border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
+              >
+                <Pencil size={13} />
+                학생 정보 수정
+              </button>
             </article>
           ))}
         </div>
+        {students.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-stone-300 bg-stone-50 p-5 text-center">
+            <p className="text-sm font-semibold text-stone-900">아직 등록된 학생이 없습니다.</p>
+            <p className="mt-1 text-sm text-stone-500">학생을 먼저 등록하면 운영 보드에 표시됩니다.</p>
+          </div>
+        ) : null}
         {students.length > 12 ? (
           <p className="mt-3 text-xs text-stone-500">
             최근 화면에서는 12명만 표시합니다. 검색/필터는 학생 관리 상세 화면에서 연결합니다.
@@ -512,7 +663,7 @@ function ManagementPanel({
           disabled={!onAction}
           onClick={onAction}
           className={[
-            "hidden min-h-10 shrink-0 items-center gap-1 rounded-md border px-3 text-xs font-semibold sm:flex",
+            "flex min-h-10 shrink-0 items-center gap-1 rounded-md border px-3 text-xs font-semibold",
             onAction
               ? "border-stone-300 bg-white text-stone-800 transition hover:border-stone-400 hover:bg-stone-50"
               : "cursor-not-allowed border-stone-200 bg-stone-50 text-stone-500",
@@ -537,7 +688,7 @@ function ClassForm({
   onSave,
 }: {
   form: ClassFormState;
-  status: { status: "idle" | "saving" | "saved" | "error"; message: string };
+  status: FormStatus;
   teacherOptions: ManagementMember[];
   onChange: (form: ClassFormState) => void;
   onCancel: () => void;
@@ -645,17 +796,180 @@ function ClassForm({
   );
 }
 
+function StudentForm({
+  form,
+  status,
+  classes,
+  onChange,
+  onCancel,
+  onSave,
+}: {
+  form: StudentFormState;
+  status: FormStatus;
+  classes: ManagementClass[];
+  onChange: (form: StudentFormState) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const canSave =
+    form.name.trim().length > 0 &&
+    form.parentPhone.trim().length > 0 &&
+    status.status !== "saving";
+
+  return (
+    <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50/80 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-stone-950">
+            {form.mode === "create" ? "새 학생 등록" : "학생 정보 수정"}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-stone-600">
+            학생명과 학부모 연락처는 필수입니다. 저장 후 주간 스케줄을 이어서 입력합니다.
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label="학생 입력 닫기"
+          onClick={onCancel}
+          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          학생 이름
+          <input
+            value={form.name}
+            onChange={(event) => onChange({ ...form, name: event.target.value })}
+            placeholder="예: 김민준"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          소속 반
+          <select
+            value={form.classId}
+            onChange={(event) => onChange({ ...form, classId: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+          >
+            <option value="">미배정</option>
+            {classes.map((classItem) => (
+              <option key={classItem.id} value={classItem.id}>
+                {classItem.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          상태
+          <select
+            value={form.status}
+            onChange={(event) => onChange({ ...form, status: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+          >
+            <option value="active">재원</option>
+            <option value="paused">휴원</option>
+            <option value="left">퇴원</option>
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          학교
+          <input
+            value={form.schoolName}
+            onChange={(event) => onChange({ ...form, schoolName: event.target.value })}
+            placeholder="예: 한들중"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          학년
+          <input
+            value={form.gradeLabel}
+            onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
+            placeholder="예: 중2"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          학부모명
+          <input
+            value={form.parentName}
+            onChange={(event) => onChange({ ...form, parentName: event.target.value })}
+            placeholder="예: 김민준 어머니"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2 lg:col-span-1">
+          학부모 연락처
+          <input
+            value={form.parentPhone}
+            onChange={(event) => onChange({ ...form, parentPhone: event.target.value })}
+            inputMode="tel"
+            placeholder="예: 010-1234-5678"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+          />
+        </label>
+      </div>
+
+      {status.status === "error" ? (
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+          {status.message}
+        </p>
+      ) : null}
+
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="min-h-11 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700"
+        >
+          취소
+        </button>
+        <button
+          type="button"
+          disabled={!canSave}
+          onClick={onSave}
+          className={[
+            "flex min-h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold",
+            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+          ].join(" ")}
+        >
+          <Save size={16} />
+          {status.status === "saving" ? "저장 중" : "저장"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function StatusBadge({ status }: { status: string }) {
-  const isActive = status === "active";
+  const labels: Record<string, string> = {
+    active: "재원",
+    paused: "휴원",
+    left: "퇴원",
+  };
+  const styles: Record<string, string> = {
+    active: "bg-emerald-50 text-emerald-800",
+    paused: "bg-amber-50 text-amber-800",
+    left: "bg-stone-200 text-stone-700",
+  };
 
   return (
     <span
       className={[
         "shrink-0 rounded-md px-2 py-1 text-xs font-semibold",
-        isActive ? "bg-emerald-50 text-emerald-800" : "bg-stone-200 text-stone-700",
+        styles[status] ?? "bg-stone-200 text-stone-700",
       ].join(" ")}
     >
-      {isActive ? "재원" : status}
+      {labels[status] ?? status}
     </span>
   );
 }
