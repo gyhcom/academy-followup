@@ -197,7 +197,6 @@ Supabase Auth 사용자와 학원 권한을 연결합니다.
 - `grade_label`
 - `parent_name`
 - `parent_phone`
-- `student_phone`
 - `status`
 - `created_at`
 
@@ -295,7 +294,6 @@ Supabase Auth 사용자와 학원 권한을 연결합니다.
 - `followup_id`
 - `provider`
 - `provider_message_id`
-- `recipient_type`: `parent`, `student`, `both`
 - `recipient_phone`
 - `status`
 - `error_message`
@@ -411,19 +409,19 @@ GET  /api/health/supabase
 - 보강 후보 시간 선택과 보강 안내 문자 초안
 - 저장된 팔로업 기준 dry-run 발송 API와 message log 저장
 - 학생별 최근 팔로업 히스토리 API와 운영 보드 패널
+- 출석부 DB 모델과 수업 세션 기준
 
 ### 다음 구현 순서
 
-1. 출석부 DB 모델과 수업 세션 기준
-2. 반별 출석부 화면
-3. 결석/지각 문자 연결과 예외 처리
-4. 원장/데스크 출석 현황
-5. 날짜 기반 보강 시간 선택 고도화
-6. 보강 문자 후 스케줄 자동 등록
-7. 학부모/학생 수신자 선택
-8. 중복 발송 방지
-9. 원장/선생님 권한 테스트
-10. SOLAPI 실제 SMS 발송 테스트
+1. 반별 출석부 화면
+2. 결석/지각 문자 연결과 예외 처리
+3. 원장/데스크 출석 현황
+4. 날짜 기반 보강 시간 선택 고도화
+5. 보강 문자 후 스케줄 자동 등록
+6. 학부모/학생 수신자 선택
+7. 중복 발송 방지
+8. 원장/선생님 권한 테스트
+9. SOLAPI 실제 SMS 발송 테스트
 
 ## 14. 제품 기능 범위와 기술 경계
 

@@ -164,6 +164,56 @@ on conflict (id) do update set
   is_active = true,
   updated_at = now();
 
+insert into public.attendance_records (
+  academy_id,
+  student_id,
+  class_id,
+  attendance_date,
+  scheduled_start_time,
+  scheduled_end_time,
+  status,
+  checked_at,
+  arrived_at,
+  note
+) values
+  (
+    '11111111-1111-4111-8111-111111111111',
+    '33333333-3333-4333-8333-333333333331',
+    '22222222-2222-4222-8222-222222222221',
+    current_date,
+    '16:30',
+    '19:00',
+    'needs_check',
+    now(),
+    null,
+    '수업 시작 후 미도착. 결석 확정 전 확인 필요'
+  ),
+  (
+    '11111111-1111-4111-8111-111111111111',
+    '33333333-3333-4333-8333-333333333332',
+    '22222222-2222-4222-8222-222222222221',
+    current_date,
+    '16:30',
+    '19:00',
+    'present',
+    now(),
+    now(),
+    '정상 출석'
+  )
+on conflict (
+  academy_id,
+  student_id,
+  class_id,
+  attendance_date,
+  scheduled_start_time,
+  scheduled_end_time
+) do update set
+  status = excluded.status,
+  checked_at = excluded.checked_at,
+  arrived_at = excluded.arrived_at,
+  note = excluded.note,
+  updated_at = now();
+
 insert into public.message_templates (
   academy_id,
   reason,

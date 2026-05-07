@@ -23,6 +23,15 @@ create type public.student_schedule_type as enum (
   'external',
   'consultation'
 );
+create type public.attendance_status as enum (
+  'pending',
+  'present',
+  'late',
+  'absent',
+  'makeup',
+  'excused',
+  'needs_check'
+);
 
 -- 플랫폼 운영자 권한입니다.
 -- 특정 학원 소속 권한이 아니라, 전체 SaaS 운영/지원 용도로만 사용합니다.
@@ -148,6 +157,31 @@ create table public.followups (
   created_at timestamptz not null default now()
 );
 
+-- 반별 수업 날짜/시간 기준 출석부 기록입니다.
+-- 미도착 학생을 바로 결석 확정하지 않고 확인 필요/지각으로 수정할 수 있게 상태를 분리합니다.
+create table public.attendance_records (
+  id uuid primary key default gen_random_uuid(),
+  academy_id uuid not null references public.academies(id) on delete cascade,
+  student_id uuid not null references public.students(id) on delete cascade,
+  class_id uuid not null references public.classes(id) on delete cascade,
+  teacher_id uuid references public.profiles(id) on delete set null,
+  student_schedule_id uuid references public.student_schedules(id) on delete set null,
+  attendance_date date not null,
+  scheduled_start_time time not null,
+  scheduled_end_time time not null,
+  status public.attendance_status not null default 'pending',
+  checked_at timestamptz,
+  arrived_at timestamptz,
+  note text,
+  followup_id uuid references public.followups(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint attendance_records_time_order_check
+    check (scheduled_start_time < scheduled_end_time),
+  constraint attendance_records_note_length_check
+    check (note is null or char_length(note) <= 300)
+);
+
 -- 문자 provider 응답 로그입니다.
 -- 운영 중 장애/비용/오발송 확인을 위해 followups와 분리해 원본 발송 결과를 남깁니다.
 create table public.message_logs (
@@ -181,6 +215,36 @@ create index student_schedules_class_id_idx
 create index student_schedules_teacher_id_idx
   on public.student_schedules(teacher_id)
   where teacher_id is not null;
+create unique index attendance_records_session_student_uidx
+  on public.attendance_records(
+    academy_id,
+    student_id,
+    class_id,
+    attendance_date,
+    scheduled_start_time,
+    scheduled_end_time
+  );
+create index attendance_records_academy_date_idx
+  on public.attendance_records(academy_id, attendance_date);
+create index attendance_records_class_session_idx
+  on public.attendance_records(
+    academy_id,
+    class_id,
+    attendance_date,
+    scheduled_start_time
+  );
+create index attendance_records_student_date_idx
+  on public.attendance_records(student_id, attendance_date desc, scheduled_start_time);
+create index attendance_records_teacher_date_idx
+  on public.attendance_records(teacher_id, attendance_date desc)
+  where teacher_id is not null;
+create index attendance_records_action_status_idx
+  on public.attendance_records(academy_id, attendance_date, status)
+  where status in (
+    'absent'::public.attendance_status,
+    'late'::public.attendance_status,
+    'needs_check'::public.attendance_status
+  );
 create index followups_academy_id_idx on public.followups(academy_id);
 create index followups_student_id_idx on public.followups(student_id);
 create index message_logs_academy_id_idx on public.message_logs(academy_id);
@@ -194,6 +258,7 @@ alter table public.profiles enable row level security;
 alter table public.classes enable row level security;
 alter table public.students enable row level security;
 alter table public.student_schedules enable row level security;
+alter table public.attendance_records enable row level security;
 alter table public.message_templates enable row level security;
 alter table public.followups enable row level security;
 alter table public.message_logs enable row level security;
