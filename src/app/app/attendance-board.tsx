@@ -937,7 +937,7 @@ function SessionList({
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto p-3 lg:block lg:space-y-2">
+      <div className="grid gap-2 p-3 sm:grid-cols-2 lg:block lg:space-y-2">
         {sessions.length > 0 ? (
           sessions.map((session) => {
             const isSelected = session.key === selectedSessionKey;
@@ -949,24 +949,36 @@ function SessionList({
                 aria-pressed={isSelected}
                 onClick={() => onSelect(session.key)}
                 className={[
-                  "min-w-56 rounded-md border px-3 py-3 text-left transition lg:w-full",
+                  "grid min-h-[4.75rem] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border px-3 py-3 text-left transition",
                   isSelected
                     ? "border-stone-950 bg-stone-950 text-white"
                     : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50",
                 ].join(" ")}
               >
-                <span className="flex items-center gap-2 text-base font-semibold tabular-nums">
-                  <Clock3 size={16} className={isSelected ? "text-white/70" : "text-stone-400"} />
-                  {session.startTime} - {session.endTime}
+                <span className="min-w-0">
+                  <span className="flex items-center gap-2 text-base font-semibold tabular-nums">
+                    <Clock3 size={16} className={isSelected ? "text-white/70" : "text-stone-400"} />
+                    {session.startTime} - {session.endTime}
+                  </span>
+                  <span className="mt-1 block truncate text-sm font-semibold">
+                    {session.className}
+                  </span>
+                  <span
+                    className={[
+                      "mt-1 block truncate text-xs",
+                      isSelected ? "text-white/70" : "text-stone-500",
+                    ].join(" ")}
+                  >
+                    {session.subject ?? "과목 미지정"} · {session.students.length}명
+                  </span>
                 </span>
-                <span className="mt-1 block text-sm font-semibold">{session.className}</span>
                 <span
                   className={[
-                    "mt-1 block text-xs",
-                    isSelected ? "text-white/70" : "text-stone-500",
+                    "rounded-md px-2 py-1 text-xs font-semibold",
+                    isSelected ? "bg-white/14 text-white" : "bg-stone-100 text-stone-500",
                   ].join(" ")}
                 >
-                  {session.subject ?? "과목 미지정"} · {session.students.length}명
+                  {session.students.length}명
                 </span>
               </button>
             );
