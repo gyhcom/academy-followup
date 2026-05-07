@@ -301,6 +301,7 @@ Supabase Auth 사용자와 학원 권한을 연결합니다.
 src/app/app/page.tsx              서버 데이터 조회와 권한별 workspace 데이터 구성
 src/app/app/app-workspace.tsx     운영 보드/관리 탭 전환 shell
 src/app/app/operations-board.tsx  선생님 팔로업 운영 보드
+src/app/app/operations-schedule.tsx 선택 학생 주간 스케줄 패널
 src/app/app/management-home.tsx   관리 홈 상태와 저장 핸들러
 src/app/app/student-directory.tsx 학생 검색/필터/상세 패널
 src/app/app/management-forms.tsx  반/학생/스케줄 입력 폼
@@ -370,15 +371,16 @@ GET  /api/health/supabase
 - 학생별 주간 스케줄 DB 모델
 - 학생별 주간 스케줄 등록/수정 API와 관리 화면 폼
 - 학생 관리 리스트/상세 패널과 시간 중심 정렬/필터
+- 운영 보드 선택 학생 주간 스케줄 패널
 
 ### 다음 구현 순서
 
-1. 전체 주간 스케줄 보드
-2. 보강 문자 생성
-3. 문자 발송 dry-run
-4. 중복 발송 방지
-5. 학생별 팔로업 히스토리
-6. 선생님/구성원 초대
+1. 보강 문자 생성
+2. 문자 발송 dry-run
+3. 중복 발송 방지
+4. 학생별 팔로업 히스토리
+5. 선생님/구성원 초대
+6. 전체 학원 기준 주간 시간표
 
 ## 14. 제품 기능 범위와 기술 경계
 

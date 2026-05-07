@@ -10,6 +10,12 @@ import {
   X,
 } from "lucide-react";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
+import {
+  getSortedActiveSchedules,
+  type OperationsStudentSchedule,
+  WeeklySchedulePanel,
+} from "@/app/app/operations-schedule";
+import { scheduleTypeLabel, weekDayShortLabel } from "@/app/app/management-utils";
 
 export type OperationsStudent = {
   id: string;
@@ -18,6 +24,7 @@ export type OperationsStudent = {
   gradeLabel: string | null;
   parentName: string | null;
   maskedParentPhone: string;
+  schedules: OperationsStudentSchedule[];
 };
 
 export type OperationsClass = {
@@ -146,6 +153,9 @@ export function OperationsBoard({
     (total, classItem) => total + classItem.students.length,
     0,
   );
+  const activeScheduleCount = selectedStudent
+    ? getSortedActiveSchedules(selectedStudent.schedules).length
+    : 0;
 
   useEffect(() => {
     if (!selectedStudentIdForPreview) {
@@ -359,7 +369,7 @@ export function OperationsBoard({
           <dl className="grid grid-cols-3 gap-x-4 gap-y-2 border-t border-stone-200 pt-3 text-sm lg:min-w-[21rem] lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
             <StatusItem label="반" value={`${classes.length}개`} />
             <StatusItem label="학생" value={`${totalStudents}명`} />
-            <StatusItem label="상태" value={isPreviewReady ? "작성 중" : "준비"} />
+            <StatusItem label="일정" value={`${activeScheduleCount}개`} />
           </dl>
         </div>
       </section>
@@ -397,7 +407,7 @@ export function OperationsBoard({
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-start">
+      <section className="grid gap-4 lg:grid-cols-[minmax(250px,0.9fr)_minmax(300px,1fr)_390px] lg:items-start">
         <section aria-labelledby="student-flow-title" className="space-y-3">
           <div className="flex items-end justify-between gap-3 px-1">
             <div>
@@ -417,6 +427,7 @@ export function OperationsBoard({
             {selectedClass?.students.length ? (
               selectedClass.students.map((student) => {
                 const isSelected = student.id === selectedStudent?.id;
+                const primarySchedule = getSortedActiveSchedules(student.schedules)[0];
                 return (
                   <article
                     key={student.id}
@@ -431,10 +442,24 @@ export function OperationsBoard({
                       <button
                         type="button"
                         onClick={() => handleStudentSelect(student.id)}
-                        className="min-w-0 text-left"
+                        className="min-w-0 flex-1 text-left"
                       >
-                        <span className="block text-base font-semibold text-stone-950">
-                          {student.name}
+                        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span className="block text-base font-semibold text-stone-950">
+                            {student.name}
+                          </span>
+                          <span
+                            className={[
+                              "rounded-md px-2 py-0.5 text-xs font-semibold",
+                              primarySchedule
+                                ? "bg-blue-50 text-blue-800"
+                                : "bg-stone-100 text-stone-500",
+                            ].join(" ")}
+                          >
+                            {primarySchedule
+                              ? `${weekDayShortLabel(primarySchedule.dayOfWeek)} ${primarySchedule.startTime}`
+                              : "스케줄 없음"}
+                          </span>
                         </span>
                         <span className="mt-1 block text-xs text-stone-500">
                           {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
@@ -443,6 +468,13 @@ export function OperationsBoard({
                         <span className="mt-2 block text-xs text-stone-500">
                           {student.parentName ?? "학부모"} · {student.maskedParentPhone}
                         </span>
+                        {primarySchedule ? (
+                          <span className="mt-2 block text-xs font-medium text-stone-600">
+                            {primarySchedule.endTime}까지 ·{" "}
+                            {scheduleTypeLabel(primarySchedule.scheduleType)} ·{" "}
+                            {primarySchedule.title}
+                          </span>
+                        ) : null}
                       </button>
 
                       {isSelected ? (
@@ -484,6 +516,11 @@ export function OperationsBoard({
             )}
           </div>
         </section>
+
+        <WeeklySchedulePanel
+          selectedClassName={selectedClass?.name}
+          selectedStudent={selectedStudent}
+        />
 
         <MessageComposer
           className="hidden lg:block"

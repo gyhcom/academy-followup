@@ -181,6 +181,7 @@ export default async function AppPage() {
   const operationsClasses = buildOperationsClasses({
     classes,
     students,
+    schedules,
     profileId: user.id,
     role: profile.role,
   });
@@ -282,11 +283,13 @@ function roleLabel(role: string) {
 function buildOperationsClasses({
   classes,
   students,
+  schedules,
   profileId,
   role,
 }: {
   classes: ClassRecord[];
   students: StudentRecord[];
+  schedules: StudentScheduleRecord[];
   profileId: string;
   role: string;
 }): OperationsClass[] {
@@ -311,6 +314,19 @@ function buildOperationsClasses({
         gradeLabel: student.grade_label,
         parentName: student.parent_name,
         maskedParentPhone: maskPhone(student.parent_phone),
+        schedules: schedules
+          .filter((schedule) => schedule.student_id === student.id)
+          .map((schedule) => ({
+            id: schedule.id,
+            scheduleType: schedule.schedule_type,
+            dayOfWeek: schedule.day_of_week,
+            startTime: schedule.start_time.slice(0, 5),
+            endTime: schedule.end_time.slice(0, 5),
+            subject: schedule.subject,
+            title: schedule.title,
+            memo: schedule.memo,
+            isActive: schedule.is_active,
+          })),
       })),
   }));
 }
