@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   CalendarDays,
   Check,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   Loader2,
   MessageSquareText,
@@ -673,20 +675,7 @@ export function AttendanceBoard({
             </p>
           </div>
 
-          <label className="w-full lg:max-w-xs">
-            <span className="mb-1 block text-xs font-semibold text-stone-500">
-              조회 날짜
-            </span>
-            <span className="flex min-h-11 items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-800">
-              <CalendarDays size={17} className="text-stone-500" />
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(event) => setSelectedDate(event.target.value)}
-                className="min-h-9 min-w-0 flex-1 bg-transparent outline-none"
-              />
-            </span>
-          </label>
+          <AttendanceDateControl value={selectedDate} onChange={setSelectedDate} />
         </div>
       </section>
 
@@ -813,6 +802,114 @@ export function AttendanceBoard({
         />
       </section>
     </div>
+  );
+}
+
+function AttendanceDateControl({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (date: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function openCalendar() {
+    const input = inputRef.current;
+
+    if (!input) {
+      return;
+    }
+
+    try {
+      if (typeof input.showPicker === "function") {
+        input.showPicker();
+        return;
+      }
+    } catch {
+      // 일부 모바일 브라우저는 showPicker를 노출해도 숨김 input에서는 실패합니다.
+    }
+
+    input.focus();
+    input.click();
+  }
+
+  return (
+    <div className="w-full lg:max-w-sm">
+      <span className="mb-1 block text-xs font-semibold text-stone-500">조회 날짜</span>
+      <div className="grid grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] gap-2">
+        <button
+          type="button"
+          aria-label="전날 출석부 보기"
+          onClick={() => onChange(shiftDate(value, -1))}
+          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50"
+        >
+          <ChevronLeft size={18} />
+        </button>
+
+        <div className="relative">
+          <input
+            ref={inputRef}
+            type="date"
+            value={value}
+            onChange={(event) => {
+              if (event.target.value) {
+                onChange(event.target.value);
+              }
+            }}
+            className="sr-only"
+            tabIndex={-1}
+            aria-hidden="true"
+          />
+          <button
+            type="button"
+            onClick={openCalendar}
+            className="flex min-h-11 w-full items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-emerald-400 hover:bg-emerald-50 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+          >
+            <CalendarDays size={17} className="shrink-0 text-stone-500" />
+            <span className="min-w-0 flex-1 truncate tabular-nums">
+              {formatAttendanceDate(value)}
+            </span>
+            <CalendarDays size={16} className="shrink-0 text-stone-400" />
+          </button>
+        </div>
+
+        <button
+          type="button"
+          aria-label="다음날 출석부 보기"
+          onClick={() => onChange(shiftDate(value, 1))}
+          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50"
+        >
+          <ChevronRight size={18} />
+        </button>
+      </div>
+
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        <DateShortcutButton label="어제" date={shiftDate(getTodayDate(), -1)} onChange={onChange} />
+        <DateShortcutButton label="오늘" date={getTodayDate()} onChange={onChange} />
+        <DateShortcutButton label="내일" date={shiftDate(getTodayDate(), 1)} onChange={onChange} />
+      </div>
+    </div>
+  );
+}
+
+function DateShortcutButton({
+  label,
+  date,
+  onChange,
+}: {
+  label: string;
+  date: string;
+  onChange: (date: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(date)}
+      className="min-h-9 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-600 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800"
+    >
+      {label}
+    </button>
   );
 }
 
@@ -1793,6 +1890,34 @@ function getSessionKey(classId: string, startTime: string, endTime: string) {
 function getDayOfWeek(dateString: string) {
   const [year, month, day] = dateString.split("-").map(Number);
   return new Date(year, month - 1, day).getDay();
+}
+
+function formatAttendanceDate(dateString: string) {
+  const [year, month, day] = dateString.split("-");
+  const dayLabel = ["일", "월", "화", "수", "목", "금", "토"][getDayOfWeek(dateString)];
+
+  return `${year}. ${month}. ${day}. ${dayLabel}`;
+}
+
+function shiftDate(dateString: string, dayOffset: number) {
+  const [year, month, day] = dateString.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + dayOffset));
+
+  return date.toISOString().slice(0, 10);
+}
+
+function getTodayDate() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const year = parts.find((part) => part.type === "year")?.value ?? "1970";
+  const month = parts.find((part) => part.type === "month")?.value ?? "01";
+  const day = parts.find((part) => part.type === "day")?.value ?? "01";
+
+  return `${year}-${month}-${day}`;
 }
 
 function createDefaultNote(status: AttendanceStatus) {
