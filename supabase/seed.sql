@@ -2,8 +2,6 @@
 -- 개발/파일럿 DB에서 더배움프라임영수학원 화면을 실제 DB 기반으로 확인하기 위한 샘플입니다.
 -- 지금 단계에서는 화면 검증이 우선이므로 기본 샘플과 볼륨 테스트 데이터를 한 번에 넣습니다.
 
-begin;
-
 insert into public.academies (
   id,
   name,
@@ -72,16 +70,20 @@ on conflict (id) do update set
   subject = excluded.subject,
   grade_label = excluded.grade_label;
 
-create temporary table pilot_volume_students (
+drop table if exists public.seed_pilot_volume_students;
+
+create table public.seed_pilot_volume_students (
   seq integer primary key,
   id uuid not null,
   class_id uuid not null,
   name text not null,
   school_name text not null,
   grade_label text not null
-) on commit drop;
+);
 
-insert into pilot_volume_students (
+alter table public.seed_pilot_volume_students enable row level security;
+
+insert into public.seed_pilot_volume_students (
   seq,
   id,
   class_id,
@@ -183,7 +185,7 @@ select
   name || ' 학부모',
   '0100001' || lpad(seq::text, 4, '0'),
   'active'
-from pilot_volume_students
+from public.seed_pilot_volume_students
 on conflict (id) do update set
   class_id = excluded.class_id,
   name = excluded.name,
@@ -272,7 +274,7 @@ on conflict (id) do update set
 
 delete from public.student_schedules
 where academy_id = '11111111-1111-4111-8111-111111111111'
-  and student_id in (select id from pilot_volume_students)
+  and student_id in (select id from public.seed_pilot_volume_students)
   and memo like '파일럿 볼륨 테스트%';
 
 insert into public.student_schedules (
@@ -298,7 +300,7 @@ select
   slot.subject,
   slot.title,
   '파일럿 볼륨 테스트 정규 수업'
-from pilot_volume_students v
+from public.seed_pilot_volume_students v
 join lateral (
   values
     ('22222222-2222-4222-8222-222222222221'::uuid, 1, '16:30'::time, '19:00'::time, '수학', '중2 수학 A반'),
@@ -354,7 +356,7 @@ select
     else '개인 일정'
   end,
   '파일럿 볼륨 테스트 외부 일정'
-from pilot_volume_students
+from public.seed_pilot_volume_students
 where seq % 4 = 0;
 
 insert into public.attendance_records (
@@ -445,7 +447,7 @@ select
     when v.seq % 9 = 0 then '볼륨 테스트: 보강 출석'
     else '볼륨 테스트: 정상 출석'
   end
-from pilot_volume_students v
+from public.seed_pilot_volume_students v
 join lateral (
   values
     ('22222222-2222-4222-8222-222222222221'::uuid, '16:30'::time, '19:00'::time),
@@ -489,4 +491,4 @@ on conflict (academy_id, reason) do update set
   body = excluded.body,
   is_active = true;
 
-commit;
+drop table if exists public.seed_pilot_volume_students;

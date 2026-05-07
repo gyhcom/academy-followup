@@ -53,7 +53,8 @@ seed에는 더배움프라임영수학원, 더미 반 6개, 더미 원생 52명,
 - 실제 개인정보가 아니라 UI 검증용 더미 데이터입니다.
 - 더미 전화번호가 들어 있으므로 실제 문자 발송 테스트에는 쓰지 않습니다.
 - 이 seed를 실행한 환경에서는 `SMS_DRY_RUN=true`를 유지합니다.
-- Supabase SQL Editor에서 `temporary table RLS` 경고가 보일 수 있지만, 쿼리 실행 중에만 쓰이는 임시 테이블입니다.
+- seed 실행 중 `public.seed_pilot_volume_students` helper 테이블을 만들고 마지막에 삭제합니다.
+- helper 테이블은 RLS를 켜고 사용하며, 최종 서비스 테이블로 남기지 않습니다.
 - `delete from student_schedules` 경고가 보일 수 있지만, `파일럿 볼륨 테스트%` 메모가 붙은 더미 스케줄만 재생성하기 위한 작업입니다.
 
 ## 4. 로컬 환경변수
