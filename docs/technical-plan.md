@@ -295,6 +295,20 @@ Supabase Auth 사용자와 학원 권한을 연결합니다.
 /app     로그인 후 학원 운영 보드
 ```
 
+`/app` 내부 주요 소스:
+
+```text
+src/app/app/page.tsx              서버 데이터 조회와 권한별 workspace 데이터 구성
+src/app/app/app-workspace.tsx     운영 보드/관리 탭 전환 shell
+src/app/app/operations-board.tsx  선생님 팔로업 운영 보드
+src/app/app/management-home.tsx   관리 홈 상태와 저장 핸들러
+src/app/app/student-directory.tsx 학생 검색/필터/상세 패널
+src/app/app/management-forms.tsx  반/학생/스케줄 입력 폼
+src/app/app/management-common.tsx 관리 화면 공통 UI
+src/app/app/management-utils.ts   관리 화면 정렬/라벨/스케줄 helper
+src/app/app/management-types.ts   관리 화면 공유 타입
+```
+
 원칙:
 
 - `/app`은 서버에서 Supabase 세션을 확인하고, 비로그인 사용자는 `/login`으로 보냅니다.
