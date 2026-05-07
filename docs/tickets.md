@@ -762,21 +762,27 @@
 
 ### T-308 문자 발송 dry-run
 
-상태: 예정
+상태: 완료
 
 목표:
 - 실제 문자 발송 없이 전체 발송 흐름을 검증
 
 작업:
-- 저장된 `followupId` 기준 발송 요청
-- `SMS_DRY_RUN=true` 처리
-- `message_logs`에 dry-run 로그 저장
-- `followups.status`를 `sent` 또는 `failed`로 갱신
-- UI에 dry-run 표시
-- 실제 SOLAPI 호출 여부를 환경별로 차단
+- 저장된 `followupId` 기준 발송 요청: 완료
+- `SMS_DRY_RUN=true` 처리: 완료
+- `message_logs`에 dry-run 로그 저장: 완료
+- `followups.status`를 `sent` 또는 `failed`로 갱신: 완료
+- UI에 dry-run 표시: 완료
+- 실제 SOLAPI 호출 여부를 환경별로 차단: 완료
 
 완료 기준:
 - 실제 비용 없이 발송 플로우 테스트 가능
+
+구현 메모:
+- `/api/messages/send`는 더 이상 임의 번호/본문을 받지 않고, 저장된 `followupId`만 받습니다.
+- 서버에서 로그인 사용자, 학원, 학생, 담당 반 권한을 다시 검증합니다.
+- `SMS_DRY_RUN=false`와 SOLAPI 환경변수가 준비되면 같은 API로 실제 문자를 보낼 수 있습니다.
+- 카카오 알림톡은 채널/템플릿 승인 절차가 필요하므로 SMS 실발송 이후 별도 티켓으로 둡니다.
 
 ### T-309 중복 발송 방지
 

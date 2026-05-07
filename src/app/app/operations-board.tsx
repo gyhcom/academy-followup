@@ -73,6 +73,22 @@ type CreateFollowupResponse = {
   error?: string;
 };
 
+type MessageSendState = {
+  followupId: string;
+  status: "idle" | "sending" | "sent" | "error";
+  dryRun: boolean;
+  message: string;
+  error: string;
+};
+
+type SendMessageResponse = {
+  dryRun?: boolean;
+  message?: string;
+  recipientPhone?: string;
+  followupId?: string;
+  error?: string;
+};
+
 const quickReasonIds: FollowupReason[] = ["absence", "retest", "homework_missing"];
 
 export function OperationsBoard({
@@ -122,6 +138,13 @@ export function OperationsBoard({
     error: "",
     followupId: "",
   });
+  const [messageSend, setMessageSend] = useState<MessageSendState>({
+    followupId: "",
+    status: "idle",
+    dryRun: true,
+    message: "",
+    error: "",
+  });
   const messageBody =
     messageDraft.key === messageKey
       ? messageDraft.body
@@ -144,6 +167,19 @@ export function OperationsBoard({
     followupSave.key === messageKey &&
     followupSave.body === messageBody &&
     followupSave.status === "saved";
+  const savedFollowupId = isFollowupSaved ? followupSave.followupId : "";
+  const isMessageSending =
+    messageSend.followupId === savedFollowupId && messageSend.status === "sending";
+  const isMessageSent =
+    Boolean(savedFollowupId) &&
+    messageSend.followupId === savedFollowupId &&
+    messageSend.status === "sent";
+  const messageSendError =
+    Boolean(savedFollowupId) &&
+    messageSend.followupId === savedFollowupId &&
+    messageSend.status === "error"
+      ? messageSend.error
+      : "";
   const followupSaveError =
     followupSave.key === messageKey && followupSave.status === "error"
       ? followupSave.error
@@ -331,6 +367,13 @@ export function OperationsBoard({
         error: "",
         followupId: payload.followup.id,
       });
+      setMessageSend({
+        followupId: "",
+        status: "idle",
+        dryRun: true,
+        message: "",
+        error: "",
+      });
     } catch (error) {
       setFollowupSave({
         key: messageKey,
@@ -341,6 +384,56 @@ export function OperationsBoard({
             ? error.message
             : "팔로업 기록을 저장하지 못했습니다.",
         followupId: "",
+      });
+    }
+  }
+
+  async function handleSendMessage() {
+    if (!savedFollowupId || isMessageSending) {
+      return;
+    }
+
+    setMessageSend({
+      followupId: savedFollowupId,
+      status: "sending",
+      dryRun: true,
+      message: "",
+      error: "",
+    });
+
+    try {
+      const response = await fetch("/api/messages/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          followupId: savedFollowupId,
+        }),
+      });
+      const payload = (await response.json()) as SendMessageResponse;
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "문자를 발송하지 못했습니다.");
+      }
+
+      setMessageSend({
+        followupId: savedFollowupId,
+        status: "sent",
+        dryRun: payload.dryRun ?? true,
+        message:
+          payload.message ??
+          (payload.dryRun ? "dry-run 발송을 기록했습니다." : "문자를 발송했습니다."),
+        error: "",
+      });
+    } catch (error) {
+      setMessageSend({
+        followupId: savedFollowupId,
+        status: "error",
+        dryRun: true,
+        message: "",
+        error:
+          error instanceof Error ? error.message : "문자를 발송하지 못했습니다.",
       });
     }
   }
@@ -547,18 +640,23 @@ export function OperationsBoard({
           isMessageBlank={isMessageBlank}
           isFollowupSaved={isFollowupSaved}
           isFollowupSaving={isFollowupSaving}
+          isMessageSending={isMessageSending}
+          isMessageSent={isMessageSent}
           isPreviewError={isPreviewError}
           isPreviewLoading={isPreviewLoading}
           isPreviewReady={isPreviewReady}
           followupSaveError={followupSaveError}
           messageBody={messageBody}
           messagePreview={messagePreview}
+          messageSend={messageSend}
+          messageSendError={messageSendError}
           makeupCandidateTime={makeupCandidateTime}
           selectedReason={selectedReason}
           selectedStudent={selectedStudent}
           onReasonChange={handleComposerReasonChange}
           onRestorePreview={handleRestorePreview}
           onSaveFollowup={handleSaveFollowup}
+          onSendMessage={handleSendMessage}
           onMessageChange={(body) => setMessageDraft({ key: messageKey, body })}
         />
       </section>
@@ -589,12 +687,16 @@ export function OperationsBoard({
               isMessageBlank={isMessageBlank}
               isFollowupSaved={isFollowupSaved}
               isFollowupSaving={isFollowupSaving}
+              isMessageSending={isMessageSending}
+              isMessageSent={isMessageSent}
               isPreviewError={isPreviewError}
               isPreviewLoading={isPreviewLoading}
               isPreviewReady={isPreviewReady}
               followupSaveError={followupSaveError}
               messageBody={messageBody}
               messagePreview={messagePreview}
+              messageSend={messageSend}
+              messageSendError={messageSendError}
               makeupCandidateTime={makeupCandidateTime}
               selectedReason={selectedReason}
               selectedStudent={selectedStudent}
@@ -602,6 +704,7 @@ export function OperationsBoard({
               onReasonChange={handleComposerReasonChange}
               onRestorePreview={handleRestorePreview}
               onSaveFollowup={handleSaveFollowup}
+              onSendMessage={handleSendMessage}
               onMessageChange={(body) => setMessageDraft({ key: messageKey, body })}
             />
           </div>
@@ -618,12 +721,16 @@ function MessageComposer({
   isMessageBlank,
   isFollowupSaved,
   isFollowupSaving,
+  isMessageSending,
+  isMessageSent,
   isPreviewError,
   isPreviewLoading,
   isPreviewReady,
   followupSaveError,
   messageBody,
   messagePreview,
+  messageSend,
+  messageSendError,
   makeupCandidateTime,
   selectedReason,
   selectedStudent,
@@ -631,6 +738,7 @@ function MessageComposer({
   onReasonChange,
   onRestorePreview,
   onSaveFollowup,
+  onSendMessage,
   onMessageChange,
 }: {
   className?: string;
@@ -639,12 +747,16 @@ function MessageComposer({
   isMessageBlank: boolean;
   isFollowupSaved: boolean;
   isFollowupSaving: boolean;
+  isMessageSending: boolean;
+  isMessageSent: boolean;
   isPreviewError: boolean;
   isPreviewLoading: boolean;
   isPreviewReady: boolean;
   followupSaveError: string;
   messageBody: string;
   messagePreview: MessagePreviewState;
+  messageSend: MessageSendState;
+  messageSendError: string;
   makeupCandidateTime: string;
   selectedReason: FollowupReason;
   selectedStudent: OperationsStudent | undefined;
@@ -652,9 +764,11 @@ function MessageComposer({
   onReasonChange: (reason: FollowupReason) => void;
   onRestorePreview: () => void;
   onSaveFollowup: () => void;
+  onSendMessage: () => void;
   onMessageChange: (body: string) => void;
 }) {
   const canSaveFollowup = isPreviewReady && !isMessageBlank && !isFollowupSaving;
+  const canSendMessage = isFollowupSaved && !isMessageSending;
 
   return (
     <section
@@ -803,7 +917,7 @@ function MessageComposer({
                 : isPreviewError
                   ? messagePreview.error
                   : isPreviewReady
-                    ? "발송 전에 먼저 팔로업 기록으로 저장합니다. dry-run 발송은 다음 티켓에서 연결합니다."
+                    ? "발송 전에 먼저 팔로업 기록으로 저장합니다. 저장 후 문자 발송 테스트를 진행할 수 있습니다."
                     : "학생과 사유를 선택하면 문자 미리보기를 생성합니다."}
             </p>
           </div>
@@ -850,6 +964,56 @@ function MessageComposer({
               ? "저장 완료"
               : "팔로업 기록 저장"}
         </button>
+
+        {isFollowupSaved ? (
+          <div className="space-y-2">
+            <button
+              type="button"
+              disabled={!canSendMessage}
+              onClick={onSendMessage}
+              className={[
+                "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+                canSendMessage
+                  ? "bg-emerald-700 text-white hover:bg-emerald-800"
+                  : "bg-emerald-200 text-emerald-900",
+              ].join(" ")}
+            >
+              <Send size={17} />
+              {isMessageSending
+                ? "발송 처리 중"
+                : isMessageSent
+                  ? messageSend.dryRun
+                    ? "dry-run 기록 완료"
+                    : "문자 발송 완료"
+                  : "문자 발송 테스트"}
+            </button>
+
+            {messageSendError || isMessageSent ? (
+              <div
+                className={[
+                  "rounded-md border p-3 text-sm leading-6",
+                  messageSendError
+                    ? "border-red-200 bg-red-50 text-red-900"
+                    : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                ].join(" ")}
+              >
+                <div className="flex items-start gap-2">
+                  {messageSendError ? (
+                    <AlertCircle className="mt-0.5 shrink-0" size={17} />
+                  ) : (
+                    <CheckCircle2 className="mt-0.5 shrink-0" size={17} />
+                  )}
+                  <p>
+                    {messageSendError ||
+                      (messageSend.dryRun
+                        ? "실제 문자는 보내지 않고 발송 로그만 저장했습니다."
+                        : messageSend.message)}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </section>
   );
