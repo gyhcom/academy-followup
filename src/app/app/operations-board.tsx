@@ -5,7 +5,6 @@ import {
   AlertCircle,
   CalendarDays,
   CheckCircle2,
-  Clock3,
   MessageSquareText,
   RotateCcw,
   Send,
@@ -22,11 +21,9 @@ import {
   type OperationsStudentSchedule,
   WeeklySchedulePanel,
 } from "@/app/app/operations-schedule";
-import {
-  scheduleTypeChipClass,
-  scheduleTypeLabel,
-  weekDayShortLabel,
-} from "@/app/app/management-utils";
+import { scheduleTypeLabel, weekDayShortLabel } from "@/app/app/management-utils";
+import { MakeupCalendarPanel } from "@/app/app/makeup-calendar-panel";
+import type { MakeupCandidate } from "@/app/app/makeup-scheduling";
 
 export type OperationsStudent = {
   id: string;
@@ -98,14 +95,6 @@ type SendMessageResponse = {
   recipientPhone?: string;
   followupId?: string;
   error?: string;
-};
-
-type MakeupCandidate = {
-  date: string;
-  dayOfWeek: number;
-  startTime: string;
-  endTime: string;
-  label: string;
 };
 
 type ScheduleCreateResponse = {
@@ -725,7 +714,7 @@ export function OperationsBoard({
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(250px,0.9fr)_minmax(300px,1fr)_390px] lg:items-start">
+      <section className="grid gap-4 lg:grid-cols-[minmax(260px,0.9fr)_minmax(340px,1.1fr)] lg:items-start xl:grid-cols-[320px_minmax(380px,1fr)_400px]">
         <section aria-labelledby="student-flow-title" className="space-y-3">
           <div className="flex items-end justify-between gap-3 px-1">
             <div>
@@ -836,7 +825,7 @@ export function OperationsBoard({
         </section>
 
         <div className="space-y-4">
-          <MakeupDateSelector
+          <MakeupCalendarPanel
             selectedStudent={selectedStudent}
             selectedCandidate={selectedMakeupCandidate}
             onCandidateSelect={handleDateMakeupCandidateSelect}
@@ -853,7 +842,7 @@ export function OperationsBoard({
         </div>
 
         <MessageComposer
-          className="hidden lg:block"
+          className="hidden lg:col-span-2 lg:block xl:col-span-1"
           composerId="desktop-message-composer"
           isDraftEdited={isDraftEdited}
           isMessageBlank={isMessageBlank}
@@ -948,165 +937,6 @@ export function OperationsBoard({
         </div>
       ) : null}
     </div>
-  );
-}
-
-function MakeupDateSelector({
-  selectedStudent,
-  selectedCandidate,
-  onCandidateSelect,
-}: {
-  selectedStudent: OperationsStudent | undefined;
-  selectedCandidate: MakeupCandidate | null;
-  onCandidateSelect: (candidate: MakeupCandidate) => void;
-}) {
-  const [date, setDate] = useState(() => getTodayDateValue());
-  const [startTime, setStartTime] = useState("20:30");
-  const [endTime, setEndTime] = useState("21:30");
-  const dayOfWeek = getDayOfWeek(date);
-  const schedulesForDate = selectedStudent
-    ? getSortedActiveSchedules(selectedStudent.schedules).filter(
-        (schedule) =>
-          schedule.scheduleDate === date ||
-          (!schedule.scheduleDate && schedule.dayOfWeek === dayOfWeek),
-      )
-    : [];
-  const isTimeRangeValid = startTime < endTime;
-  const candidateLabel = `${formatDateForLabel(date)} ${startTime}-${endTime}`;
-  const isSelected =
-    Boolean(selectedCandidate) &&
-    selectedCandidate?.date === date &&
-    selectedCandidate.startTime === startTime &&
-    selectedCandidate.endTime === endTime;
-
-  return (
-    <section
-      aria-labelledby="makeup-date-title"
-      className="rounded-lg border border-stone-200 bg-white shadow-sm"
-    >
-      <div className="border-b border-stone-200 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <CalendarDays className="text-emerald-700" size={18} />
-          <h2 id="makeup-date-title" className="text-sm font-semibold text-stone-950">
-            날짜별 보강
-          </h2>
-        </div>
-        <p className="mt-1 text-xs leading-5 text-stone-500">
-          날짜를 고르면 해당일의 정규 수업과 외부 일정을 보고 보강 문자를 만들 수 있습니다.
-        </p>
-      </div>
-
-      <div className="space-y-3 p-4">
-        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_112px_112px]">
-          <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
-            날짜
-            <input
-              type="date"
-              value={date}
-              onChange={(event) => setDate(event.target.value)}
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
-            />
-          </label>
-          <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
-            시작
-            <input
-              type="time"
-              value={startTime}
-              onChange={(event) => setStartTime(event.target.value)}
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
-            />
-          </label>
-          <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
-            종료
-            <input
-              type="time"
-              value={endTime}
-              onChange={(event) => setEndTime(event.target.value)}
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
-            />
-          </label>
-        </div>
-
-        {selectedStudent ? (
-          <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-xs font-semibold text-stone-600">
-                {formatDateForLabel(date)} 일정
-              </p>
-              <span className="rounded-md bg-white px-2 py-0.5 text-xs font-semibold text-stone-500">
-                {schedulesForDate.length}개
-              </span>
-            </div>
-
-            {schedulesForDate.length > 0 ? (
-              <div className="mt-2 space-y-1.5">
-                {schedulesForDate.map((schedule) => (
-                  <div
-                    key={`${schedule.id}:${schedule.scheduleDate ?? "weekly"}`}
-                    className="grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-2 rounded-md bg-white px-2 py-2"
-                  >
-                    <span className="flex items-center gap-1 text-xs font-semibold tabular-nums text-stone-900">
-                      <Clock3 size={13} className="text-stone-400" />
-                      {schedule.startTime}
-                    </span>
-                    <span className="min-w-0 truncate text-xs font-medium text-stone-600">
-                      {schedule.title}
-                    </span>
-                    <span
-                      className={[
-                        "rounded px-1.5 py-0.5 text-[11px] font-semibold",
-                        scheduleTypeChipClass(schedule.scheduleType),
-                      ].join(" ")}
-                    >
-                      {scheduleTypeLabel(schedule.scheduleType)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-2 rounded-md bg-white px-3 py-2 text-xs leading-5 text-stone-500">
-                이 날짜에 겹치는 등록 일정이 없습니다.
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="rounded-md border border-dashed border-stone-300 bg-stone-50 p-3 text-sm leading-6 text-stone-600">
-            학생을 선택하면 해당 날짜의 정규 수업과 외부 일정이 표시됩니다.
-          </div>
-        )}
-
-        <button
-          type="button"
-          disabled={!selectedStudent || !date || !isTimeRangeValid}
-          onClick={() =>
-            onCandidateSelect({
-              date,
-              dayOfWeek,
-              startTime,
-              endTime,
-              label: candidateLabel,
-            })
-          }
-          className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition",
-            selectedStudent && date && isTimeRangeValid
-              ? isSelected
-                ? "bg-emerald-800 text-white"
-                : "bg-emerald-700 text-white hover:bg-emerald-800"
-              : "bg-stone-300 text-stone-600",
-          ].join(" ")}
-        >
-          <Clock3 size={16} />
-          {isSelected ? "보강 후보 선택됨" : "이 날짜/시간으로 보강 문자"}
-        </button>
-
-        {!isTimeRangeValid ? (
-          <p className="rounded-md bg-red-50 px-3 py-2 text-xs font-semibold text-red-800">
-            종료 시간은 시작 시간보다 늦어야 합니다.
-          </p>
-        ) : null}
-      </div>
-    </section>
   );
 }
 
@@ -1533,30 +1363,4 @@ function reasonLabel(reasonId: FollowupReason) {
   return (
     followupReasons.find((reason) => reason.id === reasonId)?.label ?? reasonId
   );
-}
-
-function getTodayDateValue() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = `${today.getMonth() + 1}`.padStart(2, "0");
-  const day = `${today.getDate()}`.padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function getDayOfWeek(dateValue: string) {
-  const [year, month, day] = dateValue.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
-  if (Number.isNaN(date.getTime())) {
-    return 1;
-  }
-
-  return date.getDay();
-}
-
-function formatDateForLabel(dateValue: string) {
-  const dayOfWeek = getDayOfWeek(dateValue);
-
-  return `${dateValue}(${weekDayShortLabel(dayOfWeek)})`;
 }
