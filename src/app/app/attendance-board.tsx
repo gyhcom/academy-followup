@@ -892,7 +892,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
     overview.counts.absent + overview.counts.late + overview.counts.needs_check;
 
   return (
-    <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+    <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
       <div className="rounded-lg border border-stone-200 bg-white shadow-sm">
         <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -933,7 +933,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
         </div>
 
         <div className="border-t border-stone-200">
-          <div className="hidden grid-cols-[minmax(9rem,1fr)_8rem_8rem_8rem_8rem_8rem] gap-3 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5">
+          <div className="hidden grid-cols-[minmax(8rem,1fr)_5.5rem_repeat(4,4.75rem)] gap-2 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 md:grid sm:px-5">
             <span>수업</span>
             <span>시간</span>
             <span>출석</span>
@@ -946,7 +946,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
               overview.classSummaries.map((summary) => (
                 <div
                   key={summary.key}
-                  className="grid gap-2 px-4 py-3 text-sm sm:grid-cols-[minmax(9rem,1fr)_8rem_8rem_8rem_8rem_8rem] sm:items-center sm:px-5"
+                  className="grid gap-2 px-4 py-3 text-sm md:grid-cols-[minmax(8rem,1fr)_5.5rem_repeat(4,4.75rem)] md:items-center sm:px-5"
                 >
                   <div className="min-w-0">
                     <p className="font-semibold text-stone-950">{summary.className}</p>
