@@ -660,7 +660,7 @@ export function AttendanceBoard({
             </p>
           </div>
 
-          <label className="w-full max-w-xs">
+          <label className="w-full lg:max-w-xs">
             <span className="mb-1 block text-xs font-semibold text-stone-500">
               조회 날짜
             </span>
@@ -670,7 +670,7 @@ export function AttendanceBoard({
                 type="date"
                 value={selectedDate}
                 onChange={(event) => setSelectedDate(event.target.value)}
-                className="min-h-9 flex-1 bg-transparent outline-none"
+                className="min-h-9 min-w-0 flex-1 bg-transparent outline-none"
               />
             </span>
           </label>
@@ -679,7 +679,7 @@ export function AttendanceBoard({
 
       <AttendanceOverviewPanel overview={overview} />
 
-      <section className="grid gap-4 lg:grid-cols-[17rem_minmax(0,1fr)_22rem] lg:items-start">
+      <section className="grid gap-4 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start xl:grid-cols-[17rem_minmax(0,1fr)_22rem]">
         <SessionList
           sessions={sessions}
           selectedSessionKey={selectedSession?.key ?? ""}
@@ -769,6 +769,7 @@ export function AttendanceBoard({
         </section>
 
         <AttendanceFollowupPanel
+          className="lg:col-span-2 xl:col-span-1"
           duplicateWarning={duplicateWarning}
           followupSaveError={followupSaveError}
           followupTarget={followupTarget}
@@ -874,10 +875,10 @@ function AttendanceSummary({
   summary: Record<AttendanceStatus, number>;
 }) {
   return (
-    <dl className="grid grid-cols-5 gap-2 text-center text-xs">
+    <dl className="flex gap-2 overflow-x-auto pb-1 text-center text-xs sm:grid sm:grid-cols-5 sm:overflow-visible sm:pb-0">
       {editableStatuses.map((status) => (
-        <div key={status} className="rounded-md border border-stone-200 bg-stone-50 px-2 py-2">
-          <dt className="font-medium text-stone-500">{attendanceStatusLabels[status]}</dt>
+        <div key={status} className="min-w-16 rounded-md border border-stone-200 bg-stone-50 px-2 py-2">
+          <dt className="truncate font-medium text-stone-500">{attendanceStatusLabels[status]}</dt>
           <dd className="mt-1 text-base font-semibold text-stone-950">{summary[status]}</dd>
         </div>
       ))}
@@ -913,7 +914,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
           </div>
         </div>
 
-        <div className="grid gap-3 p-4 sm:grid-cols-5 sm:px-5">
+        <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-5 sm:px-5">
           {(["present", "late", "absent", "needs_check", "pending"] as AttendanceStatus[]).map(
             (status) => (
               <div
@@ -1122,6 +1123,7 @@ function AttendanceStudentRow({
 }
 
 function AttendanceFollowupPanel({
+  className = "",
   duplicateWarning,
   followupSaveError,
   followupTarget,
@@ -1145,6 +1147,7 @@ function AttendanceFollowupPanel({
   onSaveFollowup,
   onSendMessage,
 }: {
+  className?: string;
   duplicateWarning: string;
   followupSaveError: string;
   followupTarget: AttendanceFollowupTarget | null;
@@ -1172,7 +1175,7 @@ function AttendanceFollowupPanel({
   const canSendMessage = isFollowupSaved && !isMessageSending;
 
   return (
-    <section className="rounded-lg border border-stone-200 bg-white shadow-sm lg:sticky lg:top-5">
+    <section className={["rounded-lg border border-stone-200 bg-white shadow-sm xl:sticky xl:top-5", className].join(" ")}>
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
           <MessageSquareText className="text-emerald-700" size={18} />

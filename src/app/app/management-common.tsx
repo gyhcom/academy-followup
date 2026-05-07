@@ -13,13 +13,13 @@ export function SummaryCard({
   detail: string;
 }) {
   return (
-    <article className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+    <article className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm sm:p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-medium text-stone-500">{label}</p>
-          <p className="mt-2 text-2xl font-semibold text-stone-950">{value}</p>
+          <p className="mt-2 text-xl font-semibold text-stone-950 sm:text-2xl">{value}</p>
         </div>
-        <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 sm:size-10">
           {icon}
         </div>
       </div>
@@ -45,8 +45,8 @@ export function ManagementPanel({
 }) {
   return (
     <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
-      <div className="flex items-start justify-between gap-3 border-b border-stone-200 pb-3">
-        <div>
+      <div className="flex flex-col gap-3 border-b border-stone-200 pb-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h3 className="text-base font-semibold text-stone-950">{title}</h3>
           <p className="mt-1 text-sm leading-6 text-stone-600">{description}</p>
         </div>
@@ -55,7 +55,7 @@ export function ManagementPanel({
           disabled={!onAction}
           onClick={onAction}
           className={[
-            "flex min-h-10 shrink-0 items-center gap-1 rounded-md border px-3 text-xs font-semibold",
+            "flex min-h-10 w-full shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:w-auto",
             onAction
               ? "border-stone-300 bg-white text-stone-800 transition hover:border-stone-400 hover:bg-stone-50"
               : "cursor-not-allowed border-stone-200 bg-stone-50 text-stone-500",
@@ -95,4 +95,3 @@ export function StatusBadge({ status }: { status: string }) {
     </span>
   );
 }
-

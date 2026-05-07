@@ -351,7 +351,7 @@ export function ManagementHome({
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <SummaryCard
           icon={<GraduationCap size={19} />}
           label="재원 학생"

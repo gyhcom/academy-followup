@@ -269,15 +269,15 @@ function AppShell({
 }) {
   return (
     <main className="min-h-screen bg-stone-50 pb-[env(safe-area-inset-bottom)]">
-      <section className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-8 sm:py-5">
-        <header className="flex items-start justify-between gap-3 border-b border-stone-200 pb-4 sm:items-center sm:pb-5">
-          <div className="flex min-w-0 items-center gap-3">
+      <section className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-8 sm:py-5">
+        <header className="flex items-start justify-between gap-2 border-b border-stone-200 pb-4 sm:items-center sm:gap-3 sm:pb-5">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-emerald-700 text-white sm:size-11">
-              <School size={22} />
+              <School size={21} />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-stone-500">{subtitle}</p>
-              <h1 className="text-lg font-semibold leading-snug text-stone-950 sm:text-xl">
+              <p className="truncate text-xs font-medium text-stone-500 sm:text-sm">{subtitle}</p>
+              <h1 className="truncate text-base font-semibold leading-snug text-stone-950 sm:text-xl">
                 {title}
               </h1>
               <p className="mt-1 break-all text-xs text-stone-500">{email}</p>

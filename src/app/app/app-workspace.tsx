@@ -107,6 +107,7 @@ function WorkspaceNavigation({
         <WorkspaceNavButton
           icon={<LayoutDashboard size={17} />}
           label="운영 보드"
+          shortLabel="운영"
           description="수업 후 팔로업"
           isActive={activeView === "operations"}
           onClick={() => onChange("operations")}
@@ -114,6 +115,7 @@ function WorkspaceNavigation({
         <WorkspaceNavButton
           icon={<ClipboardCheck size={17} />}
           label="출석부"
+          shortLabel="출석"
           description="도착·지각 체크"
           isActive={activeView === "attendance"}
           onClick={() => onChange("attendance")}
@@ -122,6 +124,7 @@ function WorkspaceNavigation({
           <WorkspaceNavButton
             icon={<Settings size={17} />}
             label="관리"
+            shortLabel="관리"
             description="학생·반·구성원"
             isActive={activeView === "management"}
             onClick={() => onChange("management")}
@@ -135,6 +138,7 @@ function WorkspaceNavigation({
 function WorkspaceNavButton({
   icon,
   label,
+  shortLabel,
   description,
   isActive,
   disabled = false,
@@ -142,6 +146,7 @@ function WorkspaceNavButton({
 }: {
   icon: ReactNode;
   label: string;
+  shortLabel: string;
   description: string;
   isActive: boolean;
   disabled?: boolean;
@@ -154,7 +159,7 @@ function WorkspaceNavButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "flex min-h-16 items-center gap-3 rounded-lg border px-3 text-left transition",
+        "flex min-h-14 items-center gap-2 rounded-lg border px-2 text-left transition sm:min-h-16 sm:gap-3 sm:px-3",
         isActive
           ? "border-stone-950 bg-stone-950 text-white"
           : "border-stone-200 bg-stone-50 text-stone-700 hover:border-stone-300 hover:bg-white",
@@ -163,17 +168,20 @@ function WorkspaceNavButton({
     >
       <span
         className={[
-          "flex size-9 shrink-0 items-center justify-center rounded-md",
+          "flex size-8 shrink-0 items-center justify-center rounded-md sm:size-9",
           isActive ? "bg-white/14 text-white" : "bg-white text-emerald-700",
         ].join(" ")}
       >
         {icon}
       </span>
       <span className="min-w-0">
-        <span className="block text-sm font-semibold">{label}</span>
+        <span className="block truncate text-xs font-semibold sm:text-sm">
+          <span className="sm:hidden">{shortLabel}</span>
+          <span className="hidden sm:inline">{label}</span>
+        </span>
         <span
           className={[
-            "mt-0.5 block truncate text-xs",
+            "mt-0.5 hidden truncate text-xs sm:block",
             isActive ? "text-white/70" : "text-stone-500",
           ].join(" ")}
         >
