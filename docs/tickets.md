@@ -1084,9 +1084,9 @@
 - 같은 학생에게 같은 사유 문자가 짧은 시간 안에 중복 발송되는 것을 막음
 
 작업:
-- `academy_settings.duplicate_guard_minutes` 조회
-- 최근 동일 학생/동일 사유 followup 조회: 출석부 UI 완료
-- 중복이면 경고 응답: 서버 차단은 예정
+- `academy_settings.duplicate_guard_minutes` 조회: 완료
+- 최근 동일 학생/동일 사유/동일 수신자 유형 followup 조회: 완료
+- 중복이면 409 응답으로 서버 차단: 완료
 - 원장/관리자 override 여부는 후속 결정
 
 완료 기준:
@@ -1094,8 +1094,8 @@
 
 구현 메모:
 - 출석부 결석/지각 문자 흐름에서는 최근 24시간 동일 학생/동일 사유 팔로업이 있으면 경고를 표시합니다.
-- 운영 보드 전체 팔로업과 실제 발송 API 단의 hard block은 아직 없습니다.
-- 다음 단계는 `academy_settings.duplicate_guard_minutes`를 기준으로 서버에서 경고/차단 정책을 통일하는 것입니다.
+- `/api/messages/send`는 같은 학생/같은 사유/같은 수신자 유형의 당일 또는 `duplicate_guard_minutes` 이내 중복 발송을 차단합니다.
+- 중복 차단은 dry-run과 실제 발송 모두에 적용되며, 차단 시 `message_logs`를 추가 생성하지 않습니다.
 
 ### T-310 SOLAPI 실제 발송
 

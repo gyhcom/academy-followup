@@ -139,7 +139,9 @@
 - `sms_dry_run=true`인 학원에서는 실제 SOLAPI 호출 금지
 - dry-run도 `followups`와 `message_logs`에 기록
 - 학부모+학생 발송은 수신자별로 `message_logs`가 분리 저장됨
-- 같은 학생/같은 사유 중복 발송 경고
+- `/api/messages/send`는 같은 학생/같은 사유/같은 수신자 유형의 당일 또는 `duplicate_guard_minutes` 이내 중복 발송을 409로 차단
+- 중복 차단 시 dry-run/실발송 모두 SOLAPI 호출과 `message_logs` 추가 생성이 없어야 함
+- 다른 학생, 다른 사유, 다른 수신자 유형은 중복 차단 없이 발송 가능
 - 발송 실패 시 `failed` 상태와 오류 메시지 저장
 - 서버 로그에 secret key나 학부모 전화번호 원문을 과도하게 남기지 않음
 
