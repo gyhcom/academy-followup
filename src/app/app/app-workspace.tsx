@@ -8,6 +8,7 @@ import {
   type AttendanceRecordItem,
 } from "@/app/app/attendance-board";
 import { ManagementHome } from "@/app/app/management-home";
+import { OwnerPendingBoard } from "@/app/app/owner-pending-board";
 import type {
   ManagementClass,
   ManagementMember,
@@ -66,12 +67,17 @@ export function AppWorkspace({
       />
 
       {visibleView === "operations" ? (
-        <OperationsBoard
-          academyName={academyName}
-          teacherName={teacherName}
-          roleLabel={roleLabel}
-          classes={classes}
-        />
+        <div className="space-y-4 sm:space-y-5">
+          {canManage ? (
+            <OwnerPendingBoard classes={classes} records={attendanceRecords} />
+          ) : null}
+          <OperationsBoard
+            academyName={academyName}
+            teacherName={teacherName}
+            roleLabel={roleLabel}
+            classes={classes}
+          />
+        </div>
       ) : visibleView === "attendance" ? (
         <AttendanceBoard
           academyName={academyName}
