@@ -1,124 +1,63 @@
-# Supabase 연결 가이드
+# Supabase 적용 순서
 
-## 1. 프로젝트 생성
+이 문서는 실제 Supabase DB와 repo의 schema/migration/seed 상태가 어긋나지 않게 하기 위한 운영 순서입니다.
 
-Supabase에서 새 프로젝트를 생성합니다.
+## 적용 순서
 
-권장:
+1. Supabase SQL Editor에서 `supabase/schema.sql` 또는 아직 적용하지 않은 `supabase/migrations/*.sql`을 먼저 실행합니다.
+2. 아래 확인 SQL로 필수 컬럼이 있는지 확인합니다.
+3. `supabase/seed.sql`을 실행해 MVP 최소 데이터를 넣습니다.
+4. `/app`에서 학생, 스케줄, 출석부 화면이 열리는지 확인합니다.
+5. 많은 학생 수로 모바일/스크롤 테스트가 필요할 때만 `supabase/seed-volume.sql`을 추가 실행합니다.
 
-- Project name: `academy-followup`
-- Region: 한국 대상이므로 가능한 가까운 리전 선택
-- Database password: 안전하게 보관
+## 필수 컬럼 확인
 
-## 2. 스키마 적용
-
-SQL Editor에서 아래 파일 내용을 실행합니다.
-
-```text
-supabase/schema.sql
+```sql
+select column_name
+from information_schema.columns
+where table_schema = 'public'
+  and table_name = 'students'
+  and column_name in ('student_phone');
 ```
 
-Supabase CLI를 설치한 경우에는 migration 파일을 기준으로 적용합니다. CLI 로그인은 브라우저 자동 인증이 안 되는 환경에서는 access token이 필요합니다.
+결과에 `student_phone`이 없으면 `supabase/migrations/20260508020000_add_message_recipient_selection.sql` 또는 최신 `supabase/schema.sql`이 실제 DB에 반영되지 않은 상태입니다.
 
-```bash
-supabase login --token <supabase-access-token>
-supabase link --project-ref pemvzkiecivmstzqjkts
-supabase db push
+## MVP Seed 확인
+
+`supabase/seed.sql` 실행 후 아래 쿼리로 데이터 규모를 확인합니다.
+
+```sql
+select
+  (select count(*) from public.classes where academy_id = '11111111-1111-4111-8111-111111111111') as class_count,
+  (select count(*) from public.students where academy_id = '11111111-1111-4111-8111-111111111111') as student_count,
+  (select count(*) from public.student_schedules where academy_id = '11111111-1111-4111-8111-111111111111') as schedule_count,
+  (select count(*) from public.attendance_records where academy_id = '11111111-1111-4111-8111-111111111111') as attendance_count;
 ```
 
-직접 DB URL이 IPv6로만 잡히는 환경에서는 `db push`가 실패할 수 있습니다. 이 경우 Supabase Dashboard의 Database Connection 정보에서 IPv4로 접근 가능한 pooler connection string을 복사해 아래처럼 적용합니다.
+MVP seed 기준으로 학생 수는 4~8명 수준이어야 합니다. 수십 명 이상이면 volume seed가 함께 실행된 상태입니다.
 
-```bash
-supabase db push --db-url '<pooler-connection-string>'
+## Volume Seed 정리
+
+볼륨 테스트 데이터를 지우고 MVP 데이터만 다시 보고 싶을 때는 아래 SQL을 검토한 뒤 실행합니다. 운영 데이터가 섞인 DB에서는 실행하지 않습니다.
+
+```sql
+delete from public.attendance_records
+where student_id::text between '33333333-3333-4333-8333-333333333401'
+  and '33333333-3333-4333-8333-333333333448';
+
+delete from public.student_schedules
+where student_id::text between '33333333-3333-4333-8333-333333333401'
+  and '33333333-3333-4333-8333-333333333448';
+
+delete from public.students
+where id::text between '33333333-3333-4333-8333-333333333401'
+  and '33333333-3333-4333-8333-333333333448';
+
+drop table if exists public.seed_pilot_volume_students;
 ```
 
-현재 필요한 최신 migration:
+## 운영 주의
 
-```text
-supabase/migrations/20260507030000_add_one_off_schedule_fields.sql
-```
-
-이 migration은 날짜 지정 보강을 위해 `student_schedules.schedule_date`,
-`student_schedules.source_followup_id`, 날짜별 조회/중복 방지 인덱스를 추가합니다.
-
-현재 프로젝트 ref:
-
-```text
-pemvzkiecivmstzqjkts
-```
-
-## 3. 파일럿 seed 적용
-
-개발/파일럿 DB에는 아래 파일을 실행합니다.
-
-```text
-supabase/seed.sql
-```
-
-seed에는 더배움프라임영수학원, 더미 반 6개, 더미 원생 52명, 주간 스케줄, 오늘 날짜 출석 상태, 기본 문자 템플릿이 포함됩니다. 다시 실행해도 같은 더미 학생은 업데이트되고, 볼륨 테스트용 스케줄은 재생성됩니다.
-
-주의:
-
-- 실제 개인정보가 아니라 UI 검증용 더미 데이터입니다.
-- 더미 전화번호가 들어 있으므로 실제 문자 발송 테스트에는 쓰지 않습니다.
-- 이 seed를 실행한 환경에서는 `SMS_DRY_RUN=true`를 유지합니다.
-- seed 실행 중 `public.seed_pilot_volume_students` helper 테이블을 만들고 마지막에 삭제합니다.
-- helper 테이블은 RLS를 켜고 사용하며, 최종 서비스 테이블로 남기지 않습니다.
-- `delete from student_schedules` 경고가 보일 수 있지만, `파일럿 볼륨 테스트%` 메모가 붙은 더미 스케줄만 재생성하기 위한 작업입니다.
-
-## 4. 로컬 환경변수
-
-`.env.example`을 참고해 `.env.local`을 만듭니다.
-
-```text
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-```
-
-`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`에는 Supabase의 publishable key를 넣습니다.
-`SUPABASE_SERVICE_ROLE_KEY`는 서버 health check와 관리자 작업용 secret key입니다. 클라이언트에 노출하면 안 됩니다.
-
-로컬에서는 실제 문자 발송을 막기 위해 아래 값을 유지합니다.
-
-```text
-SMS_DRY_RUN=true
-```
-
-## 5. 연결 확인
-
-앱을 실행한 뒤 아래 URL을 확인합니다.
-
-```text
-http://localhost:3000/api/health/supabase
-```
-
-정상 연결이면 아래 형태로 응답합니다.
-
-```json
-{
-  "ok": true,
-  "status": "connected"
-}
-```
-
-환경변수가 없으면 `not_configured`, 스키마가 적용되지 않았거나 키가 틀리면 `connection_failed`가 반환됩니다.
-
-현재 로컬 연결 확인 결과:
-
-```json
-{
-  "ok": true,
-  "status": "connected"
-}
-```
-
-## 6. Vercel 환경변수
-
-Vercel Project Settings에서 Production/Preview 환경변수에 같은 값을 등록합니다.
-
-초기 Preview 환경은 안전하게 아래 값을 유지합니다.
-
-```text
-SMS_DRY_RUN=true
-```
+- 실제 DB에 destructive SQL을 자동 실행하지 않습니다.
+- schema 불일치 오류가 나면 앱 코드를 수정하기 전에 migration 적용 여부를 먼저 확인합니다.
+- seed는 파일럿 검증 데이터입니다. 실제 학원 데이터 입력 전에는 seed 실행 범위를 명확히 분리합니다.
