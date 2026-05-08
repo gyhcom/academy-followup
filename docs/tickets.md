@@ -1643,3 +1643,27 @@
 검증 메모:
 - 2026-05-08 `npm run lint`, `npm run build`, `git diff --check` 통과
 - 브라우저 직접 스크린샷 자동화는 macOS 앱 접근 권한 오류로 수행하지 못했고, 코드/빌드/API 스모크 기준으로 검증했습니다.
+
+### T-408 seed/migration 정리 및 Supabase 적용 순서 문서화
+
+상태: 완료
+
+목표:
+- 실제 Supabase DB와 repo의 schema/migration/seed 상태가 어긋나지 않게 정리
+
+작업:
+- MVP 최소 seed 정리: 완료
+- 볼륨 테스트 seed 별도 파일 분리: 완료
+- `students.student_phone` 컬럼 적용 여부 확인 SQL 문서화: 완료
+- Supabase 적용 순서 문서화: 완료
+- seed 실행 후 확인 SQL 추가: 완료
+- 기존 볼륨 테스트 데이터 정리 SQL 문서화: 완료
+
+완료 기준:
+- `supabase/seed.sql`만 실행하면 작은 테스트 데이터만 생성됨
+- 볼륨 테스트는 `supabase/seed-volume.sql`을 별도로 실행해야 생성됨
+- schema 불일치가 재발하지 않도록 적용 순서와 확인 SQL이 문서화됨
+
+구현 메모:
+- 적용 순서는 `docs/supabase-setup.md`에서 관리합니다.
+- 실제 Supabase DB에 destructive SQL은 자동 실행하지 않고, SQL Editor에서 검토 후 실행하는 방식으로 둡니다.
