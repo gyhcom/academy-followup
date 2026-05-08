@@ -21,6 +21,7 @@ type FollowupRecord = {
   academy_id: string;
   student_id: string;
   class_id: string | null;
+  reason: string;
   message_body: string;
   recipient_type: MessageRecipientType;
   status: string;
@@ -32,6 +33,10 @@ type FollowupRecord = {
   classes: {
     teacher_id: string | null;
   } | null;
+};
+
+type AcademySettingsRecord = {
+  duplicate_guard_minutes: number | null;
 };
 
 export async function POST(request: Request) {
@@ -84,7 +89,7 @@ export async function POST(request: Request) {
   const { data: followup, error: followupError } = await admin
     .from("followups")
     .select(
-      "id, academy_id, student_id, class_id, message_body, recipient_type, status, students(parent_phone, student_phone, status), classes(teacher_id)",
+      "id, academy_id, student_id, class_id, reason, message_body, recipient_type, status, students(parent_phone, student_phone, status), classes(teacher_id)",
     )
     .eq("id", parsedRequest.followupId)
     .eq("academy_id", profile.academy_id)
@@ -125,6 +130,30 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: "발송 가능한 수신자 연락처가 없습니다." },
       { status: 400 },
+    );
+  }
+
+  const duplicateCheck = await getDuplicateSendCheck({
+    admin,
+    academyId: profile.academy_id,
+    studentId: followup.student_id,
+    reason: followup.reason,
+    recipientType: followup.recipient_type,
+  });
+
+  if (!duplicateCheck.ok) {
+    return NextResponse.json({ error: duplicateCheck.error }, { status: 500 });
+  }
+
+  if (duplicateCheck.isDuplicate) {
+    return NextResponse.json(
+      {
+        error:
+          "최근 발송 기록이 있어 중복 발송을 차단했습니다. 같은 학생/사유/수신자에게 이미 문자를 보냈습니다.",
+        duplicate: true,
+        duplicateGuardMinutes: duplicateCheck.duplicateGuardMinutes,
+      },
+      { status: 409 },
     );
   }
 
@@ -215,6 +244,95 @@ async function parseSendMessageRequest(request: Request): Promise<
   }
 
   return { ok: true, followupId: body.followupId };
+}
+
+async function getDuplicateSendCheck({
+  admin,
+  academyId,
+  studentId,
+  reason,
+  recipientType,
+}: {
+  admin: ReturnType<typeof createSupabaseAdminClient>;
+  academyId: string;
+  studentId: string;
+  reason: string;
+  recipientType: MessageRecipientType;
+}): Promise<
+  | { ok: true; isDuplicate: boolean; duplicateGuardMinutes: number }
+  | { ok: false; error: string }
+> {
+  const { data: settings, error: settingsError } = await admin
+    .from("academy_settings")
+    .select("duplicate_guard_minutes")
+    .eq("academy_id", academyId)
+    .maybeSingle<AcademySettingsRecord>();
+
+  if (settingsError) {
+    return { ok: false, error: settingsError.message };
+  }
+
+  const duplicateGuardMinutes = Math.max(
+    0,
+    settings?.duplicate_guard_minutes ?? 1440,
+  );
+  const duplicateWindowStartedAt = getDuplicateWindowStartedAt(
+    duplicateGuardMinutes,
+  );
+
+  const { data: duplicateFollowup, error: duplicateError } = await admin
+    .from("followups")
+    .select("id")
+    .eq("academy_id", academyId)
+    .eq("student_id", studentId)
+    .eq("reason", reason)
+    .eq("recipient_type", recipientType)
+    .eq("status", "sent")
+    .gte("sent_at", duplicateWindowStartedAt)
+    .limit(1)
+    .maybeSingle<{ id: string }>();
+
+  if (duplicateError) {
+    return { ok: false, error: duplicateError.message };
+  }
+
+  return {
+    ok: true,
+    isDuplicate: Boolean(duplicateFollowup),
+    duplicateGuardMinutes,
+  };
+}
+
+function getDuplicateWindowStartedAt(duplicateGuardMinutes: number) {
+  const now = new Date();
+  const guardWindowStart = new Date(
+    now.getTime() - duplicateGuardMinutes * 60 * 1000,
+  );
+  const todayStart = getKoreanDayStart(now);
+  const earlierStart =
+    todayStart.getTime() < guardWindowStart.getTime()
+      ? todayStart
+      : guardWindowStart;
+
+  return earlierStart.toISOString();
+}
+
+function getKoreanDayStart(date: Date) {
+  const koreanDateParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const year = koreanDateParts.find((part) => part.type === "year")?.value;
+  const month = koreanDateParts.find((part) => part.type === "month")?.value;
+  const day = koreanDateParts.find((part) => part.type === "day")?.value;
+
+  if (!year || !month || !day) {
+    return new Date(date);
+  }
+
+  return new Date(`${year}-${month}-${day}T00:00:00+09:00`);
 }
 
 function canSendFollowup(
