@@ -19,6 +19,7 @@ import {
 type ProfileWithAcademy = {
   name: string;
   role: string;
+  status: string;
   academy_id: string;
   academies: {
     name: string;
@@ -88,7 +89,9 @@ type MemberRecord = {
   id: string;
   email: string;
   name: string;
+  phone: string | null;
   role: string;
+  status: string;
 };
 
 export default async function AppPage() {
@@ -127,7 +130,7 @@ export default async function AppPage() {
   const { data: profile, error } = await admin
     .from("profiles")
     .select(
-      "name, role, academy_id, academies(name, category, brand_color, sender_name)",
+      "name, role, status, academy_id, academies(name, category, brand_color, sender_name)",
     )
     .eq("id", user.id)
     .maybeSingle<ProfileWithAcademy>();
@@ -154,6 +157,17 @@ export default async function AppPage() {
     );
   }
 
+  if (profile.status !== "active") {
+    return (
+      <AppShell email={user.email ?? ""}>
+        <EmptyState
+          title="비활성 구성원 계정"
+          description="이 계정은 현재 비활성 상태입니다. 원장 또는 관리자에게 계정 상태 확인을 요청해 주세요."
+        />
+      </AppShell>
+    );
+  }
+
   const attendanceDate = getTodayDateInTimeZone("Asia/Seoul");
   const [
     classesResult,
@@ -174,7 +188,7 @@ export default async function AppPage() {
       .order("name"),
     admin
       .from("profiles")
-      .select("id, email, name, role")
+      .select("id, email, name, phone, role, status")
       .eq("academy_id", profile.academy_id)
       .order("name"),
     admin
@@ -490,7 +504,10 @@ function buildManagementMembers({
     id: member.id,
     name: member.name,
     email: member.email,
+    phone: member.phone,
+    maskedPhone: member.phone ? maskPhone(member.phone) : null,
     role: member.role,
+    status: member.status,
     classCount: classes.filter((classItem) => classItem.teacher_id === member.id).length,
   }));
 }

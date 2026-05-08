@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, ClipboardList, GraduationCap, Pencil, Plus, UsersRound } from "lucide-react";
+import { BookOpen, ClipboardList, GraduationCap, Pencil, Plus, UserPlus, UsersRound } from "lucide-react";
 import type {
   BulkScheduleFormState,
   ClassFormState,
@@ -11,6 +11,7 @@ import type {
   ManagementMember,
   ManagementStudent,
   ManagementStudentSchedule,
+  MemberFormState,
   ScheduleFormState,
   StudentFormState,
   StudentScheduleFilter,
@@ -20,6 +21,7 @@ import { ManagementPanel, SummaryCard } from "@/app/app/management-common";
 import {
   BulkScheduleForm,
   ClassForm,
+  MemberForm,
   ScheduleForm,
   StudentForm,
 } from "@/app/app/management-forms";
@@ -45,6 +47,11 @@ export function ManagementHome({
   });
   const [studentForm, setStudentForm] = useState<StudentFormState | null>(null);
   const [studentFormStatus, setStudentFormStatus] = useState<FormStatus>({
+    status: "idle",
+    message: "",
+  });
+  const [memberForm, setMemberForm] = useState<MemberFormState | null>(null);
+  const [memberFormStatus, setMemberFormStatus] = useState<FormStatus>({
     status: "idle",
     message: "",
   });
@@ -75,10 +82,13 @@ export function ManagementHome({
   );
   const inactiveStudents = students.length - activeStudents.length;
   const teacherOptions = members.filter((member) =>
+    member.status === "active" &&
     ["owner", "manager", "teacher", "assistant"].includes(member.role),
   );
 
   function openCreateClassForm() {
+    setMemberForm(null);
+    setMemberFormStatus({ status: "idle", message: "" });
     setStudentForm(null);
     setStudentFormStatus({ status: "idle", message: "" });
     setScheduleForm(null);
@@ -97,6 +107,8 @@ export function ManagementHome({
   }
 
   function openEditClassForm(classItem: ManagementClass) {
+    setMemberForm(null);
+    setMemberFormStatus({ status: "idle", message: "" });
     setStudentForm(null);
     setStudentFormStatus({ status: "idle", message: "" });
     setScheduleForm(null);
@@ -156,6 +168,8 @@ export function ManagementHome({
   }
 
   function openBulkScheduleForm(classItem: ManagementClass) {
+    setMemberForm(null);
+    setMemberFormStatus({ status: "idle", message: "" });
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
     setStudentForm(null);
@@ -234,6 +248,8 @@ export function ManagementHome({
   }
 
   function openCreateStudentForm() {
+    setMemberForm(null);
+    setMemberFormStatus({ status: "idle", message: "" });
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
     setScheduleForm(null);
@@ -256,6 +272,8 @@ export function ManagementHome({
   }
 
   function openEditStudentForm(student: ManagementStudent) {
+    setMemberForm(null);
+    setMemberFormStatus({ status: "idle", message: "" });
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
     setScheduleForm(null);
@@ -329,6 +347,8 @@ export function ManagementHome({
     const classItem = classes.find((item) => item.id === student.classId);
     const defaultTitle = student.className ?? "정규 수업";
 
+    setMemberForm(null);
+    setMemberFormStatus({ status: "idle", message: "" });
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
     setStudentForm(null);
@@ -357,6 +377,8 @@ export function ManagementHome({
   }
 
   function openEditScheduleForm(student: ManagementStudent, schedule: ManagementStudentSchedule) {
+    setMemberForm(null);
+    setMemberFormStatus({ status: "idle", message: "" });
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
     setStudentForm(null);
@@ -433,6 +455,97 @@ export function ManagementHome({
       setScheduleFormStatus({
         status: "error",
         message: error instanceof Error ? error.message : "스케줄을 저장하지 못했습니다.",
+      });
+    }
+  }
+
+  function openCreateMemberForm() {
+    setClassForm(null);
+    setClassFormStatus({ status: "idle", message: "" });
+    setStudentForm(null);
+    setStudentFormStatus({ status: "idle", message: "" });
+    setScheduleForm(null);
+    setScheduleFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
+    setMemberForm({
+      mode: "create",
+      memberId: "",
+      name: "",
+      email: "",
+      phone: "",
+      role: "teacher",
+      status: "active",
+      password: "",
+    });
+    setMemberFormStatus({ status: "idle", message: "" });
+  }
+
+  function openEditMemberForm(member: ManagementMember) {
+    setClassForm(null);
+    setClassFormStatus({ status: "idle", message: "" });
+    setStudentForm(null);
+    setStudentFormStatus({ status: "idle", message: "" });
+    setScheduleForm(null);
+    setScheduleFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
+    setMemberForm({
+      mode: "edit",
+      memberId: member.id,
+      name: member.name,
+      email: member.email,
+      phone: member.phone ?? "",
+      role: member.role,
+      status: member.status,
+      password: "",
+    });
+    setMemberFormStatus({ status: "idle", message: "" });
+  }
+
+  async function saveMemberForm() {
+    if (!memberForm) {
+      return;
+    }
+
+    setMemberFormStatus({ status: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/members", {
+        method: memberForm.mode === "create" ? "POST" : "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          memberId: memberForm.memberId,
+          name: memberForm.name,
+          email: memberForm.email,
+          phone: memberForm.phone,
+          role: memberForm.role,
+          status: memberForm.status,
+          password: memberForm.password,
+        }),
+      });
+      const payload = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "구성원 정보를 저장하지 못했습니다.");
+      }
+
+      setMemberFormStatus({
+        status: "saved",
+        message:
+          memberForm.mode === "create"
+            ? "구성원 계정을 생성했습니다. 이메일과 임시 비밀번호로 로그인할 수 있습니다."
+            : "구성원 정보를 수정했습니다.",
+      });
+      setMemberForm(null);
+      router.refresh();
+    } catch (error) {
+      setMemberFormStatus({
+        status: "error",
+        message:
+          error instanceof Error ? error.message : "구성원 정보를 저장하지 못했습니다.",
       });
     }
   }
@@ -588,9 +701,37 @@ export function ManagementHome({
 
         <ManagementPanel
           title="구성원 관리"
-          description="로그인 가능한 학원 내부 사용자를 확인합니다."
-          actionLabel="선생님 초대 예정"
+          description="원장, 관리자, 선생님 계정을 생성하고 권한과 활성 상태를 관리합니다."
+          actionLabel="구성원 등록"
+          actionIcon={<UserPlus size={14} />}
+          onAction={openCreateMemberForm}
         >
+          {memberForm ? (
+            <MemberForm
+              form={memberForm}
+              status={memberFormStatus}
+              onChange={setMemberForm}
+              onCancel={() => {
+                setMemberForm(null);
+                setMemberFormStatus({ status: "idle", message: "" });
+              }}
+              onSave={saveMemberForm}
+            />
+          ) : null}
+
+          {memberFormStatus.status === "saved" || memberFormStatus.status === "error" ? (
+            <p
+              className={[
+                "mb-3 rounded-md border px-3 py-2 text-sm",
+                memberFormStatus.status === "saved"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  : "border-red-200 bg-red-50 text-red-900",
+              ].join(" ")}
+            >
+              {memberFormStatus.message}
+            </p>
+          ) : null}
+
           <div className="space-y-2">
             {members.map((member) => (
               <div key={member.id} className="rounded-lg border border-stone-200 bg-stone-50 p-3">
@@ -598,12 +739,37 @@ export function ManagementHome({
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-stone-950">{member.name}</p>
                     <p className="mt-1 truncate text-xs text-stone-500">{member.email}</p>
+                    <p className="mt-1 text-xs text-stone-500">
+                      {member.maskedPhone ?? "전화번호 미등록"}
+                    </p>
                   </div>
-                  <span className="shrink-0 rounded-md bg-white px-2 py-1 text-xs font-semibold text-stone-700">
-                    {roleLabel(member.role)}
-                  </span>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-stone-700">
+                      {roleLabel(member.role)}
+                    </span>
+                    <span
+                      className={[
+                        "rounded-md px-2 py-1 text-xs font-semibold",
+                        member.status === "active"
+                          ? "bg-emerald-50 text-emerald-800"
+                          : "bg-stone-200 text-stone-700",
+                      ].join(" ")}
+                    >
+                      {member.status === "active" ? "활성" : "비활성"}
+                    </span>
+                  </div>
                 </div>
-                <p className="mt-2 text-xs text-stone-500">담당 반 {member.classCount}개</p>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <p className="text-xs text-stone-500">담당 반 {member.classCount}개</p>
+                  <button
+                    type="button"
+                    onClick={() => openEditMemberForm(member)}
+                    className="flex min-h-8 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
+                  >
+                    <Pencil size={13} />
+                    수정
+                  </button>
+                </div>
               </div>
             ))}
           </div>

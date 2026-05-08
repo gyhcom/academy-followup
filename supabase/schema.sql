@@ -78,8 +78,12 @@ create table public.profiles (
   academy_id uuid not null references public.academies(id) on delete cascade,
   email text not null,
   name text not null,
+  phone text,
   role public.academy_role not null default 'teacher',
-  created_at timestamptz not null default now()
+  status text not null default 'active',
+  created_at timestamptz not null default now(),
+  constraint profiles_status_check
+    check (status in ('active', 'inactive'))
 );
 
 -- 반 정보입니다. teacher_id는 담당 선생님을 의미하며, 초기에는 단일 담당자만 둡니다.
@@ -210,6 +214,7 @@ create table public.message_logs (
 create index platform_admins_role_idx on public.platform_admins(role);
 create index academies_owner_user_id_idx on public.academies(owner_user_id);
 create index academies_status_idx on public.academies(status);
+create index profiles_academy_status_idx on public.profiles(academy_id, status);
 create index classes_academy_id_idx on public.classes(academy_id);
 create index students_academy_id_idx on public.students(academy_id);
 create index students_class_id_idx on public.students(class_id);
