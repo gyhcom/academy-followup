@@ -25,6 +25,15 @@ export type DateScheduleSummary = {
   schedules: OperationsStudentSchedule[];
 };
 
+export type ScheduleConflict = {
+  id: string;
+  title: string;
+  scheduleType: string;
+  startTime: string;
+  endTime: string;
+  scheduleDate: string | null;
+};
+
 const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   month: "long",
   year: "numeric",
@@ -138,6 +147,38 @@ export class MakeupSchedulePlanner {
   isValidTimeRange(startTime: string, endTime: string) {
     return Boolean(startTime && endTime && startTime < endTime);
   }
+
+  getScheduleConflicts({
+    date,
+    startTime,
+    endTime,
+  }: {
+    date: string;
+    startTime: string;
+    endTime: string;
+  }): ScheduleConflict[] {
+    if (!this.isValidTimeRange(startTime, endTime)) {
+      return [];
+    }
+
+    return this.getSchedulesForDate(date).schedules
+      .filter((schedule) =>
+        isTimeRangeOverlapping({
+          firstStart: startTime,
+          firstEnd: endTime,
+          secondStart: schedule.startTime,
+          secondEnd: schedule.endTime,
+        }),
+      )
+      .map((schedule) => ({
+        id: schedule.id,
+        title: schedule.title,
+        scheduleType: schedule.scheduleType,
+        startTime: schedule.startTime,
+        endTime: schedule.endTime,
+        scheduleDate: schedule.scheduleDate,
+      }));
+  }
 }
 
 export function formatDateForCandidate(dateValue: string) {
@@ -169,4 +210,18 @@ function toDateValue(date: Date) {
 
 function toMondayStartIndex(dayOfWeek: number) {
   return dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+}
+
+function isTimeRangeOverlapping({
+  firstStart,
+  firstEnd,
+  secondStart,
+  secondEnd,
+}: {
+  firstStart: string;
+  firstEnd: string;
+  secondStart: string;
+  secondEnd: string;
+}) {
+  return firstStart < secondEnd && firstEnd > secondStart;
 }

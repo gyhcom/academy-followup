@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock3 } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+} from "lucide-react";
 import {
   scheduleTypeChipClass,
   scheduleTypeLabel,
@@ -12,6 +18,7 @@ import {
   formatDateForCandidate,
   type MakeupCandidate,
   MakeupSchedulePlanner,
+  type ScheduleConflict,
 } from "@/app/app/makeup-scheduling";
 
 type MakeupCalendarPanelProps = {
@@ -48,6 +55,14 @@ export function MakeupCalendarPanel({
     ? planner.getSchedulesForDate(selectedDate)
     : { schedules: [], oneOffSchedules: [], weeklySchedules: [] };
   const isTimeRangeValid = planner.isValidTimeRange(startTime, endTime);
+  const conflicts =
+    selectedStudent && isTimeRangeValid
+      ? planner.getScheduleConflicts({
+          date: selectedDate,
+          startTime,
+          endTime,
+        })
+      : [];
   const candidate = planner.createCandidate({
     date: selectedDate,
     startTime,
@@ -203,6 +218,10 @@ export function MakeupCalendarPanel({
           </div>
         </div>
 
+        {conflicts.length > 0 ? (
+          <ScheduleConflictWarning conflicts={conflicts} />
+        ) : null}
+
         <button
           type="button"
           disabled={!selectedStudent || !isTimeRangeValid}
@@ -227,6 +246,57 @@ export function MakeupCalendarPanel({
         ) : null}
       </div>
     </section>
+  );
+}
+
+function ScheduleConflictWarning({ conflicts }: { conflicts: ScheduleConflict[] }) {
+  const visibleConflicts = conflicts.slice(0, 3);
+  const hiddenCount = conflicts.length - visibleConflicts.length;
+
+  return (
+    <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
+      <div className="flex items-start gap-2">
+        <AlertTriangle className="mt-0.5 shrink-0 text-amber-700" size={16} />
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-amber-950">
+            선택 시간이 기존 일정과 겹칩니다.
+          </p>
+          <div className="mt-2 space-y-1.5">
+            {visibleConflicts.map((conflict) => (
+              <div
+                key={`${conflict.id}:${conflict.scheduleDate ?? "weekly"}`}
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md bg-white/75 px-2 py-1.5"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-stone-900">
+                    {conflict.title}
+                  </p>
+                  <p className="mt-0.5 text-[11px] font-medium tabular-nums text-stone-500">
+                    {conflict.startTime}-{conflict.endTime}
+                  </p>
+                </div>
+                <span
+                  className={[
+                    "rounded px-1.5 py-0.5 text-[11px] font-semibold",
+                    scheduleTypeChipClass(conflict.scheduleType),
+                  ].join(" ")}
+                >
+                  {scheduleTypeLabel(conflict.scheduleType)}
+                </span>
+              </div>
+            ))}
+          </div>
+          {hiddenCount > 0 ? (
+            <p className="mt-2 text-[11px] font-semibold text-amber-900">
+              외 {hiddenCount}개 일정이 더 겹칩니다.
+            </p>
+          ) : null}
+          <p className="mt-2 text-[11px] leading-4 text-amber-900">
+            필요하면 그대로 보강 후보를 선택할 수 있습니다.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
