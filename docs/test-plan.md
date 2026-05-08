@@ -113,6 +113,15 @@
 - assistant는 `allow_assistant_send=false`일 때 실제 발송 API에서 403을 반환함
 - assistant는 `allow_assistant_send=true`일 때 담당 반 팔로업만 발송할 수 있음
 
+## 5-3. 학원 설정 테스트
+
+- 원장/관리자는 관리 탭에서 학원명, 발신명, 발신번호를 수정할 수 있음
+- dry-run 토글을 저장하면 `/api/messages/send`의 실제 발송 차단 여부에 반영됨
+- 중복 발송 방지 시간을 저장할 수 있음
+- 보조 선생님 발송 허용 여부를 저장할 수 있음
+- 선생님 계정은 설정 화면에 접근할 수 없음
+- 비로그인 `PATCH /api/academy-settings`는 401을 반환함
+
 ## 6. 문자 미리보기 테스트
 
 - 학생과 사유를 선택해야 미리보기 생성 가능

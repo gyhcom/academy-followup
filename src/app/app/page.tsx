@@ -5,6 +5,7 @@ import {
   AppWorkspace,
   type ManagementClass,
   type ManagementMember,
+  type ManagementSettings,
   type ManagementStudent,
 } from "@/app/app/app-workspace";
 import type { AttendanceRecordItem } from "@/app/app/attendance-board";
@@ -27,6 +28,7 @@ type ProfileWithAcademy = {
     category: string | null;
     brand_color: string;
     sender_name: string | null;
+    sender_phone: string | null;
   } | null;
 };
 
@@ -95,6 +97,12 @@ type MemberRecord = {
   status: string;
 };
 
+type AcademySettingsRecord = {
+  sms_dry_run: boolean;
+  allow_assistant_send: boolean;
+  duplicate_guard_minutes: number;
+};
+
 export default async function AppPage() {
   if (!hasSupabaseServerEnv()) {
     return (
@@ -131,7 +139,7 @@ export default async function AppPage() {
   const { data: profile, error } = await admin
     .from("profiles")
     .select(
-      "name, role, status, academy_id, academies(name, category, brand_color, sender_name)",
+      "name, role, status, academy_id, academies(name, category, brand_color, sender_name, sender_phone)",
     )
     .eq("id", user.id)
     .maybeSingle<ProfileWithAcademy>();
@@ -176,6 +184,7 @@ export default async function AppPage() {
     membersResult,
     schedulesResult,
     attendanceResult,
+    settingsResult,
   ] = await Promise.all([
     admin
       .from("classes")
@@ -208,6 +217,11 @@ export default async function AppPage() {
       .eq("academy_id", profile.academy_id)
       .eq("attendance_date", attendanceDate)
       .order("scheduled_start_time", { ascending: true }),
+    admin
+      .from("academy_settings")
+      .select("sms_dry_run, allow_assistant_send, duplicate_guard_minutes")
+      .eq("academy_id", profile.academy_id)
+      .maybeSingle<AcademySettingsRecord>(),
   ]);
 
   if (
@@ -215,7 +229,8 @@ export default async function AppPage() {
     studentsResult.error ||
     membersResult.error ||
     schedulesResult.error ||
-    attendanceResult.error
+    attendanceResult.error ||
+    settingsResult.error
   ) {
     return (
       <AppShell email={user.email ?? ""}>
@@ -227,6 +242,7 @@ export default async function AppPage() {
             membersResult.error?.message ??
             schedulesResult.error?.message ??
             attendanceResult.error?.message ??
+            settingsResult.error?.message ??
             "반과 학생 정보를 가져오지 못했습니다."
           }
         />
@@ -249,6 +265,12 @@ export default async function AppPage() {
   const managementClasses = buildManagementClasses({ classes, students, members });
   const managementStudents = buildManagementStudents({ classes, students, schedules });
   const managementMembers = buildManagementMembers({ classes, members });
+  const managementSettings = buildManagementSettings({
+    academyName: profile.academies.name,
+    senderName: profile.academies.sender_name,
+    senderPhone: profile.academies.sender_phone,
+    settings: settingsResult.data,
+  });
 
   return (
     <AppShell
@@ -267,6 +289,7 @@ export default async function AppPage() {
         managementClasses={managementClasses}
         managementStudents={managementStudents}
         managementMembers={managementMembers}
+        managementSettings={managementSettings}
       />
     </AppShell>
   );
@@ -500,6 +523,27 @@ function buildManagementMembers({
     status: member.status,
     classCount: classes.filter((classItem) => classItem.teacher_id === member.id).length,
   }));
+}
+
+function buildManagementSettings({
+  academyName,
+  senderName,
+  senderPhone,
+  settings,
+}: {
+  academyName: string;
+  senderName: string | null;
+  senderPhone: string | null;
+  settings: AcademySettingsRecord | null;
+}): ManagementSettings {
+  return {
+    academyName,
+    senderName: senderName ?? "",
+    senderPhone: senderPhone ?? "",
+    smsDryRun: settings?.sms_dry_run ?? true,
+    duplicateGuardMinutes: settings?.duplicate_guard_minutes ?? 1440,
+    allowAssistantSend: settings?.allow_assistant_send ?? false,
+  };
 }
 
 function maskPhone(phone: string) {

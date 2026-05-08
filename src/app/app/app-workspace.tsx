@@ -11,6 +11,7 @@ import { ManagementHome } from "@/app/app/management-home";
 import type {
   ManagementClass,
   ManagementMember,
+  ManagementSettings,
   ManagementStudent,
   ManagementStudentSchedule,
 } from "@/app/app/management-types";
@@ -23,6 +24,7 @@ import { canManageAcademy } from "@/lib/permissions";
 export type {
   ManagementClass,
   ManagementMember,
+  ManagementSettings,
   ManagementStudent,
   ManagementStudentSchedule,
 };
@@ -38,6 +40,7 @@ type AppWorkspaceProps = {
   managementClasses: ManagementClass[];
   managementStudents: ManagementStudent[];
   managementMembers: ManagementMember[];
+  managementSettings: ManagementSettings;
 };
 
 type WorkspaceView = "operations" | "attendance" | "management";
@@ -53,6 +56,7 @@ export function AppWorkspace({
   managementClasses,
   managementStudents,
   managementMembers,
+  managementSettings,
 }: AppWorkspaceProps) {
   const canManage = canManageAcademy(role);
   const [activeView, setActiveView] = useState<WorkspaceView>("operations");
@@ -87,6 +91,7 @@ export function AppWorkspace({
           classes={managementClasses}
           members={managementMembers}
           students={managementStudents}
+          settings={managementSettings}
         />
       )}
     </div>
