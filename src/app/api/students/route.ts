@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { canManageAcademy } from "@/lib/permissions";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -191,7 +192,7 @@ async function getAuthorizedWorkspace(): Promise<
     return { ok: false, status: 403, error: "학원 워크스페이스 연결이 필요합니다." };
   }
 
-  if (profile.role !== "owner" && profile.role !== "manager") {
+  if (!canManageAcademy(profile.role)) {
     return { ok: false, status: 403, error: "학생 관리는 원장 또는 관리자만 할 수 있습니다." };
   }
 

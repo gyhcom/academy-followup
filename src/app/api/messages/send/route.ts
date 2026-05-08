@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { MessageRecipientType } from "@/lib/message-recipients";
+import { canSendFollowupMessage } from "@/lib/permissions";
 import { sendSms } from "@/lib/sms/solapi";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
@@ -37,6 +38,7 @@ type FollowupRecord = {
 
 type AcademySettingsRecord = {
   duplicate_guard_minutes: number | null;
+  allow_assistant_send: boolean;
 };
 
 export async function POST(request: Request) {
@@ -113,7 +115,24 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!canSendFollowup(profile.role, followup.classes, user.id)) {
+  const { data: settings, error: settingsError } = await admin
+    .from("academy_settings")
+    .select("allow_assistant_send")
+    .eq("academy_id", profile.academy_id)
+    .maybeSingle<AcademySettingsRecord>();
+
+  if (settingsError) {
+    return NextResponse.json({ error: settingsError.message }, { status: 500 });
+  }
+
+  if (
+    !canSendFollowupMessage({
+      role: profile.role,
+      classTeacherId: followup.classes?.teacher_id ?? null,
+      userId: user.id,
+      allowAssistantSend: settings?.allow_assistant_send ?? false,
+    })
+  ) {
     return NextResponse.json(
       { error: "이 팔로업 기록을 발송할 권한이 없습니다." },
       { status: 403 },
@@ -333,18 +352,6 @@ function getKoreanDayStart(date: Date) {
   }
 
   return new Date(`${year}-${month}-${day}T00:00:00+09:00`);
-}
-
-function canSendFollowup(
-  role: string,
-  classRecord: { teacher_id: string | null } | null,
-  userId: string,
-) {
-  if (role === "owner" || role === "manager") {
-    return true;
-  }
-
-  return classRecord?.teacher_id === userId;
 }
 
 async function saveMessageResult({

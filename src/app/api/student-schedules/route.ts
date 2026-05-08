@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { canAccessAssignedClass } from "@/lib/permissions";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -492,7 +493,7 @@ function isScheduleType(value: unknown): value is ScheduleType {
 }
 
 function canManageSchedule(role: string, classTeacherId: string | null, userId: string) {
-  return role === "owner" || role === "manager" || classTeacherId === userId;
+  return canAccessAssignedClass({ role, classTeacherId, userId });
 }
 
 async function findDuplicateOneOffSchedule({

@@ -103,6 +103,16 @@
 - 선생님 계정은 관리 탭과 `/api/members`에 접근할 수 없음
 - 비로그인 `GET/POST/PATCH /api/members`는 401을 반환함
 
+## 5-2. 역할/권한 테스트
+
+- owner/manager는 운영 보드, 출석부, 관리 화면에서 학원 전체 데이터를 볼 수 있음
+- teacher/assistant는 담당 반 데이터만 볼 수 있음
+- teacher/assistant는 관리 탭이 보이지 않음
+- teacher/assistant가 학생/반 관리 API를 호출하면 403을 반환함
+- teacher는 담당 반 팔로업 문자를 발송할 수 있음
+- assistant는 `allow_assistant_send=false`일 때 실제 발송 API에서 403을 반환함
+- assistant는 `allow_assistant_send=true`일 때 담당 반 팔로업만 발송할 수 있음
+
 ## 6. 문자 미리보기 테스트
 
 - 학생과 사유를 선택해야 미리보기 생성 가능

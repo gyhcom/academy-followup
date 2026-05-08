@@ -315,21 +315,26 @@
 
 ### T-207 권한/역할 관리
 
-상태: 예정
+상태: 완료
 
 목표:
 - 구성원 역할에 따라 조회, 등록, 발송, 설정 변경 범위를 제한
 
 작업:
-- 역할별 권한 매트릭스 문서화
-- owner/manager/teacher/assistant 권한 체크 helper 작성
-- 관리 화면 접근 제한
-- 발송 가능 여부 제한
-- 권한 부족 상태 UI 정리
+- 역할별 권한 매트릭스 문서화: 완료
+- owner/manager/teacher/assistant 권한 체크 helper 작성: 완료
+- 관리 화면 접근 제한: 완료
+- 발송 가능 여부 제한: 완료
+- 권한 부족 상태 UI 정리: 완료
 
 완료 기준:
 - 선생님이 학원 설정이나 다른 선생님 권한을 임의로 변경할 수 없음
 - assistant의 실제 발송 가능 여부가 학원 설정을 따름
+
+구현 메모:
+- `src/lib/permissions.ts`에 역할별 공통 helper를 추가했습니다.
+- 문자 실제 발송은 `academy_settings.allow_assistant_send`를 조회해 assistant 권한을 제한합니다.
+- 상세 권한표는 `docs/role-permissions.md`에서 관리합니다.
 
 ### T-208 반 등록/수정/비활성화
 

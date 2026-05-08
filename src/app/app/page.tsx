@@ -11,6 +11,7 @@ import type { AttendanceRecordItem } from "@/app/app/attendance-board";
 import { LogoutButton } from "@/app/app/logout-button";
 import type { OperationsClass } from "@/app/app/operations-board";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { canViewAllClasses, roleLabel } from "@/lib/permissions";
 import {
   createSupabaseServerClient,
   hasSupabaseServerEnv,
@@ -331,17 +332,6 @@ function EmptyState({
   );
 }
 
-function roleLabel(role: string) {
-  const labels: Record<string, string> = {
-    owner: "원장",
-    manager: "관리자",
-    teacher: "선생님",
-    assistant: "보조 선생님",
-  };
-
-  return labels[role] ?? role;
-}
-
 function buildOperationsClasses({
   classes,
   students,
@@ -510,10 +500,6 @@ function buildManagementMembers({
     status: member.status,
     classCount: classes.filter((classItem) => classItem.teacher_id === member.id).length,
   }));
-}
-
-function canViewAllClasses(role: string) {
-  return role === "owner" || role === "manager";
 }
 
 function maskPhone(phone: string) {
