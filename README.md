@@ -14,7 +14,7 @@
 
 ## MVP 한 줄 정의
 
-> 학생 이름 클릭 -> 사유 선택 -> 문자 미리보기 -> 발송 -> 기록 저장
+> 수업별 출석 체크 -> 확인 필요/지각/결석 학생 확인 -> 문자 초안 생성 -> dry-run 발송/기록 저장 -> 필요 시 보강 스케줄 등록
 
 ## 배포
 
@@ -72,4 +72,8 @@
 - [디자인 원칙](./docs/design-principles.md)
 - [작업 티켓](./docs/tickets.md)
 - [기능 테스트 계획](./docs/test-plan.md)
+- [파일럿 운영 가이드](./docs/pilot-operation-guide.md)
+- [파일럿 검증 지표](./docs/pilot-metrics.md)
+- [가격 및 무료 정책 전략](./docs/pricing-strategy.md)
+- [파일럿 UAT 체크리스트](./docs/uat-checklist.md)
 - [Supabase 연결 가이드](./docs/supabase-setup.md)
