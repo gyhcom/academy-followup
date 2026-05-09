@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAttendanceStatus, type AttendanceStatus } from "@/lib/attendance";
+import { canAccessAssignedClass, canViewAllClasses } from "@/lib/permissions";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -339,12 +340,12 @@ async function validateAttendanceRelations({
   return { ok: true, classItem: classResult.data, student: studentResult.data };
 }
 
-function canViewAllClasses(role: string) {
-  return role === "owner" || role === "manager";
-}
-
 function canEditClassAttendance(role: string, classItem: ClassRecord, userId: string) {
-  return canViewAllClasses(role) || classItem.teacher_id === userId;
+  return canAccessAssignedClass({
+    role,
+    classTeacherId: classItem.teacher_id,
+    userId,
+  });
 }
 
 function hasArrivedStatus(status: AttendanceStatus) {

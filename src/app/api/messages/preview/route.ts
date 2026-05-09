@@ -6,6 +6,7 @@ import {
   renderFollowupTemplate,
   type FollowupReason,
 } from "@/lib/followup-templates";
+import { canAccessAssignedClass } from "@/lib/permissions";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -145,7 +146,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: classRecord.error }, { status: 500 });
   }
 
-  if (!canPreviewStudent(profile.role, classRecord.data, user.id)) {
+  if (
+    !canAccessAssignedClass({
+      role: profile.role,
+      classTeacherId: classRecord.data?.teacher_id ?? null,
+      userId: user.id,
+    })
+  ) {
     return NextResponse.json(
       { error: "이 학생의 문자 미리보기를 만들 권한이 없습니다." },
       { status: 403 },
@@ -243,16 +250,4 @@ async function getStudentClass({
   }
 
   return { data: data ?? null, error: null };
-}
-
-function canPreviewStudent(
-  role: string,
-  classRecord: ClassRecord | null,
-  userId: string,
-) {
-  if (role === "owner" || role === "manager") {
-    return true;
-  }
-
-  return classRecord?.teacher_id === userId;
 }

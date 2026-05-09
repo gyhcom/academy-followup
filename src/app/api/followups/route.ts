@@ -4,6 +4,7 @@ import {
   isMessageRecipientType,
   type MessageRecipientType,
 } from "@/lib/message-recipients";
+import { canAccessAssignedClass } from "@/lib/permissions";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -137,7 +138,13 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: classRecord.error }, { status: 500 });
   }
 
-  if (!canCreateFollowup(profile.role, classRecord.data, user.id)) {
+  if (
+    !canAccessAssignedClass({
+      role: profile.role,
+      classTeacherId: classRecord.data?.teacher_id ?? null,
+      userId: user.id,
+    })
+  ) {
     return NextResponse.json(
       { error: "이 학생의 팔로업 기록을 볼 권한이 없습니다." },
       { status: 403 },
@@ -253,7 +260,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: classRecord.error }, { status: 500 });
   }
 
-  if (!canCreateFollowup(profile.role, classRecord.data, user.id)) {
+  if (
+    !canAccessAssignedClass({
+      role: profile.role,
+      classTeacherId: classRecord.data?.teacher_id ?? null,
+      userId: user.id,
+    })
+  ) {
     return NextResponse.json(
       { error: "이 학생의 팔로업 기록을 만들 권한이 없습니다." },
       { status: 403 },
@@ -454,16 +467,4 @@ async function getStudentClass({
   }
 
   return { data: data ?? null, error: null };
-}
-
-function canCreateFollowup(
-  role: string,
-  classRecord: ClassRecord | null,
-  userId: string,
-) {
-  if (role === "owner" || role === "manager") {
-    return true;
-  }
-
-  return classRecord?.teacher_id === userId;
 }

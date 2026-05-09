@@ -18,6 +18,7 @@ import {
   OperationsBoard,
   type OperationsClass,
 } from "@/app/app/operations-board";
+import { canManageAcademy } from "@/lib/permissions";
 
 export type {
   ManagementClass,
@@ -53,7 +54,7 @@ export function AppWorkspace({
   managementStudents,
   managementMembers,
 }: AppWorkspaceProps) {
-  const canManage = role === "owner" || role === "manager";
+  const canManage = canManageAcademy(role);
   const [activeView, setActiveView] = useState<WorkspaceView>("operations");
   const visibleView = !canManage && activeView === "management" ? "operations" : activeView;
 
