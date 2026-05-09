@@ -9,11 +9,13 @@ import type {
   FormStatus,
   ManagementClass,
   ManagementMember,
+  ManagementSettings,
   ManagementStudent,
   ManagementStudentSchedule,
   MemberFormState,
   ScheduleFormState,
   StudentFormState,
+  SettingsFormState,
   StudentScheduleFilter,
   StudentSortMode,
 } from "@/app/app/management-types";
@@ -33,11 +35,13 @@ export function ManagementHome({
   classes,
   members,
   students,
+  settings,
 }: {
   academyName: string;
   classes: ManagementClass[];
   members: ManagementMember[];
   students: ManagementStudent[];
+  settings: ManagementSettings;
 }) {
   const router = useRouter();
   const [classForm, setClassForm] = useState<ClassFormState | null>(null);
@@ -64,6 +68,11 @@ export function ManagementHome({
     null,
   );
   const [bulkScheduleFormStatus, setBulkScheduleFormStatus] = useState<FormStatus>({
+    status: "idle",
+    message: "",
+  });
+  const [settingsForm, setSettingsForm] = useState<SettingsFormState>(settings);
+  const [settingsFormStatus, setSettingsFormStatus] = useState<FormStatus>({
     status: "idle",
     message: "",
   });
@@ -550,6 +559,33 @@ export function ManagementHome({
     }
   }
 
+  async function saveSettingsForm() {
+    setSettingsFormStatus({ status: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/academy-settings", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(settingsForm),
+      });
+      const payload = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "학원 설정을 저장하지 못했습니다.");
+      }
+
+      setSettingsFormStatus({ status: "saved", message: "학원 설정을 저장했습니다." });
+      router.refresh();
+    } catch (error) {
+      setSettingsFormStatus({
+        status: "error",
+        message: error instanceof Error ? error.message : "학원 설정을 저장하지 못했습니다.",
+      });
+    }
+  }
+
   return (
     <div className="space-y-4 sm:space-y-5">
       <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
@@ -596,6 +632,108 @@ export function ManagementHome({
           detail="학생, 반, 선생님"
         />
       </section>
+
+      <ManagementPanel
+        title="학원 운영 설정"
+        description="서비스에 표시되는 학원명과 문자 발송 정책을 관리합니다."
+        actionLabel={
+          settingsFormStatus.status === "saving" ? "저장 중" : "설정 저장"
+        }
+        onAction={saveSettingsForm}
+      >
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+            학원명
+            <input
+              value={settingsForm.academyName}
+              onChange={(event) =>
+                setSettingsForm({ ...settingsForm, academyName: event.target.value })
+              }
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            />
+          </label>
+
+          <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+            발신명
+            <input
+              value={settingsForm.senderName}
+              onChange={(event) =>
+                setSettingsForm({ ...settingsForm, senderName: event.target.value })
+              }
+              placeholder="문자에 표시할 학원명"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            />
+          </label>
+
+          <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+            발신번호
+            <input
+              value={settingsForm.senderPhone}
+              onChange={(event) =>
+                setSettingsForm({ ...settingsForm, senderPhone: event.target.value })
+              }
+              placeholder="0410000000"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            />
+          </label>
+
+          <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+            중복 발송 방지 시간
+            <input
+              type="number"
+              min={0}
+              value={settingsForm.duplicateGuardMinutes}
+              onChange={(event) =>
+                setSettingsForm({
+                  ...settingsForm,
+                  duplicateGuardMinutes: Number(event.target.value),
+                })
+              }
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            />
+          </label>
+
+          <label className="flex min-h-11 items-center gap-3 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-800">
+            <input
+              type="checkbox"
+              checked={settingsForm.smsDryRun}
+              onChange={(event) =>
+                setSettingsForm({ ...settingsForm, smsDryRun: event.target.checked })
+              }
+              className="size-4 accent-emerald-700"
+            />
+            실제 문자 발송 막기
+          </label>
+
+          <label className="flex min-h-11 items-center gap-3 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-800">
+            <input
+              type="checkbox"
+              checked={settingsForm.allowAssistantSend}
+              onChange={(event) =>
+                setSettingsForm({
+                  ...settingsForm,
+                  allowAssistantSend: event.target.checked,
+                })
+              }
+              className="size-4 accent-emerald-700"
+            />
+            보조 선생님 발송 허용
+          </label>
+        </div>
+
+        {settingsFormStatus.status === "saved" || settingsFormStatus.status === "error" ? (
+          <p
+            className={[
+              "mt-3 rounded-md border px-3 py-2 text-sm",
+              settingsFormStatus.status === "saved"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-red-200 bg-red-50 text-red-900",
+            ].join(" ")}
+          >
+            {settingsFormStatus.message}
+          </p>
+        ) : null}
+      </ManagementPanel>
 
       <section className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
         <ManagementPanel

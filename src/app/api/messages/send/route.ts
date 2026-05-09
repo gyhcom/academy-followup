@@ -39,6 +39,7 @@ type FollowupRecord = {
 type AcademySettingsRecord = {
   duplicate_guard_minutes: number | null;
   allow_assistant_send: boolean;
+  sms_dry_run: boolean;
 };
 
 export async function POST(request: Request) {
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
 
   const { data: settings, error: settingsError } = await admin
     .from("academy_settings")
-    .select("allow_assistant_send")
+    .select("allow_assistant_send, sms_dry_run")
     .eq("academy_id", profile.academy_id)
     .maybeSingle<AcademySettingsRecord>();
 
@@ -176,7 +177,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const dryRun = process.env.SMS_DRY_RUN !== "false";
+  const dryRun = settings?.sms_dry_run ?? process.env.SMS_DRY_RUN !== "false";
 
   if (dryRun) {
     await saveMessageResult({

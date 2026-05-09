@@ -52,6 +52,15 @@ export type ManagementMember = {
   classCount: number;
 };
 
+export type ManagementSettings = {
+  academyName: string;
+  senderName: string;
+  senderPhone: string;
+  smsDryRun: boolean;
+  duplicateGuardMinutes: number;
+  allowAssistantSend: boolean;
+};
+
 export type FormStatus = {
   status: "idle" | "saving" | "saved" | "error";
   message: string;
@@ -95,6 +104,8 @@ export type MemberFormState = {
   status: string;
   password: string;
 };
+
+export type SettingsFormState = ManagementSettings;
 
 export type ScheduleFormMode = "create" | "edit";
 
