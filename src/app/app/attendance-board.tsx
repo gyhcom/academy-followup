@@ -670,8 +670,8 @@ export function AttendanceBoard({
               반별 출석부
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-              {teacherName}님이 수업별 도착 여부를 확인합니다. 원장/데스크는 아래
-              현황에서 연락 대상과 체크 누락을 바로 확인합니다.
+              {teacherName}님이 수업별 도착 여부를 체크합니다. 연락 필요 학생과 체크
+              필요 수업을 바로 확인합니다.
             </p>
           </div>
 
@@ -1002,7 +1002,9 @@ function AttendanceSummary({
     <dl className="flex gap-2 overflow-x-auto pb-1 text-center text-xs sm:grid sm:grid-cols-5 sm:overflow-visible sm:pb-0">
       {editableStatuses.map((status) => (
         <div key={status} className="min-w-16 rounded-md border border-stone-200 bg-stone-50 px-2 py-2">
-          <dt className="truncate font-medium text-stone-500">{attendanceStatusLabels[status]}</dt>
+          <dt className="truncate font-medium text-stone-500">
+            {attendanceDisplayLabel(status)}
+          </dt>
           <dd className="mt-1 text-base font-semibold text-stone-950">{summary[status]}</dd>
         </div>
       ))}
@@ -1021,25 +1023,25 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
         <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-emerald-700">오늘 출석 현황</p>
+              <p className="text-sm font-semibold text-emerald-700">오늘 출석 요약</p>
               <h3 className="mt-1 text-lg font-semibold text-stone-950">
-                연락 대상 {needsAttentionCount}명 · 미체크 {uncheckedCount}명
+                연락 필요 {needsAttentionCount}명 · 체크 필요 {uncheckedCount}명
               </h3>
               <p className="mt-1 text-sm leading-6 text-stone-600">
-                카톡방을 훑지 않고도 결석/지각/확인 필요 학생과 반별 체크 누락을 봅니다.
+                수업 직후 확인할 학생과 아직 체크하지 않은 수업만 빠르게 봅니다.
               </p>
             </div>
 
             <dl className="grid grid-cols-3 gap-2 text-center text-xs sm:min-w-72">
               <OverviewMetric label="수업" value={`${overview.totalSessions}개`} />
               <OverviewMetric label="학생" value={`${overview.totalStudents}명`} />
-              <OverviewMetric label="미체크" value={`${uncheckedCount}명`} />
+              <OverviewMetric label="체크 필요" value={`${uncheckedCount}명`} />
             </dl>
           </div>
         </div>
 
         <div className="border-b border-stone-200 px-4 py-3 sm:px-5">
-          <dl className="grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-5">
+          <dl className="grid grid-cols-2 gap-2 sm:grid-cols-5">
             {(["present", "late", "absent", "needs_check", "pending"] as AttendanceStatus[]).map(
               (status) => (
                 <CompactStatusMetric
@@ -1059,7 +1061,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
             <span>출석</span>
             <span>지각</span>
             <span>결석</span>
-            <span>미체크</span>
+            <span>체크 필요</span>
           </div>
           <div className="divide-y divide-stone-200">
             {overview.classSummaries.length > 0 ? (
@@ -1074,13 +1076,15 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
                       대상 {summary.studentCount}명
                     </p>
                   </div>
-                  <p className="font-semibold tabular-nums text-stone-700">
+                  <p className="text-sm font-semibold tabular-nums text-stone-700 md:text-base">
                     {summary.startTime}
                   </p>
-                  <StatusCount status="present" value={summary.counts.present} />
-                  <StatusCount status="late" value={summary.counts.late} />
-                  <StatusCount status="absent" value={summary.counts.absent} />
-                  <StatusCount status="pending" value={summary.counts.pending} />
+                  <div className="flex flex-wrap gap-1.5 md:contents">
+                    <StatusCount status="present" value={summary.counts.present} />
+                    <StatusCount status="late" value={summary.counts.late} />
+                    <StatusCount status="absent" value={summary.counts.absent} />
+                    <StatusCount status="pending" value={summary.counts.pending} />
+                  </div>
                 </div>
               ))
             ) : (
@@ -1094,7 +1098,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
 
       <div className="rounded-lg border border-stone-200 bg-white shadow-sm">
         <div className="border-b border-stone-200 px-4 py-4">
-          <h3 className="text-sm font-semibold text-stone-950">오늘 연락/확인 대상</h3>
+          <h3 className="text-sm font-semibold text-stone-950">오늘 연락 필요</h3>
           <p className="mt-1 text-xs leading-5 text-stone-500">
             결석/지각은 팔로업 저장 또는 발송 상태를 함께 표시합니다.
           </p>
@@ -1117,7 +1121,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
                       attendanceStatusClass(item.status),
                     ].join(" ")}
                   >
-                    {attendanceStatusLabels[item.status]}
+                    {attendanceDisplayLabel(item.status)}
                   </span>
                 </div>
 
@@ -1133,7 +1137,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
             ))
           ) : (
             <div className="p-4 text-sm leading-6 text-stone-600">
-              현재 연락하거나 확인할 학생이 없습니다.
+              현재 연락 필요 학생이 없습니다.
             </div>
           )}
         </div>
@@ -1166,7 +1170,7 @@ function CompactStatusMetric({
       ].join(" ")}
     >
       <dt className="min-w-0 truncate text-xs font-semibold text-stone-600">
-        {attendanceStatusLabels[status]}
+        {attendanceDisplayLabel(status)}
       </dt>
       <dd className="shrink-0 text-base font-semibold tabular-nums text-stone-950">
         {value}
@@ -1183,9 +1187,17 @@ function StatusCount({ status, value }: { status: AttendanceStatus; value: numbe
         attendanceStatusClass(status),
       ].join(" ")}
     >
-      {attendanceStatusLabels[status]} {value}
+      {attendanceDisplayLabel(status)} {value}
     </span>
   );
+}
+
+function attendanceDisplayLabel(status: AttendanceStatus) {
+  if (status === "pending") {
+    return "체크 필요";
+  }
+
+  return attendanceStatusLabels[status];
 }
 
 function AttendanceStudentRow({
@@ -1221,7 +1233,7 @@ function AttendanceStudentRow({
             attendanceStatusClass(status),
           ].join(" ")}
         >
-          {attendanceStatusLabels[status]}
+          {attendanceDisplayLabel(status)}
         </span>
         {record?.checkedAt ? (
           <p className="mt-1 text-xs text-stone-400">{formatTime(record.checkedAt)}</p>
@@ -1249,7 +1261,7 @@ function AttendanceStudentRow({
                 ].join(" ")}
               >
                 {isSelected ? <Check size={14} /> : null}
-                {attendanceStatusLabels[nextStatus]}
+                {attendanceDisplayLabel(nextStatus)}
               </button>
             );
           })}
