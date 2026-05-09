@@ -5,10 +5,155 @@ import type {
   FormStatus,
   ManagementClass,
   ManagementMember,
+  MemberFormState,
   ScheduleFormState,
   StudentFormState,
 } from "@/app/app/management-types";
 import { roleLabel, weekDayOptions } from "@/app/app/management-utils";
+
+export function MemberForm({
+  form,
+  status,
+  onChange,
+  onCancel,
+  onSave,
+}: {
+  form: MemberFormState;
+  status: FormStatus;
+  onChange: (form: MemberFormState) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const canSave =
+    form.name.trim().length > 0 &&
+    form.email.trim().length > 0 &&
+    (form.mode === "edit" || form.password.trim().length >= 8) &&
+    status.status !== "saving";
+
+  return (
+    <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50/70 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-stone-950">
+            {form.mode === "create" ? "새 구성원 등록" : "구성원 정보 수정"}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-stone-600">
+            MVP에서는 임시 비밀번호를 원장이 직접 전달하는 수동 계정 생성 방식으로
+            시작합니다.
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label="구성원 입력 닫기"
+          onClick={onCancel}
+          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          이름
+          <input
+            value={form.name}
+            onChange={(event) => onChange({ ...form, name: event.target.value })}
+            placeholder="예: 김선생"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          이메일
+          <input
+            type="email"
+            value={form.email}
+            onChange={(event) => onChange({ ...form, email: event.target.value })}
+            placeholder="teacher@example.com"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          전화번호
+          <input
+            value={form.phone}
+            onChange={(event) => onChange({ ...form, phone: event.target.value })}
+            placeholder="010-0000-0000"
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          역할
+          <select
+            value={form.role}
+            onChange={(event) => onChange({ ...form, role: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          >
+            <option value="manager">관리자</option>
+            <option value="teacher">선생님</option>
+            <option value="assistant">보조 선생님</option>
+            <option value="owner">원장</option>
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          상태
+          <select
+            value={form.status}
+            onChange={(event) => onChange({ ...form, status: event.target.value })}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+          >
+            <option value="active">활성</option>
+            <option value="inactive">비활성</option>
+          </select>
+        </label>
+
+        {form.mode === "create" ? (
+          <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+            임시 비밀번호
+            <input
+              type="password"
+              value={form.password}
+              onChange={(event) => onChange({ ...form, password: event.target.value })}
+              placeholder="8자 이상"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            />
+          </label>
+        ) : null}
+      </div>
+
+      {status.status === "error" ? (
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+          {status.message}
+        </p>
+      ) : null}
+
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="min-h-11 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700"
+        >
+          취소
+        </button>
+        <button
+          type="button"
+          disabled={!canSave}
+          onClick={onSave}
+          className={[
+            "flex min-h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold",
+            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+          ].join(" ")}
+        >
+          <Save size={16} />
+          {status.status === "saving" ? "저장 중" : "저장"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function ClassForm({
   form,

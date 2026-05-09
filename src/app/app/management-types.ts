@@ -45,7 +45,10 @@ export type ManagementMember = {
   id: string;
   name: string;
   email: string;
+  phone: string | null;
+  maskedPhone: string | null;
   role: string;
+  status: string;
   classCount: number;
 };
 
@@ -78,6 +81,19 @@ export type StudentFormState = {
   parentPhone: string;
   studentPhone: string;
   status: string;
+};
+
+export type MemberFormMode = "create" | "edit";
+
+export type MemberFormState = {
+  mode: MemberFormMode;
+  memberId: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  status: string;
+  password: string;
 };
 
 export type ScheduleFormMode = "create" | "edit";
