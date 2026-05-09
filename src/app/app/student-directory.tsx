@@ -1,5 +1,10 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, ListFilter, Pencil, Search } from "lucide-react";
+import {
+  type FollowupHistoryItem,
+  type FollowupHistoryState,
+  StudentFollowupHistory,
+} from "@/app/app/operations-history";
 import type {
   ManagementClass,
   ManagementStudent,
@@ -19,6 +24,11 @@ import {
   weekDayLabel,
   weekDayShortLabel,
 } from "@/app/app/management-utils";
+
+type FollowupHistoryResponse = {
+  followups?: FollowupHistoryItem[];
+  error?: string;
+};
 
 export function StudentDirectory({
   students,
@@ -492,7 +502,76 @@ function StudentDetailPanel({
           </div>
         )}
       </div>
+
+      <StudentContactHistoryPanel student={student} />
     </aside>
+  );
+}
+
+function StudentContactHistoryPanel({ student }: { student: ManagementStudent }) {
+  const [history, setHistory] = useState<FollowupHistoryState>({
+    studentId: student.id,
+    status: "idle",
+    items: [],
+    error: "",
+  });
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const studentId = student.id;
+
+    async function loadHistory() {
+      setHistory((current) => ({
+        studentId,
+        status: "loading",
+        items: current.studentId === studentId ? current.items : [],
+        error: "",
+      }));
+
+      try {
+        const response = await fetch(`/api/followups?studentId=${studentId}`, {
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as FollowupHistoryResponse;
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "연락 기록을 불러오지 못했습니다.");
+        }
+
+        setHistory({
+          studentId,
+          status: "ready",
+          items: payload.followups ?? [],
+          error: "",
+        });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setHistory({
+          studentId,
+          status: "error",
+          items: [],
+          error:
+            error instanceof Error
+              ? error.message
+              : "연락 기록을 불러오지 못했습니다.",
+        });
+      }
+    }
+
+    void loadHistory();
+
+    return () => {
+      controller.abort();
+    };
+  }, [student.id]);
+
+  return (
+    <div className="mt-4 border-t border-stone-200 pt-4">
+      <StudentFollowupHistory selectedStudentName={student.name} history={history} />
+    </div>
   );
 }
 
