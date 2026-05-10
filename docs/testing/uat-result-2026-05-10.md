@@ -2,7 +2,7 @@
 
 대상 브랜치: `main`
 
-기준 문서: `docs/uat-checklist.md`
+기준 문서: `docs/testing/uat-checklist.md`
 
 ## 요약
 
@@ -125,7 +125,7 @@
 - `academy_settings.allow_assistant_send`
 - `academy_settings.duplicate_guard_minutes`
 
-이번 UAT에서 `followups.recipient_type`, `message_logs.recipient_type`, `students.student_phone`, `academy_settings` 기반 흐름은 실제로 동작했습니다. 다만 파일럿 전에는 `docs/supabase-setup.md`의 컬럼 확인 SQL을 한 번 더 실행해 운영 DB 상태를 기록하는 것이 좋습니다.
+이번 UAT에서 `followups.recipient_type`, `message_logs.recipient_type`, `students.student_phone`, `academy_settings` 기반 흐름은 실제로 동작했습니다. 다만 파일럿 전에는 `docs/engineering/supabase-setup.md`의 컬럼 확인 SQL을 한 번 더 실행해 운영 DB 상태를 기록하는 것이 좋습니다.
 
 ## 다음 UAT에 필요한 준비물
 

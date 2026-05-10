@@ -66,14 +66,9 @@
 
 ## 개발 문서
 
-- [제품 기획서](./docs/product-plan.md)
-- [기술 설계서](./docs/technical-plan.md)
-- [시스템 아키텍처](./docs/architecture.md)
-- [디자인 원칙](./docs/design-principles.md)
-- [작업 티켓](./docs/tickets.md)
-- [기능 테스트 계획](./docs/test-plan.md)
-- [파일럿 운영 가이드](./docs/pilot-operation-guide.md)
-- [파일럿 검증 지표](./docs/pilot-metrics.md)
-- [가격 및 무료 정책 전략](./docs/pricing-strategy.md)
-- [파일럿 UAT 체크리스트](./docs/uat-checklist.md)
-- [Supabase 연결 가이드](./docs/supabase-setup.md)
+- [문서 인덱스](./docs/README.md)
+- [제품 기획서](./docs/product/product-plan.md)
+- [기술 설계서](./docs/engineering/technical-plan.md)
+- [작업 티켓](./docs/planning/tickets.md)
+- [친구 원장 데모 시나리오](./docs/testing/demo-scenario.md)
+- [Supabase 연결 가이드](./docs/engineering/supabase-setup.md)

@@ -18,7 +18,7 @@ Academy Follow-up은 단순 문자 발송 도구가 아니라, 학생별 주간 
 - 로컬/원격 브랜치는 `main`만 남도록 정리했습니다.
 - 2026-05-10 기준 `npm run lint`, `npx tsc --noEmit`, `npm run build`, `git diff --check`를 통과했습니다.
 - Vercel은 `main` push 기준으로 배포됩니다.
-- 실제 Supabase DB는 repo의 migration과 어긋날 수 있으므로 파일럿 전 `docs/supabase-setup.md`의 필수 컬럼 확인을 먼저 실행해야 합니다.
+- 실제 Supabase DB는 repo의 migration과 어긋날 수 있으므로 파일럿 전 `docs/engineering/supabase-setup.md`의 필수 컬럼 확인을 먼저 실행해야 합니다.
 - 최근 확인된 런타임 오류 `column followups.recipient_type does not exist`는 코드 문제가 아니라 실제 DB에 `20260508020000_add_message_recipient_selection.sql`이 적용되지 않은 상태로 판단합니다.
 
 ## 완료된 기능

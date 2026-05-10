@@ -2,7 +2,7 @@
 
 대상 브랜치: `main`
 
-기준 문서: `docs/demo-scenario.md`
+기준 문서: `docs/testing/demo-scenario.md`
 
 실행 환경:
 

@@ -63,7 +63,7 @@
 - 개인정보/보안/운영 정책 문서
 - 랜딩 CTA와 데모 신청 흐름
 
-벤치마킹 기반 전체 기능 범위는 [벤치마킹 기반 기능 맵](./benchmark-feature-map.md)에 둡니다.
+벤치마킹 기반 전체 기능 범위는 [벤치마킹 기반 기능 맵](../product/benchmark-feature-map.md)에 둡니다.
 
 ## Phase 0: 프로젝트 기반
 
@@ -90,8 +90,8 @@
 - 파일럿 학원 정보 반영
 
 완료 기준:
-- `docs/product-plan.md` 작성
-- `docs/technical-plan.md` 작성
+- `docs/product/product-plan.md` 작성
+- `docs/engineering/technical-plan.md` 작성
 
 ### T-003 단계별 티켓 문서 작성
 
@@ -101,7 +101,7 @@
 - 앞으로 구현할 작업을 Phase/Ticket 단위로 정리
 
 완료 기준:
-- `docs/tickets.md` 작성
+- `docs/planning/tickets.md` 작성
 - 다음 개발 티켓이 명확해야 함
 
 ### T-004 한국 학원 SaaS 경쟁 조사
@@ -113,7 +113,7 @@
 - Academy Follow-up의 초기 포지션과 가격 가설을 정리
 
 완료 기준:
-- `docs/competitive-research-kr.md` 작성
+- `docs/product/competitive-research-kr.md` 작성
 - 공개 가격/공식 페이지 기준 경쟁 제품 비교 완료
 - 다음 기능 우선순위에 반영할 시사점 정리
 
@@ -174,7 +174,7 @@
 
 메모:
 - `GET /api/health/supabase`가 `{ "ok": true, "status": "connected" }`를 반환함
-- 설정 절차는 `docs/supabase-setup.md` 참고
+- 설정 절차는 `docs/engineering/supabase-setup.md` 참고
 
 ## Phase 2: 인증/온보딩
 
@@ -334,7 +334,7 @@
 구현 메모:
 - `src/lib/permissions.ts`에 역할별 공통 helper를 추가했습니다.
 - 문자 실제 발송은 `academy_settings.allow_assistant_send`를 조회해 assistant 권한을 제한합니다.
-- 상세 권한표는 `docs/role-permissions.md`에서 관리합니다.
+- 상세 권한표는 `docs/engineering/role-permissions.md`에서 관리합니다.
 
 ### T-208 반 등록/수정/비활성화
 
@@ -1296,7 +1296,7 @@
 - 보강 발송 후 스케줄 자동 등록 확인
 
 완료 기준:
-- `docs/demo-scenario.md`에 3분 데모 흐름, 말하지 않을 범위, 데모 후 질문이 정리됨
+- `docs/testing/demo-scenario.md`에 3분 데모 흐름, 말하지 않을 범위, 데모 후 질문이 정리됨
 - 시연 중 빈 화면이나 수동 SQL 설명 없이 전체 흐름을 보여줄 수 있음
 
 ## Phase 6: 기능 테스트/운영 안정화
@@ -1712,7 +1712,7 @@
 - schema 불일치가 재발하지 않도록 적용 순서와 확인 SQL이 문서화됨
 
 구현 메모:
-- 적용 순서는 `docs/supabase-setup.md`에서 관리합니다.
+- 적용 순서는 `docs/engineering/supabase-setup.md`에서 관리합니다.
 - 실제 Supabase DB에 destructive SQL은 자동 실행하지 않고, SQL Editor에서 검토 후 실행하는 방식으로 둡니다.
 
 ### T-407 출석 현황 모바일 UX 및 문구 개선

@@ -512,7 +512,7 @@ GET  /api/health/supabase
 
 ## 15. 디자인/접근성 기준
 
-화면 설계 기준은 [디자인 원칙](./design-principles.md)에 둡니다.
+화면 설계 기준은 [디자인 원칙](../design/design-principles.md)에 둡니다.
 
 핵심 기준:
 
@@ -537,7 +537,7 @@ local main
 
 ## 17. 작업 티켓 연결
 
-구현 순서는 [작업 티켓](./tickets.md)을 기준으로 관리합니다.
+구현 순서는 [작업 티켓](../planning/tickets.md)을 기준으로 관리합니다.
 
 다음 우선순위:
 
