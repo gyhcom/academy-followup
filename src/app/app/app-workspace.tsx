@@ -173,7 +173,7 @@ function WorkspaceNavButton({
       className={[
         "flex min-h-14 items-center gap-2 rounded-lg border px-2 text-left transition sm:min-h-16 sm:gap-3 sm:px-3",
         isActive
-          ? "border-[#0F766E] bg-[#0F766E] text-white"
+          ? "border-[#111827] bg-[#111827] text-white"
           : "border-[#E6E0D5] bg-[#F7F5F0] text-stone-700 hover:border-[#D8D0C4] hover:bg-white",
         disabled ? "cursor-not-allowed opacity-55 hover:border-[#E6E0D5] hover:bg-[#F7F5F0]" : "",
       ].join(" ")}
@@ -181,7 +181,7 @@ function WorkspaceNavButton({
       <span
         className={[
           "flex size-8 shrink-0 items-center justify-center rounded-md sm:size-9",
-          isActive ? "bg-white/14 text-white" : "bg-white text-[#0F766E]",
+          isActive ? "bg-white/14 text-white" : "bg-white text-[#334155]",
         ].join(" ")}
       >
         {icon}

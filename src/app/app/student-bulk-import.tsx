@@ -96,7 +96,7 @@ export function StudentBulkImportForm({
               onChange={(event) => setCsvText(event.target.value)}
               rows={12}
               spellCheck={false}
-              className="min-h-72 w-full min-w-0 resize-y rounded-md border border-[#D8D0C4] bg-white px-3 py-2 font-mono text-xs leading-5 outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#EAF7F2]"
+              className="min-h-72 w-full min-w-0 resize-y rounded-md border border-[#D8D0C4] bg-white px-3 py-2 font-mono text-xs leading-5 outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
             />
           </label>
         </div>
@@ -157,7 +157,7 @@ export function StudentBulkImportForm({
           onClick={() => onSubmit(validation.validRows)}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSubmit ? "bg-[#0F766E] text-white hover:bg-[#115E59]" : "bg-stone-300 text-stone-600",
+            canSubmit ? "bg-[#111827] text-white hover:bg-[#0F172A]" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
           <Save size={16} />

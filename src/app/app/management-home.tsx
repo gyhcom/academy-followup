@@ -686,7 +686,7 @@ export function ManagementHome({
     <div className="space-y-4 text-[#1C1917] sm:space-y-5">
       <section className="rounded-xl border border-[#E6E0D5] bg-[#FFFCF7] shadow-[0_14px_36px_rgba(28,25,23,0.06)]">
         <div className="border-b border-[#E6E0D5] px-4 py-5 sm:px-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#0F766E]">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#334155]">
             Academy Admin
           </p>
           <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -716,7 +716,7 @@ export function ManagementHome({
               className={[
                 "min-w-[150px] flex-1 rounded-lg border px-3 py-2.5 text-left transition sm:flex-none sm:px-4",
                 activeSection === section.id
-                  ? "border-[#0F766E] bg-[#0F766E] text-white shadow-sm"
+                  ? "border-[#111827] bg-[#111827] text-white shadow-sm"
                   : "border-[#E6E0D5] bg-white text-stone-800 hover:bg-[#F7F5F0]",
               ].join(" ")}
             >
@@ -764,7 +764,7 @@ export function ManagementHome({
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, academyName: event.target.value })
               }
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
             />
           </label>
 
@@ -776,7 +776,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderName: event.target.value })
               }
               placeholder="문자에 표시할 학원명"
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
             />
           </label>
 
@@ -788,7 +788,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderPhone: event.target.value })
               }
               placeholder="0410000000"
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
             />
           </label>
 
@@ -804,7 +804,7 @@ export function ManagementHome({
                   duplicateGuardMinutes: Number(event.target.value),
                 })
               }
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
             />
           </label>
 
@@ -815,7 +815,7 @@ export function ManagementHome({
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, smsDryRun: event.target.checked })
               }
-              className="size-4 accent-emerald-700"
+              className="size-4 accent-[#334155]"
             />
             실제 문자 발송 막기
           </label>
@@ -830,7 +830,7 @@ export function ManagementHome({
                   allowAssistantSend: event.target.checked,
                 })
               }
-              className="size-4 accent-emerald-700"
+              className="size-4 accent-[#334155]"
             />
             보조 선생님 발송 허용
           </label>
@@ -943,7 +943,7 @@ export function ManagementHome({
                   <button
                     type="button"
                     onClick={() => openBulkScheduleForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#0F766E]/30 bg-white px-2.5 text-xs font-semibold text-[#0F766E] transition hover:bg-[#EAF7F2]"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#CBD5E1] bg-white px-2.5 text-xs font-semibold text-[#334155] transition hover:bg-[#EEF2F6]"
                   >
                     <ClipboardList size={13} />
                     스케줄
@@ -1051,7 +1051,7 @@ export function ManagementHome({
           <button
             type="button"
             onClick={openBulkStudentImport}
-            className="flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border border-[#0F766E]/30 bg-white px-3 text-xs font-semibold text-[#0F766E] transition hover:bg-[#EAF7F2] sm:w-auto"
+            className="flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#334155] transition hover:bg-[#EEF2F6] sm:w-auto"
           >
             <FileSpreadsheet size={14} />
             CSV 일괄 등록

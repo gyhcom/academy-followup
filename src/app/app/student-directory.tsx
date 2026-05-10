@@ -233,7 +233,7 @@ export function StudentDirectoryToolbar({
             value={searchQuery}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="학생명, 반, 학교, 학부모 검색"
-            className="min-h-10 w-full rounded-md border border-[#D8D0C4] bg-white pl-9 pr-3 text-sm outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#EAF7F2]"
+            className="min-h-10 w-full rounded-md border border-[#D8D0C4] bg-white pl-9 pr-3 text-sm outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
           />
         </label>
 
@@ -272,7 +272,7 @@ export function StudentDirectoryToolbar({
         <select
           value={classFilter}
           onChange={(event) => onClassFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#0F766E]"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#334155]"
         >
           <option value="all">전체 반</option>
           {classes.map((classItem) => (
@@ -285,7 +285,7 @@ export function StudentDirectoryToolbar({
         <select
           value={statusFilter}
           onChange={(event) => onStatusFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#0F766E]"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#334155]"
         >
           <option value="all">전체 상태</option>
           <option value="active">재원</option>
@@ -296,7 +296,7 @@ export function StudentDirectoryToolbar({
         <select
           value={scheduleFilter}
           onChange={(event) => onScheduleFilterChange(event.target.value as StudentScheduleFilter)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#0F766E]"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#334155]"
         >
           <option value="all">전체 스케줄</option>
           <option value="has_schedule">스케줄 있음</option>
@@ -307,7 +307,7 @@ export function StudentDirectoryToolbar({
         <select
           value={sortMode}
           onChange={(event) => onSortModeChange(event.target.value as StudentSortMode)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#0F766E]"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#334155]"
         >
           <option value="time">요일·시간순</option>
           <option value="name">이름순</option>
@@ -381,7 +381,7 @@ function StudentResourceRow({
     <div
       className={[
         "border-b border-[#EFE9DE] transition last:border-b-0",
-        isSelected ? "bg-[#EAF7F2]" : "bg-white hover:bg-[#FBFAF7]",
+        isSelected ? "bg-[#EEF2F6]" : "bg-white hover:bg-[#FBFAF7]",
       ].join(" ")}
     >
       <button
@@ -441,7 +441,7 @@ function StudentResourceRow({
 
 function FilterChip({ label }: { label: string }) {
   return (
-    <span className="rounded-md bg-[#EAF7F2] px-2 py-1 text-[11px] font-semibold text-[#0F766E]">
+    <span className="rounded-md bg-[#EEF2F6] px-2 py-1 text-[11px] font-semibold text-[#334155]">
       {label}
     </span>
   );
@@ -596,7 +596,7 @@ function StudentDetailPanel({
           <button
             type="button"
             onClick={() => onCreateSchedule(student)}
-            className="flex min-h-10 items-center justify-center gap-1 rounded-md bg-[#0F766E] px-3 text-xs font-semibold text-white transition hover:bg-[#115E59]"
+            className="flex min-h-10 items-center justify-center gap-1 rounded-md bg-[#111827] px-3 text-xs font-semibold text-white transition hover:bg-[#0F172A]"
           >
             <CalendarDays size={13} />
             스케줄 추가

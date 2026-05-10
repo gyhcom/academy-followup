@@ -19,7 +19,7 @@ export function SummaryCard({
           <p className="text-xs font-medium text-stone-500">{label}</p>
           <p className="mt-2 text-xl font-semibold text-stone-950 sm:text-2xl">{value}</p>
         </div>
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#EAF7F2] text-[#0F766E] sm:size-10">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#EEF2F6] text-[#334155] sm:size-10">
           {icon}
         </div>
       </div>
@@ -57,7 +57,7 @@ export function ManagementPanel({
           className={[
             "flex min-h-10 w-full shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:w-auto",
             onAction
-              ? "border-[#0F766E] bg-[#0F766E] text-white shadow-sm transition hover:border-[#115E59] hover:bg-[#115E59]"
+              ? "border-[#111827] bg-[#111827] text-white shadow-sm transition hover:border-[#0F172A] hover:bg-[#0F172A]"
               : "cursor-not-allowed border-[#E6E0D5] bg-[#F7F5F0] text-stone-500",
           ].join(" ")}
         >
