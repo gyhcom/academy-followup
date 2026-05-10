@@ -898,30 +898,36 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="divide-y divide-stone-100">
+          <div className="overflow-hidden rounded-md border border-stone-200">
+            <div className="hidden grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] border-b border-stone-200 bg-stone-50 px-3 py-2 text-xs font-semibold text-stone-500 md:grid">
+              <span>반</span>
+              <span>과목</span>
+              <span>학년</span>
+              <span>담당</span>
+              <span className="text-right">작업</span>
+            </div>
             {classes.map((classItem) => (
               <div
                 key={classItem.id}
-                className="grid min-w-0 gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                className="grid min-w-0 gap-3 border-b border-stone-100 px-3 py-3 last:border-b-0 md:grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] md:items-center"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-stone-950">{classItem.name}</p>
-                  <p className="mt-1 break-words text-xs text-stone-500">
-                    {[classItem.subject, classItem.gradeLabel].filter(Boolean).join(" · ") ||
-                      "과목/학년 미지정"}
-                  </p>
-                  <p className="mt-1 break-words text-xs text-stone-500">
-                    담당: {classItem.teacherName ?? "미지정"}
+                  <p className="mt-1 text-xs text-stone-500 md:hidden">
+                    {[classItem.subject, classItem.gradeLabel, classItem.teacherName ?? "담당 미지정"].filter(Boolean).join(" · ")}
                   </p>
                 </div>
-                <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+                <p className="hidden text-sm text-stone-700 md:block">{classItem.subject ?? "-"}</p>
+                <p className="hidden text-sm text-stone-700 md:block">{classItem.gradeLabel ?? "-"}</p>
+                <p className="hidden truncate text-sm text-stone-700 md:block">{classItem.teacherName ?? "미지정"}</p>
+                <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
                   <span className="w-fit shrink-0 rounded-md bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700">
                     학생 {classItem.studentCount}명
                   </span>
                   <button
                     type="button"
                     onClick={() => openBulkScheduleForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2.5 text-xs font-semibold text-violet-900 transition hover:border-violet-300 hover:bg-violet-100"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-300 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-stone-50"
                   >
                     <ClipboardList size={13} />
                     스케줄
@@ -975,44 +981,36 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="space-y-2">
+          <div className="overflow-hidden rounded-md border border-stone-200">
+            <div className="hidden grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] border-b border-stone-200 bg-stone-50 px-3 py-2 text-xs font-semibold text-stone-500 md:grid">
+              <span>이름</span>
+              <span>이메일</span>
+              <span>역할</span>
+              <span>전화번호</span>
+              <span>담당 반</span>
+              <span className="text-right">작업</span>
+            </div>
             {members.map((member) => (
-              <div key={member.id} className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-stone-950">{member.name}</p>
-                    <p className="mt-1 truncate text-xs text-stone-500">{member.email}</p>
-                    <p className="mt-1 text-xs text-stone-500">
-                      {member.maskedPhone ?? "전화번호 미등록"}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-stone-700">
-                      {roleLabel(member.role)}
-                    </span>
-                    <span
-                      className={[
-                        "rounded-md px-2 py-1 text-xs font-semibold",
-                        member.status === "active"
-                          ? "bg-emerald-50 text-emerald-800"
-                          : "bg-stone-200 text-stone-700",
-                      ].join(" ")}
-                    >
-                      {member.status === "active" ? "활성" : "비활성"}
-                    </span>
-                  </div>
+              <div
+                key={member.id}
+                className="grid min-w-0 gap-2 border-b border-stone-100 px-3 py-3 last:border-b-0 md:grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] md:items-center"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-stone-950">{member.name}</p>
+                  <p className="mt-1 truncate text-xs text-stone-500 md:hidden">{member.email}</p>
                 </div>
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                  <p className="min-w-0 text-xs text-stone-500">담당 반 {member.classCount}개</p>
-                  <button
-                    type="button"
-                    onClick={() => openEditMemberForm(member)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
-                  >
-                    <Pencil size={13} />
-                    수정
-                  </button>
-                </div>
+                <p className="hidden truncate text-sm text-stone-700 md:block">{member.email}</p>
+                <p className="text-sm text-stone-700">{roleLabel(member.role)}</p>
+                <p className="text-sm text-stone-700">{member.maskedPhone ?? "미등록"}</p>
+                <p className="text-sm text-stone-700">담당 {member.classCount}개</p>
+                <button
+                  type="button"
+                  onClick={() => openEditMemberForm(member)}
+                  className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-md border border-stone-300 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-stone-50 md:ml-auto"
+                >
+                  <Pencil size={13} />
+                  수정
+                </button>
               </div>
             ))}
           </div>
