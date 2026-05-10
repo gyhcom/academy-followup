@@ -13,13 +13,13 @@ export function SummaryCard({
   detail: string;
 }) {
   return (
-    <article className="min-w-0 rounded-xl border border-[#E6E0D5] bg-[#FFFCF7] p-3.5 shadow-[0_10px_28px_rgba(28,25,23,0.05)] sm:p-4">
+    <article className="min-w-0 rounded-lg border border-[#E2DED6] bg-white p-3.5 shadow-sm sm:p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium text-stone-500">{label}</p>
           <p className="mt-2 text-xl font-semibold text-stone-950 sm:text-2xl">{value}</p>
         </div>
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#EEF2F6] text-[#334155] sm:size-10">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#EAF1F8] text-[#315C7C] sm:size-10">
           {icon}
         </div>
       </div>
@@ -44,11 +44,11 @@ export function ManagementPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="min-w-0 rounded-xl border border-[#E6E0D5] bg-[#FFFCF7] p-4 shadow-[0_14px_36px_rgba(28,25,23,0.06)] sm:p-5">
-      <div className="flex flex-col gap-3 border-b border-[#E6E0D5] pb-4 sm:flex-row sm:items-start sm:justify-between">
+    <section className="min-w-0 rounded-lg border border-[#E2DED6] bg-white p-3 shadow-sm sm:p-5">
+      <div className="flex flex-col gap-3 border-b border-[#E2DED6] pb-3 sm:flex-row sm:items-start sm:justify-between sm:pb-4">
         <div className="min-w-0">
           <h3 className="text-base font-semibold text-stone-950">{title}</h3>
-          <p className="mt-1 text-sm leading-6 text-stone-600">{description}</p>
+          <p className="mt-1 hidden text-sm leading-6 text-stone-600 sm:block">{description}</p>
         </div>
         <button
           type="button"
@@ -57,8 +57,8 @@ export function ManagementPanel({
           className={[
             "flex min-h-10 w-full shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:w-auto",
             onAction
-              ? "border-[#111827] bg-[#111827] text-white shadow-sm transition hover:border-[#0F172A] hover:bg-[#0F172A]"
-              : "cursor-not-allowed border-[#E6E0D5] bg-[#F7F5F0] text-stone-500",
+              ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm transition hover:border-[#244B67] hover:bg-[#244B67]"
+              : "cursor-not-allowed border-[#E2DED6] bg-[#F7F5F0] text-stone-500",
           ].join(" ")}
         >
           {actionIcon}
@@ -66,7 +66,7 @@ export function ManagementPanel({
           <ChevronRight size={14} />
         </button>
       </div>
-      <div className="min-w-0 pt-4">{children}</div>
+      <div className="min-w-0 pt-3 sm:pt-4">{children}</div>
     </section>
   );
 }

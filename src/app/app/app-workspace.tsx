@@ -114,8 +114,8 @@ function WorkspaceNavigation({
   onChange: (view: WorkspaceView) => void;
 }) {
   return (
-    <section className="rounded-xl border border-[#E6E0D5] bg-[#FFFCF7] p-2 shadow-[0_10px_28px_rgba(28,25,23,0.05)]">
-      <div className={["grid gap-2", canManage ? "grid-cols-3" : "grid-cols-2"].join(" ")}>
+    <section className="border-b border-[#E2DED6] bg-transparent pb-2 sm:rounded-lg sm:border sm:bg-white sm:p-2 sm:shadow-sm">
+      <div className={["grid gap-1.5", canManage ? "grid-cols-3" : "grid-cols-2"].join(" ")}>
         <WorkspaceNavButton
           icon={<LayoutDashboard size={17} />}
           label="운영 보드"
@@ -171,17 +171,17 @@ function WorkspaceNavButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "flex min-h-14 items-center gap-2 rounded-lg border px-2 text-left transition sm:min-h-16 sm:gap-3 sm:px-3",
+        "flex min-h-10 items-center justify-center gap-2 rounded-md border px-2 text-left transition sm:min-h-12 sm:justify-start sm:px-3",
         isActive
-          ? "border-[#111827] bg-[#111827] text-white"
-          : "border-[#E6E0D5] bg-[#F7F5F0] text-stone-700 hover:border-[#D8D0C4] hover:bg-white",
+          ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67] sm:bg-[#315C7C] sm:text-white"
+          : "border-transparent bg-transparent text-stone-700 hover:bg-[#F2F5F8] sm:bg-white",
         disabled ? "cursor-not-allowed opacity-55 hover:border-[#E6E0D5] hover:bg-[#F7F5F0]" : "",
       ].join(" ")}
     >
       <span
         className={[
-          "flex size-8 shrink-0 items-center justify-center rounded-md sm:size-9",
-          isActive ? "bg-white/14 text-white" : "bg-white text-[#334155]",
+          "hidden size-8 shrink-0 items-center justify-center rounded-md sm:flex",
+          isActive ? "bg-white/15 text-white" : "bg-[#F2F5F8] text-[#315C7C]",
         ].join(" ")}
       >
         {icon}

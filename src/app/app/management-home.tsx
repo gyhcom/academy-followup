@@ -684,21 +684,21 @@ export function ManagementHome({
 
   return (
     <div className="space-y-4 text-[#1C1917] sm:space-y-5">
-      <section className="rounded-xl border border-[#E6E0D5] bg-[#FFFCF7] shadow-[0_14px_36px_rgba(28,25,23,0.06)]">
-        <div className="border-b border-[#E6E0D5] px-4 py-5 sm:px-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#334155]">
+      <section className="rounded-lg border border-[#E2DED6] bg-white shadow-sm">
+        <div className="hidden px-4 py-4 sm:block sm:px-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
             Academy Admin
           </p>
-          <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
-              <h2 className="text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
+              <h2 className="text-xl font-semibold leading-tight text-stone-950 sm:text-2xl">
                 {academyName}
               </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-stone-600">
                 학생, 반, 구성원, 발송 정책을 한 곳에서 관리합니다.
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-4 rounded-lg border border-[#E6E0D5] bg-[#F7F5F0] px-4 py-3 text-sm shadow-inner sm:gap-6">
+            <div className="grid grid-cols-3 gap-4 rounded-md border border-[#E2DED6] bg-[#F7F5F0] px-4 py-2.5 text-sm sm:gap-6">
               <Metric label="재원" value={`${activeStudents.length}명`} />
               <Metric label="스케줄 미등록" value={`${students.filter((student) => student.schedules.filter((schedule) => schedule.isActive).length === 0).length}명`} />
               <Metric label="반" value={`${classes.length}개`} />
@@ -706,41 +706,34 @@ export function ManagementHome({
           </div>
         </div>
 
-        <div className="border-b border-[#E6E0D5] bg-[#FBFAF7] p-3">
-          <div className="flex flex-wrap gap-2">
+        <div className="border-[#E2DED6] px-4 py-2 sm:border-t sm:px-5">
+          <div className="flex gap-1.5 overflow-x-auto">
           {managementSections.map((section) => (
             <button
               key={section.id}
               type="button"
               onClick={() => setActiveSection(section.id)}
               className={[
-                "min-w-[150px] flex-1 rounded-lg border px-3 py-2.5 text-left transition sm:flex-none sm:px-4",
+                "shrink-0 rounded-md border px-3 py-2 text-left transition",
                 activeSection === section.id
-                  ? "border-[#111827] bg-[#111827] text-white shadow-sm"
-                  : "border-[#E6E0D5] bg-white text-stone-800 hover:bg-[#F7F5F0]",
+                  ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67]"
+                  : "border-transparent bg-white text-stone-700 hover:bg-[#F2F5F8]",
               ].join(" ")}
             >
-              <span className="flex items-center justify-between gap-3">
+              <span className="flex items-center gap-2">
                 <span className="text-sm font-semibold">{section.label}</span>
                 <span
                   className={[
                     "rounded px-2 py-0.5 text-xs font-semibold",
                     activeSection === section.id
-                      ? "bg-white/15 text-white"
+                      ? "bg-white text-[#244B67]"
                       : "bg-[#F7F5F0] text-stone-600",
                   ].join(" ")}
                 >
                   {section.count}
                 </span>
               </span>
-              <span
-                className={[
-                  "mt-1 block truncate text-xs",
-                  activeSection === section.id ? "text-white/75" : "text-stone-500",
-                ].join(" ")}
-              >
-                {section.detail}
-              </span>
+              <span className="sr-only">{section.detail}</span>
             </button>
           ))}
           </div>
@@ -764,7 +757,7 @@ export function ManagementHome({
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, academyName: event.target.value })
               }
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
@@ -776,7 +769,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderName: event.target.value })
               }
               placeholder="문자에 표시할 학원명"
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
@@ -788,7 +781,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderPhone: event.target.value })
               }
               placeholder="0410000000"
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
@@ -804,7 +797,7 @@ export function ManagementHome({
                   duplicateGuardMinutes: Number(event.target.value),
                 })
               }
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#334155] focus:ring-2 focus:ring-[#EEF2F6]"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
@@ -815,7 +808,7 @@ export function ManagementHome({
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, smsDryRun: event.target.checked })
               }
-              className="size-4 accent-[#334155]"
+              className="size-4 accent-[#315C7C]"
             />
             실제 문자 발송 막기
           </label>
@@ -830,7 +823,7 @@ export function ManagementHome({
                   allowAssistantSend: event.target.checked,
                 })
               }
-              className="size-4 accent-[#334155]"
+              className="size-4 accent-[#315C7C]"
             />
             보조 선생님 발송 허용
           </label>
@@ -943,7 +936,7 @@ export function ManagementHome({
                   <button
                     type="button"
                     onClick={() => openBulkScheduleForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#CBD5E1] bg-white px-2.5 text-xs font-semibold text-[#334155] transition hover:bg-[#EEF2F6]"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#C9D6E2] bg-white px-2.5 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8]"
                   >
                     <ClipboardList size={13} />
                     스케줄
@@ -1041,17 +1034,17 @@ export function ManagementHome({
         actionIcon={<Plus size={14} />}
         onAction={openCreateStudentForm}
       >
-        <div className="mb-4 flex flex-col gap-2 rounded-lg border border-[#E6E0D5] bg-[#F7F5F0] p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-4 flex flex-col gap-2 rounded-md border border-[#E6E0D5] bg-[#F7F5F0] p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-stone-950">초기 세팅은 일괄 등록으로 시작합니다.</p>
-            <p className="mt-1 text-xs leading-5 text-stone-500">
+            <p className="mt-1 hidden text-xs leading-5 text-stone-500 sm:block">
               200명 규모에서도 학생 목록, 검색, 스케줄 입력 화면이 깨지지 않는지 같이 확인합니다.
             </p>
           </div>
           <button
             type="button"
             onClick={openBulkStudentImport}
-            className="flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#334155] transition hover:bg-[#EEF2F6] sm:w-auto"
+            className="flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] sm:w-auto"
           >
             <FileSpreadsheet size={14} />
             CSV 일괄 등록
