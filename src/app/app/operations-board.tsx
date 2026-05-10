@@ -250,14 +250,39 @@ export function OperationsBoard({
   const activeScheduleCount = selectedStudent
     ? getSortedActiveSchedules(selectedStudent.schedules).length
     : 0;
-  const visibleFollowupHistory = selectedStudentIdForPreview
-    ? followupHistory
-    : {
-        studentId: "",
-        status: "idle" as const,
-        items: [],
-        error: "",
-      };
+  const visibleFollowupHistory = useMemo(
+    () =>
+      selectedStudentIdForPreview
+        ? followupHistory
+        : {
+            studentId: "",
+            status: "idle" as const,
+            items: [],
+            error: "",
+          },
+    [followupHistory, selectedStudentIdForPreview],
+  );
+  const duplicateDraft = useMemo(() => {
+    if (
+      !isPreviewReady ||
+      !messageBody.trim() ||
+      visibleFollowupHistory.status !== "ready"
+    ) {
+      return null;
+    }
+
+    return (
+      visibleFollowupHistory.items.find(
+        (item) =>
+          item.status === "draft" &&
+          item.reason === selectedReason &&
+          normalizeMessageBody(item.messageBody) === normalizeMessageBody(messageBody),
+      ) ?? null
+    );
+  }, [isPreviewReady, messageBody, selectedReason, visibleFollowupHistory]);
+  const duplicateDraftWarning = duplicateDraft
+    ? "같은 학생에게 같은 내용의 저장된 초안이 있습니다. 기존 초안을 발송하거나 문구를 수정해 새 기록으로 저장해 주세요."
+    : "";
 
   useEffect(() => {
     if (!selectedStudentIdForPreview) {
@@ -648,6 +673,12 @@ export function OperationsBoard({
   }
 
   if (classes.length === 0) {
+    const emptyMessage = roleLabel.includes("보조")
+      ? "아직 담당 반이 배정되지 않았습니다. 원장 또는 관리자에게 담당 반 배정을 요청해 주세요."
+      : roleLabel.includes("선생")
+        ? "아직 담당 반이 없습니다. 원장 또는 관리자가 반의 담당 선생님으로 지정하면 수업과 학생 목록이 표시됩니다."
+        : "파일럿 시연을 위해 먼저 반과 학생 데이터를 추가해야 합니다.";
+
     return (
       <section className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
         <div className="flex gap-3">
@@ -655,7 +686,7 @@ export function OperationsBoard({
           <div>
             <h2 className="text-lg font-semibold text-stone-950">등록된 반이 없습니다</h2>
             <p className="mt-2 text-sm leading-6 text-stone-600">
-              파일럿 시연을 위해 먼저 반과 학생 데이터를 추가해야 합니다.
+              {emptyMessage}
             </p>
           </div>
         </div>
@@ -870,6 +901,7 @@ export function OperationsBoard({
           messagePreview={messagePreview}
           messageSend={messageSend}
           messageSendError={messageSendError}
+          duplicateDraftWarning={duplicateDraftWarning}
           makeupCandidateTime={makeupCandidateTime}
           makeupScheduleSave={makeupScheduleSave}
           selectedMakeupCandidate={selectedMakeupCandidate}
@@ -928,6 +960,7 @@ export function OperationsBoard({
               messagePreview={messagePreview}
               messageSend={messageSend}
               messageSendError={messageSendError}
+              duplicateDraftWarning={duplicateDraftWarning}
               makeupCandidateTime={makeupCandidateTime}
               makeupScheduleSave={makeupScheduleSave}
               selectedMakeupCandidate={selectedMakeupCandidate}
@@ -973,6 +1006,7 @@ function MessageComposer({
   messagePreview,
   messageSend,
   messageSendError,
+  duplicateDraftWarning,
   makeupCandidateTime,
   makeupScheduleSave,
   selectedMakeupCandidate,
@@ -1005,6 +1039,7 @@ function MessageComposer({
   messagePreview: MessagePreviewState;
   messageSend: MessageSendState;
   messageSendError: string;
+  duplicateDraftWarning: string;
   makeupCandidateTime: string;
   makeupScheduleSave: MakeupScheduleSaveState;
   selectedMakeupCandidate: MakeupCandidate | null;
@@ -1021,7 +1056,8 @@ function MessageComposer({
   onSendMessage: () => void;
   onMessageChange: (body: string) => void;
 }) {
-  const canSaveFollowup = isPreviewReady && !isMessageBlank && !isFollowupSaving;
+  const canSaveFollowup =
+    isPreviewReady && !isMessageBlank && !isFollowupSaving && !duplicateDraftWarning;
   const canSendMessage = isFollowupSaved && !isMessageSending;
 
   return (
@@ -1239,6 +1275,15 @@ function MessageComposer({
           </div>
         ) : null}
 
+        {duplicateDraftWarning && !isFollowupSaved ? (
+          <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="mt-0.5 shrink-0" size={17} />
+              <p>{duplicateDraftWarning}</p>
+            </div>
+          </div>
+        ) : null}
+
         <button
           type="button"
           disabled={!canSaveFollowup}
@@ -1315,6 +1360,13 @@ function MessageComposer({
                   {selectedMakeupCandidate.label} 일정으로 학생 스케줄에 1회성 보강을
                   등록합니다.
                 </p>
+                {!canRegisterMakeupSchedule &&
+                makeupScheduleSave.status !== "saving" &&
+                makeupScheduleSave.status !== "saved" ? (
+                  <p className="mt-2 rounded-md bg-white px-2 py-2 text-xs font-semibold text-emerald-900">
+                    보강 스케줄은 문자 발송 테스트가 완료된 뒤 등록할 수 있습니다.
+                  </p>
+                ) : null}
                 <button
                   type="button"
                   disabled={
@@ -1417,4 +1469,8 @@ function reasonLabel(reasonId: FollowupReason) {
   return (
     followupReasons.find((reason) => reason.id === reasonId)?.label ?? reasonId
   );
+}
+
+function normalizeMessageBody(value: string) {
+  return value.trim().replace(/\s+/g, " ");
 }
