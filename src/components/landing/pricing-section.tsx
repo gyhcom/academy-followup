@@ -33,7 +33,7 @@ export function PricingSection() {
             </div>
 
             <div className="mt-6 flex items-end gap-2">
-              <span className="text-4xl font-semibold tracking-normal text-[#202557]">월 49,000원</span>
+              <span className="text-4xl font-semibold tracking-normal text-[#202557]">월 9,900원</span>
               <span className="pb-1 text-sm font-medium text-[#68709b]">가설</span>
             </div>
             <p className="mt-2 break-keep text-sm leading-6 text-[#60688e]">
