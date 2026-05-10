@@ -606,7 +606,7 @@ export function ManagementHome({
         </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="grid min-w-0 grid-cols-2 gap-3 lg:grid-cols-4">
         <SummaryCard
           icon={<GraduationCap size={19} />}
           label="재원 학생"
@@ -735,7 +735,7 @@ export function ManagementHome({
         ) : null}
       </ManagementPanel>
 
-      <section className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
+      <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
         <ManagementPanel
           title="반 관리"
           description="반 이름, 과목, 학년, 담당 선생님을 등록하고 수정합니다."
@@ -800,25 +800,28 @@ export function ManagementHome({
 
           <div className="divide-y divide-stone-100">
             {classes.map((classItem) => (
-              <div key={classItem.id} className="grid gap-3 py-3 sm:grid-cols-[1fr_auto] sm:items-center">
+              <div
+                key={classItem.id}
+                className="grid min-w-0 gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+              >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-stone-950">{classItem.name}</p>
-                  <p className="mt-1 text-xs text-stone-500">
+                  <p className="mt-1 break-words text-xs text-stone-500">
                     {[classItem.subject, classItem.gradeLabel].filter(Boolean).join(" · ") ||
                       "과목/학년 미지정"}
                   </p>
-                  <p className="mt-1 text-xs text-stone-500">
+                  <p className="mt-1 break-words text-xs text-stone-500">
                     담당: {classItem.teacherName ?? "미지정"}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-fit rounded-md bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700">
+                <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+                  <span className="w-fit shrink-0 rounded-md bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700">
                     학생 {classItem.studentCount}명
                   </span>
                   <button
                     type="button"
                     onClick={() => openBulkScheduleForm(classItem)}
-                    className="flex min-h-8 items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2.5 text-xs font-semibold text-violet-900 transition hover:border-violet-300 hover:bg-violet-100"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2.5 text-xs font-semibold text-violet-900 transition hover:border-violet-300 hover:bg-violet-100"
                   >
                     <ClipboardList size={13} />
                     스케줄
@@ -826,7 +829,7 @@ export function ManagementHome({
                   <button
                     type="button"
                     onClick={() => openEditClassForm(classItem)}
-                    className="flex min-h-8 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
                   >
                     <Pencil size={13} />
                     수정
@@ -897,12 +900,12 @@ export function ManagementHome({
                     </span>
                   </div>
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-xs text-stone-500">담당 반 {member.classCount}개</p>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                  <p className="min-w-0 text-xs text-stone-500">담당 반 {member.classCount}개</p>
                   <button
                     type="button"
                     onClick={() => openEditMemberForm(member)}
-                    className="flex min-h-8 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
                   >
                     <Pencil size={13} />
                     수정

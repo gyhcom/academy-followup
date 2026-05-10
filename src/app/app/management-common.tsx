@@ -13,9 +13,9 @@ export function SummaryCard({
   detail: string;
 }) {
   return (
-    <article className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm sm:p-4">
+    <article className="min-w-0 rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm sm:p-4">
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-medium text-stone-500">{label}</p>
           <p className="mt-2 text-xl font-semibold text-stone-950 sm:text-2xl">{value}</p>
         </div>
@@ -44,7 +44,7 @@ export function ManagementPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
+    <section className="min-w-0 rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
       <div className="flex flex-col gap-3 border-b border-stone-200 pb-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h3 className="text-base font-semibold text-stone-950">{title}</h3>
@@ -66,7 +66,7 @@ export function ManagementPanel({
           <ChevronRight size={14} />
         </button>
       </div>
-      <div className="pt-3">{children}</div>
+      <div className="min-w-0 pt-3">{children}</div>
     </section>
   );
 }
