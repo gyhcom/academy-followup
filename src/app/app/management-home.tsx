@@ -684,7 +684,16 @@ export function ManagementHome({
 
   return (
     <div className="space-y-4 text-[#1C1917] sm:space-y-5">
-      <section className="rounded-lg border border-[#E2DED6] bg-white shadow-sm">
+      <MobileAdminInbox
+        activeStudents={activeStudents.length}
+        missingSchedules={students.filter((student) => student.schedules.filter((schedule) => schedule.isActive).length === 0).length}
+        classCount={classes.length}
+        memberCount={members.length}
+        onShowStudents={() => setActiveSection("students")}
+        onShowClasses={() => setActiveSection("classes")}
+      />
+
+      <section className="border-b border-[#DED8CE] bg-transparent sm:rounded-lg sm:border sm:border-[#E2DED6] sm:bg-white sm:shadow-sm">
         <div className="hidden px-4 py-4 sm:block sm:px-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
             Academy Admin
@@ -706,7 +715,7 @@ export function ManagementHome({
           </div>
         </div>
 
-        <div className="border-[#E2DED6] px-4 py-2 sm:border-t sm:px-5">
+        <div className="px-0 py-2 sm:border-t sm:border-[#E2DED6] sm:px-5">
           <div className="flex gap-1.5 overflow-x-auto">
           {managementSections.map((section) => (
             <button
@@ -714,7 +723,7 @@ export function ManagementHome({
               type="button"
               onClick={() => setActiveSection(section.id)}
               className={[
-                "shrink-0 rounded-md border px-3 py-2 text-left transition",
+                "shrink-0 rounded-md border px-3 py-2 text-left transition sm:px-3",
                 activeSection === section.id
                   ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67]"
                   : "border-transparent bg-white text-stone-700 hover:bg-[#F2F5F8]",
@@ -1034,7 +1043,7 @@ export function ManagementHome({
         actionIcon={<Plus size={14} />}
         onAction={openCreateStudentForm}
       >
-        <div className="mb-4 flex flex-col gap-2 rounded-md border border-[#E6E0D5] bg-[#F7F5F0] p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3">
+        <div className="mb-3 flex items-center justify-between gap-2 rounded-md border border-[#E6E0D5] bg-white p-2.5 sm:mb-4 sm:bg-[#F7F5F0] sm:p-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-stone-950">초기 세팅은 일괄 등록으로 시작합니다.</p>
             <p className="mt-1 hidden text-xs leading-5 text-stone-500 sm:block">
@@ -1044,7 +1053,7 @@ export function ManagementHome({
           <button
             type="button"
             onClick={openBulkStudentImport}
-            className="flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] sm:w-auto"
+            className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] sm:min-h-10"
           >
             <FileSpreadsheet size={14} />
             CSV 일괄 등록
@@ -1164,5 +1173,88 @@ function Metric({ label, value }: { label: string; value: string }) {
       <p className="text-xs font-medium text-stone-500">{label}</p>
       <p className="mt-1 truncate text-lg font-semibold text-stone-950">{value}</p>
     </div>
+  );
+}
+
+function MobileAdminInbox({
+  activeStudents,
+  missingSchedules,
+  classCount,
+  memberCount,
+  onShowStudents,
+  onShowClasses,
+}: {
+  activeStudents: number;
+  missingSchedules: number;
+  classCount: number;
+  memberCount: number;
+  onShowStudents: () => void;
+  onShowClasses: () => void;
+}) {
+  return (
+    <section className="space-y-3 sm:hidden">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
+          오늘 관리 큐
+        </p>
+        <h2 className="mt-1 text-2xl font-semibold text-stone-950">처리할 항목</h2>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white">
+        <button
+          type="button"
+          onClick={onShowStudents}
+          className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[#EEE7DC] px-4 py-3 text-left"
+        >
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-stone-950">
+              스케줄 미등록 학생
+            </span>
+            <span className="mt-0.5 block text-xs text-stone-500">
+              학생 상세에서 수업 스케줄을 바로 추가합니다.
+            </span>
+          </span>
+          <span className="text-lg font-semibold tabular-nums text-[#315C7C]">
+            {missingSchedules}명
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onShowStudents}
+          className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[#EEE7DC] px-4 py-3 text-left"
+        >
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-stone-950">
+              재원 학생 명단
+            </span>
+            <span className="mt-0.5 block text-xs text-stone-500">
+              검색과 필터로 학생, 학부모, 반 정보를 확인합니다.
+            </span>
+          </span>
+          <span className="text-lg font-semibold tabular-nums text-stone-900">
+            {activeStudents}명
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onShowClasses}
+          className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left"
+        >
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-stone-950">
+              반 / 구성원 세팅
+            </span>
+            <span className="mt-0.5 block text-xs text-stone-500">
+              반 {classCount}개 · 구성원 {memberCount}명
+            </span>
+          </span>
+          <span className="rounded-full bg-[#F3EFE7] px-2.5 py-1 text-xs font-semibold text-stone-700">
+            관리
+          </span>
+        </button>
+      </div>
+    </section>
   );
 }

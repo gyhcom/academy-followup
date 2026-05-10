@@ -127,7 +127,7 @@ export function StudentDirectory({
   }
 
   return (
-    <div className="min-w-0 overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+    <div className="min-w-0 overflow-hidden bg-transparent sm:rounded-lg sm:border sm:border-[#E6E0D5] sm:bg-white">
       <StudentDirectoryToolbar
         students={students}
         classes={classes}
@@ -222,7 +222,7 @@ export function StudentDirectoryToolbar({
   ].filter(Boolean).length;
 
   return (
-    <div className="space-y-2 bg-[#FFFCF7] p-3">
+    <div className="space-y-2 bg-transparent pb-3 sm:bg-[#FFFCF7] sm:p-3">
       <div className="grid gap-2 xl:grid-cols-[minmax(260px,1fr)_auto] xl:items-center">
         <label className="relative block">
           <Search
@@ -237,7 +237,7 @@ export function StudentDirectoryToolbar({
           />
         </label>
 
-        <div className="flex items-center justify-between gap-2 rounded-md border border-[#E6E0D5] bg-[#F7F5F0] px-3 py-2 text-xs font-semibold text-stone-600">
+        <div className="flex items-center justify-between gap-2 rounded-md border border-[#E6E0D5] bg-white px-3 py-2 text-xs font-semibold text-stone-600 sm:bg-[#F7F5F0]">
           <span className="truncate">
             {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
           </span>
@@ -348,7 +348,7 @@ function StudentResourceTable({
         <span>스케줄</span>
         <span className="text-right">상태</span>
       </div>
-      <div className="max-h-[680px] overflow-y-auto">
+      <div className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white sm:max-h-[680px] sm:overflow-y-auto sm:rounded-none sm:border-0 sm:bg-transparent">
         {students.map((student) => (
           <StudentResourceRow
             key={student.id}
@@ -387,7 +387,7 @@ function StudentResourceRow({
       <button
         type="button"
         onClick={onOpenMobileDetail}
-        className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-3 px-3 py-3 text-left lg:hidden"
+        className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-3 px-4 py-4 text-left sm:px-3 sm:py-3 lg:hidden"
       >
         <span className="min-w-0">
           <span className="block truncate text-sm font-semibold text-stone-950">{student.name}</span>

@@ -44,10 +44,10 @@ export function ManagementPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="min-w-0 rounded-lg border border-[#E2DED6] bg-white p-3 shadow-sm sm:p-5">
-      <div className="flex flex-col gap-3 border-b border-[#E2DED6] pb-3 sm:flex-row sm:items-start sm:justify-between sm:pb-4">
+    <section className="min-w-0 bg-transparent sm:rounded-lg sm:border sm:border-[#E2DED6] sm:bg-white sm:p-5 sm:shadow-sm">
+      <div className="flex items-center justify-between gap-3 pb-3 sm:border-b sm:border-[#E2DED6] sm:pb-4">
         <div className="min-w-0">
-          <h3 className="text-base font-semibold text-stone-950">{title}</h3>
+          <h3 className="text-lg font-semibold text-stone-950 sm:text-base">{title}</h3>
           <p className="mt-1 hidden text-sm leading-6 text-stone-600 sm:block">{description}</p>
         </div>
         <button
@@ -55,7 +55,7 @@ export function ManagementPanel({
           disabled={!onAction}
           onClick={onAction}
           className={[
-            "flex min-h-10 w-full shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:w-auto",
+            "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:min-h-10",
             onAction
               ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm transition hover:border-[#244B67] hover:bg-[#244B67]"
               : "cursor-not-allowed border-[#E2DED6] bg-[#F7F5F0] text-stone-500",
@@ -66,7 +66,7 @@ export function ManagementPanel({
           <ChevronRight size={14} />
         </button>
       </div>
-      <div className="min-w-0 pt-3 sm:pt-4">{children}</div>
+      <div className="min-w-0 pt-0 sm:pt-4">{children}</div>
     </section>
   );
 }
