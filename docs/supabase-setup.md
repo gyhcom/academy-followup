@@ -13,14 +13,103 @@
 ## 필수 컬럼 확인
 
 ```sql
-select column_name
+select table_name, column_name, data_type, column_default
 from information_schema.columns
 where table_schema = 'public'
-  and table_name = 'students'
-  and column_name in ('student_phone');
+  and table_name in ('students', 'followups', 'message_logs', 'profiles', 'academies', 'academy_settings')
+  and column_name in (
+    'student_phone',
+    'recipient_type',
+    'phone',
+    'status',
+    'sender_phone',
+    'sms_dry_run',
+    'allow_assistant_send',
+    'duplicate_guard_minutes'
+  )
+order by table_name, column_name;
 ```
 
-결과에 `student_phone`이 없으면 `supabase/migrations/20260508020000_add_message_recipient_selection.sql` 또는 최신 `supabase/schema.sql`이 실제 DB에 반영되지 않은 상태입니다.
+필수 확인 결과:
+
+- `students.student_phone`
+- `followups.recipient_type`
+- `message_logs.recipient_type`
+- `profiles.phone`
+- `profiles.status`
+- `academies.sender_phone`
+- `academy_settings.sms_dry_run`
+- `academy_settings.allow_assistant_send`
+- `academy_settings.duplicate_guard_minutes`
+
+위 컬럼 중 하나라도 없으면 앱 코드보다 실제 Supabase DB migration 적용 상태를 먼저 확인합니다.
+
+## 최근 누락 컬럼 복구 SQL
+
+`column followups.recipient_type does not exist`가 나오면 아래 SQL을 Supabase SQL Editor에서 실행합니다.
+
+```sql
+alter table public.students
+  add column if not exists student_phone text;
+
+alter table public.followups
+  add column if not exists recipient_type text not null default 'parent';
+
+alter table public.message_logs
+  add column if not exists recipient_type text not null default 'parent';
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'followups_recipient_type_check'
+  ) then
+    alter table public.followups
+      add constraint followups_recipient_type_check
+      check (recipient_type in ('parent', 'student', 'both'));
+  end if;
+
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'message_logs_recipient_type_check'
+  ) then
+    alter table public.message_logs
+      add constraint message_logs_recipient_type_check
+      check (recipient_type in ('parent', 'student', 'both'));
+  end if;
+end $$;
+```
+
+이 SQL은 `add column if not exists`와 constraint 존재 확인을 사용하므로 같은 DB에서 반복 실행해도 기존 컬럼을 다시 만들지 않습니다.
+
+## 구성원/설정 컬럼 복구 SQL
+
+로그인 후 `profiles.status does not exist`, 학원 설정 저장 실패, 발신번호 조회 실패가 나오면 아래 SQL 적용 여부를 확인합니다.
+
+```sql
+alter table public.profiles
+  add column if not exists phone text;
+
+alter table public.profiles
+  add column if not exists status text not null default 'active';
+
+alter table public.academies
+  add column if not exists sender_phone text;
+
+create table if not exists public.academy_settings (
+  academy_id uuid primary key references public.academies(id) on delete cascade,
+  sms_dry_run boolean not null default true,
+  allow_assistant_send boolean not null default false,
+  duplicate_guard_minutes integer not null default 1440,
+  parent_phone_masking boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+```
+
+운영 DB에서는 destructive SQL을 실행하지 않고, 누락 컬럼 추가만 수행합니다.
 
 ## MVP Seed 확인
 
