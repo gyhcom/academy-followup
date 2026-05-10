@@ -54,9 +54,9 @@ export function OwnerPendingBoard({ classes, records }: OwnerPendingBoardProps) 
             <CheckCircle2 size={20} />
           </div>
           <div>
-            <p className="text-sm font-semibold text-stone-950">오늘 미처리 학생 없음</p>
+            <p className="text-sm font-semibold text-stone-950">오늘 연락할 학생 없음</p>
             <p className="mt-1 text-sm leading-6 text-stone-600">
-              현재 출석 기록 기준으로 원장이 바로 확인해야 할 학생이 없습니다.
+              결석, 지각, 확인 필요로 표시된 학생이 없습니다. 수업 후 체크만 진행하면 됩니다.
             </p>
           </div>
         </div>
@@ -71,32 +71,33 @@ export function OwnerPendingBoard({ classes, records }: OwnerPendingBoardProps) 
           <div>
             <p className="flex items-center gap-2 text-sm font-semibold text-[#315C7C]">
               <AlertTriangle size={16} />
-              원장 오늘 미처리 보드
+              오늘 연락할 학생
             </p>
             <h2 className="mt-2 text-xl font-semibold leading-tight text-stone-950 sm:text-2xl">
-              연락 누락 가능 학생 {unresolvedCount}명
+              아직 연락 전인 학생 {unresolvedCount}명
             </h2>
             <p className="mt-2 text-sm leading-6 text-stone-600">
-              결석, 지각, 확인 필요, 보강 예정 학생의 연락 처리 상태를 한곳에서 봅니다.
+              결석, 지각, 확인 필요로 체크된 학생입니다. 아래 수업 목록에서 학생을 선택해
+              문자 초안을 확인하고 저장하면 됩니다.
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-2 sm:min-w-80">
-            <Metric label="대상" value={`${items.length}명`} />
-            <Metric label="미처리" value={`${unresolvedCount}명`} tone="danger" />
-            <Metric label="완료" value={`${sentCount}명`} tone="success" />
+            <Metric label="확인할 학생" value={`${items.length}명`} />
+            <Metric label="연락 전" value={`${unresolvedCount}명`} tone="danger" />
+            <Metric label="연락 완료" value={`${sentCount}명`} tone="success" />
           </div>
         </div>
 
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
           <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
-            상태
+            처리 상태
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value as "all" | AttendanceStatus)}
               className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-900 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             >
-              <option value="all">전체 상태</option>
+              <option value="all">전체 보기</option>
               {actionableStatuses.map((status) => (
                 <option key={status} value={status}>
                   {attendanceStatusLabels[status]}
@@ -106,7 +107,7 @@ export function OwnerPendingBoard({ classes, records }: OwnerPendingBoardProps) 
           </label>
 
           <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
-            반
+            반 선택
             <select
               value={classFilter}
               onChange={(event) => setClassFilter(event.target.value)}
@@ -132,8 +133,8 @@ export function OwnerPendingBoard({ classes, records }: OwnerPendingBoardProps) 
       </div>
 
       <div className="border-t border-stone-200 bg-stone-50 px-4 py-3 text-xs leading-5 text-stone-500">
-        결석·지각·확인 필요 합계 {absentOrLateCount}명입니다. 발송 완료 여부는 팔로업
-        기록의 상태를 기준으로 표시합니다.
+        결석·지각·확인 필요 학생 {absentOrLateCount}명을 먼저 확인하세요. 문자 저장과
+        발송 기록이 남으면 연락 완료로 표시됩니다.
       </div>
     </section>
   );
@@ -177,7 +178,7 @@ function PendingRow({ item }: { item: PendingItem }) {
               isSent ? "bg-[#EAF1F8] text-[#244B67]" : "bg-amber-50 text-amber-800",
             ].join(" ")}
           >
-            {isSent ? "발송 완료" : item.followupStatus === "draft" ? "초안 생성" : "미처리"}
+            {isSent ? "연락 완료" : item.followupStatus === "draft" ? "초안 저장" : "연락 전"}
           </span>
         </div>
         <p className="mt-1 text-sm text-stone-600">
@@ -191,7 +192,7 @@ function PendingRow({ item }: { item: PendingItem }) {
       </div>
       <div className="flex items-center gap-2 text-xs text-stone-500">
         <MessageSquareText size={15} />
-        {item.followupSentAt ? formatKoreanTime(item.followupSentAt) : "처리 시간 없음"}
+        {item.followupSentAt ? formatKoreanTime(item.followupSentAt) : "아직 기록 없음"}
       </div>
     </article>
   );

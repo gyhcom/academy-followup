@@ -118,9 +118,9 @@ function WorkspaceNavigation({
       <div className={["grid gap-1.5", canManage ? "grid-cols-3" : "grid-cols-2"].join(" ")}>
         <WorkspaceNavButton
           icon={<LayoutDashboard size={17} />}
-          label="운영 보드"
+          label="문자 보내기"
           shortLabel="운영"
-          description="수업 후 팔로업"
+          description="수업 후 연락"
           isActive={activeView === "operations"}
           onClick={() => onChange("operations")}
         />

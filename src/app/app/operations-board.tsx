@@ -708,11 +708,11 @@ export function OperationsBoard({
           <div className="min-w-0">
             <p className="text-sm font-medium text-[#315C7C]">{academyName}</p>
             <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
-              수업 후 바로 보내기
+              수업 후 문자 보내기
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-              {teacherName}님은 {roleLabel} 권한입니다. 학생 옆 사유를 누르면 학부모
-              문자 초안 확인 바가 열립니다.
+              {teacherName}님이 학생을 고르고 결석, 재시험, 숙제 미완료 같은 사유를
+              누르면 학부모에게 보낼 문자 초안이 바로 열립니다.
             </p>
           </div>
 
