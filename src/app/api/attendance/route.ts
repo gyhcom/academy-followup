@@ -115,16 +115,16 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const parsedRequest = await parseAttendanceRequest(request);
-
-  if (!parsedRequest.ok) {
-    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
-  }
-
   const workspace = await getAuthorizedWorkspace();
 
   if (!workspace.ok) {
     return NextResponse.json({ error: workspace.error }, { status: workspace.status });
+  }
+
+  const parsedRequest = await parseAttendanceRequest(request);
+
+  if (!parsedRequest.ok) {
+    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
   const validation = await validateAttendanceRelations({

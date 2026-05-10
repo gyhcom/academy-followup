@@ -43,12 +43,6 @@ type AcademySettingsRecord = {
 };
 
 export async function POST(request: Request) {
-  const parsedRequest = await parseSendMessageRequest(request);
-
-  if (!parsedRequest.ok) {
-    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
-  }
-
   if (!hasSupabaseServerEnv()) {
     return NextResponse.json({
       error: "Supabase 세션 환경변수가 설정되지 않았습니다.",
@@ -87,6 +81,12 @@ export async function POST(request: Request) {
       { error: "학원 워크스페이스 연결이 필요합니다." },
       { status: 403 },
     );
+  }
+
+  const parsedRequest = await parseSendMessageRequest(request);
+
+  if (!parsedRequest.ok) {
+    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
   const { data: followup, error: followupError } = await admin

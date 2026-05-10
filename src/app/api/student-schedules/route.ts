@@ -67,16 +67,16 @@ type ScheduleRecord = {
 };
 
 export async function POST(request: Request) {
-  const parsedRequest = await parseScheduleRequest(request, { requireScheduleId: false });
-
-  if (!parsedRequest.ok) {
-    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
-  }
-
   const workspace = await getAuthorizedWorkspace();
 
   if (!workspace.ok) {
     return NextResponse.json({ error: workspace.error }, { status: workspace.status });
+  }
+
+  const parsedRequest = await parseScheduleRequest(request, { requireScheduleId: false });
+
+  if (!parsedRequest.ok) {
+    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
   const validation = await validateScheduleRelations({
@@ -144,16 +144,16 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const parsedRequest = await parseScheduleRequest(request, { requireScheduleId: true });
-
-  if (!parsedRequest.ok) {
-    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
-  }
-
   const workspace = await getAuthorizedWorkspace();
 
   if (!workspace.ok) {
     return NextResponse.json({ error: workspace.error }, { status: workspace.status });
+  }
+
+  const parsedRequest = await parseScheduleRequest(request, { requireScheduleId: true });
+
+  if (!parsedRequest.ok) {
+    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
   const validation = await validateScheduleRelations({

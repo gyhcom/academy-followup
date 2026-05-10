@@ -55,16 +55,16 @@ type ExistingScheduleRecord = {
 };
 
 export async function POST(request: Request) {
-  const parsedRequest = await parseBulkScheduleRequest(request);
-
-  if (!parsedRequest.ok) {
-    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
-  }
-
   const workspace = await getAuthorizedWorkspace();
 
   if (!workspace.ok) {
     return NextResponse.json({ error: workspace.error }, { status: workspace.status });
+  }
+
+  const parsedRequest = await parseBulkScheduleRequest(request);
+
+  if (!parsedRequest.ok) {
+    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
   const { data: classItem, error: classError } = await workspace.admin

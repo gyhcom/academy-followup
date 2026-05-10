@@ -52,16 +52,16 @@ type StudentRecord = {
 };
 
 export async function POST(request: Request) {
-  const parsedRequest = await parseStudentRequest(request, { requireStudentId: false });
-
-  if (!parsedRequest.ok) {
-    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
-  }
-
   const workspace = await getAuthorizedWorkspace();
 
   if (!workspace.ok) {
     return NextResponse.json({ error: workspace.error }, { status: workspace.status });
+  }
+
+  const parsedRequest = await parseStudentRequest(request, { requireStudentId: false });
+
+  if (!parsedRequest.ok) {
+    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
   const classCheck = await validateClass({
@@ -100,16 +100,16 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const parsedRequest = await parseStudentRequest(request, { requireStudentId: true });
-
-  if (!parsedRequest.ok) {
-    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
-  }
-
   const workspace = await getAuthorizedWorkspace();
 
   if (!workspace.ok) {
     return NextResponse.json({ error: workspace.error }, { status: workspace.status });
+  }
+
+  const parsedRequest = await parseStudentRequest(request, { requireStudentId: true });
+
+  if (!parsedRequest.ok) {
+    return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
   const classCheck = await validateClass({
