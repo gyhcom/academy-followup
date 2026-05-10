@@ -662,10 +662,10 @@ export function AttendanceBoard({
 
   return (
     <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
-      <section className="rounded-lg border border-stone-200 bg-white px-4 py-4 shadow-sm sm:px-5">
+      <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-emerald-700">{academyName}</p>
+            <p className="text-sm font-medium text-[#315C7C]">{academyName}</p>
             <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
               반별 출석부
             </h2>
@@ -694,7 +694,7 @@ export function AttendanceBoard({
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <UserCheck size={18} className="text-emerald-700" />
+                  <UserCheck size={18} className="text-[#315C7C]" />
                   <h3 className="text-base font-semibold text-stone-950">
                     {selectedSession?.className ?? "선택된 수업 없음"}
                   </h3>
@@ -864,7 +864,7 @@ function AttendanceDateControl({
           <button
             type="button"
             onClick={openCalendar}
-            className="flex min-h-11 w-full items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-emerald-400 hover:bg-emerald-50 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+            className="flex min-h-11 w-full items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-[#315C7C] hover:bg-[#EAF1F8] focus:border-[#315C7C] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
           >
             <CalendarDays size={17} className="shrink-0 text-stone-500" />
             <span className="min-w-0 flex-1 truncate tabular-nums">
@@ -906,7 +906,7 @@ function DateShortcutButton({
     <button
       type="button"
       onClick={() => onChange(date)}
-      className="min-h-9 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-600 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800"
+      className="min-h-9 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-600 transition hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C]"
     >
       {label}
     </button>
@@ -951,7 +951,7 @@ function SessionList({
                 className={[
                   "grid min-h-[4.75rem] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border px-3 py-3 text-left transition",
                   isSelected
-                    ? "border-stone-950 bg-stone-950 text-white"
+                    ? "border-[#315C7C] bg-[#315C7C] text-white"
                     : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50",
                 ].join(" ")}
               >
@@ -1019,11 +1019,11 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
 
   return (
     <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
-      <div className="rounded-lg border border-stone-200 bg-white shadow-sm">
+      <div className="overflow-hidden border-y border-[#DED8CE] bg-white sm:rounded-lg sm:border sm:border-stone-200 sm:shadow-sm">
         <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-emerald-700">오늘 출석 요약</p>
+              <p className="text-sm font-semibold text-[#315C7C]">오늘 출석 요약</p>
               <h3 className="mt-1 text-lg font-semibold text-stone-950">
                 연락 필요 {needsAttentionCount}명 · 체크 필요 {uncheckedCount}명
               </h3>
@@ -1096,7 +1096,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
         </div>
       </div>
 
-      <div className="rounded-lg border border-stone-200 bg-white shadow-sm">
+      <div className="overflow-hidden border-y border-[#DED8CE] bg-white sm:rounded-lg sm:border sm:border-stone-200 sm:shadow-sm">
         <div className="border-b border-stone-200 px-4 py-4">
           <h3 className="text-sm font-semibold text-stone-950">오늘 연락 필요</h3>
           <p className="mt-1 text-xs leading-5 text-stone-500">
@@ -1255,8 +1255,8 @@ function AttendanceStudentRow({
                 className={[
                   "flex min-h-10 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-semibold transition",
                   isSelected
-                    ? "border-stone-950 bg-stone-950 text-white"
-                    : "border-stone-200 bg-white text-stone-700 hover:border-emerald-300 hover:bg-emerald-50",
+                    ? "border-[#315C7C] bg-[#315C7C] text-white"
+                    : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
                   isSaving ? "cursor-wait opacity-60" : "",
                 ].join(" ")}
               >
@@ -1338,7 +1338,7 @@ function AttendanceFollowupPanel({
     <section className={["rounded-lg border border-stone-200 bg-white shadow-sm xl:sticky xl:top-5", className].join(" ")}>
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-emerald-700" size={18} />
+          <MessageSquareText className="text-[#315C7C]" size={18} />
           <h3 className="text-sm font-semibold text-stone-950">결석/지각 문자</h3>
           {followupTarget ? (
             <button
@@ -1418,8 +1418,8 @@ function AttendanceFollowupPanel({
                     className={[
                       "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
                       isSelected
-                        ? "border-stone-950 bg-stone-950 text-white"
-                        : "border-stone-200 bg-white text-stone-700 hover:border-emerald-300 hover:bg-emerald-50",
+                        ? "border-[#315C7C] bg-[#315C7C] text-white"
+                        : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
                       isDisabled ? "cursor-not-allowed opacity-45" : "",
                     ].join(" ")}
                   >
@@ -1473,7 +1473,7 @@ function AttendanceFollowupPanel({
                   : "결석 또는 지각 학생을 선택하면 문자 초안이 표시됩니다."
               }
               rows={8}
-              className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition disabled:bg-stone-50 disabled:text-stone-500 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition disabled:bg-stone-50 disabled:text-stone-500 focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
             <p
               className={[
@@ -1498,7 +1498,7 @@ function AttendanceFollowupPanel({
           >
             <div className="flex items-start gap-2">
               {isPreviewReady && !isPreviewError ? (
-                <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-700" size={17} />
+                <CheckCircle2 className="mt-0.5 shrink-0 text-[#315C7C]" size={17} />
               ) : (
                 <AlertCircle className="mt-0.5 shrink-0" size={17} />
               )}
@@ -1518,7 +1518,7 @@ function AttendanceFollowupPanel({
                 "rounded-md border p-3 text-sm leading-6",
                 followupSaveError
                   ? "border-red-200 bg-red-50 text-red-900"
-                  : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                  : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
               ].join(" ")}
             >
               <div className="flex items-start gap-2">
@@ -1542,7 +1542,7 @@ function AttendanceFollowupPanel({
             className={[
               "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
               canSaveFollowup
-                ? "bg-stone-950 text-white hover:bg-stone-800"
+                ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
                 : "bg-stone-300 text-stone-600",
             ].join(" ")}
           >
@@ -1563,8 +1563,8 @@ function AttendanceFollowupPanel({
                 className={[
                   "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
                   canSendMessage
-                    ? "bg-emerald-700 text-white hover:bg-emerald-800"
-                    : "bg-emerald-200 text-emerald-900",
+                    ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                    : "bg-[#C9D6E2] text-[#244B67]",
                 ].join(" ")}
               >
                 <Send size={17} />
@@ -1583,7 +1583,7 @@ function AttendanceFollowupPanel({
                     "rounded-md border p-3 text-sm leading-6",
                     messageSendError
                       ? "border-red-200 bg-red-50 text-red-900"
-                      : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                      : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
                   ].join(" ")}
                 >
                   <div className="flex items-start gap-2">
@@ -1987,7 +1987,7 @@ function createDefaultNote(status: AttendanceStatus) {
 function attendanceStatusClass(status: AttendanceStatus) {
   const classes: Record<AttendanceStatus, string> = {
     pending: "bg-stone-100 text-stone-600",
-    present: "bg-emerald-50 text-emerald-800",
+    present: "bg-[#EAF1F8] text-[#315C7C]",
     late: "bg-amber-50 text-amber-800",
     absent: "bg-red-50 text-red-800",
     makeup: "bg-blue-50 text-blue-800",
@@ -2001,7 +2001,7 @@ function attendanceStatusClass(status: AttendanceStatus) {
 function compactStatusActiveClass(status: AttendanceStatus) {
   const classes: Record<AttendanceStatus, string> = {
     pending: "border-stone-300 bg-stone-100",
-    present: "border-emerald-200 bg-emerald-50",
+    present: "border-[#C9D6E2] bg-[#EAF1F8]",
     late: "border-amber-200 bg-amber-50",
     absent: "border-red-200 bg-red-50",
     makeup: "border-blue-200 bg-blue-50",
@@ -2044,7 +2044,7 @@ function contactStatusClass(item: AttendanceActionItem) {
   }
 
   if (item.followupStatus === "sent") {
-    return "bg-emerald-50 text-emerald-900";
+    return "bg-[#EAF1F8] text-[#244B67]";
   }
 
   if (item.followupStatus === "failed") {

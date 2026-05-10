@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, ClipboardList, FileSpreadsheet, GraduationCap, Pencil, Plus, UserPlus, UsersRound } from "lucide-react";
+import { ClipboardList, FileSpreadsheet, Pencil, Plus, UserPlus } from "lucide-react";
 import type {
   BulkScheduleFormState,
   ClassFormState,
@@ -19,7 +19,7 @@ import type {
   StudentScheduleFilter,
   StudentSortMode,
 } from "@/app/app/management-types";
-import { ManagementPanel, SummaryCard } from "@/app/app/management-common";
+import { ManagementPanel } from "@/app/app/management-common";
 import {
   BulkScheduleForm,
   ClassForm,
@@ -31,6 +31,8 @@ import { roleLabel } from "@/app/app/management-utils";
 import { StudentBulkImportForm } from "@/app/app/student-bulk-import";
 import { StudentDirectory } from "@/app/app/student-directory";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
+
+type ManagementSection = "students" | "classes" | "members" | "settings";
 
 export function ManagementHome({
   academyName,
@@ -92,11 +94,11 @@ export function ManagementHome({
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     students[0]?.id ?? null,
   );
+  const [activeSection, setActiveSection] = useState<ManagementSection>("students");
   const activeStudents = useMemo(
     () => students.filter((student) => student.status === "active"),
     [students],
   );
-  const inactiveStudents = students.length - activeStudents.length;
   const teacherOptions = members.filter((member) =>
     member.status === "active" &&
     ["owner", "manager", "teacher", "assistant"].includes(member.role),
@@ -668,53 +670,86 @@ export function ManagementHome({
     }
   }
 
+  const managementSections: Array<{
+    id: ManagementSection;
+    label: string;
+    detail: string;
+    count: string;
+  }> = [
+    { id: "students", label: "학생", detail: "명단·스케줄·연락처", count: `${activeStudents.length}` },
+    { id: "classes", label: "반", detail: "반·담당·일괄 스케줄", count: `${classes.length}` },
+    { id: "members", label: "구성원", detail: "권한·계정·담당 반", count: `${members.length}` },
+    { id: "settings", label: "설정", detail: "발신·정책·권한", count: "정책" },
+  ];
+
   return (
-    <div className="space-y-4 sm:space-y-5">
-      <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-medium text-emerald-700">{academyName}</p>
-            <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
-              학원 기본 관리
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-              실제 등록 기능을 붙이기 전에, 원장이 확인해야 하는 학생·반·구성원 정보를
-              한 화면에 모았습니다.
-            </p>
+    <div className="space-y-4 text-[#1C1917] sm:space-y-5">
+      <MobileAdminInbox
+        activeStudents={activeStudents.length}
+        missingSchedules={students.filter((student) => student.schedules.filter((schedule) => schedule.isActive).length === 0).length}
+        classCount={classes.length}
+        memberCount={members.length}
+        onShowStudents={() => setActiveSection("students")}
+        onShowClasses={() => setActiveSection("classes")}
+      />
+
+      <section className="border-b border-[#DED8CE] bg-transparent sm:rounded-lg sm:border sm:border-[#E2DED6] sm:bg-white sm:shadow-sm">
+        <div className="hidden px-4 py-4 sm:block sm:px-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
+            Academy Admin
+          </p>
+          <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <h2 className="text-xl font-semibold leading-tight text-stone-950 sm:text-2xl">
+                {academyName}
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-stone-600">
+                학생, 반, 구성원, 발송 정책을 한 곳에서 관리합니다.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-4 rounded-md border border-[#E2DED6] bg-[#F7F5F0] px-4 py-2.5 text-sm sm:gap-6">
+              <Metric label="재원" value={`${activeStudents.length}명`} />
+              <Metric label="스케줄 미등록" value={`${students.filter((student) => student.schedules.filter((schedule) => schedule.isActive).length === 0).length}명`} />
+              <Metric label="반" value={`${classes.length}개`} />
+            </div>
           </div>
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-900">
-            학생 등록 후 주간 스케줄 입력 화면으로 이어지게 확장합니다.
+        </div>
+
+        <div className="px-0 py-2 sm:border-t sm:border-[#E2DED6] sm:px-5">
+          <div className="flex gap-1.5 overflow-x-auto">
+          {managementSections.map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              onClick={() => setActiveSection(section.id)}
+              className={[
+                "shrink-0 rounded-md border px-3 py-2 text-left transition sm:px-3",
+                activeSection === section.id
+                  ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67]"
+                  : "border-transparent bg-white text-stone-700 hover:bg-[#F2F5F8]",
+              ].join(" ")}
+            >
+              <span className="flex items-center gap-2">
+                <span className="text-sm font-semibold">{section.label}</span>
+                <span
+                  className={[
+                    "rounded px-2 py-0.5 text-xs font-semibold",
+                    activeSection === section.id
+                      ? "bg-white text-[#244B67]"
+                      : "bg-[#F7F5F0] text-stone-600",
+                  ].join(" ")}
+                >
+                  {section.count}
+                </span>
+              </span>
+              <span className="sr-only">{section.detail}</span>
+            </button>
+          ))}
           </div>
         </div>
       </section>
 
-      <section className="grid min-w-0 grid-cols-2 gap-3 lg:grid-cols-4">
-        <SummaryCard
-          icon={<GraduationCap size={19} />}
-          label="재원 학생"
-          value={`${activeStudents.length}명`}
-          detail={inactiveStudents > 0 ? `비활성 ${inactiveStudents}명 별도 관리` : "팔로업 대상 기준"}
-        />
-        <SummaryCard
-          icon={<BookOpen size={19} />}
-          label="반"
-          value={`${classes.length}개`}
-          detail="운영 보드 반 목록과 연결"
-        />
-        <SummaryCard
-          icon={<UsersRound size={19} />}
-          label="구성원"
-          value={`${members.length}명`}
-          detail="원장·관리자·선생님 권한"
-        />
-        <SummaryCard
-          icon={<ClipboardList size={19} />}
-          label="등록 준비"
-          value="3개 화면"
-          detail="학생, 반, 선생님"
-        />
-      </section>
-
+      {activeSection === "settings" ? (
       <ManagementPanel
         title="학원 운영 설정"
         description="서비스에 표시되는 학원명과 문자 발송 정책을 관리합니다."
@@ -731,7 +766,7 @@ export function ManagementHome({
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, academyName: event.target.value })
               }
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
@@ -743,7 +778,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderName: event.target.value })
               }
               placeholder="문자에 표시할 학원명"
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
@@ -755,7 +790,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderPhone: event.target.value })
               }
               placeholder="0410000000"
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
@@ -771,7 +806,7 @@ export function ManagementHome({
                   duplicateGuardMinutes: Number(event.target.value),
                 })
               }
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
@@ -782,7 +817,7 @@ export function ManagementHome({
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, smsDryRun: event.target.checked })
               }
-              className="size-4 accent-emerald-700"
+              className="size-4 accent-[#315C7C]"
             />
             실제 문자 발송 막기
           </label>
@@ -797,7 +832,7 @@ export function ManagementHome({
                   allowAssistantSend: event.target.checked,
                 })
               }
-              className="size-4 accent-emerald-700"
+              className="size-4 accent-[#315C7C]"
             />
             보조 선생님 발송 허용
           </label>
@@ -808,7 +843,7 @@ export function ManagementHome({
             className={[
               "mt-3 rounded-md border px-3 py-2 text-sm",
               settingsFormStatus.status === "saved"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -816,8 +851,9 @@ export function ManagementHome({
           </p>
         ) : null}
       </ManagementPanel>
+      ) : null}
 
-      <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
+      {activeSection === "classes" ? (
         <ManagementPanel
           title="반 관리"
           description="반 이름, 과목, 학년, 담당 선생님을 등록하고 수정합니다."
@@ -858,7 +894,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-md border px-3 py-2 text-sm",
                 classFormStatus.status === "saved"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -872,7 +908,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-md border px-3 py-2 text-sm",
                 bulkScheduleFormStatus.status === "saved"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -880,30 +916,36 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="divide-y divide-stone-100">
+          <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+            <div className="hidden grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
+              <span>반</span>
+              <span>과목</span>
+              <span>학년</span>
+              <span>담당</span>
+              <span className="text-right">작업</span>
+            </div>
             {classes.map((classItem) => (
               <div
                 key={classItem.id}
-                className="grid min-w-0 gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                className="grid min-w-0 gap-3 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] md:items-center"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-stone-950">{classItem.name}</p>
-                  <p className="mt-1 break-words text-xs text-stone-500">
-                    {[classItem.subject, classItem.gradeLabel].filter(Boolean).join(" · ") ||
-                      "과목/학년 미지정"}
-                  </p>
-                  <p className="mt-1 break-words text-xs text-stone-500">
-                    담당: {classItem.teacherName ?? "미지정"}
+                  <p className="mt-1 text-xs text-stone-500 md:hidden">
+                    {[classItem.subject, classItem.gradeLabel, classItem.teacherName ?? "담당 미지정"].filter(Boolean).join(" · ")}
                   </p>
                 </div>
-                <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
-                  <span className="w-fit shrink-0 rounded-md bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700">
+                <p className="hidden text-sm text-stone-700 md:block">{classItem.subject ?? "-"}</p>
+                <p className="hidden text-sm text-stone-700 md:block">{classItem.gradeLabel ?? "-"}</p>
+                <p className="hidden truncate text-sm text-stone-700 md:block">{classItem.teacherName ?? "미지정"}</p>
+                <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
+                  <span className="w-fit shrink-0 rounded-md bg-[#F7F5F0] px-2.5 py-1 text-xs font-semibold text-stone-700">
                     학생 {classItem.studentCount}명
                   </span>
                   <button
                     type="button"
                     onClick={() => openBulkScheduleForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2.5 text-xs font-semibold text-violet-900 transition hover:border-violet-300 hover:bg-violet-100"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#C9D6E2] bg-white px-2.5 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8]"
                   >
                     <ClipboardList size={13} />
                     스케줄
@@ -911,7 +953,7 @@ export function ManagementHome({
                   <button
                     type="button"
                     onClick={() => openEditClassForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0]"
                   >
                     <Pencil size={13} />
                     수정
@@ -921,7 +963,9 @@ export function ManagementHome({
             ))}
           </div>
         </ManagementPanel>
+      ) : null}
 
+      {activeSection === "members" ? (
         <ManagementPanel
           title="구성원 관리"
           description="원장, 관리자, 선생님 계정을 생성하고 권한과 활성 상태를 관리합니다."
@@ -947,7 +991,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-md border px-3 py-2 text-sm",
                 memberFormStatus.status === "saved"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -955,50 +999,43 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="space-y-2">
+          <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+            <div className="hidden grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
+              <span>이름</span>
+              <span>이메일</span>
+              <span>역할</span>
+              <span>전화번호</span>
+              <span>담당 반</span>
+              <span className="text-right">작업</span>
+            </div>
             {members.map((member) => (
-              <div key={member.id} className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-stone-950">{member.name}</p>
-                    <p className="mt-1 truncate text-xs text-stone-500">{member.email}</p>
-                    <p className="mt-1 text-xs text-stone-500">
-                      {member.maskedPhone ?? "전화번호 미등록"}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-stone-700">
-                      {roleLabel(member.role)}
-                    </span>
-                    <span
-                      className={[
-                        "rounded-md px-2 py-1 text-xs font-semibold",
-                        member.status === "active"
-                          ? "bg-emerald-50 text-emerald-800"
-                          : "bg-stone-200 text-stone-700",
-                      ].join(" ")}
-                    >
-                      {member.status === "active" ? "활성" : "비활성"}
-                    </span>
-                  </div>
+              <div
+                key={member.id}
+                className="grid min-w-0 gap-2 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] md:items-center"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-stone-950">{member.name}</p>
+                  <p className="mt-1 truncate text-xs text-stone-500 md:hidden">{member.email}</p>
                 </div>
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                  <p className="min-w-0 text-xs text-stone-500">담당 반 {member.classCount}개</p>
-                  <button
-                    type="button"
-                    onClick={() => openEditMemberForm(member)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
-                  >
-                    <Pencil size={13} />
-                    수정
-                  </button>
-                </div>
+                <p className="hidden truncate text-sm text-stone-700 md:block">{member.email}</p>
+                <p className="text-sm text-stone-700">{roleLabel(member.role)}</p>
+                <p className="text-sm text-stone-700">{member.maskedPhone ?? "미등록"}</p>
+                <p className="text-sm text-stone-700">담당 {member.classCount}개</p>
+                <button
+                  type="button"
+                  onClick={() => openEditMemberForm(member)}
+                  className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0] md:ml-auto"
+                >
+                  <Pencil size={13} />
+                  수정
+                </button>
               </div>
             ))}
           </div>
         </ManagementPanel>
-      </section>
+      ) : null}
 
+      {activeSection === "students" ? (
       <ManagementPanel
         title="학생 관리"
         description="학생과 학부모 연락처는 팔로업 발송의 기준 데이터입니다."
@@ -1006,17 +1043,17 @@ export function ManagementHome({
         actionIcon={<Plus size={14} />}
         onAction={openCreateStudentForm}
       >
-        <div className="mb-3 flex flex-col gap-2 rounded-lg border border-stone-200 bg-stone-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-3 flex items-center justify-between gap-2 rounded-md border border-[#E6E0D5] bg-white p-2.5 sm:mb-4 sm:bg-[#F7F5F0] sm:p-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-stone-950">초기 세팅은 일괄 등록으로 시작합니다.</p>
-            <p className="mt-1 text-xs leading-5 text-stone-500">
+            <p className="mt-1 hidden text-xs leading-5 text-stone-500 sm:block">
               200명 규모에서도 학생 목록, 검색, 스케줄 입력 화면이 깨지지 않는지 같이 확인합니다.
             </p>
           </div>
           <button
             type="button"
             onClick={openBulkStudentImport}
-            className="flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border border-sky-200 bg-white px-3 text-xs font-semibold text-sky-800 transition hover:border-sky-300 hover:bg-sky-50 sm:w-auto"
+            className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] sm:min-h-10"
           >
             <FileSpreadsheet size={14} />
             CSV 일괄 등록
@@ -1042,7 +1079,7 @@ export function ManagementHome({
             className={[
               "mb-3 rounded-md border px-3 py-2 text-sm",
               bulkStudentImportStatus.status === "saved"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -1069,7 +1106,7 @@ export function ManagementHome({
             className={[
               "mb-3 rounded-md border px-3 py-2 text-sm",
               studentFormStatus.status === "saved"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -1097,7 +1134,7 @@ export function ManagementHome({
             className={[
               "mb-3 rounded-md border px-3 py-2 text-sm",
               scheduleFormStatus.status === "saved"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -1125,6 +1162,99 @@ export function ManagementHome({
           onEditSchedule={openEditScheduleForm}
         />
       </ManagementPanel>
+      ) : null}
     </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-xs font-medium text-stone-500">{label}</p>
+      <p className="mt-1 truncate text-lg font-semibold text-stone-950">{value}</p>
+    </div>
+  );
+}
+
+function MobileAdminInbox({
+  activeStudents,
+  missingSchedules,
+  classCount,
+  memberCount,
+  onShowStudents,
+  onShowClasses,
+}: {
+  activeStudents: number;
+  missingSchedules: number;
+  classCount: number;
+  memberCount: number;
+  onShowStudents: () => void;
+  onShowClasses: () => void;
+}) {
+  return (
+    <section className="space-y-3 sm:hidden">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
+          오늘 관리 큐
+        </p>
+        <h2 className="mt-1 text-2xl font-semibold text-stone-950">처리할 항목</h2>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white">
+        <button
+          type="button"
+          onClick={onShowStudents}
+          className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[#EEE7DC] px-4 py-3 text-left"
+        >
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-stone-950">
+              스케줄 미등록 학생
+            </span>
+            <span className="mt-0.5 block text-xs text-stone-500">
+              학생 상세에서 수업 스케줄을 바로 추가합니다.
+            </span>
+          </span>
+          <span className="text-lg font-semibold tabular-nums text-[#315C7C]">
+            {missingSchedules}명
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onShowStudents}
+          className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[#EEE7DC] px-4 py-3 text-left"
+        >
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-stone-950">
+              재원 학생 명단
+            </span>
+            <span className="mt-0.5 block text-xs text-stone-500">
+              검색과 필터로 학생, 학부모, 반 정보를 확인합니다.
+            </span>
+          </span>
+          <span className="text-lg font-semibold tabular-nums text-stone-900">
+            {activeStudents}명
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onShowClasses}
+          className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left"
+        >
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-stone-950">
+              반 / 구성원 세팅
+            </span>
+            <span className="mt-0.5 block text-xs text-stone-500">
+              반 {classCount}개 · 구성원 {memberCount}명
+            </span>
+          </span>
+          <span className="rounded-full bg-[#F3EFE7] px-2.5 py-1 text-xs font-semibold text-stone-700">
+            관리
+          </span>
+        </button>
+      </div>
+    </section>
   );
 }

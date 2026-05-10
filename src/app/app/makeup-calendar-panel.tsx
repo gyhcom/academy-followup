@@ -91,7 +91,7 @@ export function MakeupCalendarPanel({
     >
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
-          <CalendarDays className="text-emerald-700" size={18} />
+          <CalendarDays className="text-[#315C7C]" size={18} />
           <h2 id="makeup-calendar-title" className="text-sm font-semibold text-stone-950">
             보강 달력
           </h2>
@@ -147,9 +147,9 @@ export function MakeupCalendarPanel({
                   className={[
                     "relative min-h-12 rounded-md border px-1 py-1 text-left transition",
                     isActive
-                      ? "border-stone-950 bg-stone-950 text-white"
+                      ? "border-[#315C7C] bg-[#315C7C] text-white"
                       : day.isCurrentMonth
-                        ? "border-stone-200 bg-white text-stone-900 hover:border-emerald-300"
+                        ? "border-stone-200 bg-white text-stone-900 hover:border-[#315C7C]"
                         : "border-stone-100 bg-stone-100 text-stone-400",
                   ].join(" ")}
                 >
@@ -161,7 +161,7 @@ export function MakeupCalendarPanel({
                       <span
                         className={[
                           "h-1.5 w-4 rounded-full",
-                          day.hasExternalSchedule ? "bg-amber-400" : "bg-emerald-400",
+                          day.hasExternalSchedule ? "bg-amber-400" : "bg-[#315C7C]",
                         ].join(" ")}
                       />
                     ) : null}
@@ -169,7 +169,7 @@ export function MakeupCalendarPanel({
                       <span
                         className={[
                           "h-1.5 w-1.5 rounded-full",
-                          isActive ? "bg-white" : "bg-stone-950",
+                          isActive ? "bg-white" : "bg-[#315C7C]",
                         ].join(" ")}
                       />
                     ) : null}
@@ -203,7 +203,7 @@ export function MakeupCalendarPanel({
                 type="time"
                 value={startTime}
                 onChange={(event) => setStartTime(event.target.value)}
-                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
               />
             </label>
             <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
@@ -212,7 +212,7 @@ export function MakeupCalendarPanel({
                 type="time"
                 value={endTime}
                 onChange={(event) => setEndTime(event.target.value)}
-                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
               />
             </label>
           </div>
@@ -230,8 +230,8 @@ export function MakeupCalendarPanel({
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition",
             selectedStudent && isTimeRangeValid
               ? isSelected
-                ? "bg-emerald-800 text-white"
-                : "bg-emerald-700 text-white hover:bg-emerald-800"
+                ? "bg-[#244B67] text-white"
+                : "bg-[#315C7C] text-white hover:bg-[#244B67]"
               : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >

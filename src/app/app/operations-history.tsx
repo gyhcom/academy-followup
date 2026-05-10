@@ -36,7 +36,7 @@ export function StudentFollowupHistory({
     >
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
-          <History className="text-emerald-700" size={18} />
+          <History className="text-[#315C7C]" size={18} />
           <h2
             id="student-followup-history-title"
             className="text-sm font-semibold text-stone-950"
@@ -93,7 +93,7 @@ export function StudentFollowupHistory({
                     </p>
                   </div>
                   {item.status === "sent" ? (
-                    <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-700" size={17} />
+                    <CheckCircle2 className="mt-0.5 shrink-0 text-[#315C7C]" size={17} />
                   ) : item.status === "failed" ? (
                     <AlertCircle className="mt-0.5 shrink-0 text-red-700" size={17} />
                   ) : (
@@ -139,7 +139,7 @@ function HistoryMessage({
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     draft: "border-amber-200 bg-amber-50 text-amber-800",
-    sent: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    sent: "border-[#C9D6E2] bg-[#EAF1F8] text-[#315C7C]",
     failed: "border-red-200 bg-red-50 text-red-800",
   };
 

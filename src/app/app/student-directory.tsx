@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ListFilter, Pencil, Search, SlidersHorizontal, X } from "lucide-react";
+import { CalendarDays, ChevronRight, Pencil, Search, SlidersHorizontal, X } from "lucide-react";
 import {
   type FollowupHistoryItem,
   type FollowupHistoryState,
@@ -19,7 +19,6 @@ import {
   getActiveSchedules,
   getPrimarySchedule,
   groupSchedulesByDay,
-  scheduleTypeChipClass,
   scheduleTypeLabel,
   weekDayLabel,
   weekDayShortLabel,
@@ -122,13 +121,13 @@ export function StudentDirectory({
     filteredStudents[0] ??
     null;
 
-  function selectStudent(studentId: string) {
+  function selectStudent(studentId: string, openDetail = false) {
     onSelectStudent(studentId);
-    setIsMobileDetailOpen(true);
+    setIsMobileDetailOpen(openDetail);
   }
 
   return (
-    <div className="space-y-3">
+    <div className="min-w-0 overflow-hidden bg-transparent sm:rounded-lg sm:border sm:border-[#E6E0D5] sm:bg-white">
       <StudentDirectoryToolbar
         students={students}
         classes={classes}
@@ -146,37 +145,22 @@ export function StudentDirectory({
       />
 
       {students.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-stone-300 bg-stone-50 p-5 text-center">
+        <div className="border-t border-[#E6E0D5] px-4 py-12 text-center">
           <p className="text-sm font-semibold text-stone-900">아직 등록된 학생이 없습니다.</p>
-          <p className="mt-1 text-sm text-stone-500">학생을 먼저 등록하면 운영 보드에 표시됩니다.</p>
+          <p className="mt-1 text-sm text-stone-500">CSV 일괄 등록 또는 학생 등록으로 시작합니다.</p>
         </div>
       ) : (
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_390px]">
-          <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-            <div className="grid grid-cols-[104px_minmax(0,1fr)_86px] gap-3 border-b border-stone-200 bg-stone-50 px-3 py-2 text-xs font-semibold text-stone-500 sm:grid-cols-[132px_minmax(0,1fr)_128px]">
-              <span>시간</span>
-              <span>학생</span>
-              <span className="text-right">상태</span>
-            </div>
-            <div className="max-h-[680px] overflow-y-auto">
-              {filteredStudents.map((student) => (
-                <StudentListRow
-                  key={student.id}
-                  student={student}
-                  isSelected={student.id === selectedStudent?.id}
-                  onSelect={() => selectStudent(student.id)}
-                />
-              ))}
-              {filteredStudents.length === 0 ? (
-                <div className="px-4 py-10 text-center">
-                  <p className="text-sm font-semibold text-stone-900">조건에 맞는 학생이 없습니다.</p>
-                  <p className="mt-1 text-sm text-stone-500">검색어와 필터를 조정해 주세요.</p>
-                </div>
-              ) : null}
-            </div>
+        <div className="grid min-h-[620px] lg:grid-cols-[minmax(0,1fr)_420px]">
+          <div className="min-w-0 border-t border-[#E6E0D5] lg:border-r lg:border-[#E6E0D5]">
+            <StudentResourceTable
+              students={filteredStudents}
+              selectedStudentId={selectedStudent?.id ?? null}
+              onSelectStudent={(studentId) => selectStudent(studentId, false)}
+              onOpenMobileDetail={(studentId) => selectStudent(studentId, true)}
+            />
           </div>
 
-          <div className="hidden lg:block">
+          <div className="hidden min-w-0 border-t border-[#E6E0D5] bg-[#F7F5F0]/70 lg:block">
             <StudentDetailPanel
               student={selectedStudent}
               onEditStudent={onEditStudent}
@@ -238,8 +222,8 @@ export function StudentDirectoryToolbar({
   ].filter(Boolean).length;
 
   return (
-    <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-      <div className="grid gap-2 lg:grid-cols-[minmax(220px,1fr)_auto] lg:items-center">
+    <div className="space-y-2 bg-transparent pb-3 sm:bg-[#FFFCF7] sm:p-3">
+      <div className="grid gap-2 xl:grid-cols-[minmax(260px,1fr)_auto] xl:items-center">
         <label className="relative block">
           <Search
             size={16}
@@ -249,21 +233,18 @@ export function StudentDirectoryToolbar({
             value={searchQuery}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="학생명, 반, 학교, 학부모 검색"
-            className="min-h-11 w-full rounded-md border border-stone-300 bg-white pl-9 pr-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            className="min-h-10 w-full rounded-md border border-[#D8D0C4] bg-white pl-9 pr-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
           />
         </label>
 
-        <div className="flex items-center justify-between gap-2 rounded-md bg-white px-3 py-2 text-xs font-semibold text-stone-600">
-          <span className="flex min-w-0 items-center gap-2">
-            <ListFilter size={14} className="shrink-0" />
-            <span className="truncate">
-              {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
-            </span>
+        <div className="flex items-center justify-between gap-2 rounded-md border border-[#E6E0D5] bg-white px-3 py-2 text-xs font-semibold text-stone-600 sm:bg-[#F7F5F0]">
+          <span className="truncate">
+            {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
           </span>
           <button
             type="button"
             onClick={() => setIsFilterOpen((current) => !current)}
-            className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-700 lg:hidden"
+            className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2 text-xs font-semibold text-stone-700 lg:hidden"
           >
             <SlidersHorizontal size={13} />
             필터{activeFilterCount > 0 ? ` ${activeFilterCount}` : ""}
@@ -272,7 +253,7 @@ export function StudentDirectoryToolbar({
       </div>
 
       {activeFilterCount > 0 ? (
-        <div className="mt-2 flex flex-wrap gap-1.5 lg:hidden">
+        <div className="flex flex-wrap gap-1.5 lg:hidden">
           {classFilter !== "all" ? (
             <FilterChip label={classes.find((item) => item.id === classFilter)?.name ?? "반 필터"} />
           ) : null}
@@ -284,14 +265,14 @@ export function StudentDirectoryToolbar({
 
       <div
         className={[
-          "mt-2 gap-2 sm:grid-cols-2 lg:grid lg:grid-cols-4",
+          "gap-2 sm:grid-cols-2 lg:grid lg:grid-cols-4",
           isFilterOpen ? "grid" : "hidden",
         ].join(" ")}
       >
         <select
           value={classFilter}
           onChange={(event) => onClassFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#315C7C]"
         >
           <option value="all">전체 반</option>
           {classes.map((classItem) => (
@@ -304,7 +285,7 @@ export function StudentDirectoryToolbar({
         <select
           value={statusFilter}
           onChange={(event) => onStatusFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#315C7C]"
         >
           <option value="all">전체 상태</option>
           <option value="active">재원</option>
@@ -315,7 +296,7 @@ export function StudentDirectoryToolbar({
         <select
           value={scheduleFilter}
           onChange={(event) => onScheduleFilterChange(event.target.value as StudentScheduleFilter)}
-          className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#315C7C]"
         >
           <option value="all">전체 스케줄</option>
           <option value="has_schedule">스케줄 있음</option>
@@ -326,7 +307,7 @@ export function StudentDirectoryToolbar({
         <select
           value={sortMode}
           onChange={(event) => onSortModeChange(event.target.value as StudentSortMode)}
-          className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#315C7C]"
         >
           <option value="time">요일·시간순</option>
           <option value="name">이름순</option>
@@ -337,9 +318,130 @@ export function StudentDirectoryToolbar({
   );
 }
 
+function StudentResourceTable({
+  students,
+  selectedStudentId,
+  onSelectStudent,
+  onOpenMobileDetail,
+}: {
+  students: ManagementStudent[];
+  selectedStudentId: string | null;
+  onSelectStudent: (studentId: string) => void;
+  onOpenMobileDetail: (studentId: string) => void;
+}) {
+  if (students.length === 0) {
+    return (
+      <div className="px-4 py-12 text-center">
+        <p className="text-sm font-semibold text-stone-900">조건에 맞는 학생이 없습니다.</p>
+        <p className="mt-1 text-sm text-stone-500">검색어와 필터를 조정해 주세요.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-w-0">
+      <div className="hidden grid-cols-[minmax(150px,1.2fr)_minmax(150px,1fr)_80px_128px_104px_78px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 lg:grid">
+        <span>학생</span>
+        <span>반</span>
+        <span>학년</span>
+        <span>보호자</span>
+        <span>스케줄</span>
+        <span className="text-right">상태</span>
+      </div>
+      <div className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white sm:max-h-[680px] sm:overflow-y-auto sm:rounded-none sm:border-0 sm:bg-transparent">
+        {students.map((student) => (
+          <StudentResourceRow
+            key={student.id}
+            student={student}
+            isSelected={student.id === selectedStudentId}
+            onSelect={() => onSelectStudent(student.id)}
+            onOpenMobileDetail={() => onOpenMobileDetail(student.id)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StudentResourceRow({
+  student,
+  isSelected,
+  onSelect,
+  onOpenMobileDetail,
+}: {
+  student: ManagementStudent;
+  isSelected: boolean;
+  onSelect: () => void;
+  onOpenMobileDetail: () => void;
+}) {
+  const primarySchedule = getPrimarySchedule(student);
+  const activeSchedules = getActiveSchedules(student);
+
+  return (
+    <div
+      className={[
+        "border-b border-[#EFE9DE] transition last:border-b-0",
+        isSelected ? "bg-[#EAF1F8]" : "bg-white hover:bg-[#FBFAF7]",
+      ].join(" ")}
+    >
+      <button
+        type="button"
+        onClick={onOpenMobileDetail}
+        className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-3 px-4 py-4 text-left sm:px-3 sm:py-3 lg:hidden"
+      >
+        <span className="min-w-0">
+          <span className="block truncate text-sm font-semibold text-stone-950">{student.name}</span>
+          <span className="mt-1 block truncate text-xs text-stone-500">
+            {student.className ?? "미배정"} · {student.gradeLabel ?? "학년 미지정"}
+          </span>
+          <span className="mt-1 block truncate text-xs text-stone-500">
+            {primarySchedule
+              ? `${primarySchedule.scheduleDate ? formatShortDate(primarySchedule.scheduleDate) : weekDayShortLabel(primarySchedule.dayOfWeek)} ${primarySchedule.startTime}`
+              : "스케줄 미등록"} · {student.maskedParentPhone}
+          </span>
+        </span>
+        <span className="flex shrink-0 items-center gap-2">
+          <StatusBadge status={student.status} />
+          <ChevronRight size={16} className="text-stone-400" />
+        </span>
+      </button>
+
+      <button
+        type="button"
+        onClick={onSelect}
+        className="hidden w-full grid-cols-[minmax(150px,1.2fr)_minmax(150px,1fr)_80px_128px_104px_78px] items-center gap-3 px-3 py-3 text-left lg:grid"
+      >
+        <span className="min-w-0">
+          <span className="block truncate text-sm font-semibold text-stone-950">{student.name}</span>
+          <span className="mt-0.5 block truncate text-xs text-stone-500">
+            {student.schoolName ?? "학교 미지정"}
+          </span>
+        </span>
+        <span className="truncate text-sm text-stone-700">{student.className ?? "미배정"}</span>
+        <span className="text-sm text-stone-600">{student.gradeLabel ?? "-"}</span>
+        <span className="min-w-0">
+          <span className="block truncate text-sm text-stone-700">{student.parentName ?? "학부모"}</span>
+          <span className="mt-0.5 block truncate text-xs text-stone-500">{student.maskedParentPhone}</span>
+        </span>
+        <span className="min-w-0">
+          <span className="block truncate text-sm text-stone-700">
+            {primarySchedule
+              ? `${primarySchedule.scheduleDate ? formatShortDate(primarySchedule.scheduleDate) : weekDayShortLabel(primarySchedule.dayOfWeek)} ${primarySchedule.startTime}`
+              : "미등록"}
+          </span>
+          <span className="mt-0.5 block truncate text-xs text-stone-500">{activeSchedules.length}개 일정</span>
+        </span>
+        <span className="flex justify-end">
+          <StatusBadge status={student.status} />
+        </span>
+      </button>
+    </div>
+  );
+}
+
 function FilterChip({ label }: { label: string }) {
   return (
-    <span className="rounded-md bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-800">
+    <span className="rounded-md bg-[#EAF1F8] px-2 py-1 text-[11px] font-semibold text-[#315C7C]">
       {label}
     </span>
   );
@@ -377,92 +479,6 @@ function sortModeLabel(sortMode: StudentSortMode) {
   return labels[sortMode];
 }
 
-function StudentListRow({
-  student,
-  isSelected,
-  onSelect,
-}: {
-  student: ManagementStudent;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  const primarySchedule = getPrimarySchedule(student);
-  const activeSchedules = getActiveSchedules(student);
-
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={[
-        "grid w-full grid-cols-[104px_minmax(0,1fr)_86px] gap-3 border-b border-stone-100 px-3 py-3 text-left transition last:border-b-0 sm:grid-cols-[132px_minmax(0,1fr)_128px]",
-        isSelected ? "bg-emerald-50" : "bg-white hover:bg-stone-50",
-      ].join(" ")}
-    >
-      <div
-        className={[
-          "rounded-md border px-2.5 py-2",
-          primarySchedule
-            ? "border-stone-300 bg-stone-950 text-white"
-            : "border-dashed border-stone-300 bg-stone-50 text-stone-500",
-        ].join(" ")}
-      >
-        <p className="text-[11px] font-semibold leading-none">
-          {primarySchedule
-            ? primarySchedule.scheduleDate
-              ? "1회"
-              : weekDayShortLabel(primarySchedule.dayOfWeek)
-            : "미등록"}
-        </p>
-        <p className="mt-1 text-base font-semibold leading-none">
-          {primarySchedule ? primarySchedule.startTime : "--:--"}
-        </p>
-        <p className="mt-1 text-[11px] leading-none opacity-75">
-          {primarySchedule ? `~ ${primarySchedule.endTime}` : "스케줄 없음"}
-        </p>
-      </div>
-
-      <div className="min-w-0">
-        <div className="flex min-w-0 items-center gap-2">
-          <p className="truncate text-sm font-semibold text-stone-950">{student.name}</p>
-          <span className="hidden shrink-0 rounded bg-stone-100 px-1.5 py-0.5 text-[11px] font-semibold text-stone-600 sm:inline">
-            {student.gradeLabel ?? "학년 미지정"}
-          </span>
-        </div>
-        <p className="mt-1 truncate text-xs text-stone-500">
-          {student.className ?? "미배정"} · {student.schoolName ?? "학교 미지정"}
-        </p>
-        <div className="mt-2 flex gap-1 overflow-hidden">
-          {activeSchedules.slice(0, 3).map((schedule) => (
-            <span
-              key={schedule.id}
-              className={[
-                "shrink-0 rounded px-1.5 py-0.5 text-[11px] font-semibold",
-                scheduleTypeChipClass(schedule.scheduleType),
-              ].join(" ")}
-            >
-              {schedule.scheduleDate
-                ? `${formatShortDate(schedule.scheduleDate)} ${schedule.startTime}`
-                : `${weekDayShortLabel(schedule.dayOfWeek)} ${schedule.startTime}`}
-            </span>
-          ))}
-          {activeSchedules.length === 0 ? (
-            <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800">
-              스케줄 미등록
-            </span>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="flex flex-col items-end gap-2">
-        <StatusBadge status={student.status} />
-        <span className="text-right text-xs font-medium text-stone-500">
-          {activeSchedules.length}개 일정
-        </span>
-      </div>
-    </button>
-  );
-}
-
 function StudentDetailSheet({
   student,
   isOpen,
@@ -487,26 +503,26 @@ function StudentDetailSheet({
       <button
         type="button"
         aria-label="학생 상세 닫기"
-        className="absolute inset-0 bg-stone-950/35"
+        className="absolute inset-0 bg-[#111827]/35"
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border border-stone-200 bg-white p-4 shadow-2xl">
-        <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-stone-300" />
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-stone-950">학생 상세</p>
-            <p className="mt-0.5 truncate text-xs text-stone-500">
-              목록으로 돌아가려면 닫기를 누릅니다.
-            </p>
+      <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border border-[#E6E0D5] bg-[#FFFCF7] shadow-2xl">
+        <div className="sticky top-0 z-10 border-b border-[#E6E0D5] bg-[#FFFCF7] px-4 py-3">
+          <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-stone-300" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-stone-950">학생 상세</p>
+              <p className="mt-0.5 truncate text-xs text-stone-500">목록에서 선택한 학생의 운영 정보</p>
+            </div>
+            <button
+              type="button"
+              aria-label="학생 상세 닫기"
+              onClick={onClose}
+              className="flex size-9 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+            >
+              <X size={16} />
+            </button>
           </div>
-          <button
-            type="button"
-            aria-label="학생 상세 닫기"
-            onClick={onClose}
-            className="flex size-9 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
-          >
-            <X size={16} />
-          </button>
         </div>
         <StudentDetailPanel
           student={student}
@@ -539,11 +555,13 @@ function StudentDetailPanel({
   onCreateSchedule: (student: ManagementStudent) => void;
   onEditSchedule: (student: ManagementStudent, schedule: ManagementStudentSchedule) => void;
 }) {
+  const history = useStudentHistory(student?.id ?? null);
+
   if (!student) {
     return (
-      <aside className="rounded-lg border border-dashed border-stone-300 bg-stone-50 p-5 text-center">
+      <aside className="p-5 text-center">
         <p className="text-sm font-semibold text-stone-900">선택된 학생이 없습니다.</p>
-        <p className="mt-1 text-sm text-stone-500">왼쪽 리스트에서 학생을 선택해 주세요.</p>
+        <p className="mt-1 text-sm text-stone-500">왼쪽 테이블에서 학생을 선택해 주세요.</p>
       </aside>
     );
   }
@@ -551,105 +569,73 @@ function StudentDetailPanel({
   const groupedSchedules = groupSchedulesByDay(student.schedules);
 
   return (
-    <aside className="rounded-lg border border-stone-200 bg-white p-4 lg:sticky lg:top-4 lg:self-start">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-lg font-semibold text-stone-950">{student.name}</p>
-          <p className="mt-1 truncate text-sm text-stone-500">
-            {student.className ?? "미배정"} · {student.gradeLabel ?? "학년 미지정"}
-          </p>
-          <p className="mt-1 truncate text-xs text-stone-500">
-            {student.parentName ?? "학부모"} · {student.maskedParentPhone}
-          </p>
+    <aside className="bg-[#FFFCF7] p-4 lg:sticky lg:top-4 lg:bg-transparent">
+      <div className="rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-lg font-semibold text-stone-950">{student.name}</p>
+            <p className="mt-1 truncate text-sm text-stone-500">
+              {student.className ?? "미배정"} · {student.gradeLabel ?? "학년 미지정"}
+            </p>
+            <p className="mt-1 truncate text-xs text-stone-500">
+              {student.parentName ?? "학부모"} · {student.maskedParentPhone}
+            </p>
+          </div>
+          <StatusBadge status={student.status} />
         </div>
-        <StatusBadge status={student.status} />
+
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => onEditStudent(student)}
+            className="flex min-h-10 items-center justify-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-3 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0]"
+          >
+            <Pencil size={13} />
+            학생 수정
+          </button>
+          <button
+            type="button"
+            onClick={() => onCreateSchedule(student)}
+            className="flex min-h-10 items-center justify-center gap-1 rounded-md bg-[#315C7C] px-3 text-xs font-semibold text-white transition hover:bg-[#244B67]"
+          >
+            <CalendarDays size={13} />
+            스케줄 추가
+          </button>
+        </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={() => onEditStudent(student)}
-          className="flex min-h-10 items-center justify-center gap-1 rounded-md border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
-        >
-          <Pencil size={13} />
-          학생 수정
-        </button>
-        <button
-          type="button"
-          onClick={() => onCreateSchedule(student)}
-          className="flex min-h-10 items-center justify-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100"
-        >
-          <CalendarDays size={13} />
-          스케줄 추가
-        </button>
-      </div>
-
-      <div className="mt-4 border-t border-stone-200 pt-4">
+      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-stone-950">주간 스케줄</p>
-          <p className="text-xs font-medium text-stone-500">
-            활성 {activeScheduleCount(student)}개
-          </p>
+          <p className="text-sm font-semibold text-stone-950">스케줄</p>
+          <p className="text-xs font-medium text-stone-500">활성 {activeScheduleCount(student)}개</p>
         </div>
 
         {groupedSchedules.length === 0 ? (
-          <div className="mt-3 rounded-lg border border-dashed border-stone-300 bg-stone-50 p-4 text-sm text-stone-500">
-            등록된 스케줄이 없습니다. 정규 수업이나 외부 일정을 추가해 주세요.
+          <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-4 text-sm text-stone-500">
+            등록된 스케줄이 없습니다.
           </div>
         ) : (
-          <div className="mt-3 space-y-3">
+          <div className="mt-3 divide-y divide-stone-100">
             {groupedSchedules.map(({ dayOfWeek, schedules }) => (
-              <div key={dayOfWeek}>
-                <p className="mb-1.5 text-xs font-semibold text-stone-500">
-                  {weekDayLabel(dayOfWeek)}
-                </p>
-                <div className="space-y-2">
+              <div key={dayOfWeek} className="py-3 first:pt-0 last:pb-0">
+                <p className="mb-2 text-xs font-semibold text-stone-500">{weekDayLabel(dayOfWeek)}</p>
+                <div className="space-y-1.5">
                   {schedules.map((schedule) => (
                     <button
                       key={schedule.id}
                       type="button"
                       onClick={() => onEditSchedule(student, schedule)}
-                      className={[
-                        "grid w-full grid-cols-[94px_minmax(0,1fr)] gap-3 rounded-md border px-3 py-2 text-left transition hover:border-stone-300 hover:bg-stone-50",
-                        schedule.isActive ? "border-stone-200 bg-white" : "border-stone-200 bg-stone-50 opacity-60",
-                      ].join(" ")}
+                      className="grid w-full grid-cols-[72px_minmax(0,1fr)_42px] items-center gap-3 rounded-md px-2 py-2 text-left transition hover:bg-[#F7F5F0]"
                     >
-                      <span className="rounded-md bg-stone-950 px-2 py-1.5 text-center text-white">
-                        <span className="block text-sm font-semibold leading-none">
-                          {schedule.startTime}
-                        </span>
-                        <span className="mt-1 block text-[11px] leading-none text-white/70">
-                          {schedule.endTime}
-                        </span>
-                        {schedule.scheduleDate ? (
-                          <span className="mt-1 block text-[10px] leading-none text-white/70">
-                            {formatShortDate(schedule.scheduleDate)}
-                          </span>
-                        ) : null}
-                      </span>
+                      <span className="text-sm font-semibold tabular-nums text-stone-950">{schedule.startTime}</span>
                       <span className="min-w-0">
-                        <span className="flex items-center gap-1">
-                          <span
-                            className={[
-                              "rounded px-1.5 py-0.5 text-[11px] font-semibold",
-                              scheduleTypeChipClass(schedule.scheduleType),
-                            ].join(" ")}
-                          >
-                            {scheduleTypeLabel(schedule.scheduleType)}
-                          </span>
-                          {!schedule.isActive ? (
-                            <span className="rounded bg-stone-200 px-1.5 py-0.5 text-[11px] font-semibold text-stone-600">
-                              비활성
-                            </span>
-                          ) : null}
-                        </span>
-                        <span className="mt-1 block truncate text-sm font-semibold text-stone-950">
-                          {schedule.title}
-                        </span>
+                        <span className="block truncate text-sm font-medium text-stone-900">{schedule.title}</span>
                         <span className="mt-0.5 block truncate text-xs text-stone-500">
-                          {[schedule.subject, schedule.memo].filter(Boolean).join(" · ") ||
-                            "메모 없음"}
+                          {[schedule.subject, schedule.memo].filter(Boolean).join(" · ") || "메모 없음"}
                         </span>
+                      </span>
+                      <span className="rounded bg-stone-100 px-1.5 py-0.5 text-center text-[11px] font-semibold text-stone-600">
+                        {scheduleTypeLabel(schedule.scheduleType)}
                       </span>
                     </button>
                   ))}
@@ -660,33 +646,39 @@ function StudentDetailPanel({
         )}
       </div>
 
-      <StudentContactHistoryPanel student={student} />
+      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
+        <StudentFollowupHistory selectedStudentName={student.name} history={history} />
+      </div>
     </aside>
   );
 }
 
-function StudentContactHistoryPanel({ student }: { student: ManagementStudent }) {
+function useStudentHistory(studentId: string | null): FollowupHistoryState {
   const [history, setHistory] = useState<FollowupHistoryState>({
-    studentId: student.id,
+    studentId: studentId ?? "",
     status: "idle",
     items: [],
     error: "",
   });
 
   useEffect(() => {
+    if (!studentId) {
+      return;
+    }
+
     const controller = new AbortController();
-    const studentId = student.id;
+    const activeStudentId = studentId;
 
     async function loadHistory() {
       setHistory((current) => ({
-        studentId,
+        studentId: activeStudentId,
         status: "loading",
-        items: current.studentId === studentId ? current.items : [],
+        items: current.studentId === activeStudentId ? current.items : [],
         error: "",
       }));
 
       try {
-        const response = await fetch(`/api/followups?studentId=${studentId}`, {
+        const response = await fetch(`/api/followups?studentId=${activeStudentId}`, {
           signal: controller.signal,
         });
         const payload = (await response.json()) as FollowupHistoryResponse;
@@ -696,7 +688,7 @@ function StudentContactHistoryPanel({ student }: { student: ManagementStudent })
         }
 
         setHistory({
-          studentId,
+          studentId: activeStudentId,
           status: "ready",
           items: payload.followups ?? [],
           error: "",
@@ -707,7 +699,7 @@ function StudentContactHistoryPanel({ student }: { student: ManagementStudent })
         }
 
         setHistory({
-          studentId,
+          studentId: activeStudentId,
           status: "error",
           items: [],
           error:
@@ -723,13 +715,9 @@ function StudentContactHistoryPanel({ student }: { student: ManagementStudent })
     return () => {
       controller.abort();
     };
-  }, [student.id]);
+  }, [studentId]);
 
-  return (
-    <div className="mt-4 border-t border-stone-200 pt-4">
-      <StudentFollowupHistory selectedStudentName={student.name} history={history} />
-    </div>
-  );
+  return history;
 }
 
 function formatShortDate(dateValue: string) {

@@ -703,10 +703,10 @@ export function OperationsBoard({
           : "pb-[max(1rem,env(safe-area-inset-bottom))]",
       ].join(" ")}
     >
-      <section className="rounded-lg border border-stone-200 bg-white px-4 py-4 shadow-sm sm:px-5">
+      <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-emerald-700">{academyName}</p>
+            <p className="text-sm font-medium text-[#315C7C]">{academyName}</p>
             <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
               수업 후 바로 보내기
             </h2>
@@ -738,7 +738,7 @@ export function OperationsBoard({
                 className={[
                   "min-h-11 shrink-0 rounded-md border px-3 text-left transition",
                   isSelected
-                    ? "border-stone-950 bg-stone-950 text-white"
+                    ? "border-[#315C7C] bg-[#315C7C] text-white"
                     : "border-stone-200 bg-white text-stone-700 hover:border-stone-300",
                 ].join(" ")}
               >
@@ -773,7 +773,7 @@ export function OperationsBoard({
             </span>
           </div>
 
-          <div className="space-y-2">
+          <div className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm">
             {selectedClass?.students.length ? (
               selectedClass.students.map((student) => {
                 const isSelected = student.id === selectedStudent?.id;
@@ -782,10 +782,10 @@ export function OperationsBoard({
                   <article
                     key={student.id}
                     className={[
-                      "rounded-lg border bg-white p-3 shadow-sm transition",
+                      "border-b border-stone-100 p-4 transition last:border-b-0",
                       isSelected
-                        ? "border-emerald-600 shadow-emerald-900/10"
-                        : "border-stone-200",
+                        ? "bg-[#EAF1F8]"
+                        : "bg-white",
                     ].join(" ")}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -828,7 +828,7 @@ export function OperationsBoard({
                       </button>
 
                       {isSelected ? (
-                        <span className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800">
+                        <span className="rounded-md bg-[#EAF1F8] px-2 py-1 text-xs font-semibold text-[#315C7C]">
                           선택됨
                         </span>
                       ) : null}
@@ -847,8 +847,8 @@ export function OperationsBoard({
                             className={[
                               "min-h-9 shrink-0 rounded-md border px-3 text-xs font-semibold transition",
                               isReasonSelected
-                                ? "border-emerald-600 bg-emerald-700 text-white"
-                                : "border-stone-200 bg-stone-50 text-stone-700 hover:border-emerald-300 hover:bg-emerald-50",
+                                ? "border-[#315C7C] bg-[#315C7C] text-white"
+                                : "border-stone-200 bg-stone-50 text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
                             ].join(" ")}
                           >
                             {reasonLabel(reasonId)}
@@ -860,7 +860,7 @@ export function OperationsBoard({
                 );
               })
             ) : (
-              <div className="rounded-lg border border-stone-200 bg-white p-5 text-sm text-stone-600 shadow-sm">
+              <div className="p-5 text-sm text-stone-600">
                 이 반에 등록된 학생이 없습니다.
               </div>
             )}
@@ -939,7 +939,7 @@ export function OperationsBoard({
           <button
             type="button"
             aria-label="문자 작성 닫기"
-            className="absolute inset-0 bg-stone-950/35"
+            className="absolute inset-0 bg-[#111827]/35"
             onClick={() => setIsMobileComposerOpen(false)}
           />
           <div className="absolute inset-x-0 bottom-0 max-h-[calc(100dvh-2.5rem)] overflow-y-auto rounded-t-2xl bg-white shadow-2xl">
@@ -1070,12 +1070,12 @@ function MessageComposer({
     >
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-emerald-700" size={18} />
+          <MessageSquareText className="text-[#315C7C]" size={18} />
           <h2 id={`${composerId}-title`} className="text-sm font-semibold text-stone-950">
             학부모 문자
           </h2>
           {isPreviewReady ? (
-            <span className="ml-auto rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800">
+            <span className="ml-auto rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-2 py-0.5 text-xs font-medium text-[#315C7C]">
               수정 가능
             </span>
           ) : null}
@@ -1109,7 +1109,7 @@ function MessageComposer({
               {selectedStudent.parentName ?? "학부모"} · {selectedStudent.maskedParentPhone}
             </p>
             {selectedReason === "makeup" && makeupCandidateTime ? (
-              <p className="mt-2 rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800">
+              <p className="mt-2 rounded-md bg-[#EAF1F8] px-2 py-1 text-xs font-semibold text-[#315C7C]">
                 보강 후보 {makeupCandidateTime}
               </p>
             ) : null}
@@ -1135,8 +1135,8 @@ function MessageComposer({
                   className={[
                     "min-h-10 shrink-0 rounded-md border px-3 text-sm font-medium transition",
                     isSelected
-                      ? "border-emerald-600 bg-emerald-700 text-white"
-                      : "border-stone-200 bg-white text-stone-700 hover:border-emerald-300 hover:bg-emerald-50",
+                      ? "border-[#315C7C] bg-[#315C7C] text-white"
+                      : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
                   ].join(" ")}
                 >
                   {reason.label}
@@ -1165,8 +1165,8 @@ function MessageComposer({
                   className={[
                     "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
                     isSelected
-                      ? "border-stone-950 bg-stone-950 text-white"
-                      : "border-stone-200 bg-white text-stone-700 hover:border-emerald-300 hover:bg-emerald-50",
+                      ? "border-[#315C7C] bg-[#315C7C] text-white"
+                      : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
                 >
@@ -1211,7 +1211,7 @@ function MessageComposer({
                 : "학생과 사유를 선택하면 문자 초안이 표시됩니다."
             }
             rows={8}
-            className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition disabled:bg-stone-50 disabled:text-stone-500 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 sm:min-h-44"
+            className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition disabled:bg-stone-50 disabled:text-stone-500 focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8] sm:min-h-44"
           />
           <p
             className={[
@@ -1236,7 +1236,7 @@ function MessageComposer({
         >
           <div className="flex items-start gap-2">
             {isPreviewReady && !isPreviewError ? (
-              <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-700" size={17} />
+              <CheckCircle2 className="mt-0.5 shrink-0 text-[#315C7C]" size={17} />
             ) : (
               <AlertCircle className="mt-0.5 shrink-0" size={17} />
             )}
@@ -1258,7 +1258,7 @@ function MessageComposer({
               "rounded-md border p-3 text-sm leading-6",
               followupSaveError
                 ? "border-red-200 bg-red-50 text-red-900"
-                : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
             ].join(" ")}
           >
             <div className="flex items-start gap-2">
@@ -1291,7 +1291,7 @@ function MessageComposer({
           className={[
             "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
             canSaveFollowup
-              ? "bg-stone-950 text-white hover:bg-stone-800"
+              ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
               : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
@@ -1312,8 +1312,8 @@ function MessageComposer({
               className={[
                 "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
                 canSendMessage
-                  ? "bg-emerald-700 text-white hover:bg-emerald-800"
-                  : "bg-emerald-200 text-emerald-900",
+                  ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                  : "bg-[#C9D6E2] text-[#244B67]",
               ].join(" ")}
             >
               <Send size={17} />
@@ -1332,7 +1332,7 @@ function MessageComposer({
                   "rounded-md border p-3 text-sm leading-6",
                   messageSendError
                     ? "border-red-200 bg-red-50 text-red-900"
-                    : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                    : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
                 ].join(" ")}
               >
                 <div className="flex items-start gap-2">
@@ -1352,18 +1352,18 @@ function MessageComposer({
             ) : null}
 
             {selectedReason === "makeup" && selectedMakeupCandidate ? (
-              <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3">
-                <p className="text-sm font-semibold text-emerald-950">
+              <div className="rounded-md border border-[#C9D6E2] bg-[#EAF1F8] p-3">
+                <p className="text-sm font-semibold text-[#244B67]">
                   보강 스케줄 등록
                 </p>
-                <p className="mt-1 text-xs leading-5 text-emerald-900">
+                <p className="mt-1 text-xs leading-5 text-[#244B67]">
                   {selectedMakeupCandidate.label} 일정으로 학생 스케줄에 1회성 보강을
                   등록합니다.
                 </p>
                 {!canRegisterMakeupSchedule &&
                 makeupScheduleSave.status !== "saving" &&
                 makeupScheduleSave.status !== "saved" ? (
-                  <p className="mt-2 rounded-md bg-white px-2 py-2 text-xs font-semibold text-emerald-900">
+                  <p className="mt-2 rounded-md bg-white px-2 py-2 text-xs font-semibold text-[#244B67]">
                     보강 스케줄은 문자 발송 테스트가 완료된 뒤 등록할 수 있습니다.
                   </p>
                 ) : null}
@@ -1380,8 +1380,8 @@ function MessageComposer({
                     canRegisterMakeupSchedule &&
                     makeupScheduleSave.status !== "saving" &&
                     makeupScheduleSave.status !== "saved"
-                      ? "bg-emerald-700 text-white hover:bg-emerald-800"
-                      : "bg-emerald-200 text-emerald-950",
+                      ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                      : "bg-[#C9D6E2] text-[#244B67]",
                   ].join(" ")}
                 >
                   <CalendarDays size={16} />
@@ -1397,7 +1397,7 @@ function MessageComposer({
                       "mt-2 rounded-md px-2 py-2 text-xs font-semibold",
                       makeupScheduleSave.status === "error"
                         ? "bg-red-50 text-red-900"
-                        : "bg-white text-emerald-900",
+                        : "bg-white text-[#244B67]",
                     ].join(" ")}
                   >
                     {makeupScheduleSave.message}
@@ -1447,7 +1447,7 @@ function MobileSelectionBar({
         <button
           type="button"
           onClick={onOpenComposer}
-          className="min-h-11 shrink-0 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white"
+          className="min-h-11 shrink-0 rounded-md bg-[#315C7C] px-4 text-sm font-semibold text-white"
         >
           확인/수정
         </button>

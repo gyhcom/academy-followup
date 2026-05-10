@@ -47,7 +47,7 @@ export function StudentBulkImportForm({
   }
 
   return (
-    <div className="mb-4 min-w-0 overflow-hidden rounded-xl border border-sky-200 bg-sky-50/80 p-3">
+    <div className="mb-4 min-w-0 overflow-hidden rounded-xl border border-[#E6E0D5] bg-[#F7F5F0] p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-stone-950">학생 CSV 일괄 등록</p>
@@ -60,7 +60,7 @@ export function StudentBulkImportForm({
           type="button"
           aria-label="학생 일괄 등록 닫기"
           onClick={onCancel}
-          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-[#E6E0D5] bg-white text-stone-600"
         >
           <X size={15} />
         </button>
@@ -69,7 +69,7 @@ export function StudentBulkImportForm({
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <div className="min-w-0 space-y-3">
           <div className="flex flex-col gap-2 sm:flex-row">
-            <label className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-800 sm:w-auto">
+            <label className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm font-semibold text-stone-800 sm:w-auto">
               <FileSpreadsheet size={16} />
               CSV 파일 선택
               <input
@@ -82,7 +82,7 @@ export function StudentBulkImportForm({
             <button
               type="button"
               onClick={downloadTemplate}
-              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-800 sm:w-auto"
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm font-semibold text-stone-800 sm:w-auto"
             >
               <Download size={16} />
               템플릿 다운로드
@@ -96,13 +96,13 @@ export function StudentBulkImportForm({
               onChange={(event) => setCsvText(event.target.value)}
               rows={12}
               spellCheck={false}
-              className="min-h-72 w-full min-w-0 resize-y rounded-md border border-stone-300 bg-white px-3 py-2 font-mono text-xs leading-5 outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+              className="min-h-72 w-full min-w-0 resize-y rounded-md border border-[#D8D0C4] bg-white px-3 py-2 font-mono text-xs leading-5 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
         </div>
 
-        <div className="min-w-0 rounded-lg border border-stone-200 bg-white">
-          <div className="grid grid-cols-3 divide-x divide-stone-200 border-b border-stone-200 text-center">
+        <div className="min-w-0 rounded-lg border border-[#E6E0D5] bg-white">
+          <div className="grid grid-cols-3 divide-x divide-[#E6E0D5] border-b border-[#E6E0D5] bg-[#FBFAF7] text-center">
             <ImportStat label="전체" value={`${validation.rows.length}명`} />
             <ImportStat label="등록 가능" value={`${validation.validRows.length}명`} tone="good" />
             <ImportStat label="확인 필요" value={`${validation.invalidRows.length}명`} tone="bad" />
@@ -123,7 +123,7 @@ export function StudentBulkImportForm({
           </div>
 
           {validation.rows.length > 80 ? (
-            <p className="border-t border-stone-200 px-3 py-2 text-xs text-stone-500">
+            <p className="border-t border-[#E6E0D5] px-3 py-2 text-xs text-stone-500">
               화면에는 80명까지만 미리보기로 표시합니다. 실제 등록은 유효한 전체 행을 처리합니다.
             </p>
           ) : null}
@@ -135,7 +135,7 @@ export function StudentBulkImportForm({
           className={[
             "mt-3 rounded-md border px-3 py-2 text-sm",
             status.status === "saved"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+              ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
               : "border-red-200 bg-red-50 text-red-900",
           ].join(" ")}
         >
@@ -147,7 +147,7 @@ export function StudentBulkImportForm({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 sm:w-auto"
+          className="min-h-11 w-full min-w-0 rounded-md border border-[#D8D0C4] bg-white px-4 text-sm font-semibold text-stone-700 sm:w-auto"
         >
           취소
         </button>
@@ -157,7 +157,7 @@ export function StudentBulkImportForm({
           onClick={() => onSubmit(validation.validRows)}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSubmit ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+            canSubmit ? "bg-[#315C7C] text-white hover:bg-[#244B67]" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
           <Save size={16} />
@@ -178,7 +178,7 @@ function ImportStat({
   tone?: "default" | "good" | "bad";
 }) {
   const valueClass =
-    tone === "good" ? "text-emerald-700" : tone === "bad" ? "text-red-700" : "text-stone-950";
+    tone === "good" ? "text-[#315C7C]" : tone === "bad" ? "text-red-700" : "text-stone-950";
 
   return (
     <div className="min-w-0 px-3 py-3">
@@ -202,7 +202,7 @@ function ImportPreviewRow({ row }: { row: StudentImportValidatedRow }) {
           <span
             className={[
               "rounded px-1.5 py-0.5 text-[11px] font-semibold",
-              isValid ? "bg-emerald-50 text-emerald-800" : "bg-red-50 text-red-800",
+              isValid ? "bg-[#EAF1F8] text-[#244B67]" : "bg-red-50 text-red-800",
             ].join(" ")}
           >
             {isValid ? "등록 가능" : "확인 필요"}

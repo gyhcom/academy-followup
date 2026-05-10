@@ -13,13 +13,13 @@ export function SummaryCard({
   detail: string;
 }) {
   return (
-    <article className="min-w-0 rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm sm:p-4">
+    <article className="min-w-0 rounded-lg border border-[#E2DED6] bg-white p-3.5 shadow-sm sm:p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium text-stone-500">{label}</p>
           <p className="mt-2 text-xl font-semibold text-stone-950 sm:text-2xl">{value}</p>
         </div>
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 sm:size-10">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#EAF1F8] text-[#315C7C] sm:size-10">
           {icon}
         </div>
       </div>
@@ -44,21 +44,21 @@ export function ManagementPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="min-w-0 rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
-      <div className="flex flex-col gap-3 border-b border-stone-200 pb-3 sm:flex-row sm:items-start sm:justify-between">
+    <section className="min-w-0 bg-transparent sm:rounded-lg sm:border sm:border-[#E2DED6] sm:bg-white sm:p-5 sm:shadow-sm">
+      <div className="flex items-center justify-between gap-3 pb-3 sm:border-b sm:border-[#E2DED6] sm:pb-4">
         <div className="min-w-0">
-          <h3 className="text-base font-semibold text-stone-950">{title}</h3>
-          <p className="mt-1 text-sm leading-6 text-stone-600">{description}</p>
+          <h3 className="text-lg font-semibold text-stone-950 sm:text-base">{title}</h3>
+          <p className="mt-1 hidden text-sm leading-6 text-stone-600 sm:block">{description}</p>
         </div>
         <button
           type="button"
           disabled={!onAction}
           onClick={onAction}
           className={[
-            "flex min-h-10 w-full shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:w-auto",
+            "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:min-h-10",
             onAction
-              ? "border-stone-300 bg-white text-stone-800 transition hover:border-stone-400 hover:bg-stone-50"
-              : "cursor-not-allowed border-stone-200 bg-stone-50 text-stone-500",
+              ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm transition hover:border-[#244B67] hover:bg-[#244B67]"
+              : "cursor-not-allowed border-[#E2DED6] bg-[#F7F5F0] text-stone-500",
           ].join(" ")}
         >
           {actionIcon}
@@ -66,7 +66,7 @@ export function ManagementPanel({
           <ChevronRight size={14} />
         </button>
       </div>
-      <div className="min-w-0 pt-3">{children}</div>
+      <div className="min-w-0 pt-0 sm:pt-4">{children}</div>
     </section>
   );
 }
@@ -79,7 +79,7 @@ export function StatusBadge({ status }: { status: string }) {
     left: "퇴원",
   };
   const styles: Record<string, string> = {
-    active: "bg-emerald-50 text-emerald-800",
+    active: "bg-[#EAF7F2] text-[#0F766E]",
     paused: "bg-amber-50 text-amber-800",
     left: "bg-stone-200 text-stone-700",
   };

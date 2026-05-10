@@ -64,7 +64,7 @@ export function AppWorkspace({
   const visibleView = !canManage && activeView === "management" ? "operations" : activeView;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+    <div className="mx-auto max-w-6xl space-y-4 pb-20 sm:space-y-5 sm:pb-0">
       <WorkspaceNavigation
         activeView={visibleView}
         canManage={canManage}
@@ -114,8 +114,8 @@ function WorkspaceNavigation({
   onChange: (view: WorkspaceView) => void;
 }) {
   return (
-    <section className="rounded-xl border border-stone-200 bg-white p-2 shadow-sm">
-      <div className={["grid gap-2", canManage ? "grid-cols-3" : "grid-cols-2"].join(" ")}>
+    <section className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DED8CE] bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:static sm:rounded-lg sm:border sm:bg-white sm:p-2 sm:shadow-sm">
+      <div className={["grid gap-1.5", canManage ? "grid-cols-3" : "grid-cols-2"].join(" ")}>
         <WorkspaceNavButton
           icon={<LayoutDashboard size={17} />}
           label="운영 보드"
@@ -134,7 +134,7 @@ function WorkspaceNavigation({
         />
         {canManage ? (
           <WorkspaceNavButton
-            icon={<Settings size={17} />}
+          icon={<Settings size={17} />}
             label="관리"
             shortLabel="관리"
             description="학생·반·구성원"
@@ -171,17 +171,17 @@ function WorkspaceNavButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "flex min-h-14 items-center gap-2 rounded-lg border px-2 text-left transition sm:min-h-16 sm:gap-3 sm:px-3",
+        "flex min-h-12 flex-col items-center justify-center gap-1 rounded-md border px-2 text-center transition sm:min-h-12 sm:flex-row sm:justify-start sm:text-left sm:px-3",
         isActive
-          ? "border-stone-950 bg-stone-950 text-white"
-          : "border-stone-200 bg-stone-50 text-stone-700 hover:border-stone-300 hover:bg-white",
-        disabled ? "cursor-not-allowed opacity-55 hover:border-stone-200 hover:bg-stone-50" : "",
+          ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67] sm:bg-[#315C7C] sm:text-white"
+          : "border-transparent bg-transparent text-stone-700 hover:bg-[#F2F5F8] sm:bg-white",
+        disabled ? "cursor-not-allowed opacity-55 hover:border-[#E6E0D5] hover:bg-[#F7F5F0]" : "",
       ].join(" ")}
     >
       <span
         className={[
-          "flex size-8 shrink-0 items-center justify-center rounded-md sm:size-9",
-          isActive ? "bg-white/14 text-white" : "bg-white text-emerald-700",
+          "flex size-6 shrink-0 items-center justify-center rounded-md sm:size-8",
+          isActive ? "text-[#244B67] sm:bg-white/15 sm:text-white" : "text-stone-500 sm:bg-[#F2F5F8] sm:text-[#315C7C]",
         ].join(" ")}
       >
         {icon}
