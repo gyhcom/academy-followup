@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ListFilter, Pencil, Search } from "lucide-react";
+import { CalendarDays, ListFilter, Pencil, Search, SlidersHorizontal, X } from "lucide-react";
 import {
   type FollowupHistoryItem,
   type FollowupHistoryState,
@@ -67,6 +67,7 @@ export function StudentDirectory({
   onCreateSchedule: (student: ManagementStudent) => void;
   onEditSchedule: (student: ManagementStudent, schedule: ManagementStudentSchedule) => void;
 }) {
+  const [isMobileDetailOpen, setIsMobileDetailOpen] = useState(false);
   const filteredStudents = useMemo(() => {
     const normalizedSearch = searchQuery.trim().toLowerCase();
 
@@ -121,6 +122,11 @@ export function StudentDirectory({
     filteredStudents[0] ??
     null;
 
+  function selectStudent(studentId: string) {
+    onSelectStudent(studentId);
+    setIsMobileDetailOpen(true);
+  }
+
   return (
     <div className="space-y-3">
       <StudentDirectoryToolbar
@@ -158,7 +164,7 @@ export function StudentDirectory({
                   key={student.id}
                   student={student}
                   isSelected={student.id === selectedStudent?.id}
-                  onSelect={() => onSelectStudent(student.id)}
+                  onSelect={() => selectStudent(student.id)}
                 />
               ))}
               {filteredStudents.length === 0 ? (
@@ -170,8 +176,19 @@ export function StudentDirectory({
             </div>
           </div>
 
-          <StudentDetailPanel
+          <div className="hidden lg:block">
+            <StudentDetailPanel
+              student={selectedStudent}
+              onEditStudent={onEditStudent}
+              onCreateSchedule={onCreateSchedule}
+              onEditSchedule={onEditSchedule}
+            />
+          </div>
+
+          <StudentDetailSheet
             student={selectedStudent}
+            isOpen={isMobileDetailOpen}
+            onClose={() => setIsMobileDetailOpen(false)}
             onEditStudent={onEditStudent}
             onCreateSchedule={onCreateSchedule}
             onEditSchedule={onEditSchedule}
@@ -211,7 +228,14 @@ export function StudentDirectoryToolbar({
   onScheduleFilterChange: (value: StudentScheduleFilter) => void;
   onSortModeChange: (value: StudentSortMode) => void;
 }) {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const missingScheduleCount = students.filter((student) => activeScheduleCount(student) === 0).length;
+  const activeFilterCount = [
+    classFilter !== "all",
+    statusFilter !== "active",
+    scheduleFilter !== "all",
+    sortMode !== "time",
+  ].filter(Boolean).length;
 
   return (
     <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
@@ -229,13 +253,41 @@ export function StudentDirectoryToolbar({
           />
         </label>
 
-        <div className="flex items-center gap-2 rounded-md bg-white px-3 py-2 text-xs font-semibold text-stone-600">
-          <ListFilter size={14} />
-          {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
+        <div className="flex items-center justify-between gap-2 rounded-md bg-white px-3 py-2 text-xs font-semibold text-stone-600">
+          <span className="flex min-w-0 items-center gap-2">
+            <ListFilter size={14} className="shrink-0" />
+            <span className="truncate">
+              {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={() => setIsFilterOpen((current) => !current)}
+            className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-700 lg:hidden"
+          >
+            <SlidersHorizontal size={13} />
+            필터{activeFilterCount > 0 ? ` ${activeFilterCount}` : ""}
+          </button>
         </div>
       </div>
 
-      <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      {activeFilterCount > 0 ? (
+        <div className="mt-2 flex flex-wrap gap-1.5 lg:hidden">
+          {classFilter !== "all" ? (
+            <FilterChip label={classes.find((item) => item.id === classFilter)?.name ?? "반 필터"} />
+          ) : null}
+          {statusFilter !== "active" ? <FilterChip label={studentStatusLabel(statusFilter)} /> : null}
+          {scheduleFilter !== "all" ? <FilterChip label={scheduleFilterLabel(scheduleFilter)} /> : null}
+          {sortMode !== "time" ? <FilterChip label={sortModeLabel(sortMode)} /> : null}
+        </div>
+      ) : null}
+
+      <div
+        className={[
+          "mt-2 gap-2 sm:grid-cols-2 lg:grid lg:grid-cols-4",
+          isFilterOpen ? "grid" : "hidden",
+        ].join(" ")}
+      >
         <select
           value={classFilter}
           onChange={(event) => onClassFilterChange(event.target.value)}
@@ -283,6 +335,46 @@ export function StudentDirectoryToolbar({
       </div>
     </div>
   );
+}
+
+function FilterChip({ label }: { label: string }) {
+  return (
+    <span className="rounded-md bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-800">
+      {label}
+    </span>
+  );
+}
+
+function studentStatusLabel(status: string) {
+  const labels: Record<string, string> = {
+    all: "전체 상태",
+    active: "재원",
+    paused: "휴원",
+    left: "퇴원",
+  };
+
+  return labels[status] ?? status;
+}
+
+function scheduleFilterLabel(filter: StudentScheduleFilter) {
+  const labels: Record<StudentScheduleFilter, string> = {
+    all: "전체 스케줄",
+    has_schedule: "스케줄 있음",
+    missing_schedule: "스케줄 미등록",
+    external: "외부 일정 있음",
+  };
+
+  return labels[filter];
+}
+
+function sortModeLabel(sortMode: StudentSortMode) {
+  const labels: Record<StudentSortMode, string> = {
+    time: "요일·시간순",
+    name: "이름순",
+    class: "반순",
+  };
+
+  return labels[sortMode];
 }
 
 function StudentListRow({
@@ -368,6 +460,71 @@ function StudentListRow({
         </span>
       </div>
     </button>
+  );
+}
+
+function StudentDetailSheet({
+  student,
+  isOpen,
+  onClose,
+  onEditStudent,
+  onCreateSchedule,
+  onEditSchedule,
+}: {
+  student: ManagementStudent | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onEditStudent: (student: ManagementStudent) => void;
+  onCreateSchedule: (student: ManagementStudent) => void;
+  onEditSchedule: (student: ManagementStudent, schedule: ManagementStudentSchedule) => void;
+}) {
+  if (!isOpen || !student) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 lg:hidden">
+      <button
+        type="button"
+        aria-label="학생 상세 닫기"
+        className="absolute inset-0 bg-stone-950/35"
+        onClick={onClose}
+      />
+      <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border border-stone-200 bg-white p-4 shadow-2xl">
+        <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-stone-300" />
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-stone-950">학생 상세</p>
+            <p className="mt-0.5 truncate text-xs text-stone-500">
+              목록으로 돌아가려면 닫기를 누릅니다.
+            </p>
+          </div>
+          <button
+            type="button"
+            aria-label="학생 상세 닫기"
+            onClick={onClose}
+            className="flex size-9 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <StudentDetailPanel
+          student={student}
+          onEditStudent={(selectedStudent) => {
+            onClose();
+            onEditStudent(selectedStudent);
+          }}
+          onCreateSchedule={(selectedStudent) => {
+            onClose();
+            onCreateSchedule(selectedStudent);
+          }}
+          onEditSchedule={(selectedStudent, schedule) => {
+            onClose();
+            onEditSchedule(selectedStudent, schedule);
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
