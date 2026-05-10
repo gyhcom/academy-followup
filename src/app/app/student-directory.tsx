@@ -127,7 +127,7 @@ export function StudentDirectory({
   }
 
   return (
-    <div className="min-w-0 rounded-md border border-stone-200 bg-white">
+    <div className="min-w-0 overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
       <StudentDirectoryToolbar
         students={students}
         classes={classes}
@@ -145,13 +145,13 @@ export function StudentDirectory({
       />
 
       {students.length === 0 ? (
-        <div className="border-t border-stone-200 px-4 py-12 text-center">
+        <div className="border-t border-[#E6E0D5] px-4 py-12 text-center">
           <p className="text-sm font-semibold text-stone-900">아직 등록된 학생이 없습니다.</p>
           <p className="mt-1 text-sm text-stone-500">CSV 일괄 등록 또는 학생 등록으로 시작합니다.</p>
         </div>
       ) : (
         <div className="grid min-h-[620px] lg:grid-cols-[minmax(0,1fr)_420px]">
-          <div className="min-w-0 border-t border-stone-200 lg:border-r lg:border-stone-200">
+          <div className="min-w-0 border-t border-[#E6E0D5] lg:border-r lg:border-[#E6E0D5]">
             <StudentResourceTable
               students={filteredStudents}
               selectedStudentId={selectedStudent?.id ?? null}
@@ -160,7 +160,7 @@ export function StudentDirectory({
             />
           </div>
 
-          <div className="hidden min-w-0 border-t border-stone-200 bg-stone-50/40 lg:block">
+          <div className="hidden min-w-0 border-t border-[#E6E0D5] bg-[#F7F5F0]/70 lg:block">
             <StudentDetailPanel
               student={selectedStudent}
               onEditStudent={onEditStudent}
@@ -222,7 +222,7 @@ export function StudentDirectoryToolbar({
   ].filter(Boolean).length;
 
   return (
-    <div className="space-y-2 p-3">
+    <div className="space-y-2 bg-[#FFFCF7] p-3">
       <div className="grid gap-2 xl:grid-cols-[minmax(260px,1fr)_auto] xl:items-center">
         <label className="relative block">
           <Search
@@ -233,18 +233,18 @@ export function StudentDirectoryToolbar({
             value={searchQuery}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="학생명, 반, 학교, 학부모 검색"
-            className="min-h-10 w-full rounded-md border border-stone-300 bg-white pl-9 pr-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            className="min-h-10 w-full rounded-md border border-[#D8D0C4] bg-white pl-9 pr-3 text-sm outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#EAF7F2]"
           />
         </label>
 
-        <div className="flex items-center justify-between gap-2 rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-xs font-semibold text-stone-600">
+        <div className="flex items-center justify-between gap-2 rounded-md border border-[#E6E0D5] bg-[#F7F5F0] px-3 py-2 text-xs font-semibold text-stone-600">
           <span className="truncate">
             {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
           </span>
           <button
             type="button"
             onClick={() => setIsFilterOpen((current) => !current)}
-            className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-white px-2 text-xs font-semibold text-stone-700 lg:hidden"
+            className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2 text-xs font-semibold text-stone-700 lg:hidden"
           >
             <SlidersHorizontal size={13} />
             필터{activeFilterCount > 0 ? ` ${activeFilterCount}` : ""}
@@ -272,7 +272,7 @@ export function StudentDirectoryToolbar({
         <select
           value={classFilter}
           onChange={(event) => onClassFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#0F766E]"
         >
           <option value="all">전체 반</option>
           {classes.map((classItem) => (
@@ -285,7 +285,7 @@ export function StudentDirectoryToolbar({
         <select
           value={statusFilter}
           onChange={(event) => onStatusFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#0F766E]"
         >
           <option value="all">전체 상태</option>
           <option value="active">재원</option>
@@ -296,7 +296,7 @@ export function StudentDirectoryToolbar({
         <select
           value={scheduleFilter}
           onChange={(event) => onScheduleFilterChange(event.target.value as StudentScheduleFilter)}
-          className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#0F766E]"
         >
           <option value="all">전체 스케줄</option>
           <option value="has_schedule">스케줄 있음</option>
@@ -307,7 +307,7 @@ export function StudentDirectoryToolbar({
         <select
           value={sortMode}
           onChange={(event) => onSortModeChange(event.target.value as StudentSortMode)}
-          className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#0F766E]"
         >
           <option value="time">요일·시간순</option>
           <option value="name">이름순</option>
@@ -340,7 +340,7 @@ function StudentResourceTable({
 
   return (
     <div className="min-w-0">
-      <div className="hidden grid-cols-[minmax(150px,1.2fr)_minmax(150px,1fr)_80px_128px_104px_78px] border-b border-stone-200 bg-stone-50 px-3 py-2 text-xs font-semibold text-stone-500 lg:grid">
+      <div className="hidden grid-cols-[minmax(150px,1.2fr)_minmax(150px,1fr)_80px_128px_104px_78px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 lg:grid">
         <span>학생</span>
         <span>반</span>
         <span>학년</span>
@@ -380,8 +380,8 @@ function StudentResourceRow({
   return (
     <div
       className={[
-        "border-b border-stone-100 transition last:border-b-0",
-        isSelected ? "bg-emerald-50/60" : "bg-white hover:bg-stone-50",
+        "border-b border-[#EFE9DE] transition last:border-b-0",
+        isSelected ? "bg-[#EAF7F2]" : "bg-white hover:bg-[#FBFAF7]",
       ].join(" ")}
     >
       <button
@@ -441,7 +441,7 @@ function StudentResourceRow({
 
 function FilterChip({ label }: { label: string }) {
   return (
-    <span className="rounded-md bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-800">
+    <span className="rounded-md bg-[#EAF7F2] px-2 py-1 text-[11px] font-semibold text-[#0F766E]">
       {label}
     </span>
   );
@@ -506,8 +506,8 @@ function StudentDetailSheet({
         className="absolute inset-0 bg-stone-950/35"
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border border-stone-200 bg-white shadow-2xl">
-        <div className="sticky top-0 z-10 border-b border-stone-200 bg-white px-4 py-3">
+      <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border border-[#E6E0D5] bg-[#FFFCF7] shadow-2xl">
+        <div className="sticky top-0 z-10 border-b border-[#E6E0D5] bg-[#FFFCF7] px-4 py-3">
           <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-stone-300" />
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
@@ -569,8 +569,8 @@ function StudentDetailPanel({
   const groupedSchedules = groupSchedulesByDay(student.schedules);
 
   return (
-    <aside className="bg-white p-4 lg:sticky lg:top-4 lg:bg-transparent">
-      <div className="rounded-md border border-stone-200 bg-white p-4">
+    <aside className="bg-[#FFFCF7] p-4 lg:sticky lg:top-4 lg:bg-transparent">
+      <div className="rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="truncate text-lg font-semibold text-stone-950">{student.name}</p>
@@ -588,7 +588,7 @@ function StudentDetailPanel({
           <button
             type="button"
             onClick={() => onEditStudent(student)}
-            className="flex min-h-10 items-center justify-center gap-1 rounded-md border border-stone-300 bg-white px-3 text-xs font-semibold text-stone-700 transition hover:bg-stone-50"
+            className="flex min-h-10 items-center justify-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-3 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0]"
           >
             <Pencil size={13} />
             학생 수정
@@ -596,7 +596,7 @@ function StudentDetailPanel({
           <button
             type="button"
             onClick={() => onCreateSchedule(student)}
-            className="flex min-h-10 items-center justify-center gap-1 rounded-md bg-stone-950 px-3 text-xs font-semibold text-white transition hover:bg-stone-800"
+            className="flex min-h-10 items-center justify-center gap-1 rounded-md bg-[#0F766E] px-3 text-xs font-semibold text-white transition hover:bg-[#115E59]"
           >
             <CalendarDays size={13} />
             스케줄 추가
@@ -604,14 +604,14 @@ function StudentDetailPanel({
         </div>
       </div>
 
-      <div className="mt-3 rounded-md border border-stone-200 bg-white p-4">
+      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-stone-950">스케줄</p>
           <p className="text-xs font-medium text-stone-500">활성 {activeScheduleCount(student)}개</p>
         </div>
 
         {groupedSchedules.length === 0 ? (
-          <div className="mt-3 rounded-md border border-dashed border-stone-300 bg-stone-50 p-4 text-sm text-stone-500">
+          <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-4 text-sm text-stone-500">
             등록된 스케줄이 없습니다.
           </div>
         ) : (
@@ -625,7 +625,7 @@ function StudentDetailPanel({
                       key={schedule.id}
                       type="button"
                       onClick={() => onEditSchedule(student, schedule)}
-                      className="grid w-full grid-cols-[72px_minmax(0,1fr)_42px] items-center gap-3 rounded-md px-2 py-2 text-left transition hover:bg-stone-50"
+                      className="grid w-full grid-cols-[72px_minmax(0,1fr)_42px] items-center gap-3 rounded-md px-2 py-2 text-left transition hover:bg-[#F7F5F0]"
                     >
                       <span className="text-sm font-semibold tabular-nums text-stone-950">{schedule.startTime}</span>
                       <span className="min-w-0">
@@ -646,7 +646,7 @@ function StudentDetailPanel({
         )}
       </div>
 
-      <div className="mt-3 rounded-md border border-stone-200 bg-white p-4">
+      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
         <StudentFollowupHistory selectedStudentName={student.name} history={history} />
       </div>
     </aside>

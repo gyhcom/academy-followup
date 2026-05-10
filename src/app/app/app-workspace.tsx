@@ -114,7 +114,7 @@ function WorkspaceNavigation({
   onChange: (view: WorkspaceView) => void;
 }) {
   return (
-    <section className="rounded-xl border border-stone-200 bg-white p-2 shadow-sm">
+    <section className="rounded-xl border border-[#E6E0D5] bg-[#FFFCF7] p-2 shadow-[0_10px_28px_rgba(28,25,23,0.05)]">
       <div className={["grid gap-2", canManage ? "grid-cols-3" : "grid-cols-2"].join(" ")}>
         <WorkspaceNavButton
           icon={<LayoutDashboard size={17} />}
@@ -173,15 +173,15 @@ function WorkspaceNavButton({
       className={[
         "flex min-h-14 items-center gap-2 rounded-lg border px-2 text-left transition sm:min-h-16 sm:gap-3 sm:px-3",
         isActive
-          ? "border-stone-950 bg-stone-950 text-white"
-          : "border-stone-200 bg-stone-50 text-stone-700 hover:border-stone-300 hover:bg-white",
-        disabled ? "cursor-not-allowed opacity-55 hover:border-stone-200 hover:bg-stone-50" : "",
+          ? "border-[#0F766E] bg-[#0F766E] text-white"
+          : "border-[#E6E0D5] bg-[#F7F5F0] text-stone-700 hover:border-[#D8D0C4] hover:bg-white",
+        disabled ? "cursor-not-allowed opacity-55 hover:border-[#E6E0D5] hover:bg-[#F7F5F0]" : "",
       ].join(" ")}
     >
       <span
         className={[
           "flex size-8 shrink-0 items-center justify-center rounded-md sm:size-9",
-          isActive ? "bg-white/14 text-white" : "bg-white text-emerald-700",
+          isActive ? "bg-white/14 text-white" : "bg-white text-[#0F766E]",
         ].join(" ")}
       >
         {icon}

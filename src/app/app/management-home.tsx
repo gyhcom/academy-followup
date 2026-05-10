@@ -683,10 +683,10 @@ export function ManagementHome({
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-5">
-      <section className="rounded-lg border border-stone-200 bg-white shadow-sm">
-        <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+    <div className="space-y-4 text-[#1C1917] sm:space-y-5">
+      <section className="rounded-xl border border-[#E6E0D5] bg-[#FFFCF7] shadow-[0_14px_36px_rgba(28,25,23,0.06)]">
+        <div className="border-b border-[#E6E0D5] px-4 py-5 sm:px-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#0F766E]">
             Academy Admin
           </p>
           <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -698,7 +698,7 @@ export function ManagementHome({
                 학생, 반, 구성원, 발송 정책을 한 곳에서 관리합니다.
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-6 rounded-md border border-stone-200 bg-stone-50 px-4 py-3 text-sm">
+            <div className="grid grid-cols-3 gap-4 rounded-lg border border-[#E6E0D5] bg-[#F7F5F0] px-4 py-3 text-sm shadow-inner sm:gap-6">
               <Metric label="재원" value={`${activeStudents.length}명`} />
               <Metric label="스케줄 미등록" value={`${students.filter((student) => student.schedules.filter((schedule) => schedule.isActive).length === 0).length}명`} />
               <Metric label="반" value={`${classes.length}개`} />
@@ -706,28 +706,44 @@ export function ManagementHome({
           </div>
         </div>
 
-        <div className="grid border-b border-stone-200 bg-white md:grid-cols-4">
+        <div className="border-b border-[#E6E0D5] bg-[#FBFAF7] p-3">
+          <div className="flex flex-wrap gap-2">
           {managementSections.map((section) => (
             <button
               key={section.id}
               type="button"
               onClick={() => setActiveSection(section.id)}
               className={[
-                "min-w-0 border-b px-4 py-3 text-left transition md:border-b-0 md:border-r md:last:border-r-0",
+                "min-w-[150px] flex-1 rounded-lg border px-3 py-2.5 text-left transition sm:flex-none sm:px-4",
                 activeSection === section.id
-                  ? "border-emerald-600 bg-emerald-50/70"
-                  : "border-stone-200 bg-white hover:bg-stone-50",
+                  ? "border-[#0F766E] bg-[#0F766E] text-white shadow-sm"
+                  : "border-[#E6E0D5] bg-white text-stone-800 hover:bg-[#F7F5F0]",
               ].join(" ")}
             >
               <span className="flex items-center justify-between gap-3">
-                <span className="text-sm font-semibold text-stone-950">{section.label}</span>
-                <span className="rounded bg-stone-100 px-2 py-0.5 text-xs font-semibold text-stone-600">
+                <span className="text-sm font-semibold">{section.label}</span>
+                <span
+                  className={[
+                    "rounded px-2 py-0.5 text-xs font-semibold",
+                    activeSection === section.id
+                      ? "bg-white/15 text-white"
+                      : "bg-[#F7F5F0] text-stone-600",
+                  ].join(" ")}
+                >
                   {section.count}
                 </span>
               </span>
-              <span className="mt-1 block truncate text-xs text-stone-500">{section.detail}</span>
+              <span
+                className={[
+                  "mt-1 block truncate text-xs",
+                  activeSection === section.id ? "text-white/75" : "text-stone-500",
+                ].join(" ")}
+              >
+                {section.detail}
+              </span>
             </button>
           ))}
+          </div>
         </div>
       </section>
 
@@ -898,8 +914,8 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="overflow-hidden rounded-md border border-stone-200">
-            <div className="hidden grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] border-b border-stone-200 bg-stone-50 px-3 py-2 text-xs font-semibold text-stone-500 md:grid">
+          <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+            <div className="hidden grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
               <span>반</span>
               <span>과목</span>
               <span>학년</span>
@@ -909,7 +925,7 @@ export function ManagementHome({
             {classes.map((classItem) => (
               <div
                 key={classItem.id}
-                className="grid min-w-0 gap-3 border-b border-stone-100 px-3 py-3 last:border-b-0 md:grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] md:items-center"
+                className="grid min-w-0 gap-3 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] md:items-center"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-stone-950">{classItem.name}</p>
@@ -921,13 +937,13 @@ export function ManagementHome({
                 <p className="hidden text-sm text-stone-700 md:block">{classItem.gradeLabel ?? "-"}</p>
                 <p className="hidden truncate text-sm text-stone-700 md:block">{classItem.teacherName ?? "미지정"}</p>
                 <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
-                  <span className="w-fit shrink-0 rounded-md bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700">
+                  <span className="w-fit shrink-0 rounded-md bg-[#F7F5F0] px-2.5 py-1 text-xs font-semibold text-stone-700">
                     학생 {classItem.studentCount}명
                   </span>
                   <button
                     type="button"
                     onClick={() => openBulkScheduleForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-300 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-stone-50"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#0F766E]/30 bg-white px-2.5 text-xs font-semibold text-[#0F766E] transition hover:bg-[#EAF7F2]"
                   >
                     <ClipboardList size={13} />
                     스케줄
@@ -935,7 +951,7 @@ export function ManagementHome({
                   <button
                     type="button"
                     onClick={() => openEditClassForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0]"
                   >
                     <Pencil size={13} />
                     수정
@@ -981,8 +997,8 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="overflow-hidden rounded-md border border-stone-200">
-            <div className="hidden grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] border-b border-stone-200 bg-stone-50 px-3 py-2 text-xs font-semibold text-stone-500 md:grid">
+          <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+            <div className="hidden grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
               <span>이름</span>
               <span>이메일</span>
               <span>역할</span>
@@ -993,7 +1009,7 @@ export function ManagementHome({
             {members.map((member) => (
               <div
                 key={member.id}
-                className="grid min-w-0 gap-2 border-b border-stone-100 px-3 py-3 last:border-b-0 md:grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] md:items-center"
+                className="grid min-w-0 gap-2 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] md:items-center"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-stone-950">{member.name}</p>
@@ -1006,7 +1022,7 @@ export function ManagementHome({
                 <button
                   type="button"
                   onClick={() => openEditMemberForm(member)}
-                  className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-md border border-stone-300 bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-stone-50 md:ml-auto"
+                  className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0] md:ml-auto"
                 >
                   <Pencil size={13} />
                   수정
@@ -1025,7 +1041,7 @@ export function ManagementHome({
         actionIcon={<Plus size={14} />}
         onAction={openCreateStudentForm}
       >
-        <div className="mb-3 flex flex-col gap-2 rounded-lg border border-stone-200 bg-stone-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-4 flex flex-col gap-2 rounded-lg border border-[#E6E0D5] bg-[#F7F5F0] p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-stone-950">초기 세팅은 일괄 등록으로 시작합니다.</p>
             <p className="mt-1 text-xs leading-5 text-stone-500">
@@ -1035,7 +1051,7 @@ export function ManagementHome({
           <button
             type="button"
             onClick={openBulkStudentImport}
-            className="flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border border-sky-200 bg-white px-3 text-xs font-semibold text-sky-800 transition hover:border-sky-300 hover:bg-sky-50 sm:w-auto"
+            className="flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border border-[#0F766E]/30 bg-white px-3 text-xs font-semibold text-[#0F766E] transition hover:bg-[#EAF7F2] sm:w-auto"
           >
             <FileSpreadsheet size={14} />
             CSV 일괄 등록
