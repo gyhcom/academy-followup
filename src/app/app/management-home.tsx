@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, ClipboardList, FileSpreadsheet, GraduationCap, Pencil, Plus, UserPlus, UsersRound } from "lucide-react";
+import { ClipboardList, FileSpreadsheet, Pencil, Plus, UserPlus } from "lucide-react";
 import type {
   BulkScheduleFormState,
   ClassFormState,
@@ -19,7 +19,7 @@ import type {
   StudentScheduleFilter,
   StudentSortMode,
 } from "@/app/app/management-types";
-import { ManagementPanel, SummaryCard } from "@/app/app/management-common";
+import { ManagementPanel } from "@/app/app/management-common";
 import {
   BulkScheduleForm,
   ClassForm,
@@ -31,6 +31,8 @@ import { roleLabel } from "@/app/app/management-utils";
 import { StudentBulkImportForm } from "@/app/app/student-bulk-import";
 import { StudentDirectory } from "@/app/app/student-directory";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
+
+type ManagementSection = "students" | "classes" | "members" | "settings";
 
 export function ManagementHome({
   academyName,
@@ -92,11 +94,11 @@ export function ManagementHome({
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     students[0]?.id ?? null,
   );
+  const [activeSection, setActiveSection] = useState<ManagementSection>("students");
   const activeStudents = useMemo(
     () => students.filter((student) => student.status === "active"),
     [students],
   );
-  const inactiveStudents = students.length - activeStudents.length;
   const teacherOptions = members.filter((member) =>
     member.status === "active" &&
     ["owner", "manager", "teacher", "assistant"].includes(member.role),
@@ -668,53 +670,68 @@ export function ManagementHome({
     }
   }
 
+  const managementSections: Array<{
+    id: ManagementSection;
+    label: string;
+    detail: string;
+    count: string;
+  }> = [
+    { id: "students", label: "학생", detail: "명단·스케줄·연락처", count: `${activeStudents.length}` },
+    { id: "classes", label: "반", detail: "반·담당·일괄 스케줄", count: `${classes.length}` },
+    { id: "members", label: "구성원", detail: "권한·계정·담당 반", count: `${members.length}` },
+    { id: "settings", label: "설정", detail: "발신·정책·권한", count: "정책" },
+  ];
+
   return (
     <div className="space-y-4 sm:space-y-5">
-      <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-medium text-emerald-700">{academyName}</p>
-            <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
-              학원 기본 관리
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-              실제 등록 기능을 붙이기 전에, 원장이 확인해야 하는 학생·반·구성원 정보를
-              한 화면에 모았습니다.
-            </p>
+      <section className="rounded-lg border border-stone-200 bg-white shadow-sm">
+        <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+            Academy Admin
+          </p>
+          <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div className="min-w-0">
+              <h2 className="text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
+                {academyName}
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
+                학생, 반, 구성원, 발송 정책을 한 곳에서 관리합니다.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-6 rounded-md border border-stone-200 bg-stone-50 px-4 py-3 text-sm">
+              <Metric label="재원" value={`${activeStudents.length}명`} />
+              <Metric label="스케줄 미등록" value={`${students.filter((student) => student.schedules.filter((schedule) => schedule.isActive).length === 0).length}명`} />
+              <Metric label="반" value={`${classes.length}개`} />
+            </div>
           </div>
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-900">
-            학생 등록 후 주간 스케줄 입력 화면으로 이어지게 확장합니다.
-          </div>
+        </div>
+
+        <div className="grid border-b border-stone-200 bg-white md:grid-cols-4">
+          {managementSections.map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              onClick={() => setActiveSection(section.id)}
+              className={[
+                "min-w-0 border-b px-4 py-3 text-left transition md:border-b-0 md:border-r md:last:border-r-0",
+                activeSection === section.id
+                  ? "border-emerald-600 bg-emerald-50/70"
+                  : "border-stone-200 bg-white hover:bg-stone-50",
+              ].join(" ")}
+            >
+              <span className="flex items-center justify-between gap-3">
+                <span className="text-sm font-semibold text-stone-950">{section.label}</span>
+                <span className="rounded bg-stone-100 px-2 py-0.5 text-xs font-semibold text-stone-600">
+                  {section.count}
+                </span>
+              </span>
+              <span className="mt-1 block truncate text-xs text-stone-500">{section.detail}</span>
+            </button>
+          ))}
         </div>
       </section>
 
-      <section className="grid min-w-0 grid-cols-2 gap-3 lg:grid-cols-4">
-        <SummaryCard
-          icon={<GraduationCap size={19} />}
-          label="재원 학생"
-          value={`${activeStudents.length}명`}
-          detail={inactiveStudents > 0 ? `비활성 ${inactiveStudents}명 별도 관리` : "팔로업 대상 기준"}
-        />
-        <SummaryCard
-          icon={<BookOpen size={19} />}
-          label="반"
-          value={`${classes.length}개`}
-          detail="운영 보드 반 목록과 연결"
-        />
-        <SummaryCard
-          icon={<UsersRound size={19} />}
-          label="구성원"
-          value={`${members.length}명`}
-          detail="원장·관리자·선생님 권한"
-        />
-        <SummaryCard
-          icon={<ClipboardList size={19} />}
-          label="등록 준비"
-          value="3개 화면"
-          detail="학생, 반, 선생님"
-        />
-      </section>
-
+      {activeSection === "settings" ? (
       <ManagementPanel
         title="학원 운영 설정"
         description="서비스에 표시되는 학원명과 문자 발송 정책을 관리합니다."
@@ -816,8 +833,9 @@ export function ManagementHome({
           </p>
         ) : null}
       </ManagementPanel>
+      ) : null}
 
-      <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
+      {activeSection === "classes" ? (
         <ManagementPanel
           title="반 관리"
           description="반 이름, 과목, 학년, 담당 선생님을 등록하고 수정합니다."
@@ -921,7 +939,9 @@ export function ManagementHome({
             ))}
           </div>
         </ManagementPanel>
+      ) : null}
 
+      {activeSection === "members" ? (
         <ManagementPanel
           title="구성원 관리"
           description="원장, 관리자, 선생님 계정을 생성하고 권한과 활성 상태를 관리합니다."
@@ -997,8 +1017,9 @@ export function ManagementHome({
             ))}
           </div>
         </ManagementPanel>
-      </section>
+      ) : null}
 
+      {activeSection === "students" ? (
       <ManagementPanel
         title="학생 관리"
         description="학생과 학부모 연락처는 팔로업 발송의 기준 데이터입니다."
@@ -1125,6 +1146,16 @@ export function ManagementHome({
           onEditSchedule={openEditScheduleForm}
         />
       </ManagementPanel>
+      ) : null}
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-xs font-medium text-stone-500">{label}</p>
+      <p className="mt-1 truncate text-lg font-semibold text-stone-950">{value}</p>
     </div>
   );
 }
