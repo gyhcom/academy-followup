@@ -47,6 +47,7 @@
 - `PATCH /api/classes`
 - `POST /api/students`
 - `PATCH /api/students`
+- `POST /api/students/bulk`
 - `POST /api/student-schedules`
 - `PATCH /api/student-schedules`
 - `POST /api/student-schedules/bulk`

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, ClipboardList, GraduationCap, Pencil, Plus, UserPlus, UsersRound } from "lucide-react";
+import { BookOpen, ClipboardList, FileSpreadsheet, GraduationCap, Pencil, Plus, UserPlus, UsersRound } from "lucide-react";
 import type {
   BulkScheduleFormState,
   ClassFormState,
@@ -28,7 +28,9 @@ import {
   StudentForm,
 } from "@/app/app/management-forms";
 import { roleLabel } from "@/app/app/management-utils";
+import { StudentBulkImportForm } from "@/app/app/student-bulk-import";
 import { StudentDirectory } from "@/app/app/student-directory";
+import type { StudentImportValidatedRow } from "@/lib/student-import";
 
 export function ManagementHome({
   academyName,
@@ -51,6 +53,11 @@ export function ManagementHome({
   });
   const [studentForm, setStudentForm] = useState<StudentFormState | null>(null);
   const [studentFormStatus, setStudentFormStatus] = useState<FormStatus>({
+    status: "idle",
+    message: "",
+  });
+  const [isBulkStudentImportOpen, setIsBulkStudentImportOpen] = useState(false);
+  const [bulkStudentImportStatus, setBulkStudentImportStatus] = useState<FormStatus>({
     status: "idle",
     message: "",
   });
@@ -104,6 +111,8 @@ export function ManagementHome({
     setScheduleFormStatus({ status: "idle", message: "" });
     setBulkScheduleForm(null);
     setBulkScheduleFormStatus({ status: "idle", message: "" });
+    setIsBulkStudentImportOpen(false);
+    setBulkStudentImportStatus({ status: "idle", message: "" });
     setClassForm({
       mode: "create",
       classId: "",
@@ -124,6 +133,8 @@ export function ManagementHome({
     setScheduleFormStatus({ status: "idle", message: "" });
     setBulkScheduleForm(null);
     setBulkScheduleFormStatus({ status: "idle", message: "" });
+    setIsBulkStudentImportOpen(false);
+    setBulkStudentImportStatus({ status: "idle", message: "" });
     setClassForm({
       mode: "edit",
       classId: classItem.id,
@@ -265,6 +276,8 @@ export function ManagementHome({
     setScheduleFormStatus({ status: "idle", message: "" });
     setBulkScheduleForm(null);
     setBulkScheduleFormStatus({ status: "idle", message: "" });
+    setIsBulkStudentImportOpen(false);
+    setBulkStudentImportStatus({ status: "idle", message: "" });
     setStudentForm({
       mode: "create",
       studentId: "",
@@ -289,6 +302,8 @@ export function ManagementHome({
     setScheduleFormStatus({ status: "idle", message: "" });
     setBulkScheduleForm(null);
     setBulkScheduleFormStatus({ status: "idle", message: "" });
+    setIsBulkStudentImportOpen(false);
+    setBulkStudentImportStatus({ status: "idle", message: "" });
     setStudentForm({
       mode: "edit",
       studentId: student.id,
@@ -348,6 +363,73 @@ export function ManagementHome({
       setStudentFormStatus({
         status: "error",
         message: error instanceof Error ? error.message : "학생 정보를 저장하지 못했습니다.",
+      });
+    }
+  }
+
+  function openBulkStudentImport() {
+    setMemberForm(null);
+    setMemberFormStatus({ status: "idle", message: "" });
+    setClassForm(null);
+    setClassFormStatus({ status: "idle", message: "" });
+    setStudentForm(null);
+    setStudentFormStatus({ status: "idle", message: "" });
+    setScheduleForm(null);
+    setScheduleFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
+    setIsBulkStudentImportOpen(true);
+    setBulkStudentImportStatus({ status: "idle", message: "" });
+  }
+
+  async function saveBulkStudentImport(rows: StudentImportValidatedRow[]) {
+    setBulkStudentImportStatus({ status: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/students/bulk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          rows: rows.map((row) => ({
+            rowNumber: row.rowNumber,
+            name: row.name,
+            className: row.className,
+            schoolName: row.schoolName,
+            gradeLabel: row.gradeLabel,
+            parentName: row.parentName,
+            parentPhone: row.normalizedParentPhone,
+            studentPhone: row.normalizedStudentPhone ?? "",
+            status: row.status,
+          })),
+        }),
+      });
+      const payload = (await response.json()) as {
+        error?: string;
+        message?: string;
+        insertedCount?: number;
+        duplicateCount?: number;
+        invalidCount?: number;
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "학생 일괄 등록에 실패했습니다.");
+      }
+
+      setBulkStudentImportStatus({
+        status: "saved",
+        message:
+          payload.message ??
+          `등록 ${payload.insertedCount ?? 0}명 · 중복 ${payload.duplicateCount ?? 0}명 · 오류 ${payload.invalidCount ?? 0}명`,
+      });
+      setIsBulkStudentImportOpen(false);
+      router.refresh();
+    } catch (error) {
+      setBulkStudentImportStatus({
+        status: "error",
+        message:
+          error instanceof Error ? error.message : "학생 일괄 등록에 실패했습니다.",
       });
     }
   }
@@ -924,6 +1006,50 @@ export function ManagementHome({
         actionIcon={<Plus size={14} />}
         onAction={openCreateStudentForm}
       >
+        <div className="mb-3 flex flex-col gap-2 rounded-lg border border-stone-200 bg-stone-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-stone-950">초기 세팅은 일괄 등록으로 시작합니다.</p>
+            <p className="mt-1 text-xs leading-5 text-stone-500">
+              200명 규모에서도 학생 목록, 검색, 스케줄 입력 화면이 깨지지 않는지 같이 확인합니다.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={openBulkStudentImport}
+            className="flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border border-sky-200 bg-white px-3 text-xs font-semibold text-sky-800 transition hover:border-sky-300 hover:bg-sky-50 sm:w-auto"
+          >
+            <FileSpreadsheet size={14} />
+            CSV 일괄 등록
+          </button>
+        </div>
+
+        {isBulkStudentImportOpen ? (
+          <StudentBulkImportForm
+            classes={classes}
+            status={bulkStudentImportStatus}
+            onCancel={() => {
+              setIsBulkStudentImportOpen(false);
+              setBulkStudentImportStatus({ status: "idle", message: "" });
+            }}
+            onSubmit={saveBulkStudentImport}
+          />
+        ) : null}
+
+        {!isBulkStudentImportOpen &&
+        (bulkStudentImportStatus.status === "saved" ||
+          bulkStudentImportStatus.status === "error") ? (
+          <p
+            className={[
+              "mb-3 rounded-md border px-3 py-2 text-sm",
+              bulkStudentImportStatus.status === "saved"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-red-200 bg-red-50 text-red-900",
+            ].join(" ")}
+          >
+            {bulkStudentImportStatus.message}
+          </p>
+        ) : null}
+
         {studentForm ? (
           <StudentForm
             form={studentForm}
