@@ -449,8 +449,8 @@ export function OperationsBoard({
 
   function handleStudentSelect(studentId: string) {
     setSelectedStudentId(studentId);
-    setHasMobileFollowupSelection(false);
-    setIsMobileComposerOpen(false);
+    setHasMobileFollowupSelection(true);
+    setIsMobileComposerOpen(true);
     setMakeupCandidateTime("");
     setSelectedMakeupCandidate(null);
     setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
@@ -460,7 +460,7 @@ export function OperationsBoard({
     setSelectedStudentId(studentId);
     setSelectedReason(reasonId);
     setHasMobileFollowupSelection(true);
-    setIsMobileComposerOpen(false);
+    setIsMobileComposerOpen(true);
     setMakeupCandidateTime("");
     setSelectedMakeupCandidate(null);
     setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
@@ -711,7 +711,7 @@ export function OperationsBoard({
       className={[
         "mx-auto max-w-6xl space-y-4 sm:space-y-5",
         shouldShowMobileSelectionBar
-          ? "pb-[calc(8rem+env(safe-area-inset-bottom))] lg:pb-[max(1rem,env(safe-area-inset-bottom))]"
+          ? "pb-[calc(13rem+env(safe-area-inset-bottom))] lg:pb-[max(1rem,env(safe-area-inset-bottom))]"
           : "pb-[max(1rem,env(safe-area-inset-bottom))]",
       ].join(" ")}
     >
@@ -769,8 +769,8 @@ export function OperationsBoard({
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(260px,0.9fr)_minmax(340px,1.1fr)] lg:items-start xl:grid-cols-[320px_minmax(380px,1fr)_400px]">
-        <section aria-labelledby="student-flow-title" className="space-y-3">
+      <section className="grid gap-4 lg:grid-cols-[minmax(260px,0.95fr)_minmax(360px,1.05fr)] lg:items-start xl:grid-cols-[320px_minmax(380px,1fr)_400px]">
+        <section aria-labelledby="student-flow-title" className="space-y-3 lg:order-1">
           <div className="flex items-end justify-between gap-3 px-1">
             <div>
               <h2 id="student-flow-title" className="text-base font-semibold text-stone-950">
@@ -879,7 +879,7 @@ export function OperationsBoard({
           </div>
         </section>
 
-        <div className="space-y-4">
+        <div className="space-y-4 lg:order-3 lg:col-span-2 xl:order-2 xl:col-span-1">
           <MakeupCalendarPanel
             selectedStudent={selectedStudent}
             selectedCandidate={selectedMakeupCandidate}
@@ -897,7 +897,7 @@ export function OperationsBoard({
         </div>
 
         <MessageComposer
-          className="hidden lg:col-span-2 lg:block xl:col-span-1"
+          className="hidden lg:order-2 lg:block xl:order-3"
           composerId="desktop-message-composer"
           isDraftEdited={isDraftEdited}
           isMessageBlank={isMessageBlank}
@@ -947,7 +947,7 @@ export function OperationsBoard({
       ) : null}
 
       {isMobileComposerOpen ? (
-        <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
           <button
             type="button"
             aria-label="문자 작성 닫기"
@@ -1442,11 +1442,11 @@ function MobileSelectionBar({
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-stone-200 bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_30px_rgba(28,25,23,0.12)] backdrop-blur lg:hidden">
+    <div className="fixed inset-x-0 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 border-t border-stone-200 bg-white/95 px-4 pb-3 pt-3 shadow-[0_-10px_30px_rgba(28,25,23,0.12)] backdrop-blur lg:hidden">
       <div className="mx-auto flex max-w-6xl items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-stone-950">
-            {selectedStudent.name} · {reasonLabel(selectedReason)}
+            {selectedStudent.name} · {reasonLabel(selectedReason)} 문자 작성
           </p>
           <p className="mt-0.5 truncate text-xs text-stone-500">
             {isPreviewLoading
@@ -1461,7 +1461,7 @@ function MobileSelectionBar({
           onClick={onOpenComposer}
           className="min-h-11 shrink-0 rounded-md bg-[#315C7C] px-4 text-sm font-semibold text-white"
         >
-          확인/수정
+          문자 작성
         </button>
       </div>
     </div>

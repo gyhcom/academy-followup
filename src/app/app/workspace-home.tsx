@@ -1,11 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
   ArrowRight,
+  CalendarDays,
   ClipboardCheck,
   Clock3,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
   MessageSquareText,
   Settings,
 } from "lucide-react";
@@ -27,7 +31,13 @@ type WorkspaceHomeProps = {
   roleLabel: string;
   canManage: boolean;
   classes: OperationsClass[];
+  selectedDate: string;
   records: AttendanceRecordItem[];
+  loadState: {
+    status: "idle" | "loading" | "error";
+    error: string;
+  };
+  onDateChange: (date: string) => void;
   onNavigate: (view: WorkspaceView) => void;
   onStudentSelect: (selection: {
     classId: string;
@@ -65,7 +75,10 @@ export function WorkspaceHome({
   roleLabel,
   canManage,
   classes,
+  selectedDate,
   records,
+  loadState,
+  onDateChange,
   onNavigate,
   onStudentSelect,
 }: WorkspaceHomeProps) {
@@ -78,6 +91,7 @@ export function WorkspaceHome({
   const unsentCount = followupItems.length - sentCount;
   const filteredItems = getFilteredItems(followupItems, expandedFilter);
   const copy = getRoleHomeCopy({ academyName, teacherName, role, roleLabel });
+  const isToday = selectedDate === getTodayDate();
 
   function toggleFilter(filter: FollowupFilter) {
     setExpandedFilter((current) => (current === filter ? null : filter));
@@ -86,13 +100,19 @@ export function WorkspaceHome({
   return (
     <section className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
       <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-5 sm:shadow-sm">
-        <p className="text-sm font-semibold text-[#315C7C]">{academyName}</p>
-        <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
-          {copy.title}
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-          {copy.description}
-        </p>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[#315C7C]">{academyName}</p>
+            <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
+              {copy.title}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
+              {copy.description}
+            </p>
+          </div>
+
+          <HomeDateControl value={selectedDate} onChange={onDateChange} />
+        </div>
       </section>
 
       <section aria-label="주요 바로가기" className="grid gap-3 sm:grid-cols-3">
@@ -120,39 +140,63 @@ export function WorkspaceHome({
 
       <section className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm">
         <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
-          <p className="text-sm font-semibold text-[#315C7C]">오늘 요약</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-[#315C7C]">
+              {isToday ? "오늘 요약" : "선택 날짜 요약"}
+            </p>
+            {loadState.status === "loading" ? (
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-500">
+                <Loader2 size={13} className="animate-spin" />
+                불러오는 중
+              </span>
+            ) : null}
+          </div>
           <h3 className="mt-1 text-lg font-semibold text-stone-950">
-            결석/지각 학생은 문자 저장 후 연락 완료로 표시됩니다.
+            {formatHomeDate(selectedDate)} 기준 운영 현황
           </h3>
+          <p className="mt-1 text-sm leading-6 text-stone-600">
+            결석/지각 학생은 문자 저장 후 연락 완료로 표시됩니다.
+          </p>
           <p className="mt-1 text-sm leading-6 text-stone-600">
             숫자를 누르면 해당 학생 목록만 아래에 펼쳐집니다.
           </p>
+          {loadState.status === "error" ? (
+            <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-900">
+              {loadState.error}
+            </div>
+          ) : null}
         </div>
 
-        <div className="grid grid-cols-3 gap-2 border-b border-stone-200 p-4 sm:p-5">
-          <SummaryButton
-            label="확인할 학생"
-            value={`${followupItems.length}명`}
-            isActive={expandedFilter === "all"}
-            onClick={() => toggleFilter("all")}
-          />
-          <SummaryButton
-            label="연락 전"
-            value={`${unsentCount}명`}
-            tone="danger"
-            isActive={expandedFilter === "unsent"}
-            onClick={() => toggleFilter("unsent")}
-          />
-          <SummaryButton
-            label="연락 완료"
-            value={`${sentCount}명`}
-            tone="success"
-            isActive={expandedFilter === "sent"}
-            onClick={() => toggleFilter("sent")}
-          />
-        </div>
+        {records.length === 0 && loadState.status !== "loading" ? (
+          <HomeEmptyState selectedDate={selectedDate} onDateChange={onDateChange} />
+        ) : (
+          <>
+            <div className="grid grid-cols-3 gap-2 border-b border-stone-200 p-4 sm:p-5">
+              <SummaryButton
+                label="확인할 학생"
+                value={`${followupItems.length}명`}
+                isActive={expandedFilter === "all"}
+                onClick={() => toggleFilter("all")}
+              />
+              <SummaryButton
+                label="연락 전"
+                value={`${unsentCount}명`}
+                tone="danger"
+                isActive={expandedFilter === "unsent"}
+                onClick={() => toggleFilter("unsent")}
+              />
+              <SummaryButton
+                label="연락 완료"
+                value={`${sentCount}명`}
+                tone="success"
+                isActive={expandedFilter === "sent"}
+                onClick={() => toggleFilter("sent")}
+              />
+            </div>
+          </>
+        )}
 
-        {expandedFilter ? (
+        {expandedFilter && records.length > 0 ? (
           <div>
             <div className="flex items-center justify-between gap-3 bg-stone-50 px-4 py-3 text-sm sm:px-5">
               <p className="font-semibold text-stone-900">
@@ -185,6 +229,144 @@ export function WorkspaceHome({
         ) : null}
       </section>
     </section>
+  );
+}
+
+function HomeDateControl({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (date: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function openCalendar() {
+    const input = inputRef.current;
+
+    if (!input) {
+      return;
+    }
+
+    try {
+      if (typeof input.showPicker === "function") {
+        input.showPicker();
+        return;
+      }
+    } catch {
+      // 브라우저별 date picker 제약이 있어 focus/click으로 보완합니다.
+    }
+
+    input.focus();
+    input.click();
+  }
+
+  return (
+    <div className="w-full">
+      <span className="mb-1 block text-xs font-semibold text-stone-500">운영 기준 날짜</span>
+      <div className="grid grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] gap-2">
+        <button
+          type="button"
+          aria-label="전날 운영 요약 보기"
+          onClick={() => onChange(shiftDate(value, -1))}
+          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50"
+        >
+          <ChevronLeft size={18} />
+        </button>
+
+        <div className="relative">
+          <input
+            ref={inputRef}
+            type="date"
+            value={value}
+            onChange={(event) => {
+              if (event.target.value) {
+                onChange(event.target.value);
+              }
+            }}
+            className="sr-only"
+            tabIndex={-1}
+            aria-hidden="true"
+          />
+          <button
+            type="button"
+            onClick={openCalendar}
+            className="flex min-h-11 w-full items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-[#315C7C] hover:bg-[#EAF1F8] focus:border-[#315C7C] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+          >
+            <CalendarDays size={17} className="shrink-0 text-stone-500" />
+            <span className="min-w-0 flex-1 truncate tabular-nums">
+              {formatHomeDate(value)}
+            </span>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          aria-label="다음날 운영 요약 보기"
+          onClick={() => onChange(shiftDate(value, 1))}
+          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50"
+        >
+          <ChevronRight size={18} />
+        </button>
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => onChange(shiftDate(getTodayDate(), -1))}
+          className="min-h-9 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-600 transition hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C]"
+        >
+          어제 보기
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange(getTodayDate())}
+          className="min-h-9 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-600 transition hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C]"
+        >
+          오늘 보기
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function HomeEmptyState({
+  selectedDate,
+  onDateChange,
+}: {
+  selectedDate: string;
+  onDateChange: (date: string) => void;
+}) {
+  const isToday = selectedDate === getTodayDate();
+
+  return (
+    <div className="border-b border-stone-200 px-4 py-5 sm:px-5">
+      <div className="rounded-lg border border-dashed border-stone-300 bg-stone-50 px-4 py-5 text-center">
+        <p className="text-sm font-semibold text-stone-950">
+          이 날짜에는 출석/연락 기록이 없습니다.
+        </p>
+        <p className="mt-1 text-sm leading-6 text-stone-600">
+          {formatHomeDate(selectedDate)} 기준 기록이 아직 없어 학생 목록을 표시하지 않습니다.
+        </p>
+        <div className="mt-4 flex flex-col justify-center gap-2 sm:flex-row">
+          {isToday ? (
+            <button
+              type="button"
+              onClick={() => onDateChange(shiftDate(getTodayDate(), -1))}
+              className="min-h-10 rounded-md border border-[#C9D6E2] bg-white px-4 text-sm font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8]"
+            >
+              어제 기록 보기
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => onDateChange(getTodayDate())}
+            className="min-h-10 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 transition hover:bg-stone-100"
+          >
+            오늘로 돌아가기
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -444,4 +626,46 @@ function followupReasonForStatus(status: AttendanceStatus): FollowupReason {
   }
 
   return "absence";
+}
+
+function formatHomeDate(dateValue: string) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateValue;
+  }
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  }).format(date);
+}
+
+function getTodayDate() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function shiftDate(dateValue: string, amount: number) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateValue;
+  }
+
+  date.setDate(date.getDate() + amount);
+
+  const nextYear = date.getFullYear();
+  const nextMonth = `${date.getMonth() + 1}`.padStart(2, "0");
+  const nextDay = `${date.getDate()}`.padStart(2, "0");
+
+  return `${nextYear}-${nextMonth}-${nextDay}`;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { ClipboardCheck, Home, MessageSquareText, Settings } from "lucide-react";
 import {
@@ -53,6 +53,11 @@ type OperationsSelection = {
   reason: FollowupReason;
 };
 
+type AttendanceApiResponse = {
+  records?: AttendanceRecordItem[];
+  error?: string;
+};
+
 export function AppWorkspace({
   academyName,
   teacherName,
@@ -68,9 +73,57 @@ export function AppWorkspace({
 }: AppWorkspaceProps) {
   const canManage = canManageAcademy(role);
   const [activeView, setActiveView] = useState<WorkspaceView>("home");
+  const [selectedDate, setSelectedDate] = useState(attendanceDate);
+  const [workspaceAttendanceRecords, setWorkspaceAttendanceRecords] =
+    useState(attendanceRecords);
+  const [attendanceLoadState, setAttendanceLoadState] = useState<{
+    status: "idle" | "loading" | "error";
+    error: string;
+  }>({ status: "idle", error: "" });
   const [operationsSelection, setOperationsSelection] =
     useState<OperationsSelection | null>(null);
   const visibleView = !canManage && activeView === "management" ? "home" : activeView;
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadAttendanceRecords() {
+      setAttendanceLoadState({ status: "loading", error: "" });
+
+      try {
+        const response = await fetch(`/api/attendance?date=${selectedDate}`, {
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as AttendanceApiResponse;
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "출석 기록을 불러오지 못했습니다.");
+        }
+
+        setWorkspaceAttendanceRecords(payload.records ?? []);
+        setAttendanceLoadState({ status: "idle", error: "" });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setWorkspaceAttendanceRecords([]);
+        setAttendanceLoadState({
+          status: "error",
+          error:
+            error instanceof Error
+              ? error.message
+              : "출석 기록을 불러오지 못했습니다.",
+        });
+      }
+    }
+
+    void loadAttendanceRecords();
+
+    return () => {
+      controller.abort();
+    };
+  }, [selectedDate]);
 
   function handleHomeStudentSelect(selection: OperationsSelection) {
     setOperationsSelection(selection);
@@ -87,13 +140,17 @@ export function AppWorkspace({
 
       {visibleView === "home" ? (
         <WorkspaceHome
+          key={selectedDate}
           academyName={academyName}
           teacherName={teacherName}
           role={role}
           roleLabel={roleLabel}
           canManage={canManage}
           classes={classes}
-          records={attendanceRecords}
+          selectedDate={selectedDate}
+          records={workspaceAttendanceRecords}
+          loadState={attendanceLoadState}
+          onDateChange={setSelectedDate}
           onNavigate={setActiveView}
           onStudentSelect={handleHomeStudentSelect}
         />
@@ -110,8 +167,10 @@ export function AppWorkspace({
           academyName={academyName}
           teacherName={teacherName}
           classes={classes}
-          initialDate={attendanceDate}
-          initialRecords={attendanceRecords}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          initialRecords={workspaceAttendanceRecords}
+          onRecordsChange={setWorkspaceAttendanceRecords}
         />
       ) : (
         <ManagementHome

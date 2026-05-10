@@ -70,8 +70,10 @@ type AttendanceBoardProps = {
   academyName: string;
   teacherName: string;
   classes: AttendanceClass[];
-  initialDate: string;
+  selectedDate: string;
+  onDateChange: (date: string) => void;
   initialRecords: AttendanceRecordItem[];
+  onRecordsChange?: (records: AttendanceRecordItem[]) => void;
 };
 
 type AttendanceApiResponse = {
@@ -199,10 +201,11 @@ export function AttendanceBoard({
   academyName,
   teacherName,
   classes,
-  initialDate,
+  selectedDate,
+  onDateChange,
   initialRecords,
+  onRecordsChange,
 }: AttendanceBoardProps) {
-  const [selectedDate, setSelectedDate] = useState(initialDate);
   const [attendanceRecords, setAttendanceRecords] = useState(initialRecords);
   const [selectedSessionKey, setSelectedSessionKey] = useState("");
   const [loadState, setLoadState] = useState<{
@@ -343,7 +346,9 @@ export function AttendanceBoard({
           throw new Error(payload.error ?? "출석 기록을 불러오지 못했습니다.");
         }
 
-        setAttendanceRecords(payload.records ?? []);
+        const nextRecords = payload.records ?? [];
+        setAttendanceRecords(nextRecords);
+        onRecordsChange?.(nextRecords);
         setLoadState({ status: "idle", error: "" });
       } catch (error) {
         if (controller.signal.aborted) {
@@ -365,7 +370,7 @@ export function AttendanceBoard({
     return () => {
       controller.abort();
     };
-  }, [selectedDate]);
+  }, [onRecordsChange, selectedDate]);
 
   useEffect(() => {
     if (!followupTarget) {
@@ -490,7 +495,11 @@ export function AttendanceBoard({
       const savedRecord = payload.record;
       const followupReason = getFollowupReasonForAttendanceStatus(status);
 
-      setAttendanceRecords((current) => mergeAttendanceRecord(current, savedRecord));
+      setAttendanceRecords((current) => {
+        const nextRecords = mergeAttendanceRecord(current, savedRecord);
+        onRecordsChange?.(nextRecords);
+        return nextRecords;
+      });
       setSaveState({ key: updateKey, status: "saved", error: "" });
 
       if (followupReason) {
@@ -573,8 +582,8 @@ export function AttendanceBoard({
         message: "",
         error: "",
       });
-      setAttendanceRecords((current) =>
-        current.map((record) =>
+      setAttendanceRecords((current) => {
+        const nextRecords = current.map((record) =>
           record.id === followupTarget.record.id
             ? {
                 ...record,
@@ -583,8 +592,10 @@ export function AttendanceBoard({
                 followupSentAt: null,
               }
             : record,
-        ),
-      );
+        );
+        onRecordsChange?.(nextRecords);
+        return nextRecords;
+      });
     } catch (error) {
       setFollowupSave({
         key: followupTargetKey,
@@ -637,8 +648,8 @@ export function AttendanceBoard({
           (payload.dryRun ? "dry-run 발송을 기록했습니다." : "문자를 발송했습니다."),
         error: "",
       });
-      setAttendanceRecords((current) =>
-        current.map((record) =>
+      setAttendanceRecords((current) => {
+        const nextRecords = current.map((record) =>
           record.followupId === savedFollowupId
             ? {
                 ...record,
@@ -646,8 +657,10 @@ export function AttendanceBoard({
                 followupSentAt: new Date().toISOString(),
               }
             : record,
-        ),
-      );
+        );
+        onRecordsChange?.(nextRecords);
+        return nextRecords;
+      });
     } catch (error) {
       setMessageSend({
         followupId: savedFollowupId,
@@ -675,7 +688,7 @@ export function AttendanceBoard({
             </p>
           </div>
 
-          <AttendanceDateControl value={selectedDate} onChange={setSelectedDate} />
+          <AttendanceDateControl value={selectedDate} onChange={onDateChange} />
         </div>
       </section>
 
