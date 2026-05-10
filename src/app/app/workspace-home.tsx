@@ -16,6 +16,7 @@ import {
 } from "@/lib/attendance";
 import type { AttendanceRecordItem } from "@/app/app/attendance-board";
 import type { OperationsClass, OperationsStudent } from "@/app/app/operations-board";
+import type { FollowupReason } from "@/lib/followup-templates";
 
 type WorkspaceView = "home" | "operations" | "attendance" | "management";
 
@@ -28,12 +29,18 @@ type WorkspaceHomeProps = {
   classes: OperationsClass[];
   records: AttendanceRecordItem[];
   onNavigate: (view: WorkspaceView) => void;
+  onStudentSelect: (selection: {
+    classId: string;
+    studentId: string;
+    reason: FollowupReason;
+  }) => void;
 };
 
 type FollowupFilter = "all" | "unsent" | "sent";
 
 type HomeFollowupItem = {
   key: string;
+  classId: string;
   className: string;
   student: OperationsStudent;
   status: AttendanceStatus;
@@ -60,6 +67,7 @@ export function WorkspaceHome({
   classes,
   records,
   onNavigate,
+  onStudentSelect,
 }: WorkspaceHomeProps) {
   const [expandedFilter, setExpandedFilter] = useState<FollowupFilter | null>(null);
   const followupItems = useMemo(
@@ -161,7 +169,11 @@ export function WorkspaceHome({
             <div className="divide-y divide-stone-100">
               {filteredItems.length > 0 ? (
                 filteredItems.map((item) => (
-                  <HomeFollowupRow key={item.key} item={item} />
+                  <HomeFollowupRow
+                    key={item.key}
+                    item={item}
+                    onStudentSelect={onStudentSelect}
+                  />
                 ))
               ) : (
                 <p className="p-4 text-sm leading-6 text-stone-600 sm:px-5">
@@ -245,14 +257,36 @@ function SummaryButton({
   );
 }
 
-function HomeFollowupRow({ item }: { item: HomeFollowupItem }) {
+function HomeFollowupRow({
+  item,
+  onStudentSelect,
+}: {
+  item: HomeFollowupItem;
+  onStudentSelect: (selection: {
+    classId: string;
+    studentId: string;
+    reason: FollowupReason;
+  }) => void;
+}) {
   const isSent = item.followupStatus === "sent";
 
   return (
     <article className="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-5">
-      <div className="min-w-0">
+      <button
+        type="button"
+        onClick={() =>
+          onStudentSelect({
+            classId: item.classId,
+            studentId: item.student.id,
+            reason: followupReasonForStatus(item.status),
+          })
+        }
+        className="min-w-0 rounded-md text-left transition hover:bg-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+      >
         <div className="flex flex-wrap items-center gap-2">
-          <p className="font-semibold text-stone-950">{item.student.name}</p>
+          <p className="font-semibold text-[#315C7C] underline-offset-4 hover:underline">
+            {item.student.name}
+          </p>
           <span
             className={[
               "rounded-md px-2 py-1 text-xs font-semibold",
@@ -273,7 +307,7 @@ function HomeFollowupRow({ item }: { item: HomeFollowupItem }) {
         <p className="mt-1 text-sm text-stone-600">
           {item.className} · {item.student.gradeLabel ?? "학년 미지정"}
         </p>
-      </div>
+      </button>
       <p className="flex items-center gap-1 text-xs text-stone-500">
         <Clock3 size={13} />
         {item.startTime} - {item.endTime}
@@ -335,6 +369,7 @@ function buildHomeFollowupItems(
       return {
         key: record.id,
         className: classItem.name,
+        classId: classItem.id,
         student,
         status: record.status as AttendanceStatus,
         startTime: record.scheduledStartTime,
@@ -393,4 +428,20 @@ function statusTone(status: AttendanceStatus) {
   }
 
   return "bg-violet-50 text-violet-800";
+}
+
+function followupReasonForStatus(status: AttendanceStatus): FollowupReason {
+  if (status === "late") {
+    return "late";
+  }
+
+  if (status === "makeup") {
+    return "makeup";
+  }
+
+  if (status === "needs_check") {
+    return "consultation";
+  }
+
+  return "absence";
 }

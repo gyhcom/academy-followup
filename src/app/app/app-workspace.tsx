@@ -20,6 +20,7 @@ import {
   OperationsBoard,
   type OperationsClass,
 } from "@/app/app/operations-board";
+import type { FollowupReason } from "@/lib/followup-templates";
 import { canManageAcademy } from "@/lib/permissions";
 
 export type {
@@ -46,6 +47,12 @@ type AppWorkspaceProps = {
 
 type WorkspaceView = "home" | "operations" | "attendance" | "management";
 
+type OperationsSelection = {
+  classId: string;
+  studentId: string;
+  reason: FollowupReason;
+};
+
 export function AppWorkspace({
   academyName,
   teacherName,
@@ -61,7 +68,14 @@ export function AppWorkspace({
 }: AppWorkspaceProps) {
   const canManage = canManageAcademy(role);
   const [activeView, setActiveView] = useState<WorkspaceView>("home");
+  const [operationsSelection, setOperationsSelection] =
+    useState<OperationsSelection | null>(null);
   const visibleView = !canManage && activeView === "management" ? "home" : activeView;
+
+  function handleHomeStudentSelect(selection: OperationsSelection) {
+    setOperationsSelection(selection);
+    setActiveView("operations");
+  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-4 pb-20 sm:space-y-5 sm:pb-0">
@@ -81,6 +95,7 @@ export function AppWorkspace({
           classes={classes}
           records={attendanceRecords}
           onNavigate={setActiveView}
+          onStudentSelect={handleHomeStudentSelect}
         />
       ) : visibleView === "operations" ? (
         <OperationsBoard
@@ -88,6 +103,7 @@ export function AppWorkspace({
           teacherName={teacherName}
           roleLabel={roleLabel}
           classes={classes}
+          initialSelection={operationsSelection}
         />
       ) : visibleView === "attendance" ? (
         <AttendanceBoard

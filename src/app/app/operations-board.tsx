@@ -54,6 +54,11 @@ type OperationsBoardProps = {
   teacherName: string;
   roleLabel: string;
   classes: OperationsClass[];
+  initialSelection?: {
+    classId: string;
+    studentId: string;
+    reason: FollowupReason;
+  } | null;
 };
 
 type MessagePreviewState = {
@@ -132,19 +137,25 @@ export function OperationsBoard({
   teacherName,
   roleLabel,
   classes,
+  initialSelection,
 }: OperationsBoardProps) {
-  const [selectedClassId, setSelectedClassId] = useState(classes[0]?.id ?? "");
+  const [selectedClassId, setSelectedClassId] = useState(
+    initialSelection?.classId ?? classes[0]?.id ?? "",
+  );
   const selectedClass = useMemo(
     () => classes.find((classItem) => classItem.id === selectedClassId) ?? classes[0],
     [classes, selectedClassId],
   );
   const [selectedStudentId, setSelectedStudentId] = useState(
-    selectedClass?.students[0]?.id ?? "",
+    initialSelection?.studentId ?? selectedClass?.students[0]?.id ?? "",
   );
-  const [selectedReason, setSelectedReason] = useState<FollowupReason>("absence");
+  const [selectedReason, setSelectedReason] = useState<FollowupReason>(
+    initialSelection?.reason ?? "absence",
+  );
   const [selectedRecipientType, setSelectedRecipientType] =
     useState<MessageRecipientType>("parent");
-  const [hasMobileFollowupSelection, setHasMobileFollowupSelection] = useState(false);
+  const [hasMobileFollowupSelection, setHasMobileFollowupSelection] =
+    useState(Boolean(initialSelection));
   const [isMobileComposerOpen, setIsMobileComposerOpen] = useState(false);
   const [makeupCandidateTime, setMakeupCandidateTime] = useState("");
   const [selectedMakeupCandidate, setSelectedMakeupCandidate] =
@@ -202,6 +213,7 @@ export function OperationsBoard({
     items: [],
     error: "",
   });
+
   const messageBody =
     messageDraft.key === messageKey
       ? messageDraft.body
