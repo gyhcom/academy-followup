@@ -843,7 +843,7 @@ export function ManagementHome({
             className={[
               "mt-3 rounded-md border px-3 py-2 text-sm",
               settingsFormStatus.status === "saved"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -894,7 +894,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-md border px-3 py-2 text-sm",
                 classFormStatus.status === "saved"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -908,7 +908,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-md border px-3 py-2 text-sm",
                 bulkScheduleFormStatus.status === "saved"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -991,7 +991,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-md border px-3 py-2 text-sm",
                 memberFormStatus.status === "saved"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -1079,7 +1079,7 @@ export function ManagementHome({
             className={[
               "mb-3 rounded-md border px-3 py-2 text-sm",
               bulkStudentImportStatus.status === "saved"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -1106,7 +1106,7 @@ export function ManagementHome({
             className={[
               "mb-3 rounded-md border px-3 py-2 text-sm",
               studentFormStatus.status === "saved"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -1134,7 +1134,7 @@ export function ManagementHome({
             className={[
               "mb-3 rounded-md border px-3 py-2 text-sm",
               scheduleFormStatus.status === "saved"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >

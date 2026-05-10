@@ -50,7 +50,7 @@ export function OwnerPendingBoard({ classes, records }: OwnerPendingBoardProps) 
     return (
       <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="flex items-start gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF1F8] text-[#244B67]">
             <CheckCircle2 size={20} />
           </div>
           <div>
@@ -69,7 +69,7 @@ export function OwnerPendingBoard({ classes, records }: OwnerPendingBoardProps) 
       <div className="border-b border-stone-200 p-4 sm:p-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="flex items-center gap-2 text-sm font-semibold text-emerald-700">
+            <p className="flex items-center gap-2 text-sm font-semibold text-[#315C7C]">
               <AlertTriangle size={16} />
               원장 오늘 미처리 보드
             </p>
@@ -94,7 +94,7 @@ export function OwnerPendingBoard({ classes, records }: OwnerPendingBoardProps) 
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value as "all" | AttendanceStatus)}
-              className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-900 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             >
               <option value="all">전체 상태</option>
               {actionableStatuses.map((status) => (
@@ -110,7 +110,7 @@ export function OwnerPendingBoard({ classes, records }: OwnerPendingBoardProps) 
             <select
               value={classFilter}
               onChange={(event) => setClassFilter(event.target.value)}
-              className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-900 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             >
               <option value="all">전체 반</option>
               {classes.map((classItem) => (
@@ -151,7 +151,7 @@ function Metric({
   const toneClass = {
     default: "text-stone-950",
     danger: "text-red-700",
-    success: "text-emerald-700",
+    success: "text-[#315C7C]",
   }[tone];
 
   return (
@@ -174,7 +174,7 @@ function PendingRow({ item }: { item: PendingItem }) {
           <span
             className={[
               "rounded-md px-2 py-1 text-xs font-semibold",
-              isSent ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800",
+              isSent ? "bg-[#EAF1F8] text-[#244B67]" : "bg-amber-50 text-amber-800",
             ].join(" ")}
           >
             {isSent ? "발송 완료" : item.followupStatus === "draft" ? "초안 생성" : "미처리"}

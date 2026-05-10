@@ -144,7 +144,7 @@ export function MemberForm({
           onClick={onSave}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
           <Save size={16} />
@@ -173,7 +173,7 @@ export function ClassForm({
   const canSave = form.name.trim().length > 0 && status.status !== "saving";
 
   return (
-    <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 min-w-0 overflow-hidden">
+    <div className="mb-4 min-w-0 overflow-hidden rounded-xl border border-[#C9D6E2] bg-[#EAF1F8] p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-stone-950">
@@ -200,7 +200,7 @@ export function ClassForm({
             value={form.name}
             onChange={(event) => onChange({ ...form, name: event.target.value })}
             placeholder="예: 중2 수학 A반"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
           />
         </label>
 
@@ -209,7 +209,7 @@ export function ClassForm({
           <select
             value={form.teacherId}
             onChange={(event) => onChange({ ...form, teacherId: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
           >
             <option value="">담당자 미지정</option>
             {teacherOptions.map((member) => (
@@ -226,7 +226,7 @@ export function ClassForm({
             value={form.subject}
             onChange={(event) => onChange({ ...form, subject: event.target.value })}
             placeholder="예: 수학"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
           />
         </label>
 
@@ -236,7 +236,7 @@ export function ClassForm({
             value={form.gradeLabel}
             onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
             placeholder="예: 중2"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
           />
         </label>
       </div>
@@ -261,7 +261,7 @@ export function ClassForm({
           onClick={onSave}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
           <Save size={16} />
@@ -426,7 +426,7 @@ export function StudentForm({
           onClick={onSave}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
           <Save size={16} />
@@ -656,7 +656,7 @@ export function ScheduleForm({
           onClick={onSave}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
           <Save size={16} />
@@ -825,7 +825,7 @@ export function BulkScheduleForm({
           onClick={onSave}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-stone-950 text-white" : "bg-stone-300 text-stone-600",
+            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
           <Save size={16} />

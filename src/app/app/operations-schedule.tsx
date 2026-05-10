@@ -70,7 +70,7 @@ export function WeeklySchedulePanel({
     >
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
-          <CalendarDays className="text-emerald-700" size={18} />
+          <CalendarDays className="text-[#315C7C]" size={18} />
           <h2 id="weekly-schedule-title" className="text-sm font-semibold text-stone-950">
             주간 스케줄
           </h2>
@@ -89,8 +89,8 @@ export function WeeklySchedulePanel({
 
       <div className="space-y-3 p-4">
         {selectedStudent ? (
-          <div className="rounded-md border border-emerald-100 bg-emerald-50 p-3">
-            <p className="text-xs font-medium text-emerald-800">
+          <div className="rounded-md border border-[#C9D6E2] bg-[#EAF1F8] p-3">
+            <p className="text-xs font-medium text-[#315C7C]">
               {selectedClassName ?? "반 미지정"}
             </p>
             <p className="mt-1 text-base font-semibold text-stone-950">
@@ -121,7 +121,7 @@ export function WeeklySchedulePanel({
                       : "border-stone-100 bg-stone-50",
                   ].join(" ")}
                 >
-                  <div className="flex size-10 items-center justify-center rounded-md bg-stone-950 text-sm font-semibold text-white">
+                  <div className="flex size-10 items-center justify-center rounded-md bg-[#315C7C] text-sm font-semibold text-white">
                     {weekDayShortLabel(dayOfWeek)}
                   </div>
 
@@ -175,7 +175,7 @@ function ScheduleRow({
             {schedule.title}
           </p>
           {schedule.scheduleDate ? (
-            <p className="mt-1 text-xs font-semibold text-emerald-700">
+            <p className="mt-1 text-xs font-semibold text-[#315C7C]">
               {schedule.scheduleDate} 1회 일정
             </p>
           ) : null}
@@ -200,7 +200,7 @@ function ScheduleRow({
         <button
           type="button"
           onClick={() => onMakeupCandidateSelect(schedule)}
-          className="mt-3 min-h-9 w-full rounded-md border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100"
+          className="mt-3 min-h-9 w-full rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-3 text-xs font-semibold text-[#315C7C] transition hover:border-[#315C7C] hover:bg-[#EAF1F8]"
         >
           이 시간으로 보강 안내
         </button>

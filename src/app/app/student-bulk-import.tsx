@@ -135,7 +135,7 @@ export function StudentBulkImportForm({
           className={[
             "mt-3 rounded-md border px-3 py-2 text-sm",
             status.status === "saved"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+              ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
               : "border-red-200 bg-red-50 text-red-900",
           ].join(" ")}
         >
@@ -178,7 +178,7 @@ function ImportStat({
   tone?: "default" | "good" | "bad";
 }) {
   const valueClass =
-    tone === "good" ? "text-emerald-700" : tone === "bad" ? "text-red-700" : "text-stone-950";
+    tone === "good" ? "text-[#315C7C]" : tone === "bad" ? "text-red-700" : "text-stone-950";
 
   return (
     <div className="min-w-0 px-3 py-3">
@@ -202,7 +202,7 @@ function ImportPreviewRow({ row }: { row: StudentImportValidatedRow }) {
           <span
             className={[
               "rounded px-1.5 py-0.5 text-[11px] font-semibold",
-              isValid ? "bg-emerald-50 text-emerald-800" : "bg-red-50 text-red-800",
+              isValid ? "bg-[#EAF1F8] text-[#244B67]" : "bg-red-50 text-red-800",
             ].join(" ")}
           >
             {isValid ? "등록 가능" : "확인 필요"}

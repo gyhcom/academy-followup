@@ -503,7 +503,7 @@ function StudentDetailSheet({
       <button
         type="button"
         aria-label="학생 상세 닫기"
-        className="absolute inset-0 bg-stone-950/35"
+        className="absolute inset-0 bg-[#111827]/35"
         onClick={onClose}
       />
       <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border border-[#E6E0D5] bg-[#FFFCF7] shadow-2xl">

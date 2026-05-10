@@ -151,7 +151,7 @@ export function scheduleTypeLabel(scheduleType: string) {
 export function scheduleTypeChipClass(scheduleType: string) {
   const styles: Record<string, string> = {
     regular_class: "bg-blue-50 text-blue-800",
-    makeup: "bg-emerald-50 text-emerald-800",
+    makeup: "bg-[#EAF1F8] text-[#244B67]",
     external: "bg-amber-50 text-amber-800",
     consultation: "bg-violet-50 text-violet-800",
   };
