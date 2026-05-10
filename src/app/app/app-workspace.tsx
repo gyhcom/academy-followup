@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { ClipboardCheck, LayoutDashboard, Settings } from "lucide-react";
+import { ClipboardCheck, Home, MessageSquareText, Settings } from "lucide-react";
 import {
   AttendanceBoard,
   type AttendanceRecordItem,
 } from "@/app/app/attendance-board";
 import { ManagementHome } from "@/app/app/management-home";
-import { OwnerPendingBoard } from "@/app/app/owner-pending-board";
+import { WorkspaceHome } from "@/app/app/workspace-home";
 import type {
   ManagementClass,
   ManagementMember,
@@ -44,7 +44,7 @@ type AppWorkspaceProps = {
   managementSettings: ManagementSettings;
 };
 
-type WorkspaceView = "operations" | "attendance" | "management";
+type WorkspaceView = "home" | "operations" | "attendance" | "management";
 
 export function AppWorkspace({
   academyName,
@@ -60,8 +60,8 @@ export function AppWorkspace({
   managementSettings,
 }: AppWorkspaceProps) {
   const canManage = canManageAcademy(role);
-  const [activeView, setActiveView] = useState<WorkspaceView>("operations");
-  const visibleView = !canManage && activeView === "management" ? "operations" : activeView;
+  const [activeView, setActiveView] = useState<WorkspaceView>("home");
+  const visibleView = !canManage && activeView === "management" ? "home" : activeView;
 
   return (
     <div className="mx-auto max-w-6xl space-y-4 pb-20 sm:space-y-5 sm:pb-0">
@@ -71,18 +71,24 @@ export function AppWorkspace({
         onChange={setActiveView}
       />
 
-      {visibleView === "operations" ? (
-        <div className="space-y-4 sm:space-y-5">
-          {canManage ? (
-            <OwnerPendingBoard classes={classes} records={attendanceRecords} />
-          ) : null}
-          <OperationsBoard
-            academyName={academyName}
-            teacherName={teacherName}
-            roleLabel={roleLabel}
-            classes={classes}
-          />
-        </div>
+      {visibleView === "home" ? (
+        <WorkspaceHome
+          academyName={academyName}
+          teacherName={teacherName}
+          role={role}
+          roleLabel={roleLabel}
+          canManage={canManage}
+          classes={classes}
+          records={attendanceRecords}
+          onNavigate={setActiveView}
+        />
+      ) : visibleView === "operations" ? (
+        <OperationsBoard
+          academyName={academyName}
+          teacherName={teacherName}
+          roleLabel={roleLabel}
+          classes={classes}
+        />
       ) : visibleView === "attendance" ? (
         <AttendanceBoard
           academyName={academyName}
@@ -115,11 +121,19 @@ function WorkspaceNavigation({
 }) {
   return (
     <section className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DED8CE] bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:static sm:rounded-lg sm:border sm:bg-white sm:p-2 sm:shadow-sm">
-      <div className={["grid gap-1.5", canManage ? "grid-cols-3" : "grid-cols-2"].join(" ")}>
+      <div className={["grid gap-1.5", canManage ? "grid-cols-4" : "grid-cols-3"].join(" ")}>
         <WorkspaceNavButton
-          icon={<LayoutDashboard size={17} />}
+          icon={<Home size={17} />}
+          label="홈"
+          shortLabel="홈"
+          description="오늘 요약"
+          isActive={activeView === "home"}
+          onClick={() => onChange("home")}
+        />
+        <WorkspaceNavButton
+          icon={<MessageSquareText size={17} />}
           label="문자 보내기"
-          shortLabel="운영"
+          shortLabel="문자"
           description="수업 후 연락"
           isActive={activeView === "operations"}
           onClick={() => onChange("operations")}
@@ -134,7 +148,7 @@ function WorkspaceNavigation({
         />
         {canManage ? (
           <WorkspaceNavButton
-          icon={<Settings size={17} />}
+            icon={<Settings size={17} />}
             label="관리"
             shortLabel="관리"
             description="학생·반·구성원"
