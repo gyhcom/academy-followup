@@ -115,7 +115,10 @@ export function WorkspaceHome({
         </div>
       </section>
 
-      <section aria-label="주요 바로가기" className="grid gap-3 sm:grid-cols-3">
+      <section
+        aria-label="주요 바로가기"
+        className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm"
+      >
         <HomeActionButton
           icon={<MessageSquareText size={18} />}
           title="수업 후 문자 보내기"
@@ -382,23 +385,23 @@ function HomeActionButton({
   onClick: () => void;
 }) {
   return (
-    <article className="flex min-h-28 items-start gap-3 rounded-lg border border-[#DED8CE] bg-white p-4 shadow-sm">
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF1F8] text-[#315C7C]">
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex min-h-[4.75rem] w-full items-center gap-3 border-b border-stone-100 bg-white px-4 py-3 text-left transition last:border-b-0 hover:bg-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:px-5"
+    >
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-[#EAF1F8] text-[#315C7C]">
         {icon}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-base font-semibold text-stone-950">{title}</span>
         <span className="mt-1 block text-sm leading-6 text-stone-600">{description}</span>
-        <button
-          type="button"
-          onClick={onClick}
-          className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-md bg-[#315C7C] px-3 text-sm font-semibold text-white transition hover:bg-[#244B67] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
-        >
-          열기
-          <ArrowRight size={15} />
-        </button>
       </span>
-    </article>
+      <ArrowRight
+        size={17}
+        className="shrink-0 text-stone-400 transition group-hover:translate-x-0.5 group-hover:text-[#315C7C]"
+      />
+    </button>
   );
 }
 
