@@ -1063,6 +1063,7 @@ export function ManagementHome({
         {isBulkStudentImportOpen ? (
           <StudentBulkImportForm
             classes={classes}
+            existingStudents={students}
             status={bulkStudentImportStatus}
             onCancel={() => {
               setIsBulkStudentImportOpen(false);

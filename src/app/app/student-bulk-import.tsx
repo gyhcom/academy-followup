@@ -5,6 +5,7 @@ import { Download, FileSpreadsheet, Save, X } from "lucide-react";
 import type { FormStatus, ManagementClass } from "@/app/app/management-types";
 import {
   formatPhoneForDisplay,
+  normalizePhone,
   studentImportTemplate,
   type StudentImportValidatedRow,
   validateStudentImportCsv,
@@ -12,11 +13,16 @@ import {
 
 export function StudentBulkImportForm({
   classes,
+  existingStudents,
   status,
   onCancel,
   onSubmit,
 }: {
   classes: ManagementClass[];
+  existingStudents: Array<{
+    name: string;
+    parentPhone: string;
+  }>;
   status: FormStatus;
   onCancel: () => void;
   onSubmit: (rows: StudentImportValidatedRow[]) => void;
@@ -26,7 +32,37 @@ export function StudentBulkImportForm({
     () => validateStudentImportCsv(csvText, classes),
     [classes, csvText],
   );
-  const canSubmit = validation.validRows.length > 0 && status.status !== "saving";
+  const existingStudentKeys = useMemo(
+    () =>
+      new Set(
+        existingStudents
+          .map((student) => createStudentImportKey(student.name, student.parentPhone))
+          .filter((key): key is string => Boolean(key)),
+      ),
+    [existingStudents],
+  );
+  const previewRows = useMemo(
+    () =>
+      validation.rows.map((row) => {
+        const duplicateKey = createStudentImportKey(row.name, row.normalizedParentPhone);
+
+        if (!duplicateKey || !existingStudentKeys.has(duplicateKey)) {
+          return row;
+        }
+
+        return {
+          ...row,
+          errors: [...row.errors, "이미 등록된 학생입니다."],
+        };
+      }),
+    [existingStudentKeys, validation.rows],
+  );
+  const validRows = previewRows.filter((row) => row.errors.length === 0);
+  const invalidRows = previewRows.filter((row) => row.errors.length > 0);
+  const existingDuplicateCount = previewRows.filter((row) =>
+    row.errors.includes("이미 등록된 학생입니다."),
+  ).length;
+  const canSubmit = validRows.length > 0 && status.status !== "saving";
 
   async function readCsvFile(file: File | null) {
     if (!file) {
@@ -53,7 +89,7 @@ export function StudentBulkImportForm({
           <p className="text-sm font-semibold text-stone-950">학생 CSV 일괄 등록</p>
           <p className="mt-1 text-xs leading-5 text-stone-600">
             엑셀에서 CSV로 저장한 뒤 붙여넣거나 파일을 선택합니다. 반 이름은 현재 등록된 반 이름과
-            정확히 일치해야 합니다.
+            정확히 일치해야 하며, 이미 등록된 학생은 미리보기에서 제외됩니다.
           </p>
         </div>
         <button
@@ -104,18 +140,24 @@ export function StudentBulkImportForm({
         <div className="min-w-0 rounded-lg border border-[#E6E0D5] bg-white">
           <div className="grid grid-cols-3 divide-x divide-[#E6E0D5] border-b border-[#E6E0D5] bg-[#FBFAF7] text-center">
             <ImportStat label="전체" value={`${validation.rows.length}명`} />
-            <ImportStat label="등록 가능" value={`${validation.validRows.length}명`} tone="good" />
-            <ImportStat label="확인 필요" value={`${validation.invalidRows.length}명`} tone="bad" />
+            <ImportStat label="등록 가능" value={`${validRows.length}명`} tone="good" />
+            <ImportStat label="확인 필요" value={`${invalidRows.length}명`} tone="bad" />
           </div>
 
+          {existingDuplicateCount > 0 ? (
+            <p className="border-b border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+              이미 등록된 학생 {existingDuplicateCount}명은 저장 대상에서 제외됩니다.
+            </p>
+          ) : null}
+
           <div className="max-h-[420px] overflow-y-auto">
-            {validation.rows.length === 0 ? (
+            {previewRows.length === 0 ? (
               <div className="px-4 py-10 text-center text-sm text-stone-500">
                 CSV 데이터를 입력하면 미리보기가 표시됩니다.
               </div>
             ) : (
               <div className="divide-y divide-stone-100">
-                {validation.rows.slice(0, 80).map((row) => (
+                {previewRows.slice(0, 80).map((row) => (
                   <ImportPreviewRow key={`${row.rowNumber}-${row.name}-${row.parentPhone}`} row={row} />
                 ))}
               </div>
@@ -154,14 +196,14 @@ export function StudentBulkImportForm({
         <button
           type="button"
           disabled={!canSubmit}
-          onClick={() => onSubmit(validation.validRows)}
+          onClick={() => onSubmit(validRows)}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
             canSubmit ? "bg-[#315C7C] text-white hover:bg-[#244B67]" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
           <Save size={16} />
-          {status.status === "saving" ? "등록 중" : `${validation.validRows.length}명 등록`}
+          {status.status === "saving" ? "등록 중" : `${validRows.length}명 등록`}
         </button>
       </div>
     </div>
@@ -227,4 +269,15 @@ function ImportPreviewRow({ row }: { row: StudentImportValidatedRow }) {
       </div>
     </div>
   );
+}
+
+function createStudentImportKey(name: string, phone: string) {
+  const normalizedPhone = normalizePhone(phone);
+  const normalizedName = name.trim();
+
+  if (!normalizedName || !normalizedPhone) {
+    return null;
+  }
+
+  return `${normalizedName}:${normalizedPhone}`;
 }
