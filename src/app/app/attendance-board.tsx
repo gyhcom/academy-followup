@@ -1012,9 +1012,9 @@ function AttendanceSummary({
   summary: Record<AttendanceStatus, number>;
 }) {
   return (
-    <dl className="flex gap-2 overflow-x-auto pb-1 text-center text-xs sm:grid sm:grid-cols-5 sm:overflow-visible sm:pb-0">
+    <dl className="grid grid-cols-5 divide-x divide-stone-200 rounded-md border border-stone-200 bg-stone-50 text-center text-xs">
       {editableStatuses.map((status) => (
-        <div key={status} className="min-w-16 rounded-md border border-stone-200 bg-stone-50 px-2 py-2">
+        <div key={status} className="min-w-0 px-2 py-2">
           <dt className="truncate font-medium text-stone-500">
             {attendanceDisplayLabel(status)}
           </dt>
@@ -1045,7 +1045,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
               </p>
             </div>
 
-            <dl className="grid grid-cols-3 gap-2 text-center text-xs sm:min-w-72">
+            <dl className="grid grid-cols-3 divide-x divide-stone-200 rounded-md border border-stone-200 bg-stone-50 text-center text-xs sm:min-w-72">
               <OverviewMetric label="수업" value={`${overview.totalSessions}개`} />
               <OverviewMetric label="학생" value={`${overview.totalStudents}명`} />
               <OverviewMetric label="체크 필요" value={`${uncheckedCount}명`} />
@@ -1054,7 +1054,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
         </div>
 
         <div className="border-b border-stone-200 px-4 py-3 sm:px-5">
-          <dl className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+          <dl className="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
             {(["present", "late", "absent", "needs_check", "pending"] as AttendanceStatus[]).map(
               (status) => (
                 <CompactStatusMetric
@@ -1161,7 +1161,7 @@ function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview })
 
 function OverviewMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-stone-200 bg-stone-50 px-2.5 py-2">
+    <div className="px-2.5 py-2">
       <dt className="font-medium text-stone-500">{label}</dt>
       <dd className="mt-1 text-base font-semibold text-stone-950">{value}</dd>
     </div>
@@ -1178,8 +1178,8 @@ function CompactStatusMetric({
   return (
     <div
       className={[
-        "flex min-h-9 items-center justify-between gap-2 rounded-md border px-2.5 text-sm",
-        value > 0 ? compactStatusActiveClass(status) : "border-stone-200 bg-stone-50",
+        "flex min-h-9 items-center justify-between gap-2 rounded-md px-2.5 text-sm",
+        value > 0 ? compactStatusActiveClass(status) : "bg-stone-50",
       ].join(" ")}
     >
       <dt className="min-w-0 truncate text-xs font-semibold text-stone-600">
@@ -1254,7 +1254,8 @@ function AttendanceStudentRow({
       </div>
 
       <div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <p className="mb-2 text-xs font-semibold text-stone-500">상태 변경</p>
+        <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label={`${student.name} 출석 상태 변경`}>
           {editableStatuses.map((nextStatus) => {
             const isSelected = status === nextStatus;
 
@@ -1266,7 +1267,7 @@ function AttendanceStudentRow({
                 aria-pressed={isSelected}
                 onClick={() => onStatusChange(nextStatus)}
                 className={[
-                  "flex min-h-10 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-semibold transition",
+                  "flex min-h-10 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
                   isSelected
                     ? "border-[#315C7C] bg-[#315C7C] text-white"
                     : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
@@ -1274,6 +1275,7 @@ function AttendanceStudentRow({
                 ].join(" ")}
               >
                 {isSelected ? <Check size={14} /> : null}
+                {isSelected ? "현재 " : ""}
                 {attendanceDisplayLabel(nextStatus)}
               </button>
             );

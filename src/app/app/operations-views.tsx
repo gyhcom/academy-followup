@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import type { FollowupReason } from "@/lib/followup-templates";
 import type { FollowupHistoryState } from "@/app/app/operations-history";
 import { StudentFollowupHistory } from "@/app/app/operations-history";
@@ -265,16 +266,12 @@ function StudentSelectionList({
               <article
                 key={student.id}
                 className={[
-                  "border-b border-stone-100 p-4 transition last:border-b-0",
-                  isSelected ? "bg-[#EAF1F8]" : "bg-white",
+                  "border-b border-stone-100 p-4 last:border-b-0",
+                  isSelected ? "bg-[#F3F8FC]" : "bg-white",
                 ].join(" ")}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={() => onStudentSelect(student.id)}
-                    className="min-w-0 flex-1 text-left"
-                  >
+                  <div className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <span className="block text-base font-semibold text-stone-950">
                         {student.name}
@@ -306,16 +303,30 @@ function StudentSelectionList({
                         {primarySchedule.title}
                       </span>
                     ) : null}
-                  </button>
+                  </div>
 
                   {isSelected ? (
-                    <span className="rounded-md bg-[#EAF1F8] px-2 py-1 text-xs font-semibold text-[#315C7C]">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#315C7C] px-2 py-1 text-xs font-semibold text-white">
+                      <CheckCircle2 size={13} />
                       선택됨
                     </span>
                   ) : null}
                 </div>
 
                 <div className="mt-3 flex gap-2 overflow-x-auto pb-0.5">
+                  <button
+                    type="button"
+                    onClick={() => onStudentSelect(student.id)}
+                    className={[
+                      "inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+                      isSelected
+                        ? "border-[#315C7C] bg-white text-[#315C7C]"
+                        : "border-[#C9D6E2] bg-white text-[#315C7C] hover:bg-[#EAF1F8]",
+                    ].join(" ")}
+                  >
+                    문자 작성
+                    <ArrowRight size={13} />
+                  </button>
                   {quickReasonIds.map((reasonId) => {
                     const isReasonSelected = isSelected && selectedReason === reasonId;
                     return (
@@ -325,7 +336,7 @@ function StudentSelectionList({
                         aria-pressed={isReasonSelected}
                         onClick={() => onStudentReasonSelect(student.id, reasonId)}
                         className={[
-                          "min-h-9 shrink-0 rounded-md border px-3 text-xs font-semibold transition",
+                          "min-h-9 shrink-0 rounded-md border px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
                           isReasonSelected
                             ? "border-[#315C7C] bg-[#315C7C] text-white"
                             : "border-stone-200 bg-stone-50 text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",

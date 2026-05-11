@@ -382,23 +382,23 @@ function HomeActionButton({
   onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex min-h-28 items-start gap-3 rounded-lg border border-[#DED8CE] bg-white p-4 text-left shadow-sm transition hover:border-[#C9D6E2] hover:bg-[#F8FAFC]"
-    >
+    <article className="flex min-h-28 items-start gap-3 rounded-lg border border-[#DED8CE] bg-white p-4 shadow-sm">
       <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF1F8] text-[#315C7C]">
         {icon}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-base font-semibold text-stone-950">{title}</span>
         <span className="mt-1 block text-sm leading-6 text-stone-600">{description}</span>
+        <button
+          type="button"
+          onClick={onClick}
+          className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-md bg-[#315C7C] px-3 text-sm font-semibold text-white transition hover:bg-[#244B67] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+        >
+          열기
+          <ArrowRight size={15} />
+        </button>
       </span>
-      <ArrowRight
-        size={17}
-        className="mt-1 shrink-0 text-stone-400 transition group-hover:text-[#315C7C]"
-      />
-    </button>
+    </article>
   );
 }
 
@@ -427,14 +427,18 @@ function SummaryButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "rounded-lg border px-3 py-3 text-left transition",
+        "rounded-lg border px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
         isActive
           ? "border-[#315C7C] bg-[#EAF1F8]"
-          : "border-stone-200 bg-white hover:border-[#C9D6E2] hover:bg-[#F8FAFC]",
+          : "border-stone-300 bg-white hover:border-[#315C7C] hover:bg-[#F8FAFC]",
       ].join(" ")}
     >
       <span className="block text-xs font-medium text-stone-500">{label}</span>
       <span className={`mt-1 block text-xl font-semibold ${valueClass}`}>{value}</span>
+      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#315C7C]">
+        목록 보기
+        <ArrowRight size={13} />
+      </span>
     </button>
   );
 }
@@ -453,20 +457,10 @@ function HomeFollowupRow({
   const isSent = item.followupStatus === "sent";
 
   return (
-    <article className="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-5">
-      <button
-        type="button"
-        onClick={() =>
-          onStudentSelect({
-            classId: item.classId,
-            studentId: item.student.id,
-            reason: followupReasonForStatus(item.status),
-          })
-        }
-        className="min-w-0 rounded-md text-left transition hover:bg-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
-      >
+    <article className="grid gap-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-5">
+      <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="font-semibold text-[#315C7C] underline-offset-4 hover:underline">
+          <p className="font-semibold text-stone-950">
             {item.student.name}
           </p>
           <span
@@ -489,11 +483,27 @@ function HomeFollowupRow({
         <p className="mt-1 text-sm text-stone-600">
           {item.className} · {item.student.gradeLabel ?? "학년 미지정"}
         </p>
-      </button>
-      <p className="flex items-center gap-1 text-xs text-stone-500">
-        <Clock3 size={13} />
-        {item.startTime} - {item.endTime}
-      </p>
+        <p className="mt-1 flex items-center gap-1 text-xs text-stone-500">
+          <Clock3 size={13} />
+          {item.startTime} - {item.endTime}
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-2 sm:justify-end">
+        <button
+          type="button"
+          onClick={() =>
+            onStudentSelect({
+              classId: item.classId,
+              studentId: item.student.id,
+              reason: followupReasonForStatus(item.status),
+            })
+          }
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+        >
+          문자 작성
+          <ArrowRight size={13} />
+        </button>
+      </div>
     </article>
   );
 }
