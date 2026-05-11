@@ -111,7 +111,11 @@ export function WorkspaceHome({
             </p>
           </div>
 
-          <HomeDateControl value={selectedDate} onChange={onDateChange} />
+          <HomeDateControl
+            value={selectedDate}
+            loadStatus={loadState.status}
+            onChange={onDateChange}
+          />
         </div>
       </section>
 
@@ -237,14 +241,25 @@ export function WorkspaceHome({
 
 function HomeDateControl({
   value,
+  loadStatus,
   onChange,
 }: {
   value: string;
+  loadStatus: "idle" | "loading" | "error";
   onChange: (date: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const todayDate = getTodayDate();
+  const yesterdayDate = shiftDate(todayDate, -1);
+  const isLoading = loadStatus === "loading";
+  const isTodaySelected = value === todayDate;
+  const isYesterdaySelected = value === yesterdayDate;
 
   function openCalendar() {
+    if (isLoading) {
+      return;
+    }
+
     const input = inputRef.current;
 
     if (!input) {
@@ -265,69 +280,126 @@ function HomeDateControl({
   }
 
   return (
-    <div className="w-full">
-      <span className="mb-1 block text-xs font-semibold text-stone-500">운영 기준 날짜</span>
-      <div className="grid grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] gap-2">
+    <div className="w-full rounded-lg border border-[#DED8CE] bg-[#F8FAFC] p-3">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-stone-500">운영 기준 날짜</span>
+        <span
+          className={[
+            "inline-flex min-h-6 items-center gap-1.5 rounded-md px-2 text-xs font-semibold",
+            isLoading
+              ? "bg-[#EAF1F8] text-[#315C7C]"
+              : loadStatus === "error"
+                ? "bg-red-50 text-red-800"
+                : "bg-white text-stone-600",
+          ].join(" ")}
+        >
+          {isLoading ? <Loader2 size={13} className="animate-spin" /> : null}
+          {isLoading ? "불러오는 중" : loadStatus === "error" ? "조회 실패" : "기준 적용됨"}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        onClick={openCalendar}
+        disabled={isLoading}
+        className={[
+          "mb-2 flex min-h-12 w-full items-center gap-3 rounded-md border bg-white px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+          isLoading
+            ? "cursor-wait border-stone-200 opacity-70"
+            : "border-[#C9D6E2] hover:border-[#315C7C] hover:bg-[#EAF1F8]",
+        ].join(" ")}
+      >
+        <CalendarDays size={18} className="shrink-0 text-[#315C7C]" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-xs font-medium text-stone-500">현재 기준</span>
+          <span className="block truncate text-sm font-semibold tabular-nums text-stone-950">
+            {formatHomeDate(value)}
+          </span>
+        </span>
+        <span className="shrink-0 text-xs font-semibold text-[#315C7C]">
+          날짜 선택
+        </span>
+      </button>
+
+      <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
           aria-label="전날 운영 요약 보기"
+          disabled={isLoading}
           onClick={() => onChange(shiftDate(value, -1))}
-          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50"
+          className={[
+            "flex min-h-10 items-center justify-center gap-1.5 rounded-md border border-stone-300 bg-white text-xs font-semibold text-stone-700 transition",
+            isLoading
+              ? "cursor-wait opacity-60"
+              : "hover:border-stone-400 hover:bg-stone-50",
+          ].join(" ")}
         >
-          <ChevronLeft size={18} />
+          <ChevronLeft size={16} />
+          전날
         </button>
-
-        <div className="relative">
-          <input
-            ref={inputRef}
-            type="date"
-            value={value}
-            onChange={(event) => {
-              if (event.target.value) {
-                onChange(event.target.value);
-              }
-            }}
-            className="sr-only"
-            tabIndex={-1}
-            aria-hidden="true"
-          />
-          <button
-            type="button"
-            onClick={openCalendar}
-            className="flex min-h-11 w-full items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-[#315C7C] hover:bg-[#EAF1F8] focus:border-[#315C7C] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
-          >
-            <CalendarDays size={17} className="shrink-0 text-stone-500" />
-            <span className="min-w-0 flex-1 truncate tabular-nums">
-              {formatHomeDate(value)}
-            </span>
-          </button>
-        </div>
 
         <button
           type="button"
           aria-label="다음날 운영 요약 보기"
+          disabled={isLoading}
           onClick={() => onChange(shiftDate(value, 1))}
-          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50"
+          className={[
+            "flex min-h-10 items-center justify-center gap-1.5 rounded-md border border-stone-300 bg-white text-xs font-semibold text-stone-700 transition",
+            isLoading
+              ? "cursor-wait opacity-60"
+              : "hover:border-stone-400 hover:bg-stone-50",
+          ].join(" ")}
         >
-          <ChevronRight size={18} />
+          다음날
+          <ChevronRight size={16} />
         </button>
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
         <button
           type="button"
-          onClick={() => onChange(shiftDate(getTodayDate(), -1))}
-          className="min-h-9 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-600 transition hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C]"
+          disabled={isLoading || isYesterdaySelected}
+          aria-pressed={isYesterdaySelected}
+          onClick={() => onChange(yesterdayDate)}
+          className={[
+            "min-h-9 rounded-md border px-2 text-xs font-semibold transition",
+            isYesterdaySelected
+              ? "border-[#315C7C] bg-[#315C7C] text-white"
+              : "border-stone-200 bg-white text-stone-600 hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C]",
+            isLoading ? "cursor-wait opacity-60" : "",
+          ].join(" ")}
         >
-          어제 보기
+          {isYesterdaySelected ? "어제 적용됨" : "어제 보기"}
         </button>
         <button
           type="button"
-          onClick={() => onChange(getTodayDate())}
-          className="min-h-9 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-600 transition hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C]"
+          disabled={isLoading || isTodaySelected}
+          aria-pressed={isTodaySelected}
+          onClick={() => onChange(todayDate)}
+          className={[
+            "min-h-9 rounded-md border px-2 text-xs font-semibold transition",
+            isTodaySelected
+              ? "border-[#315C7C] bg-[#315C7C] text-white"
+              : "border-stone-200 bg-white text-stone-600 hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C]",
+            isLoading ? "cursor-wait opacity-60" : "",
+          ].join(" ")}
         >
-          오늘 보기
+          {isTodaySelected ? "오늘 적용됨" : "오늘 보기"}
         </button>
       </div>
+      <input
+        ref={inputRef}
+        type="date"
+        value={value}
+        onChange={(event) => {
+          if (event.target.value) {
+            onChange(event.target.value);
+          }
+        }}
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden="true"
+        disabled={isLoading}
+      />
     </div>
   );
 }
