@@ -925,7 +925,7 @@ function MessageComposer({
         <div className="flex items-center gap-2">
           <MessageSquareText className="text-[#315C7C]" size={18} />
           <h2 id={`${composerId}-title`} className="text-sm font-semibold text-stone-950">
-            학부모 문자
+            문자 초안
           </h2>
           {isPreviewReady ? (
             <span className="ml-auto rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-2 py-0.5 text-xs font-medium text-[#315C7C]">
@@ -946,7 +946,7 @@ function MessageComposer({
         </div>
         <p className="mt-1 text-xs text-stone-500">
           {selectedStudent
-            ? `${selectedStudent.name} 학생 안내를 작성 중입니다.`
+            ? `현재 선택: ${selectedStudent.name} · ${followupReasons.find((reason) => reason.id === selectedReason)?.label ?? selectedReason}`
             : "학생을 선택하면 문자 초안이 표시됩니다."}
         </p>
       </div>

@@ -48,10 +48,8 @@ export function OperationsDesktopView(props: OperationsViewProps) {
     <div className="hidden lg:block">
       <OperationsHeader
         academyName={props.academyName}
-        teacherName={props.teacherName}
         classCount={props.classes.length}
         totalStudents={props.totalStudents}
-        activeScheduleCount={props.activeScheduleCount}
       />
       <ClassPicker
         classes={props.classes}
@@ -89,10 +87,8 @@ export function OperationsMobileView(props: OperationsViewProps) {
     <div className="lg:hidden">
       <OperationsHeader
         academyName={props.academyName}
-        teacherName={props.teacherName}
         classCount={props.classes.length}
         totalStudents={props.totalStudents}
-        activeScheduleCount={props.activeScheduleCount}
       />
       <ClassPicker
         classes={props.classes}
@@ -148,35 +144,29 @@ export function OperationsMobileView(props: OperationsViewProps) {
 
 function OperationsHeader({
   academyName,
-  teacherName,
   classCount,
   totalStudents,
-  activeScheduleCount,
 }: {
   academyName: string;
-  teacherName: string;
   classCount: number;
   totalStudents: number;
-  activeScheduleCount: number;
 }) {
   return (
-    <section className="mb-4 border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:mb-5 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
+    <section className="mb-3 border-b border-[#DED8CE] bg-transparent px-1 pb-3 sm:mb-4 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="text-sm font-medium text-[#315C7C]">{academyName}</p>
-          <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
-            수업 후 문자 보내기
+          <h2 className="mt-1 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
+            수업 후 연락
           </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-            {teacherName}님이 학생을 고르고 결석, 재시험, 숙제 미완료 같은 사유를
-            누르면 학부모에게 보낼 문자 초안이 바로 열립니다.
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-stone-600">
+            반과 학생을 선택하면 학부모 문자 초안이 준비됩니다.
           </p>
         </div>
 
-        <dl className="grid grid-cols-3 gap-x-4 gap-y-2 border-t border-stone-200 pt-3 text-sm lg:min-w-[21rem] lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
+        <dl className="flex gap-3 border-t border-stone-200 pt-3 text-sm lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
           <StatusItem label="반" value={`${classCount}개`} />
           <StatusItem label="학생" value={`${totalStudents}명`} />
-          <StatusItem label="일정" value={`${activeScheduleCount}개`} />
         </dl>
       </div>
     </section>
@@ -193,8 +183,15 @@ function ClassPicker({
   onClassSelect: (classId: string) => void;
 }) {
   return (
-    <section aria-label="반 선택" className="mb-4 space-y-2 sm:mb-5">
-      <p className="px-1 text-xs font-semibold text-stone-500">오늘 수업</p>
+    <section aria-label="반 선택" className="mb-3 space-y-2 sm:mb-4">
+      <div className="flex items-center justify-between gap-2 px-1">
+        <p className="text-xs font-semibold text-stone-500">반 선택</p>
+        {selectedClass ? (
+          <p className="truncate text-xs font-medium text-stone-500">
+            {selectedClass.name} · {selectedClass.students.length}명
+          </p>
+        ) : null}
+      </div>
       <div className="flex gap-2 overflow-x-auto pb-1">
         {classes.map((classItem) => {
           const isSelected = classItem.id === selectedClass?.id;
@@ -205,7 +202,7 @@ function ClassPicker({
               aria-pressed={isSelected}
               onClick={() => onClassSelect(classItem.id)}
               className={[
-                "min-h-11 shrink-0 rounded-md border px-3 text-left transition",
+                "min-h-10 shrink-0 rounded-md border px-3 text-left transition",
                 isSelected
                   ? "border-[#315C7C] bg-[#315C7C] text-white"
                   : "border-stone-200 bg-white text-stone-700 hover:border-stone-300",
@@ -246,10 +243,10 @@ function StudentSelectionList({
       <div className="flex items-end justify-between gap-3 px-1">
         <div>
           <h2 id="student-flow-title" className="text-base font-semibold text-stone-950">
-            {selectedClass?.name ?? "학생 목록"}
+            연락 대상
           </h2>
           <p className="mt-1 text-xs text-stone-500">
-            자주 쓰는 사유는 학생 옆에서 바로 선택합니다.
+            학생을 고른 뒤 사유를 선택합니다.
           </p>
         </div>
         <span className="shrink-0 text-xs font-medium text-stone-500">
@@ -257,7 +254,7 @@ function StudentSelectionList({
         </span>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm">
+      <div className="max-h-[min(34rem,calc(100vh-16rem))] overflow-y-auto rounded-lg border border-[#DED8CE] bg-white shadow-sm">
         {selectedClass?.students.length ? (
           selectedClass.students.map((student) => {
             const isSelected = student.id === selectedStudent?.id;
@@ -266,54 +263,56 @@ function StudentSelectionList({
               <article
                 key={student.id}
                 className={[
-                  "border-b border-stone-100 p-4 last:border-b-0",
-                  isSelected ? "bg-[#F3F8FC]" : "bg-white",
+                  "border-b border-stone-100 border-l-4 px-3 py-3 last:border-b-0",
+                  isSelected ? "border-l-[#315C7C] bg-[#F3F8FC]" : "border-l-transparent bg-white",
                 ].join(" ")}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      <span className="block text-base font-semibold text-stone-950">
-                        {student.name}
-                      </span>
-                      <span
-                        className={[
-                          "rounded-md px-2 py-0.5 text-xs font-semibold",
-                          primarySchedule
-                            ? "bg-blue-50 text-blue-800"
-                            : "bg-stone-100 text-stone-500",
-                        ].join(" ")}
-                      >
-                        {primarySchedule
-                          ? `${weekDayShortLabel(primarySchedule.dayOfWeek)} ${primarySchedule.startTime}`
-                          : "스케줄 없음"}
-                      </span>
+                <div className="grid gap-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <p className="text-base font-semibold text-stone-950">
+                          {student.name}
+                        </p>
+                        {isSelected ? (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#315C7C] px-2 py-0.5 text-xs font-semibold text-white">
+                            <CheckCircle2 size={12} />
+                            선택됨
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="mt-1 truncate text-xs text-stone-500">
+                        {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
+                          "학년 정보 없음"}
+                      </p>
+                      <p className="mt-1 truncate text-xs text-stone-500">
+                        {student.parentName ?? "학부모"} · {student.maskedParentPhone}
+                      </p>
+                    </div>
+                    <span
+                      className={[
+                        "shrink-0 rounded-md px-2 py-1 text-xs font-semibold",
+                        primarySchedule
+                          ? "bg-blue-50 text-blue-800"
+                          : "bg-stone-100 text-stone-500",
+                      ].join(" ")}
+                    >
+                      {primarySchedule
+                        ? `${weekDayShortLabel(primarySchedule.dayOfWeek)} ${primarySchedule.startTime}`
+                        : "스케줄 없음"}
                     </span>
-                    <span className="mt-1 block text-xs text-stone-500">
-                      {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
-                        "학년 정보 없음"}
-                    </span>
-                    <span className="mt-2 block text-xs text-stone-500">
-                      {student.parentName ?? "학부모"} · {student.maskedParentPhone}
-                    </span>
-                    {primarySchedule ? (
-                      <span className="mt-2 block text-xs font-medium text-stone-600">
-                        {primarySchedule.endTime}까지 ·{" "}
-                        {scheduleTypeLabel(primarySchedule.scheduleType)} ·{" "}
-                        {primarySchedule.title}
-                      </span>
-                    ) : null}
                   </div>
 
-                  {isSelected ? (
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#315C7C] px-2 py-1 text-xs font-semibold text-white">
-                      <CheckCircle2 size={13} />
-                      선택됨
-                    </span>
+                  {primarySchedule ? (
+                    <p className="truncate text-xs font-medium text-stone-600">
+                      {primarySchedule.endTime}까지 ·{" "}
+                      {scheduleTypeLabel(primarySchedule.scheduleType)} ·{" "}
+                      {primarySchedule.title}
+                    </p>
                   ) : null}
                 </div>
 
-                <div className="mt-3 flex gap-2 overflow-x-auto pb-0.5">
+                <div className="mt-2 flex gap-2 overflow-x-auto pb-0.5">
                   <button
                     type="button"
                     onClick={() => onStudentSelect(student.id)}
@@ -419,7 +418,7 @@ function MobileSelectionBar({
       <div className="mx-auto flex max-w-6xl items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-stone-950">
-            {selectedStudent.name} · {reasonLabel(selectedReason)} 문자 작성
+            {selectedStudent.name} · {reasonLabel(selectedReason)} 초안 확인
           </p>
           <p className="mt-0.5 truncate text-xs text-stone-500">
             {isPreviewLoading
@@ -434,7 +433,7 @@ function MobileSelectionBar({
           onClick={onOpenComposer}
           className="min-h-11 shrink-0 rounded-md bg-[#315C7C] px-4 text-sm font-semibold text-white"
         >
-          문자 작성
+          초안 확인
         </button>
       </div>
     </div>
@@ -443,7 +442,7 @@ function MobileSelectionBar({
 
 function StatusItem({ label, value }: { label: string; value: string }) {
   return (
-    <div>
+    <div className="min-w-14">
       <dt className="text-xs text-stone-500">{label}</dt>
       <dd className="mt-1 truncate font-semibold text-stone-950">{value}</dd>
     </div>
