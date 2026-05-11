@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   ArrowRight,
@@ -245,31 +245,10 @@ function HomeDateControl({
   value: string;
   onChange: (date: string) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const todayDate = getTodayDate();
   const yesterdayDate = shiftDate(todayDate, -1);
   const isTodaySelected = value === todayDate;
   const isYesterdaySelected = value === yesterdayDate;
-
-  function openCalendar() {
-    const input = inputRef.current;
-
-    if (!input) {
-      return;
-    }
-
-    try {
-      if (typeof input.showPicker === "function") {
-        input.showPicker();
-        return;
-      }
-    } catch {
-      // 브라우저별 date picker 제약이 있어 focus/click으로 보완합니다.
-    }
-
-    input.focus();
-    input.click();
-  }
 
   return (
     <div className="w-full rounded-lg border border-[#DED8CE] bg-[#F8FAFC] p-3">
@@ -284,11 +263,7 @@ function HomeDateControl({
           <ChevronLeft size={18} />
         </button>
 
-        <button
-          type="button"
-          onClick={openCalendar}
-          className="flex min-h-11 w-full items-center gap-2 rounded-md border border-[#C9D6E2] bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-[#315C7C] hover:bg-[#EAF1F8] focus:border-[#315C7C] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
-        >
+        <label className="relative flex min-h-11 w-full cursor-pointer items-center gap-2 overflow-hidden rounded-md border border-[#C9D6E2] bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-[#315C7C] hover:bg-[#EAF1F8] focus-within:border-[#315C7C] focus-within:ring-2 focus-within:ring-[#C9D6E2]">
           <CalendarDays size={17} className="shrink-0 text-[#315C7C]" />
           <span className="min-w-0 flex-1 truncate tabular-nums">
             {formatHomeDate(value)}
@@ -296,7 +271,18 @@ function HomeDateControl({
           <span className="shrink-0 text-xs font-semibold text-[#315C7C]">
             달력 선택
           </span>
-        </button>
+          <input
+            type="date"
+            value={value}
+            aria-label="운영 기준 날짜 선택"
+            onChange={(event) => {
+              if (event.target.value) {
+                onChange(event.target.value);
+              }
+            }}
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+          />
+        </label>
 
         <button
           type="button"
@@ -337,19 +323,6 @@ function HomeDateControl({
           오늘 보기
         </button>
       </div>
-      <input
-        ref={inputRef}
-        type="date"
-        value={value}
-        onChange={(event) => {
-          if (event.target.value) {
-            onChange(event.target.value);
-          }
-        }}
-        className="sr-only"
-        tabIndex={-1}
-        aria-hidden="true"
-      />
     </div>
   );
 }
