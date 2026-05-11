@@ -2,7 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ClipboardList, FileSpreadsheet, Pencil, Plus, UserPlus } from "lucide-react";
+import {
+  CalendarDays,
+  ClipboardList,
+  FileSpreadsheet,
+  Pencil,
+  Plus,
+  UserPlus,
+} from "lucide-react";
 import type {
   BulkScheduleFormState,
   ClassFormState,
@@ -32,7 +39,7 @@ import { StudentBulkImportForm } from "@/app/app/student-bulk-import";
 import { StudentDirectory } from "@/app/app/student-directory";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
 
-type ManagementSection = "students" | "classes" | "members" | "settings";
+type ManagementSection = "setup" | "students" | "classes" | "members" | "settings";
 
 export function ManagementHome({
   academyName,
@@ -94,7 +101,7 @@ export function ManagementHome({
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     students[0]?.id ?? null,
   );
-  const [activeSection, setActiveSection] = useState<ManagementSection>("students");
+  const [activeSection, setActiveSection] = useState<ManagementSection>("setup");
   const activeStudents = useMemo(
     () => students.filter((student) => student.status === "active"),
     [students],
@@ -552,6 +559,78 @@ export function ManagementHome({
     }
   }
 
+  async function deleteScheduleForm() {
+    if (!scheduleForm || scheduleForm.mode !== "edit") {
+      return;
+    }
+
+    setScheduleFormStatus({ status: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/student-schedules", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          scheduleId: scheduleForm.scheduleId,
+          studentId: scheduleForm.studentId,
+          classId: scheduleForm.classId,
+          teacherId: scheduleForm.teacherId,
+          scheduleType: scheduleForm.scheduleType,
+          scheduleDate: scheduleForm.scheduleDate,
+          dayOfWeek: scheduleForm.dayOfWeek,
+          startTime: scheduleForm.startTime,
+          endTime: scheduleForm.endTime,
+          subject: scheduleForm.subject,
+          title: scheduleForm.title,
+          memo: scheduleForm.memo,
+          isActive: false,
+          sourceFollowupId: scheduleForm.sourceFollowupId,
+        }),
+      });
+      const payload = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "스케줄을 삭제하지 못했습니다.");
+      }
+
+      setScheduleFormStatus({
+        status: "saved",
+        message: "학생 스케줄을 삭제했습니다.",
+      });
+      setScheduleForm(null);
+      router.refresh();
+    } catch (error) {
+      setScheduleFormStatus({
+        status: "error",
+        message: error instanceof Error ? error.message : "스케줄을 삭제하지 못했습니다.",
+      });
+    }
+  }
+
+  function openSetupMemberForm() {
+    setActiveSection("members");
+    openCreateMemberForm();
+  }
+
+  function openSetupClassForm() {
+    setActiveSection("classes");
+    openCreateClassForm();
+  }
+
+  function openSetupStudentForm() {
+    setActiveSection("students");
+    openCreateStudentForm();
+  }
+
+  function openMissingScheduleStudents() {
+    setActiveSection("students");
+    setStudentStatusFilter("active");
+    setStudentScheduleFilter("missing_schedule");
+    setStudentSortMode("class");
+  }
+
   function openCreateMemberForm() {
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
@@ -676,6 +755,7 @@ export function ManagementHome({
     detail: string;
     count: string;
   }> = [
+    { id: "setup", label: "초기 세팅", detail: "구성원·반·학생·스케줄 순서", count: "순서" },
     { id: "students", label: "학생", detail: "명단·스케줄·연락처", count: `${activeStudents.length}` },
     { id: "classes", label: "반", detail: "반·담당·일괄 스케줄", count: `${classes.length}` },
     { id: "members", label: "구성원", detail: "권한·계정·담당 반", count: `${members.length}` },
@@ -748,6 +828,32 @@ export function ManagementHome({
           </div>
         </div>
       </section>
+
+      {activeSection === "setup" ? (
+        <ManagementPanel
+          title="운영 초기 세팅"
+          description="파일럿 시작 전 원장이 입력해야 하는 구성원, 반, 학생, 스케줄 순서를 한 흐름으로 정리합니다."
+          actionLabel="스케줄 미등록 보기"
+          actionIcon={<CalendarDays size={14} />}
+          onAction={openMissingScheduleStudents}
+        >
+          <SetupWorkflow
+            memberCount={members.length}
+            classCount={classes.length}
+            activeStudentCount={activeStudents.length}
+            missingScheduleCount={
+              activeStudents.filter(
+                (student) => student.schedules.filter((schedule) => schedule.isActive).length === 0,
+              ).length
+            }
+            onCreateMember={openSetupMemberForm}
+            onCreateClass={openSetupClassForm}
+            onCreateStudent={openSetupStudentForm}
+            onOpenClassSchedules={() => setActiveSection("classes")}
+            onOpenMissingSchedules={openMissingScheduleStudents}
+          />
+        </ManagementPanel>
+      ) : null}
 
       {activeSection === "settings" ? (
       <ManagementPanel
@@ -1127,6 +1233,7 @@ export function ManagementHome({
               setScheduleFormStatus({ status: "idle", message: "" });
             }}
             onSave={saveScheduleForm}
+            onDelete={deleteScheduleForm}
           />
         ) : null}
 
@@ -1173,6 +1280,133 @@ function Metric({ label, value }: { label: string; value: string }) {
     <div className="min-w-0">
       <p className="text-xs font-medium text-stone-500">{label}</p>
       <p className="mt-1 truncate text-lg font-semibold text-stone-950">{value}</p>
+    </div>
+  );
+}
+
+function SetupWorkflow({
+  memberCount,
+  classCount,
+  activeStudentCount,
+  missingScheduleCount,
+  onCreateMember,
+  onCreateClass,
+  onCreateStudent,
+  onOpenClassSchedules,
+  onOpenMissingSchedules,
+}: {
+  memberCount: number;
+  classCount: number;
+  activeStudentCount: number;
+  missingScheduleCount: number;
+  onCreateMember: () => void;
+  onCreateClass: () => void;
+  onCreateStudent: () => void;
+  onOpenClassSchedules: () => void;
+  onOpenMissingSchedules: () => void;
+}) {
+  const setupSteps = [
+    {
+      step: "1",
+      title: "선생님 계정 등록",
+      description: "정규 선생님과 보조 선생님을 먼저 만들고 권한을 정합니다.",
+      metric: `${memberCount}명`,
+      actionLabel: "구성원 등록",
+      onAction: onCreateMember,
+    },
+    {
+      step: "2",
+      title: "반 생성과 주 담당 배정",
+      description: "반 이름, 과목, 학년을 만들고 주 담당 선생님을 연결합니다.",
+      metric: `${classCount}개`,
+      actionLabel: "반 등록",
+      onAction: onCreateClass,
+    },
+    {
+      step: "3",
+      title: "학생 등록과 반 배정",
+      description: "학생과 학부모 연락처를 입력하고 소속 반을 지정합니다.",
+      metric: `${activeStudentCount}명`,
+      actionLabel: "학생 등록",
+      onAction: onCreateStudent,
+    },
+    {
+      step: "4",
+      title: "반 공통 수업 스케줄",
+      description: "같은 반 학생에게 반복 수업 시간을 한 번에 등록합니다.",
+      metric: "일괄",
+      actionLabel: "반 스케줄",
+      onAction: onOpenClassSchedules,
+    },
+    {
+      step: "5",
+      title: "학생별 예외 일정",
+      description: "논술, 타 학원, 상담, 1회 보강처럼 개인별 일정을 추가합니다.",
+      metric: `${missingScheduleCount}명 미등록`,
+      actionLabel: "미등록 보기",
+      onAction: onOpenMissingSchedules,
+    },
+  ];
+
+  return (
+    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
+      <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+        {setupSteps.map((step, index) => (
+          <div
+            key={step.step}
+            className="grid gap-3 border-b border-[#EFE9DE] px-4 py-4 last:border-b-0 sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
+          >
+            <div className="flex size-9 items-center justify-center rounded-md bg-[#111827] text-sm font-semibold text-white">
+              {step.step}
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-sm font-semibold text-stone-950">{step.title}</p>
+                <span className="rounded bg-[#F7F5F0] px-2 py-0.5 text-xs font-semibold text-stone-600">
+                  {step.metric}
+                </span>
+              </div>
+              <p className="mt-1 text-sm leading-6 text-stone-600">{step.description}</p>
+            </div>
+            <button
+              type="button"
+              onClick={step.onAction}
+              className={[
+                "min-h-10 rounded-md px-3 text-sm font-semibold transition",
+                index === 0
+                  ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                  : "border border-[#D8D0C4] bg-white text-stone-800 hover:bg-[#F7F5F0]",
+              ].join(" ")}
+            >
+              {step.actionLabel}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <aside className="rounded-lg border border-[#C9D6E2] bg-[#EAF1F8] p-4">
+        <p className="text-sm font-semibold text-[#244B67]">현재 배정 모델</p>
+        <dl className="mt-3 space-y-3 text-sm">
+          <div>
+            <dt className="font-semibold text-stone-950">반 담당</dt>
+            <dd className="mt-1 leading-6 text-stone-600">
+              한 반은 우선 한 명의 주 담당 선생님을 가집니다.
+            </dd>
+          </div>
+          <div>
+            <dt className="font-semibold text-stone-950">학생 소속</dt>
+            <dd className="mt-1 leading-6 text-stone-600">
+              학생은 하나의 소속 반을 기준으로 문자, 출석, 스케줄 권한이 정해집니다.
+            </dd>
+          </div>
+          <div>
+            <dt className="font-semibold text-stone-950">보조 선생님</dt>
+            <dd className="mt-1 leading-6 text-stone-600">
+              파일럿에서는 주 담당 방식으로 검증하고, 다중 배정은 별도 모델로 확장합니다.
+            </dd>
+          </div>
+        </dl>
+      </aside>
     </div>
   );
 }

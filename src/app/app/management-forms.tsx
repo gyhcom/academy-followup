@@ -1,4 +1,4 @@
-import { Save, X } from "lucide-react";
+import { Save, Trash2, X } from "lucide-react";
 import type {
   BulkScheduleFormState,
   ClassFormState,
@@ -445,6 +445,7 @@ export function ScheduleForm({
   onChange,
   onCancel,
   onSave,
+  onDelete,
 }: {
   form: ScheduleFormState;
   status: FormStatus;
@@ -453,6 +454,7 @@ export function ScheduleForm({
   onChange: (form: ScheduleFormState) => void;
   onCancel: () => void;
   onSave: () => void;
+  onDelete?: () => void;
 }) {
   const canSave =
     form.title.trim().length > 0 &&
@@ -642,7 +644,21 @@ export function ScheduleForm({
         </p>
       ) : null}
 
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        {form.mode === "edit" && form.isActive && onDelete ? (
+          <button
+            type="button"
+            disabled={status.status === "saving"}
+            onClick={onDelete}
+            className="flex min-h-11 w-full min-w-0 items-center justify-center gap-2 rounded-md border border-red-200 bg-white px-4 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          >
+            <Trash2 size={16} />
+            삭제
+          </button>
+        ) : (
+          <span className="hidden sm:block" />
+        )}
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
         <button
           type="button"
           onClick={onCancel}
@@ -662,6 +678,7 @@ export function ScheduleForm({
           <Save size={16} />
           {status.status === "saving" ? "저장 중" : "저장"}
         </button>
+        </div>
       </div>
     </div>
   );

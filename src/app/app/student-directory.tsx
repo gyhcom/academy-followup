@@ -566,7 +566,9 @@ function StudentDetailPanel({
     );
   }
 
-  const groupedSchedules = groupSchedulesByDay(student.schedules);
+  const groupedSchedules = groupSchedulesByDay(
+    student.schedules.filter((schedule) => schedule.isActive),
+  );
 
   return (
     <aside className="bg-[#FFFCF7] p-4 lg:sticky lg:top-4 lg:bg-transparent">
