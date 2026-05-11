@@ -1160,20 +1160,27 @@
 
 ### T-312 선생님 계정/권한 필터 테스트
 
-상태: 예정
+상태: 완료
 
 목표:
 - 원장과 선생님 계정의 조회/발송 권한 차이를 검증
 
 작업:
-- Supabase Auth 선생님 테스트 계정 생성
-- `profiles.role = teacher` 연결
-- 담당 반 `classes.teacher_id` 연결
-- 선생님은 담당 반 중심으로 보이게 처리
-- 원장은 전체 반을 볼 수 있게 처리
+- Supabase Auth 선생님 테스트 계정 생성: 완료
+- Supabase Auth 보조 선생님 테스트 계정 생성: 완료
+- `profiles.role = teacher/assistant` 연결: 완료
+- 담당 반 `classes.teacher_id` 연결: 완료
+- 선생님/보조 선생님은 담당 반 중심으로 보이게 처리: 완료
+- 원장은 전체 반을 볼 수 있게 처리: 완료
 
 완료 기준:
 - 원장 계정과 선생님 계정에서 보이는 반/학생 범위가 의도대로 다름
+
+구현 메모:
+- 테스트 계정은 `teacher@test.com`, `assistant@test.com`입니다.
+- 선생님은 담당 반 문자 미리보기 API가 200, 담당 외 반 학생은 403으로 차단됨을 확인했습니다.
+- 보조 선생님은 담당 반 조회와 팔로업 작성은 가능하지만, `allow_assistant_send=false` 설정에서 문자 발송 API가 403으로 차단됨을 확인했습니다.
+- 상세 결과는 `docs/testing/role-permission-result-2026-05-11.md`에 기록했습니다.
 
 ## Phase 4: 원장 운영 보드
 
