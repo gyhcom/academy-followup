@@ -89,6 +89,23 @@ export function AppWorkspace({
   const visibleView = !canManage && activeView === "management" ? "home" : activeView;
 
   useEffect(() => {
+    function syncVisualViewportHeight() {
+      const height = window.visualViewport?.height ?? window.innerHeight;
+      document.documentElement.style.setProperty("--app-vvh", `${height}px`);
+    }
+
+    syncVisualViewportHeight();
+    window.visualViewport?.addEventListener("resize", syncVisualViewportHeight);
+    window.addEventListener("resize", syncVisualViewportHeight);
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", syncVisualViewportHeight);
+      window.removeEventListener("resize", syncVisualViewportHeight);
+      document.documentElement.style.removeProperty("--app-vvh");
+    };
+  }, []);
+
+  useEffect(() => {
     const controller = new AbortController();
 
     async function loadAttendanceRecords() {
@@ -200,7 +217,7 @@ function WorkspaceNavigation({
   onChange: (view: WorkspaceView) => void;
 }) {
   return (
-    <section className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DED8CE] bg-white/95 px-3 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:static sm:rounded-lg sm:border sm:bg-white sm:p-2 sm:shadow-sm">
+    <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[#DED8CE] bg-white/95 px-3 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:static sm:w-auto sm:max-w-none sm:rounded-lg sm:border sm:bg-white sm:p-2 sm:shadow-sm">
       <div className={["grid gap-1.5", canManage ? "grid-cols-4" : "grid-cols-3"].join(" ")}>
         <WorkspaceNavButton
           icon={<Home size={17} />}
