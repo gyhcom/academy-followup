@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   ArrowRight,
+  BookOpen,
   CalendarDays,
   ClipboardCheck,
   Clock3,
@@ -12,6 +13,8 @@ import {
   Loader2,
   MessageSquareText,
   Settings,
+  Sparkles,
+  Users,
 } from "lucide-react";
 import {
   attendanceStatusLabels,
@@ -99,7 +102,26 @@ export function WorkspaceHome({
 
   return (
     <section className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
-      <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-5 sm:shadow-sm">
+      <MobileHomeExperience
+        academyName={academyName}
+        copy={copy}
+        canManage={canManage}
+        selectedDate={selectedDate}
+        records={records}
+        loadState={loadState}
+        followupItems={followupItems}
+        unsentCount={unsentCount}
+        sentCount={sentCount}
+        expandedFilter={expandedFilter}
+        filteredItems={filteredItems}
+        onDateChange={onDateChange}
+        onNavigate={onNavigate}
+        onToggleFilter={toggleFilter}
+        onCollapse={() => setExpandedFilter(null)}
+        onStudentSelect={onStudentSelect}
+      />
+
+      <section className="hidden border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:block sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-5 sm:shadow-sm">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-[#315C7C]">{academyName}</p>
@@ -120,7 +142,7 @@ export function WorkspaceHome({
 
       <section
         aria-label="주요 바로가기"
-        className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm"
+        className="hidden overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm sm:block"
       >
         <HomeActionButton
           icon={<MessageSquareText size={18} />}
@@ -144,7 +166,7 @@ export function WorkspaceHome({
         ) : null}
       </section>
 
-      <section className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm">
+      <section className="hidden overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm sm:block">
         <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-semibold text-[#315C7C]">
@@ -238,6 +260,228 @@ export function WorkspaceHome({
   );
 }
 
+function MobileHomeExperience({
+  academyName,
+  copy,
+  canManage,
+  selectedDate,
+  records,
+  loadState,
+  followupItems,
+  unsentCount,
+  sentCount,
+  expandedFilter,
+  filteredItems,
+  onDateChange,
+  onNavigate,
+  onToggleFilter,
+  onCollapse,
+  onStudentSelect,
+}: {
+  academyName: string;
+  copy: { title: string; description: string };
+  canManage: boolean;
+  selectedDate: string;
+  records: AttendanceRecordItem[];
+  loadState: {
+    status: "idle" | "loading" | "error";
+    error: string;
+  };
+  followupItems: HomeFollowupItem[];
+  unsentCount: number;
+  sentCount: number;
+  expandedFilter: FollowupFilter | null;
+  filteredItems: HomeFollowupItem[];
+  onDateChange: (date: string) => void;
+  onNavigate: (view: WorkspaceView) => void;
+  onToggleFilter: (filter: FollowupFilter) => void;
+  onCollapse: () => void;
+  onStudentSelect: (selection: {
+    classId: string;
+    studentId: string;
+    reason: FollowupReason;
+  }) => void;
+}) {
+  const isToday = selectedDate === getTodayDate();
+
+  return (
+    <div className="space-y-4 sm:hidden">
+      <section className="relative overflow-hidden rounded-[2rem] bg-[#48B77A] px-5 pb-5 pt-5 text-white shadow-[0_22px_58px_rgba(38,101,73,0.22)]">
+        <div className="absolute right-[-1.5rem] top-5 h-28 w-32 rotate-6 rounded-[2rem] bg-[#05765D]" />
+        <div className="absolute right-5 top-9 h-16 w-24 -rotate-6 rounded-3xl bg-[#7EDFB0]" />
+        <div className="relative z-10">
+          <div className="flex items-center justify-between gap-3">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-semibold backdrop-blur">
+              <Sparkles size={13} />
+              오늘 운영
+            </span>
+            {loadState.status === "loading" ? (
+              <Loader2 size={18} className="animate-spin text-white/80" />
+            ) : null}
+          </div>
+          <p className="mt-5 text-sm font-semibold text-white/85">{academyName}</p>
+          <h2 className="mt-1 max-w-[16rem] text-[2rem] font-black leading-[1.08] tracking-tight">
+            {copy.title}
+          </h2>
+          <p className="mt-3 max-w-[18rem] text-sm leading-6 text-white/80">
+            {copy.description}
+          </p>
+
+          <div className="mt-5 grid grid-cols-2 gap-2">
+            <MobileHeroMetric label="확인할 학생" value={`${followupItems.length}명`} />
+            <MobileHeroMetric label="연락 전" value={`${unsentCount}명`} tone="warm" />
+          </div>
+
+          <div className="mt-4 rounded-2xl bg-white/95 p-3 text-stone-950 shadow-[0_14px_32px_rgba(20,83,45,0.16)]">
+            <div className="flex items-center gap-3">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#E9F8EF] text-[#05765D]">
+                <BookOpen size={21} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-black">오늘 바로 할 일</p>
+                <p className="mt-0.5 truncate text-xs font-medium text-stone-500">
+                  문자, 출석, 관리 흐름을 이어서 처리합니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <HomeDateControl value={selectedDate} onChange={onDateChange} />
+
+      <section aria-label="오늘 바로가기" className="space-y-2">
+        <div className="flex items-center justify-between gap-3 px-1">
+          <div>
+            <p className="text-lg font-black text-stone-950">빠른 시작</p>
+            <p className="mt-0.5 text-xs font-medium text-stone-500">수업 후 처리할 일을 바로 엽니다.</p>
+          </div>
+          <span className="rounded-full bg-[#F2EFE7] px-2.5 py-1 text-xs font-bold text-stone-600">
+            {isToday ? "오늘" : "선택일"}
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <MobileActionCard
+            icon={<MessageSquareText size={18} />}
+            title="문자"
+            description="수업 후 연락"
+            tone="coral"
+            onClick={() => onNavigate("operations")}
+          />
+          <MobileActionCard
+            icon={<ClipboardCheck size={18} />}
+            title="출석"
+            description="도착·지각 체크"
+            tone="violet"
+            onClick={() => onNavigate("attendance")}
+          />
+          {canManage ? (
+            <MobileActionCard
+              icon={<Settings size={18} />}
+              title="관리"
+              description="학생·반 설정"
+              tone="mint"
+              onClick={() => onNavigate("management")}
+            />
+          ) : null}
+          <MobileActionCard
+            icon={<Users size={18} />}
+            title="목록"
+            description="대상 학생 보기"
+            tone="amber"
+            onClick={() => onToggleFilter("all")}
+          />
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-[1.5rem] border border-[#E6E0D5] bg-white shadow-[0_14px_42px_rgba(33,32,30,0.08)]">
+        <div className="border-b border-stone-100 px-4 py-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-[#05765D]">
+                {isToday ? "오늘 요약" : "선택 날짜 요약"}
+              </p>
+              <h3 className="mt-1 text-xl font-black leading-tight text-stone-950">
+                {formatHomeDate(selectedDate)}
+              </h3>
+            </div>
+            <span className="rounded-full bg-[#F2F7F0] px-2.5 py-1 text-xs font-bold text-[#05765D]">
+              운영 현황
+            </span>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            숫자를 누르면 해당 학생 목록이 펼쳐집니다.
+          </p>
+          {loadState.status === "error" ? (
+            <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-900">
+              {loadState.error}
+            </div>
+          ) : null}
+        </div>
+
+        {records.length === 0 && loadState.status !== "loading" ? (
+          <HomeEmptyState selectedDate={selectedDate} onDateChange={onDateChange} />
+        ) : (
+          <div className="grid grid-cols-3 gap-2 p-3">
+            <MobileSummaryButton
+              label="확인"
+              value={`${followupItems.length}`}
+              isActive={expandedFilter === "all"}
+              onClick={() => onToggleFilter("all")}
+            />
+            <MobileSummaryButton
+              label="연락 전"
+              value={`${unsentCount}`}
+              tone="danger"
+              isActive={expandedFilter === "unsent"}
+              onClick={() => onToggleFilter("unsent")}
+            />
+            <MobileSummaryButton
+              label="완료"
+              value={`${sentCount}`}
+              tone="success"
+              isActive={expandedFilter === "sent"}
+              onClick={() => onToggleFilter("sent")}
+            />
+          </div>
+        )}
+
+        {expandedFilter && records.length > 0 ? (
+          <div className="border-t border-stone-100">
+            <div className="flex items-center justify-between gap-3 bg-[#FBFAF7] px-4 py-3">
+              <p className="text-sm font-black text-stone-950">
+                {filterLabel(expandedFilter)} {filteredItems.length}명
+              </p>
+              <button
+                type="button"
+                onClick={onCollapse}
+                className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-stone-500 shadow-sm"
+              >
+                접기
+              </button>
+            </div>
+            <div className="divide-y divide-stone-100">
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item) => (
+                  <MobileFollowupRow
+                    key={item.key}
+                    item={item}
+                    onStudentSelect={onStudentSelect}
+                  />
+                ))
+              ) : (
+                <p className="px-4 py-5 text-sm leading-6 text-stone-600">
+                  선택한 조건에 해당하는 학생이 없습니다.
+                </p>
+              )}
+            </div>
+          </div>
+        ) : null}
+      </section>
+    </div>
+  );
+}
+
 function HomeDateControl({
   value,
   onChange,
@@ -324,6 +568,158 @@ function HomeDateControl({
         </button>
       </div>
     </div>
+  );
+}
+
+function MobileHeroMetric({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: string;
+  tone?: "default" | "warm";
+}) {
+  return (
+    <div
+      className={[
+        "rounded-2xl px-3 py-3 backdrop-blur",
+        tone === "warm" ? "bg-[#FFEFDD] text-[#7D3A15]" : "bg-white/20 text-white",
+      ].join(" ")}
+    >
+      <p className={["text-xs font-bold", tone === "warm" ? "text-[#A0531D]" : "text-white/78"].join(" ")}>
+        {label}
+      </p>
+      <p className="mt-1 text-2xl font-black tabular-nums">{value}</p>
+    </div>
+  );
+}
+
+function MobileActionCard({
+  icon,
+  title,
+  description,
+  tone,
+  onClick,
+}: {
+  icon: ReactNode;
+  title: string;
+  description: string;
+  tone: "coral" | "violet" | "mint" | "amber";
+  onClick: () => void;
+}) {
+  const toneClass = {
+    coral: "bg-[#FF714D] text-white shadow-[0_12px_28px_rgba(255,113,77,0.22)]",
+    violet: "bg-[#8387F5] text-white shadow-[0_12px_28px_rgba(103,107,230,0.20)]",
+    mint: "bg-[#087A61] text-white shadow-[0_12px_28px_rgba(8,122,97,0.20)]",
+    amber: "bg-[#FFB65C] text-[#3B2507] shadow-[0_12px_28px_rgba(255,182,92,0.20)]",
+  }[tone];
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={[
+        "group min-h-[7.2rem] overflow-hidden rounded-[1.35rem] p-3 text-left transition active:scale-[0.98]",
+        toneClass,
+      ].join(" ")}
+    >
+      <span className="flex items-start justify-between gap-3">
+        <span className="flex size-9 items-center justify-center rounded-2xl bg-white/20">
+          {icon}
+        </span>
+        <ArrowRight size={16} className="mt-1 transition group-active:translate-x-0.5" />
+      </span>
+      <span className="mt-4 block text-lg font-black leading-none">{title}</span>
+      <span className="mt-1.5 block text-xs font-bold opacity-[0.82]">{description}</span>
+    </button>
+  );
+}
+
+function MobileSummaryButton({
+  label,
+  value,
+  tone = "default",
+  isActive,
+  onClick,
+}: {
+  label: string;
+  value: string;
+  tone?: "default" | "danger" | "success";
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  const toneClass = {
+    default: "bg-[#EEF8F2] text-[#087A61]",
+    danger: "bg-[#FFF0E8] text-[#B64C1E]",
+    success: "bg-[#EEF1FF] text-[#555CD8]",
+  }[tone];
+
+  return (
+    <button
+      type="button"
+      aria-pressed={isActive}
+      onClick={onClick}
+      className={[
+        "rounded-2xl border px-3 py-3 text-left transition active:scale-[0.98]",
+        isActive ? "border-stone-950 bg-stone-950 text-white" : `border-transparent ${toneClass}`,
+      ].join(" ")}
+    >
+      <span className="block text-xs font-black">{label}</span>
+      <span className="mt-1 block text-2xl font-black tabular-nums">{value}</span>
+      <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-black">
+        보기
+        <ArrowRight size={12} />
+      </span>
+    </button>
+  );
+}
+
+function MobileFollowupRow({
+  item,
+  onStudentSelect,
+}: {
+  item: HomeFollowupItem;
+  onStudentSelect: (selection: {
+    classId: string;
+    studentId: string;
+    reason: FollowupReason;
+  }) => void;
+}) {
+  const isSent = item.followupStatus === "sent";
+
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        onStudentSelect({
+          classId: item.classId,
+          studentId: item.student.id,
+          reason: followupReasonForStatus(item.status),
+        })
+      }
+      className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-3 px-4 py-3 text-left transition active:bg-stone-50"
+    >
+      <span className="min-w-0">
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="truncate text-base font-black text-stone-950">
+            {item.student.name}
+          </span>
+          <span className={["shrink-0 rounded-full px-2 py-0.5 text-[11px] font-black", statusTone(item.status)].join(" ")}>
+            {attendanceStatusLabels[item.status]}
+          </span>
+        </span>
+        <span className="mt-1 block truncate text-sm font-medium text-stone-600">
+          {item.className} · {item.startTime}-{item.endTime}
+        </span>
+        <span className="mt-1 block text-xs font-medium text-stone-500">
+          {isSent ? "연락 완료" : item.followupStatus === "draft" ? "초안 저장" : "문자 작성 필요"}
+        </span>
+      </span>
+      <span className="mt-1 flex size-9 items-center justify-center rounded-full bg-[#F2F7F0] text-[#087A61]">
+        <ArrowRight size={15} />
+      </span>
+    </button>
   );
 }
 
