@@ -1,10 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   ArrowRight,
-  BookOpen,
   CalendarDays,
   ClipboardCheck,
   Clock3,
@@ -335,7 +335,13 @@ function MobileHomeExperience({
           <div className="mt-4 rounded-2xl bg-white/95 p-3 text-stone-950 shadow-[0_14px_32px_rgba(20,83,45,0.16)]">
             <div className="flex items-center gap-3">
               <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#E9F8EF] text-[#05765D]">
-                <BookOpen size={21} />
+                <Image
+                  src="/icons/education/education-book.svg"
+                  alt=""
+                  width={30}
+                  height={30}
+                  aria-hidden="true"
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-black">오늘 바로 할 일</p>
@@ -363,6 +369,7 @@ function MobileHomeExperience({
         <div className="grid grid-cols-2 gap-2">
           <MobileActionCard
             icon={<MessageSquareText size={18} />}
+            iconSrc="/icons/education/education-discuss.svg"
             title="문자"
             description="수업 후 연락"
             tone="coral"
@@ -370,6 +377,7 @@ function MobileHomeExperience({
           />
           <MobileActionCard
             icon={<ClipboardCheck size={18} />}
+            iconSrc="/icons/education/education-schedule.svg"
             title="출석"
             description="도착·지각 체크"
             tone="violet"
@@ -378,6 +386,7 @@ function MobileHomeExperience({
           {canManage ? (
             <MobileActionCard
               icon={<Settings size={18} />}
+              iconSrc="/icons/education/education-school.svg"
               title="관리"
               description="학생·반 설정"
               tone="mint"
@@ -386,6 +395,7 @@ function MobileHomeExperience({
           ) : null}
           <MobileActionCard
             icon={<Users size={18} />}
+            iconSrc="/icons/education/education-knowledge.svg"
             title="목록"
             description="대상 학생 보기"
             tone="amber"
@@ -597,12 +607,14 @@ function MobileHeroMetric({
 
 function MobileActionCard({
   icon,
+  iconSrc,
   title,
   description,
   tone,
   onClick,
 }: {
   icon: ReactNode;
+  iconSrc?: string;
   title: string;
   description: string;
   tone: "coral" | "violet" | "mint" | "amber";
@@ -626,7 +638,18 @@ function MobileActionCard({
     >
       <span className="flex items-start justify-between gap-3">
         <span className="flex size-9 items-center justify-center rounded-2xl bg-white/20">
-          {icon}
+          {iconSrc ? (
+            <Image
+              src={iconSrc}
+              alt=""
+              width={30}
+              height={30}
+              aria-hidden="true"
+              className="size-7 object-contain"
+            />
+          ) : (
+            icon
+          )}
         </span>
         <ArrowRight size={16} className="mt-1 transition group-active:translate-x-0.5" />
       </span>
