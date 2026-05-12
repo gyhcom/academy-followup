@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   CalendarDays,
@@ -130,6 +130,8 @@ type AttendanceOverview = {
   classSummaries: AttendanceClassSummary[];
 };
 
+type AttendanceFilter = "all" | "unchecked" | "attention";
+
 type MessagePreviewState = {
   key: string;
   status: "idle" | "ready" | "error";
@@ -196,6 +198,12 @@ const editableStatuses: AttendanceStatus[] = [
   "needs_check",
   "makeup",
 ];
+const exceptionStatuses: AttendanceStatus[] = ["late", "absent", "needs_check", "makeup"];
+const attendanceFilterLabels: Record<AttendanceFilter, string> = {
+  all: "전체",
+  unchecked: "미체크만",
+  attention: "연락 필요만",
+};
 
 export function AttendanceBoard({
   academyName,
@@ -207,7 +215,9 @@ export function AttendanceBoard({
   onRecordsChange,
 }: AttendanceBoardProps) {
   const [attendanceRecords, setAttendanceRecords] = useState(initialRecords);
+  const attendanceRecordsRef = useRef(initialRecords);
   const [selectedSessionKey, setSelectedSessionKey] = useState("");
+  const [attendanceFilter, setAttendanceFilter] = useState<AttendanceFilter>("all");
   const [loadState, setLoadState] = useState<{
     status: "idle" | "loading" | "error";
     error: string;
@@ -274,6 +284,21 @@ export function AttendanceBoard({
   const summary = selectedSession
     ? summarizeSession(selectedSession.students, recordsByStudent)
     : null;
+  const filteredStudents = selectedSession
+    ? selectedSession.students.filter((student) => {
+        const status = normalizeAttendanceStatus(recordsByStudent.get(student.id)?.status);
+
+        if (attendanceFilter === "unchecked") {
+          return status === "pending";
+        }
+
+        if (attendanceFilter === "attention") {
+          return status === "absent" || status === "late" || status === "needs_check";
+        }
+
+        return true;
+      })
+    : [];
   const overview = useMemo(
     () => buildAttendanceOverview(sessions, dateAttendanceRecords),
     [dateAttendanceRecords, sessions],
@@ -330,6 +355,12 @@ export function AttendanceBoard({
       ? messageSend.error
       : "";
 
+  const applyAttendanceRecords = useCallback((nextRecords: AttendanceRecordItem[]) => {
+    attendanceRecordsRef.current = nextRecords;
+    setAttendanceRecords(nextRecords);
+    onRecordsChange?.(nextRecords);
+  }, [onRecordsChange]);
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -347,8 +378,7 @@ export function AttendanceBoard({
         }
 
         const nextRecords = payload.records ?? [];
-        setAttendanceRecords(nextRecords);
-        onRecordsChange?.(nextRecords);
+        applyAttendanceRecords(nextRecords);
         setLoadState({ status: "idle", error: "" });
       } catch (error) {
         if (controller.signal.aborted) {
@@ -370,7 +400,7 @@ export function AttendanceBoard({
     return () => {
       controller.abort();
     };
-  }, [onRecordsChange, selectedDate]);
+  }, [applyAttendanceRecords, selectedDate]);
 
   useEffect(() => {
     if (!followupTarget) {
@@ -494,12 +524,9 @@ export function AttendanceBoard({
 
       const savedRecord = payload.record;
       const followupReason = getFollowupReasonForAttendanceStatus(status);
+      const nextRecords = mergeAttendanceRecord(attendanceRecordsRef.current, savedRecord);
 
-      setAttendanceRecords((current) => {
-        const nextRecords = mergeAttendanceRecord(current, savedRecord);
-        onRecordsChange?.(nextRecords);
-        return nextRecords;
-      });
+      applyAttendanceRecords(nextRecords);
       setSaveState({ key: updateKey, status: "saved", error: "" });
 
       if (followupReason) {
@@ -582,8 +609,8 @@ export function AttendanceBoard({
         message: "",
         error: "",
       });
-      setAttendanceRecords((current) => {
-        const nextRecords = current.map((record) =>
+      applyAttendanceRecords(
+        attendanceRecordsRef.current.map((record) =>
           record.id === followupTarget.record.id
             ? {
                 ...record,
@@ -592,10 +619,8 @@ export function AttendanceBoard({
                 followupSentAt: null,
               }
             : record,
-        );
-        onRecordsChange?.(nextRecords);
-        return nextRecords;
-      });
+        ),
+      );
     } catch (error) {
       setFollowupSave({
         key: followupTargetKey,
@@ -648,8 +673,8 @@ export function AttendanceBoard({
           (payload.dryRun ? "dry-run 발송을 기록했습니다." : "문자를 발송했습니다."),
         error: "",
       });
-      setAttendanceRecords((current) => {
-        const nextRecords = current.map((record) =>
+      applyAttendanceRecords(
+        attendanceRecordsRef.current.map((record) =>
           record.followupId === savedFollowupId
             ? {
                 ...record,
@@ -657,10 +682,8 @@ export function AttendanceBoard({
                 followupSentAt: new Date().toISOString(),
               }
             : record,
-        );
-        onRecordsChange?.(nextRecords);
-        return nextRecords;
-      });
+        ),
+      );
     } catch (error) {
       setMessageSend({
         followupId: savedFollowupId,
@@ -698,8 +721,12 @@ export function AttendanceBoard({
         <SessionList
           sessions={sessions}
           selectedSessionKey={selectedSession?.key ?? ""}
+          records={dateAttendanceRecords}
           loadState={loadState.status}
-          onSelect={setSelectedSessionKey}
+          onSelect={(sessionKey) => {
+            setSelectedSessionKey(sessionKey);
+            setAttendanceFilter("all");
+          }}
         />
 
         <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
@@ -727,6 +754,15 @@ export function AttendanceBoard({
               {summary ? <AttendanceSummary summary={summary} /> : null}
             </div>
 
+            {selectedSession ? (
+              <AttendanceFilterBar
+                value={attendanceFilter}
+                summary={summary}
+                totalCount={selectedSession.students.length}
+                onChange={setAttendanceFilter}
+              />
+            ) : null}
+
             {loadState.status === "error" ? (
               <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-900">
                 {loadState.error}
@@ -736,45 +772,63 @@ export function AttendanceBoard({
 
           {selectedSession ? (
             <div>
-              <div className="hidden grid-cols-[minmax(9rem,1fr)_8rem_minmax(24rem,1.4fr)] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5">
+              <div className="hidden grid-cols-[minmax(12rem,1fr)_11rem_minmax(18rem,1.1fr)] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5">
                 <span>학생</span>
-                <span>상태</span>
-                <span>체크</span>
+                <span>도착 체크</span>
+                <span>예외 처리</span>
               </div>
 
               <div className="divide-y divide-stone-200">
-                {selectedSession.students.map((student) => {
-                  const record = recordsByStudent.get(student.id);
-                  const status = normalizeAttendanceStatus(record?.status);
-                  const updateKey = getAttendanceUpdateKey({
-                    studentId: student.id,
-                    classId: selectedSession.classId,
-                    attendanceDate: selectedDate,
-                    scheduledStartTime: selectedSession.startTime,
-                    scheduledEndTime: selectedSession.endTime,
-                  });
-                  const isSaving =
-                    saveState.key === updateKey && saveState.status === "saving";
-                  const saveError =
-                    saveState.key === updateKey && saveState.status === "error"
-                      ? saveState.error
-                      : "";
+                {filteredStudents.length > 0 ? (
+                  filteredStudents.map((student) => {
+                    const record = recordsByStudent.get(student.id);
+                    const status = normalizeAttendanceStatus(record?.status);
+                    const updateKey = getAttendanceUpdateKey({
+                      studentId: student.id,
+                      classId: selectedSession.classId,
+                      attendanceDate: selectedDate,
+                      scheduledStartTime: selectedSession.startTime,
+                      scheduledEndTime: selectedSession.endTime,
+                    });
+                    const isSaving =
+                      saveState.key === updateKey && saveState.status === "saving";
+                    const isSaved =
+                      saveState.key === updateKey && saveState.status === "saved";
+                    const saveError =
+                      saveState.key === updateKey && saveState.status === "error"
+                        ? saveState.error
+                        : "";
 
-                  return (
-                    <AttendanceStudentRow
-                      key={student.id}
-                      student={student}
-                      status={status}
-                      record={record}
-                      isSaving={isSaving}
-                      saveError={saveError}
-                      onStatusChange={(nextStatus) =>
-                        handleStatusChange(student, nextStatus)
-                      }
-                    />
-                  );
-                })}
+                    return (
+                      <AttendanceStudentRow
+                        key={student.id}
+                        student={student}
+                        status={status}
+                        record={record}
+                        isSaving={isSaving}
+                        isSaved={isSaved}
+                        saveError={saveError}
+                        onStatusChange={(nextStatus) =>
+                          handleStatusChange(student, nextStatus)
+                        }
+                      />
+                    );
+                  })
+                ) : (
+                  <div className="px-4 py-8 text-center text-sm leading-6 text-stone-500 sm:px-5">
+                    현재 필터에 해당하는 학생이 없습니다.
+                  </div>
+                )}
               </div>
+
+              {summary ? (
+                <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-stone-200 bg-white/95 px-4 py-3 text-sm shadow-[0_-8px_20px_rgba(28,25,23,0.06)] backdrop-blur sm:px-5">
+                  <span className="font-medium text-stone-600">이 수업 미체크</span>
+                  <span className="rounded-full bg-stone-950 px-3 py-1 text-sm font-semibold text-white">
+                    {summary.pending}명
+                  </span>
+                </div>
+              ) : null}
             </div>
           ) : (
             <div className="p-5 text-sm leading-6 text-stone-600">
@@ -929,11 +983,13 @@ function DateShortcutButton({
 function SessionList({
   sessions,
   selectedSessionKey,
+  records,
   loadState,
   onSelect,
 }: {
   sessions: AttendanceSession[];
   selectedSessionKey: string;
+  records: AttendanceRecordItem[];
   loadState: "idle" | "loading" | "error";
   onSelect: (sessionKey: string) => void;
 }) {
@@ -954,6 +1010,7 @@ function SessionList({
         {sessions.length > 0 ? (
           sessions.map((session) => {
             const isSelected = session.key === selectedSessionKey;
+            const progress = getSessionProgress(session, records);
 
             return (
               <button
@@ -962,7 +1019,7 @@ function SessionList({
                 aria-pressed={isSelected}
                 onClick={() => onSelect(session.key)}
                 className={[
-                  "grid min-h-[4.75rem] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border px-3 py-3 text-left transition",
+                  "grid min-h-[4.5rem] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border px-3 py-3 text-left transition",
                   isSelected
                     ? "border-[#315C7C] bg-[#315C7C] text-white"
                     : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50",
@@ -985,13 +1042,25 @@ function SessionList({
                     {session.subject ?? "과목 미지정"} · {session.students.length}명
                   </span>
                 </span>
-                <span
-                  className={[
-                    "rounded-md px-2 py-1 text-xs font-semibold",
-                    isSelected ? "bg-white/14 text-white" : "bg-stone-100 text-stone-500",
-                  ].join(" ")}
-                >
-                  {session.students.length}명
+                <span className="grid justify-items-end gap-1">
+                  <span
+                    className={[
+                      "rounded-md px-2 py-1 text-xs font-semibold",
+                      isSelected ? "bg-white/14 text-white" : "bg-stone-100 text-stone-500",
+                    ].join(" ")}
+                  >
+                    미체크 {progress.pending}명
+                  </span>
+                  {progress.attention > 0 ? (
+                    <span
+                      className={[
+                        "rounded-md px-2 py-1 text-xs font-semibold",
+                        isSelected ? "bg-white/14 text-white" : "bg-red-50 text-red-800",
+                      ].join(" ")}
+                    >
+                      연락 {progress.attention}명
+                    </span>
+                  ) : null}
                 </span>
               </button>
             );
@@ -1003,6 +1072,60 @@ function SessionList({
         )}
       </div>
     </section>
+  );
+}
+
+function AttendanceFilterBar({
+  value,
+  summary,
+  totalCount,
+  onChange,
+}: {
+  value: AttendanceFilter;
+  summary: Record<AttendanceStatus, number> | null;
+  totalCount: number;
+  onChange: (filter: AttendanceFilter) => void;
+}) {
+  const attentionCount = summary
+    ? summary.absent + summary.late + summary.needs_check
+    : 0;
+  const counts: Record<AttendanceFilter, number> = {
+    all: totalCount,
+    unchecked: summary?.pending ?? 0,
+    attention: attentionCount,
+  };
+
+  return (
+    <div className="mt-4 flex gap-2 overflow-x-auto pb-1" aria-label="출석 학생 필터">
+      {(Object.keys(attendanceFilterLabels) as AttendanceFilter[]).map((filter) => {
+        const isSelected = value === filter;
+
+        return (
+          <button
+            key={filter}
+            type="button"
+            aria-pressed={isSelected}
+            onClick={() => onChange(filter)}
+            className={[
+              "inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+              isSelected
+                ? "border-stone-950 bg-stone-950 text-white"
+                : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50",
+            ].join(" ")}
+          >
+            {attendanceFilterLabels[filter]}
+            <span
+              className={[
+                "rounded-full px-1.5 py-0.5 tabular-nums",
+                isSelected ? "bg-white/15 text-white" : "bg-stone-100 text-stone-500",
+              ].join(" ")}
+            >
+              {counts[filter]}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -1218,6 +1341,7 @@ function AttendanceStudentRow({
   status,
   record,
   isSaving,
+  isSaved,
   saveError,
   onStatusChange,
 }: {
@@ -1225,13 +1349,30 @@ function AttendanceStudentRow({
   status: AttendanceStatus;
   record: AttendanceRecordItem | undefined;
   isSaving: boolean;
+  isSaved: boolean;
   saveError: string;
   onStatusChange: (status: AttendanceStatus) => void;
 }) {
+  const isPresent = status === "present";
+  const isPending = status === "pending";
+  const isExceptionStatus = !isPresent && !isPending;
+
   return (
-    <article className="grid gap-3 px-4 py-4 sm:grid-cols-[minmax(9rem,1fr)_8rem_minmax(24rem,1.4fr)] sm:items-center sm:px-5">
+    <article className="grid gap-3 px-4 py-4 sm:grid-cols-[minmax(12rem,1fr)_11rem_minmax(18rem,1.1fr)] sm:items-center sm:px-5">
       <div className="min-w-0">
-        <p className="text-base font-semibold text-stone-950">{student.name}</p>
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <p className="text-base font-semibold text-stone-950">{student.name}</p>
+          {isExceptionStatus ? (
+            <span
+              className={[
+                "inline-flex min-h-6 items-center rounded-md px-2 text-xs font-semibold",
+                attendanceStatusClass(status),
+              ].join(" ")}
+            >
+              {attendanceDisplayLabel(status)}
+            </span>
+          ) : null}
+        </div>
         <p className="mt-1 text-xs text-stone-500">
           {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
             "학년 정보 없음"}{" "}
@@ -1239,24 +1380,49 @@ function AttendanceStudentRow({
         </p>
       </div>
 
-      <div>
-        <span
+      <div className="flex items-center justify-between gap-3 sm:block">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isPresent}
+          disabled={isSaving}
+          onClick={() => onStatusChange(isPresent ? "pending" : "present")}
           className={[
-            "inline-flex min-h-8 items-center rounded-md px-2.5 text-xs font-semibold",
-            attendanceStatusClass(status),
+            "group inline-flex min-h-11 w-full max-w-[11rem] items-center justify-between rounded-full border px-1.5 pl-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2] sm:w-full",
+            isPresent
+              ? "border-[#315C7C] bg-[#315C7C] text-white"
+              : "border-stone-200 bg-stone-100 text-stone-600 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
+            isSaving ? "cursor-wait opacity-60" : "",
           ].join(" ")}
         >
-          {attendanceDisplayLabel(status)}
-        </span>
-        {record?.checkedAt ? (
-          <p className="mt-1 text-xs text-stone-400">{formatTime(record.checkedAt)}</p>
-        ) : null}
+          <span>{isPresent ? "도착" : "미체크"}</span>
+          <span
+            className={[
+              "flex size-8 items-center justify-center rounded-full bg-white shadow-sm transition",
+              isPresent ? "translate-x-0 text-[#315C7C]" : "text-stone-400",
+            ].join(" ")}
+          >
+            {isPresent ? <Check size={16} /> : null}
+          </span>
+        </button>
+
+        <div className="min-w-[4.5rem] text-right sm:mt-1 sm:text-left">
+          {isSaving ? (
+            <p className="text-xs font-medium text-stone-400">저장 중</p>
+          ) : isSaved ? (
+            <p className="text-xs font-medium text-[#315C7C]">저장됨</p>
+          ) : record?.checkedAt ? (
+            <p className="text-xs text-stone-400">{formatTime(record.checkedAt)}</p>
+          ) : (
+            <p className="text-xs text-stone-400">대기</p>
+          )}
+        </div>
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-semibold text-stone-500">상태 변경</p>
+        <p className="mb-2 text-xs font-semibold text-stone-500">예외 처리</p>
         <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label={`${student.name} 출석 상태 변경`}>
-          {editableStatuses.map((nextStatus) => {
+          {exceptionStatuses.map((nextStatus) => {
             const isSelected = status === nextStatus;
 
             return (
@@ -1267,7 +1433,7 @@ function AttendanceStudentRow({
                 aria-pressed={isSelected}
                 onClick={() => onStatusChange(nextStatus)}
                 className={[
-                  "flex min-h-10 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+                  "flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
                   isSelected
                     ? "border-[#315C7C] bg-[#315C7C] text-white"
                     : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
@@ -1275,7 +1441,6 @@ function AttendanceStudentRow({
                 ].join(" ")}
               >
                 {isSelected ? <Check size={14} /> : null}
-                {isSelected ? "현재 " : ""}
                 {attendanceDisplayLabel(nextStatus)}
               </button>
             );
@@ -1774,6 +1939,25 @@ function summarizeSession(
   });
 
   return summary;
+}
+
+function getSessionProgress(session: AttendanceSession, records: AttendanceRecordItem[]) {
+  const recordsByStudent = new Map(
+    records
+      .filter(
+        (record) =>
+          record.classId === session.classId &&
+          record.scheduledStartTime === session.startTime &&
+          record.scheduledEndTime === session.endTime,
+      )
+      .map((record) => [record.studentId, record]),
+  );
+  const summary = summarizeSession(session.students, recordsByStudent);
+
+  return {
+    pending: summary.pending,
+    attention: summary.absent + summary.late + summary.needs_check,
+  };
 }
 
 function buildAttendanceOverview(
