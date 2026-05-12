@@ -772,9 +772,9 @@ export function AttendanceBoard({
 
           {selectedSession ? (
             <div>
-              <div className="hidden grid-cols-[minmax(12rem,1fr)_11rem_minmax(18rem,1.1fr)] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5">
+              <div className="hidden grid-cols-[minmax(14rem,1fr)_7.5rem_minmax(16rem,0.95fr)] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5">
                 <span>학생</span>
-                <span>도착 체크</span>
+                <span>도착</span>
                 <span>예외 처리</span>
               </div>
 
@@ -822,9 +822,9 @@ export function AttendanceBoard({
               </div>
 
               {summary ? (
-                <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-stone-200 bg-white/95 px-4 py-3 text-sm shadow-[0_-8px_20px_rgba(28,25,23,0.06)] backdrop-blur sm:px-5">
+                <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-stone-200 bg-white/95 px-4 py-2 text-sm shadow-[0_-8px_20px_rgba(28,25,23,0.06)] backdrop-blur sm:px-5">
                   <span className="font-medium text-stone-600">이 수업 미체크</span>
-                  <span className="rounded-full bg-stone-950 px-3 py-1 text-sm font-semibold text-white">
+                  <span className="rounded-full bg-stone-950 px-2.5 py-1 text-xs font-semibold text-white">
                     {summary.pending}명
                   </span>
                 </div>
@@ -1358,9 +1358,10 @@ function AttendanceStudentRow({
   const isExceptionStatus = !isPresent && !isPending;
 
   return (
-    <article className="grid gap-3 px-4 py-4 sm:grid-cols-[minmax(12rem,1fr)_11rem_minmax(18rem,1.1fr)] sm:items-center sm:px-5">
-      <div className="min-w-0">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
+    <article className="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(14rem,1fr)_7.5rem_minmax(16rem,0.95fr)] sm:items-center sm:gap-3 sm:px-5">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:block">
+        <div className="min-w-0">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
           <p className="text-base font-semibold text-stone-950">{student.name}</p>
           {isExceptionStatus ? (
             <span
@@ -1372,56 +1373,32 @@ function AttendanceStudentRow({
               {attendanceDisplayLabel(status)}
             </span>
           ) : null}
+          </div>
+          <p className="mt-0.5 text-xs text-stone-500">
+            {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
+              "학년 정보 없음"}{" "}
+            · {student.maskedParentPhone}
+          </p>
         </div>
-        <p className="mt-1 text-xs text-stone-500">
-          {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
-            "학년 정보 없음"}{" "}
-          · {student.maskedParentPhone}
-        </p>
+
+        <AttendanceArrivalToggle
+          isPresent={isPresent}
+          isSaving={isSaving}
+          onToggle={() => onStatusChange(isPresent ? "pending" : "present")}
+        />
       </div>
 
-      <div className="flex items-center justify-between gap-3 sm:block">
-        <button
-          type="button"
-          role="switch"
-          aria-checked={isPresent}
-          disabled={isSaving}
-          onClick={() => onStatusChange(isPresent ? "pending" : "present")}
-          className={[
-            "group inline-flex min-h-11 w-full max-w-[11rem] items-center justify-between rounded-full border px-1.5 pl-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2] sm:w-full",
-            isPresent
-              ? "border-[#315C7C] bg-[#315C7C] text-white"
-              : "border-stone-200 bg-stone-100 text-stone-600 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
-            isSaving ? "cursor-wait opacity-60" : "",
-          ].join(" ")}
-        >
-          <span>{isPresent ? "도착" : "미체크"}</span>
-          <span
-            className={[
-              "flex size-8 items-center justify-center rounded-full bg-white shadow-sm transition",
-              isPresent ? "translate-x-0 text-[#315C7C]" : "text-stone-400",
-            ].join(" ")}
-          >
-            {isPresent ? <Check size={16} /> : null}
-          </span>
-        </button>
-
-        <div className="min-w-[4.5rem] text-right sm:mt-1 sm:text-left">
-          {isSaving ? (
-            <p className="text-xs font-medium text-stone-400">저장 중</p>
-          ) : isSaved ? (
-            <p className="text-xs font-medium text-[#315C7C]">저장됨</p>
-          ) : record?.checkedAt ? (
-            <p className="text-xs text-stone-400">{formatTime(record.checkedAt)}</p>
-          ) : (
-            <p className="text-xs text-stone-400">대기</p>
-          )}
-        </div>
+      <div className="hidden sm:block">
+        <AttendanceArrivalToggle
+          isPresent={isPresent}
+          isSaving={isSaving}
+          onToggle={() => onStatusChange(isPresent ? "pending" : "present")}
+        />
+        <AttendanceSaveStatus isSaving={isSaving} isSaved={isSaved} checkedAt={record?.checkedAt} />
       </div>
 
-      <div>
-        <p className="mb-2 text-xs font-semibold text-stone-500">예외 처리</p>
-        <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label={`${student.name} 출석 상태 변경`}>
+      <div className="min-w-0">
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5" role="group" aria-label={`${student.name} 출석 상태 변경`}>
           {exceptionStatuses.map((nextStatus) => {
             const isSelected = status === nextStatus;
 
@@ -1433,7 +1410,7 @@ function AttendanceStudentRow({
                 aria-pressed={isSelected}
                 onClick={() => onStatusChange(nextStatus)}
                 className={[
-                  "flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+                  "flex min-h-8 shrink-0 items-center gap-1 rounded-md border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
                   isSelected
                     ? "border-[#315C7C] bg-[#315C7C] text-white"
                     : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
@@ -1447,6 +1424,10 @@ function AttendanceStudentRow({
           })}
         </div>
 
+        <div className="mt-1 sm:hidden">
+          <AttendanceSaveStatus isSaving={isSaving} isSaved={isSaved} checkedAt={record?.checkedAt} />
+        </div>
+
         {saveError ? (
           <p className="mt-2 flex items-start gap-1.5 text-xs leading-5 text-red-700">
             <AlertCircle size={14} className="mt-0.5 shrink-0" />
@@ -1456,6 +1437,67 @@ function AttendanceStudentRow({
       </div>
     </article>
   );
+}
+
+function AttendanceArrivalToggle({
+  isPresent,
+  isSaving,
+  onToggle,
+}: {
+  isPresent: boolean;
+  isSaving: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={isPresent}
+      disabled={isSaving}
+      onClick={onToggle}
+      className={[
+        "inline-flex min-h-8 w-[3.25rem] items-center rounded-full border p-0.5 transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+        isPresent
+          ? "justify-end border-[#315C7C] bg-[#315C7C]"
+          : "justify-start border-stone-300 bg-stone-100 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
+        isSaving ? "cursor-wait opacity-60" : "",
+      ].join(" ")}
+    >
+      <span className="sr-only">{isPresent ? "도착을 미체크로 변경" : "도착으로 변경"}</span>
+      <span
+        className={[
+          "flex size-6 items-center justify-center rounded-full bg-white shadow-sm transition",
+          isPresent ? "text-[#315C7C]" : "text-stone-400",
+        ].join(" ")}
+      >
+        {isPresent ? <Check size={14} /> : null}
+      </span>
+    </button>
+  );
+}
+
+function AttendanceSaveStatus({
+  isSaving,
+  isSaved,
+  checkedAt,
+}: {
+  isSaving: boolean;
+  isSaved: boolean;
+  checkedAt: string | null | undefined;
+}) {
+  if (isSaving) {
+    return <p className="text-[11px] font-medium text-stone-400">저장 중</p>;
+  }
+
+  if (isSaved) {
+    return <p className="text-[11px] font-medium text-[#315C7C]">저장됨</p>;
+  }
+
+  if (checkedAt) {
+    return <p className="text-[11px] text-stone-400">{formatTime(checkedAt)}</p>;
+  }
+
+  return <p className="text-[11px] text-stone-400">대기</p>;
 }
 
 function AttendanceFollowupPanel({
