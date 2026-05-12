@@ -1,20 +1,12 @@
 import { NextResponse } from "next/server";
 import type { MessageRecipientType } from "@/lib/message-recipients";
 import { canSendFollowupMessage } from "@/lib/permissions";
+import { getRouteWorkspace } from "@/lib/server/route-workspace";
 import { sendSms } from "@/lib/sms/solapi";
-import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
-import {
-  createSupabaseServerClient,
-  hasSupabaseServerEnv,
-} from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type SendMessageRequest = {
   followupId?: unknown;
-};
-
-type ProfileRecord = {
-  role: string;
-  academy_id: string;
 };
 
 type FollowupRecord = {
@@ -43,45 +35,16 @@ type AcademySettingsRecord = {
 };
 
 export async function POST(request: Request) {
-  if (!hasSupabaseServerEnv()) {
-    return NextResponse.json({
-      error: "Supabase 세션 환경변수가 설정되지 않았습니다.",
-    }, { status: 500 });
-  }
+  const workspaceResult = await getRouteWorkspace();
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  }
-
-  if (!hasSupabaseAdminEnv()) {
+  if (!workspaceResult.ok) {
     return NextResponse.json(
-      { error: "서버 전용 Supabase 키가 설정되지 않았습니다." },
-      { status: 500 },
+      { error: workspaceResult.error },
+      { status: workspaceResult.status },
     );
   }
 
-  const admin = createSupabaseAdminClient();
-  const { data: profile, error: profileError } = await admin
-    .from("profiles")
-    .select("role, academy_id")
-    .eq("id", user.id)
-    .maybeSingle<ProfileRecord>();
-
-  if (profileError) {
-    return NextResponse.json({ error: profileError.message }, { status: 500 });
-  }
-
-  if (!profile) {
-    return NextResponse.json(
-      { error: "학원 워크스페이스 연결이 필요합니다." },
-      { status: 403 },
-    );
-  }
+  const { admin, profile, userId } = workspaceResult.workspace;
 
   const parsedRequest = await parseSendMessageRequest(request);
 
@@ -130,7 +93,7 @@ export async function POST(request: Request) {
     !canSendFollowupMessage({
       role: profile.role,
       classTeacherId: followup.classes?.teacher_id ?? null,
-      userId: user.id,
+      userId,
       allowAssistantSend: settings?.allow_assistant_send ?? false,
     })
   ) {

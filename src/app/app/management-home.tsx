@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ClipboardList,
   FileSpreadsheet,
+  MessageSquareText,
   Pencil,
   Plus,
   UserPlus,
@@ -15,10 +16,12 @@ import type {
   ClassFormState,
   FormStatus,
   ManagementClass,
+  ManagementMessageTemplate,
   ManagementMember,
   ManagementSettings,
   ManagementStudent,
   ManagementStudentSchedule,
+  MessageTemplateFormState,
   MemberFormState,
   ScheduleFormState,
   StudentFormState,
@@ -39,7 +42,13 @@ import { StudentBulkImportForm } from "@/app/app/student-bulk-import";
 import { StudentDirectory } from "@/app/app/student-directory";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
 
-type ManagementSection = "setup" | "students" | "classes" | "members" | "settings";
+type ManagementSection =
+  | "setup"
+  | "students"
+  | "classes"
+  | "members"
+  | "templates"
+  | "settings";
 
 export function ManagementHome({
   academyName,
@@ -47,12 +56,14 @@ export function ManagementHome({
   members,
   students,
   settings,
+  templates,
 }: {
   academyName: string;
   classes: ManagementClass[];
   members: ManagementMember[];
   students: ManagementStudent[];
   settings: ManagementSettings;
+  templates: ManagementMessageTemplate[];
 }) {
   const router = useRouter();
   const [classForm, setClassForm] = useState<ClassFormState | null>(null);
@@ -89,6 +100,13 @@ export function ManagementHome({
   });
   const [settingsForm, setSettingsForm] = useState<SettingsFormState>(settings);
   const [settingsFormStatus, setSettingsFormStatus] = useState<FormStatus>({
+    status: "idle",
+    message: "",
+  });
+  const [templateForm, setTemplateForm] = useState<MessageTemplateFormState | null>(
+    null,
+  );
+  const [templateFormStatus, setTemplateFormStatus] = useState<FormStatus>({
     status: "idle",
     message: "",
   });
@@ -749,6 +767,61 @@ export function ManagementHome({
     }
   }
 
+  function openEditTemplateForm(template: ManagementMessageTemplate) {
+    setTemplateForm({
+      templateId: template.id,
+      reason: template.reason,
+      reasonLabel: template.reasonLabel,
+      title: template.title,
+      body: template.body,
+      isActive: template.isActive,
+    });
+    setTemplateFormStatus({ status: "idle", message: "" });
+  }
+
+  async function saveTemplateForm() {
+    if (!templateForm) {
+      return;
+    }
+
+    setTemplateFormStatus({ status: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/message-templates", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason: templateForm.reason,
+          title: templateForm.title,
+          body: templateForm.body,
+          isActive: templateForm.isActive,
+        }),
+      });
+      const payload = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "문자 템플릿을 저장하지 못했습니다.");
+      }
+
+      setTemplateFormStatus({
+        status: "saved",
+        message: `${templateForm.reasonLabel} 템플릿을 저장했습니다.`,
+      });
+      setTemplateForm(null);
+      router.refresh();
+    } catch (error) {
+      setTemplateFormStatus({
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "문자 템플릿을 저장하지 못했습니다.",
+      });
+    }
+  }
+
   const managementSections: Array<{
     id: ManagementSection;
     label: string;
@@ -759,6 +832,7 @@ export function ManagementHome({
     { id: "students", label: "학생", detail: "명단·스케줄·연락처", count: `${activeStudents.length}` },
     { id: "classes", label: "반", detail: "반·담당·일괄 스케줄", count: `${classes.length}` },
     { id: "members", label: "구성원", detail: "권한·계정·담당 반", count: `${members.length}` },
+    { id: "templates", label: "문자", detail: "사유별 템플릿", count: `${templates.length}` },
     { id: "settings", label: "설정", detail: "발신·정책·권한", count: "정책" },
   ];
 
@@ -851,6 +925,50 @@ export function ManagementHome({
             onCreateStudent={openSetupStudentForm}
             onOpenClassSchedules={() => setActiveSection("classes")}
             onOpenMissingSchedules={openMissingScheduleStudents}
+          />
+        </ManagementPanel>
+      ) : null}
+
+      {activeSection === "templates" ? (
+        <ManagementPanel
+          title="문자 템플릿"
+          description="결석, 지각, 보강 같은 사유별 기본 문구를 학원 말투에 맞게 관리합니다."
+          actionLabel="첫 템플릿 수정"
+          actionIcon={<MessageSquareText size={14} />}
+          onAction={templates[0] ? () => openEditTemplateForm(templates[0]) : undefined}
+        >
+          {templateForm ? (
+            <MessageTemplateForm
+              form={templateForm}
+              status={templateFormStatus}
+              onChange={setTemplateForm}
+              onCancel={() => {
+                setTemplateForm(null);
+                setTemplateFormStatus({ status: "idle", message: "" });
+              }}
+              onSave={saveTemplateForm}
+            />
+          ) : null}
+
+          {!templateForm &&
+          (templateFormStatus.status === "saved" ||
+            templateFormStatus.status === "error") ? (
+            <p
+              className={[
+                "mb-3 rounded-md border px-3 py-2 text-sm",
+                templateFormStatus.status === "saved"
+                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+                  : "border-red-200 bg-red-50 text-red-900",
+              ].join(" ")}
+            >
+              {templateFormStatus.message}
+            </p>
+          ) : null}
+
+          <MessageTemplateList
+            templates={templates}
+            activeReason={templateForm?.reason ?? null}
+            onEditTemplate={openEditTemplateForm}
           />
         </ManagementPanel>
       ) : null}
@@ -1271,6 +1389,166 @@ export function ManagementHome({
         />
       </ManagementPanel>
       ) : null}
+    </div>
+  );
+}
+
+function MessageTemplateForm({
+  form,
+  status,
+  onChange,
+  onCancel,
+  onSave,
+}: {
+  form: MessageTemplateFormState;
+  status: FormStatus;
+  onChange: (form: MessageTemplateFormState) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const isSaving = status.status === "saving";
+
+  return (
+    <div className="mb-4 rounded-lg border border-[#C9D6E2] bg-[#F8FBFD] p-3 sm:p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
+            {form.reasonLabel}
+          </p>
+          <h4 className="mt-1 text-base font-semibold text-stone-950">
+            문자 템플릿 수정
+          </h4>
+        </div>
+        <label className="flex w-fit items-center gap-2 rounded-md border border-[#D8D0C4] bg-white px-3 py-2 text-xs font-semibold text-stone-700">
+          <input
+            type="checkbox"
+            checked={form.isActive}
+            onChange={(event) =>
+              onChange({ ...form, isActive: event.target.checked })
+            }
+            className="size-4 accent-[#315C7C]"
+          />
+          미리보기 사용
+        </label>
+      </div>
+
+      <div className="mt-4 grid gap-3">
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          템플릿 제목
+          <input
+            value={form.title}
+            onChange={(event) => onChange({ ...form, title: event.target.value })}
+            placeholder={`${form.reasonLabel} 안내`}
+            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          문자 본문
+          <textarea
+            value={form.body}
+            onChange={(event) => onChange({ ...form, body: event.target.value })}
+            rows={7}
+            className="min-h-40 rounded-md border border-stone-300 bg-white px-3 py-2 text-sm leading-6 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+          />
+        </label>
+      </div>
+
+      <div className="mt-3 rounded-md border border-[#E6E0D5] bg-white px-3 py-2 text-xs leading-5 text-stone-600">
+        사용할 수 있는 변수:
+        <span className="ml-1 font-semibold text-stone-800">
+          {"{{academyName}}"}, {"{{studentName}}"}, {"{{teacherName}}"},{" "}
+          {"{{className}}"}, {"{{makeupCandidateTime}}"}
+        </span>
+      </div>
+
+      {status.status === "error" ? (
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+          {status.message}
+        </p>
+      ) : null}
+
+      <div className="mt-4 flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-4 text-sm font-semibold text-stone-700 transition hover:bg-[#F7F5F0]"
+        >
+          취소
+        </button>
+        <button
+          type="button"
+          disabled={isSaving}
+          onClick={onSave}
+          className="min-h-10 rounded-md bg-[#315C7C] px-4 text-sm font-semibold text-white transition hover:bg-[#244B67] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isSaving ? "저장 중" : "템플릿 저장"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MessageTemplateList({
+  templates,
+  activeReason,
+  onEditTemplate,
+}: {
+  templates: ManagementMessageTemplate[];
+  activeReason: string | null;
+  onEditTemplate: (template: ManagementMessageTemplate) => void;
+}) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+      <div className="hidden grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
+        <span>사유</span>
+        <span>제목</span>
+        <span>본문 미리보기</span>
+        <span className="text-right">작업</span>
+      </div>
+      {templates.map((template) => {
+        const isActive = activeReason === template.reason;
+
+        return (
+          <div
+            key={template.reason}
+            className={[
+              "grid min-w-0 gap-2 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] md:items-center",
+              isActive ? "bg-[#F8FBFD]" : "",
+            ].join(" ")}
+          >
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-stone-950">
+                {template.reasonLabel}
+              </p>
+              <p className="mt-1 text-xs text-stone-500 md:hidden">
+                {template.title}
+              </p>
+            </div>
+            <p className="hidden truncate text-sm font-medium text-stone-800 md:block">
+              {template.title}
+            </p>
+            <p className="line-clamp-2 min-w-0 text-sm leading-6 text-stone-600">
+              {template.body}
+            </p>
+            <div className="flex items-center justify-between gap-2 md:justify-end">
+              {!template.isActive ? (
+                <span className="rounded bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
+                  비활성
+                </span>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => onEditTemplate(template)}
+                className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0] md:ml-auto"
+              >
+                <Pencil size={13} />
+                수정
+              </button>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

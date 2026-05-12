@@ -61,6 +61,15 @@ export type ManagementSettings = {
   allowAssistantSend: boolean;
 };
 
+export type ManagementMessageTemplate = {
+  id: string | null;
+  reason: string;
+  reasonLabel: string;
+  title: string;
+  body: string;
+  isActive: boolean;
+};
+
 export type FormStatus = {
   status: "idle" | "saving" | "saved" | "error";
   message: string;
@@ -106,6 +115,15 @@ export type MemberFormState = {
 };
 
 export type SettingsFormState = ManagementSettings;
+
+export type MessageTemplateFormState = {
+  templateId: string | null;
+  reason: string;
+  reasonLabel: string;
+  title: string;
+  body: string;
+  isActive: boolean;
+};
 
 export type ScheduleFormMode = "create" | "edit";
 

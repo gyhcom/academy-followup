@@ -4,12 +4,11 @@ import {
   isMessageRecipientType,
   type MessageRecipientType,
 } from "@/lib/message-recipients";
-import { canAccessAssignedClass } from "@/lib/permissions";
-import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
-  createSupabaseServerClient,
-  hasSupabaseServerEnv,
-} from "@/lib/supabase/server";
+  getRouteWorkspace,
+  getStudentForFollowupAccess,
+} from "@/lib/server/route-workspace";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type CreateFollowupRequest = {
   studentId?: unknown;
@@ -17,24 +16,6 @@ type CreateFollowupRequest = {
   messageBody?: unknown;
   attendanceRecordId?: unknown;
   recipientType?: unknown;
-};
-
-type ProfileRecord = {
-  role: string;
-  academy_id: string;
-};
-
-type StudentRecord = {
-  id: string;
-  academy_id: string;
-  class_id: string | null;
-  status: string;
-};
-
-type ClassRecord = {
-  id: string;
-  academy_id: string;
-  teacher_id: string | null;
 };
 
 type CreatedFollowupRecord = {
@@ -63,21 +44,16 @@ type FollowupHistoryRecord = {
 };
 
 export async function GET(request: Request) {
-  if (!hasSupabaseServerEnv()) {
+  const workspaceResult = await getRouteWorkspace();
+
+  if (!workspaceResult.ok) {
     return NextResponse.json(
-      { error: "Supabase 세션 환경변수가 설정되지 않았습니다." },
-      { status: 500 },
+      { error: workspaceResult.error },
+      { status: workspaceResult.status },
     );
   }
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  }
+  const { admin, profile } = workspaceResult.workspace;
 
   const studentId = new URL(request.url).searchParams.get("studentId");
 
@@ -85,69 +61,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "학생 ID가 필요합니다." }, { status: 400 });
   }
 
-  if (!hasSupabaseAdminEnv()) {
-    return NextResponse.json(
-      { error: "서버 전용 Supabase 키가 설정되지 않았습니다." },
-      { status: 500 },
-    );
-  }
-
-  const admin = createSupabaseAdminClient();
-  const { data: profile, error: profileError } = await admin
-    .from("profiles")
-    .select("role, academy_id")
-    .eq("id", user.id)
-    .maybeSingle<ProfileRecord>();
-
-  if (profileError) {
-    return NextResponse.json({ error: profileError.message }, { status: 500 });
-  }
-
-  if (!profile) {
-    return NextResponse.json(
-      { error: "학원 워크스페이스 연결이 필요합니다." },
-      { status: 403 },
-    );
-  }
-
-  const { data: student, error: studentError } = await admin
-    .from("students")
-    .select("id, academy_id, class_id, status")
-    .eq("id", studentId)
-    .eq("academy_id", profile.academy_id)
-    .maybeSingle<StudentRecord>();
-
-  if (studentError) {
-    return NextResponse.json({ error: studentError.message }, { status: 500 });
-  }
-
-  if (!student) {
-    return NextResponse.json(
-      { error: "선택한 학생을 찾을 수 없습니다." },
-      { status: 404 },
-    );
-  }
-
-  const classRecord = await getStudentClass({
-    admin,
-    academyId: profile.academy_id,
-    classId: student.class_id,
+  const accessResult = await getStudentForFollowupAccess({
+    workspace: workspaceResult.workspace,
+    studentId,
+    requireActiveStudent: false,
+    permissionError: "이 학생의 팔로업 기록을 볼 권한이 없습니다.",
   });
 
-  if (classRecord.error) {
-    return NextResponse.json({ error: classRecord.error }, { status: 500 });
-  }
-
-  if (
-    !canAccessAssignedClass({
-      role: profile.role,
-      classTeacherId: classRecord.data?.teacher_id ?? null,
-      userId: user.id,
-    })
-  ) {
+  if (!accessResult.ok) {
     return NextResponse.json(
-      { error: "이 학생의 팔로업 기록을 볼 권한이 없습니다." },
-      { status: 403 },
+      { error: accessResult.error },
+      { status: accessResult.status },
     );
   }
 
@@ -155,7 +79,7 @@ export async function GET(request: Request) {
     .from("followups")
     .select("id, reason, message_body, recipient_type, status, sent_at, created_at")
     .eq("academy_id", profile.academy_id)
-    .eq("student_id", student.id)
+    .eq("student_id", accessResult.student.id)
     .order("created_at", { ascending: false })
     .limit(8)
     .returns<FollowupHistoryRecord[]>();
@@ -178,46 +102,16 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!hasSupabaseServerEnv()) {
+  const workspaceResult = await getRouteWorkspace();
+
+  if (!workspaceResult.ok) {
     return NextResponse.json(
-      { error: "Supabase 세션 환경변수가 설정되지 않았습니다." },
-      { status: 500 },
+      { error: workspaceResult.error },
+      { status: workspaceResult.status },
     );
   }
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  }
-
-  if (!hasSupabaseAdminEnv()) {
-    return NextResponse.json(
-      { error: "서버 전용 Supabase 키가 설정되지 않았습니다." },
-      { status: 500 },
-    );
-  }
-
-  const admin = createSupabaseAdminClient();
-  const { data: profile, error: profileError } = await admin
-    .from("profiles")
-    .select("role, academy_id")
-    .eq("id", user.id)
-    .maybeSingle<ProfileRecord>();
-
-  if (profileError) {
-    return NextResponse.json({ error: profileError.message }, { status: 500 });
-  }
-
-  if (!profile) {
-    return NextResponse.json(
-      { error: "학원 워크스페이스 연결이 필요합니다." },
-      { status: 403 },
-    );
-  }
+  const { admin, profile, userId } = workspaceResult.workspace;
 
   const parsedRequest = await parseCreateFollowupRequest(request);
 
@@ -225,51 +119,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
-  const { data: student, error: studentError } = await admin
-    .from("students")
-    .select("id, academy_id, class_id, status")
-    .eq("id", parsedRequest.studentId)
-    .eq("academy_id", profile.academy_id)
-    .maybeSingle<StudentRecord>();
-
-  if (studentError) {
-    return NextResponse.json({ error: studentError.message }, { status: 500 });
-  }
-
-  if (!student) {
-    return NextResponse.json(
-      { error: "선택한 학생을 찾을 수 없습니다." },
-      { status: 404 },
-    );
-  }
-
-  if (student.status !== "active") {
-    return NextResponse.json(
-      { error: "비활성 학생은 팔로업 기록을 만들 수 없습니다." },
-      { status: 403 },
-    );
-  }
-
-  const classRecord = await getStudentClass({
-    admin,
-    academyId: profile.academy_id,
-    classId: student.class_id,
+  const accessResult = await getStudentForFollowupAccess({
+    workspace: workspaceResult.workspace,
+    studentId: parsedRequest.studentId,
+    requireActiveStudent: true,
+    inactiveError: "비활성 학생은 팔로업 기록을 만들 수 없습니다.",
+    permissionError: "이 학생의 팔로업 기록을 만들 권한이 없습니다.",
   });
 
-  if (classRecord.error) {
-    return NextResponse.json({ error: classRecord.error }, { status: 500 });
-  }
-
-  if (
-    !canAccessAssignedClass({
-      role: profile.role,
-      classTeacherId: classRecord.data?.teacher_id ?? null,
-      userId: user.id,
-    })
-  ) {
+  if (!accessResult.ok) {
     return NextResponse.json(
-      { error: "이 학생의 팔로업 기록을 만들 권한이 없습니다." },
-      { status: 403 },
+      { error: accessResult.error },
+      { status: accessResult.status },
     );
   }
 
@@ -288,8 +149,8 @@ export async function POST(request: Request) {
 
   if (
     attendanceRecord.data &&
-    (attendanceRecord.data.student_id !== student.id ||
-      attendanceRecord.data.class_id !== student.class_id)
+    (attendanceRecord.data.student_id !== accessResult.student.id ||
+      attendanceRecord.data.class_id !== accessResult.student.class_id)
   ) {
     return NextResponse.json(
       { error: "출석 기록과 팔로업 대상 학생 정보가 일치하지 않습니다." },
@@ -301,9 +162,9 @@ export async function POST(request: Request) {
     .from("followups")
     .insert({
       academy_id: profile.academy_id,
-      student_id: student.id,
-      class_id: student.class_id,
-      teacher_id: user.id,
+      student_id: accessResult.student.id,
+      class_id: accessResult.student.class_id,
+      teacher_id: userId,
       reason: parsedRequest.reason,
       message_body: parsedRequest.messageBody,
       recipient_type: parsedRequest.recipientType,
@@ -440,31 +301,4 @@ async function getAttendanceRecordForFollowup({
   }
 
   return { ok: true, data };
-}
-
-async function getStudentClass({
-  admin,
-  academyId,
-  classId,
-}: {
-  admin: ReturnType<typeof createSupabaseAdminClient>;
-  academyId: string;
-  classId: string | null;
-}): Promise<{ data: ClassRecord | null; error: string | null }> {
-  if (!classId) {
-    return { data: null, error: null };
-  }
-
-  const { data, error } = await admin
-    .from("classes")
-    .select("id, academy_id, teacher_id")
-    .eq("id", classId)
-    .eq("academy_id", academyId)
-    .maybeSingle<ClassRecord>();
-
-  if (error) {
-    return { data: null, error: error.message };
-  }
-
-  return { data: data ?? null, error: null };
 }

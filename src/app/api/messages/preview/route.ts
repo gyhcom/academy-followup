@@ -6,12 +6,10 @@ import {
   renderFollowupTemplate,
   type FollowupReason,
 } from "@/lib/followup-templates";
-import { canAccessAssignedClass } from "@/lib/permissions";
-import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
-  createSupabaseServerClient,
-  hasSupabaseServerEnv,
-} from "@/lib/supabase/server";
+  getRouteWorkspace,
+  getStudentForFollowupAccess,
+} from "@/lib/server/route-workspace";
 
 type PreviewMessageRequest = {
   studentId?: unknown;
@@ -21,27 +19,10 @@ type PreviewMessageRequest = {
 
 type ProfileWithAcademy = {
   name: string;
-  role: string;
-  academy_id: string;
   academies: {
     name: string;
     sender_name: string | null;
   } | null;
-};
-
-type StudentRecord = {
-  id: string;
-  academy_id: string;
-  class_id: string | null;
-  name: string;
-  status: string;
-};
-
-type ClassRecord = {
-  id: string;
-  academy_id: string;
-  name: string;
-  teacher_id: string | null;
 };
 
 type MessageTemplateRecord = {
@@ -51,46 +32,16 @@ type MessageTemplateRecord = {
 };
 
 export async function POST(request: Request) {
-  if (!hasSupabaseServerEnv()) {
+  const workspaceResult = await getRouteWorkspace();
+
+  if (!workspaceResult.ok) {
     return NextResponse.json(
-      { error: "Supabase 세션 환경변수가 설정되지 않았습니다." },
-      { status: 500 },
+      { error: workspaceResult.error },
+      { status: workspaceResult.status },
     );
   }
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  }
-
-  if (!hasSupabaseAdminEnv()) {
-    return NextResponse.json(
-      { error: "서버 전용 Supabase 키가 설정되지 않았습니다." },
-      { status: 500 },
-    );
-  }
-
-  const admin = createSupabaseAdminClient();
-  const { data: profile, error: profileError } = await admin
-    .from("profiles")
-    .select("name, role, academy_id, academies(name, sender_name)")
-    .eq("id", user.id)
-    .maybeSingle<ProfileWithAcademy>();
-
-  if (profileError) {
-    return NextResponse.json({ error: profileError.message }, { status: 500 });
-  }
-
-  if (!profile || !profile.academies) {
-    return NextResponse.json(
-      { error: "학원 워크스페이스 연결이 필요합니다." },
-      { status: 403 },
-    );
-  }
+  const { admin, profile, userId } = workspaceResult.workspace;
 
   const parsedRequest = await parsePreviewRequest(request);
 
@@ -98,13 +49,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
-  const [studentResult, templateResult] = await Promise.all([
+  const [profileResult, templateResult] = await Promise.all([
     admin
-      .from("students")
-      .select("id, academy_id, class_id, name, status")
-      .eq("id", parsedRequest.studentId)
-      .eq("academy_id", profile.academy_id)
-      .maybeSingle<StudentRecord>(),
+      .from("profiles")
+      .select("name, academies(name, sender_name)")
+      .eq("id", userId)
+      .maybeSingle<ProfileWithAcademy>(),
     admin
       .from("message_templates")
       .select("id, title, body")
@@ -114,48 +64,33 @@ export async function POST(request: Request) {
       .maybeSingle<MessageTemplateRecord>(),
   ]);
 
-  if (studentResult.error) {
-    return NextResponse.json({ error: studentResult.error.message }, { status: 500 });
+  if (profileResult.error) {
+    return NextResponse.json({ error: profileResult.error.message }, { status: 500 });
   }
 
   if (templateResult.error) {
     return NextResponse.json({ error: templateResult.error.message }, { status: 500 });
   }
 
-  if (!studentResult.data) {
+  if (!profileResult.data || !profileResult.data.academies) {
     return NextResponse.json(
-      { error: "선택한 학생을 찾을 수 없습니다." },
-      { status: 404 },
-    );
-  }
-
-  if (studentResult.data.status !== "active") {
-    return NextResponse.json(
-      { error: "비활성 학생은 문자 미리보기를 만들 수 없습니다." },
+      { error: "학원 워크스페이스 연결이 필요합니다." },
       { status: 403 },
     );
   }
 
-  const classRecord = await getStudentClass({
-    admin,
-    academyId: profile.academy_id,
-    classId: studentResult.data.class_id,
+  const accessResult = await getStudentForFollowupAccess({
+    workspace: workspaceResult.workspace,
+    studentId: parsedRequest.studentId,
+    requireActiveStudent: true,
+    inactiveError: "비활성 학생은 문자 미리보기를 만들 수 없습니다.",
+    permissionError: "이 학생의 문자 미리보기를 만들 권한이 없습니다.",
   });
 
-  if (classRecord.error) {
-    return NextResponse.json({ error: classRecord.error }, { status: 500 });
-  }
-
-  if (
-    !canAccessAssignedClass({
-      role: profile.role,
-      classTeacherId: classRecord.data?.teacher_id ?? null,
-      userId: user.id,
-    })
-  ) {
+  if (!accessResult.ok) {
     return NextResponse.json(
-      { error: "이 학생의 문자 미리보기를 만들 권한이 없습니다." },
-      { status: 403 },
+      { error: accessResult.error },
+      { status: accessResult.status },
     );
   }
 
@@ -163,12 +98,13 @@ export async function POST(request: Request) {
     templateResult.data?.body ?? getDefaultFollowupTemplate(parsedRequest.reason);
   const templateTitle =
     templateResult.data?.title ?? getDefaultFollowupTitle(parsedRequest.reason);
-  const senderName = profile.academies.sender_name ?? profile.academies.name;
+  const senderName =
+    profileResult.data.academies.sender_name ?? profileResult.data.academies.name;
   const body = renderFollowupTemplate(templateBody, {
     academyName: senderName,
-    studentName: studentResult.data.name,
-    teacherName: profile.name,
-    className: classRecord.data?.name,
+    studentName: accessResult.student.name,
+    teacherName: profileResult.data.name,
+    className: accessResult.classRecord?.name,
     makeupCandidateTime: parsedRequest.makeupCandidateTime,
   });
 
@@ -178,8 +114,8 @@ export async function POST(request: Request) {
     body,
     reason: parsedRequest.reason,
     student: {
-      id: studentResult.data.id,
-      name: studentResult.data.name,
+      id: accessResult.student.id,
+      name: accessResult.student.name,
     },
   });
 }
@@ -223,31 +159,4 @@ async function parsePreviewRequest(request: Request): Promise<
     reason: body.reason,
     makeupCandidateTime: body.makeupCandidateTime?.trim() || undefined,
   };
-}
-
-async function getStudentClass({
-  admin,
-  academyId,
-  classId,
-}: {
-  admin: ReturnType<typeof createSupabaseAdminClient>;
-  academyId: string;
-  classId: string | null;
-}): Promise<{ data: ClassRecord | null; error: string | null }> {
-  if (!classId) {
-    return { data: null, error: null };
-  }
-
-  const { data, error } = await admin
-    .from("classes")
-    .select("id, academy_id, name, teacher_id")
-    .eq("id", classId)
-    .eq("academy_id", academyId)
-    .maybeSingle<ClassRecord>();
-
-  if (error) {
-    return { data: null, error: error.message };
-  }
-
-  return { data: data ?? null, error: null };
 }

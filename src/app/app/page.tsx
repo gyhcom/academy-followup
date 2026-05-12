@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import {
   AppWorkspace,
   type ManagementClass,
+  type ManagementMessageTemplate,
   type ManagementMember,
   type ManagementSettings,
   type ManagementStudent,
@@ -12,6 +13,12 @@ import type { AttendanceRecordItem } from "@/app/app/attendance-board";
 import { LogoutButton } from "@/app/app/logout-button";
 import type { OperationsClass } from "@/app/app/operations-board";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
+import {
+  followupReasons,
+  getDefaultFollowupTemplate,
+  getDefaultFollowupTitle,
+  type FollowupReason,
+} from "@/lib/followup-templates";
 import { canViewAllClasses, roleLabel } from "@/lib/permissions";
 import {
   createSupabaseServerClient,
@@ -103,6 +110,14 @@ type AcademySettingsRecord = {
   duplicate_guard_minutes: number;
 };
 
+type MessageTemplateRecord = {
+  id: string;
+  reason: FollowupReason;
+  title: string;
+  body: string;
+  is_active: boolean;
+};
+
 export default async function AppPage() {
   if (!hasSupabaseServerEnv()) {
     return (
@@ -185,6 +200,7 @@ export default async function AppPage() {
     schedulesResult,
     attendanceResult,
     settingsResult,
+    templatesResult,
   ] = await Promise.all([
     admin
       .from("classes")
@@ -222,6 +238,12 @@ export default async function AppPage() {
       .select("sms_dry_run, allow_assistant_send, duplicate_guard_minutes")
       .eq("academy_id", profile.academy_id)
       .maybeSingle<AcademySettingsRecord>(),
+    admin
+      .from("message_templates")
+      .select("id, reason, title, body, is_active")
+      .eq("academy_id", profile.academy_id)
+      .order("created_at", { ascending: true })
+      .returns<MessageTemplateRecord[]>(),
   ]);
 
   if (
@@ -230,7 +252,8 @@ export default async function AppPage() {
     membersResult.error ||
     schedulesResult.error ||
     attendanceResult.error ||
-    settingsResult.error
+    settingsResult.error ||
+    templatesResult.error
   ) {
     return (
       <AppShell email={user.email ?? ""}>
@@ -243,6 +266,7 @@ export default async function AppPage() {
             schedulesResult.error?.message ??
             attendanceResult.error?.message ??
             settingsResult.error?.message ??
+            templatesResult.error?.message ??
             "반과 학생 정보를 가져오지 못했습니다."
           }
         />
@@ -255,6 +279,7 @@ export default async function AppPage() {
   const members = (membersResult.data ?? []) as MemberRecord[];
   const schedules = (schedulesResult.data ?? []) as StudentScheduleRecord[];
   const attendanceRecords = (attendanceResult.data ?? []) as AttendanceRecord[];
+  const templates = (templatesResult.data ?? []) as MessageTemplateRecord[];
   const operationsClasses = buildOperationsClasses({
     classes,
     students,
@@ -271,6 +296,7 @@ export default async function AppPage() {
     senderPhone: profile.academies.sender_phone,
     settings: settingsResult.data,
   });
+  const managementTemplates = buildManagementTemplates(templates);
 
   return (
     <AppShell
@@ -290,9 +316,31 @@ export default async function AppPage() {
         managementStudents={managementStudents}
         managementMembers={managementMembers}
         managementSettings={managementSettings}
+        managementTemplates={managementTemplates}
       />
     </AppShell>
   );
+}
+
+function buildManagementTemplates(
+  templates: MessageTemplateRecord[],
+): ManagementMessageTemplate[] {
+  const templatesByReason = new Map(
+    templates.map((template) => [template.reason, template]),
+  );
+
+  return followupReasons.map((reason) => {
+    const template = templatesByReason.get(reason.id);
+
+    return {
+      id: template?.id ?? null,
+      reason: reason.id,
+      reasonLabel: reason.label,
+      title: template?.title ?? getDefaultFollowupTitle(reason.id),
+      body: template?.body ?? getDefaultFollowupTemplate(reason.id),
+      isActive: template?.is_active ?? true,
+    };
+  });
 }
 
 function AppShell({

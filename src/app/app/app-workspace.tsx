@@ -11,6 +11,7 @@ import { ManagementHome } from "@/app/app/management-home";
 import { WorkspaceHome } from "@/app/app/workspace-home";
 import type {
   ManagementClass,
+  ManagementMessageTemplate,
   ManagementMember,
   ManagementSettings,
   ManagementStudent,
@@ -25,6 +26,7 @@ import { canManageAcademy } from "@/lib/permissions";
 
 export type {
   ManagementClass,
+  ManagementMessageTemplate,
   ManagementMember,
   ManagementSettings,
   ManagementStudent,
@@ -43,6 +45,7 @@ type AppWorkspaceProps = {
   managementStudents: ManagementStudent[];
   managementMembers: ManagementMember[];
   managementSettings: ManagementSettings;
+  managementTemplates: ManagementMessageTemplate[];
 };
 
 type WorkspaceView = "home" | "operations" | "attendance" | "management";
@@ -70,6 +73,7 @@ export function AppWorkspace({
   managementStudents,
   managementMembers,
   managementSettings,
+  managementTemplates,
 }: AppWorkspaceProps) {
   const canManage = canManageAcademy(role);
   const [activeView, setActiveView] = useState<WorkspaceView>("home");
@@ -179,6 +183,7 @@ export function AppWorkspace({
           members={managementMembers}
           students={managementStudents}
           settings={managementSettings}
+          templates={managementTemplates}
         />
       )}
     </div>
@@ -195,7 +200,7 @@ function WorkspaceNavigation({
   onChange: (view: WorkspaceView) => void;
 }) {
   return (
-    <section className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DED8CE] bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:static sm:rounded-lg sm:border sm:bg-white sm:p-2 sm:shadow-sm">
+    <section className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DED8CE] bg-white/95 px-3 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:static sm:rounded-lg sm:border sm:bg-white sm:p-2 sm:shadow-sm">
       <div className={["grid gap-1.5", canManage ? "grid-cols-4" : "grid-cols-3"].join(" ")}>
         <WorkspaceNavButton
           icon={<Home size={17} />}
