@@ -500,6 +500,19 @@ export function AttendanceBoard({
 
     setSaveState({ key: updateKey, status: "saving", error: "" });
 
+    const previousRecords = attendanceRecordsRef.current;
+    const optimisticRecord = createOptimisticAttendanceRecord({
+      previousRecords,
+      studentId: student.id,
+      classId: selectedSession.classId,
+      attendanceDate: selectedDate,
+      scheduledStartTime: selectedSession.startTime,
+      scheduledEndTime: selectedSession.endTime,
+      status,
+    });
+
+    applyAttendanceRecords(mergeAttendanceRecord(previousRecords, optimisticRecord));
+
     try {
       const response = await fetch("/api/attendance", {
         method: "PATCH",
@@ -543,6 +556,7 @@ export function AttendanceBoard({
         setFollowupTarget(null);
       }
     } catch (error) {
+      applyAttendanceRecords(previousRecords);
       setSaveState({
         key: updateKey,
         status: "error",
@@ -2152,6 +2166,60 @@ function mergeAttendanceRecord(
   );
 }
 
+function createOptimisticAttendanceRecord({
+  previousRecords,
+  studentId,
+  classId,
+  attendanceDate,
+  scheduledStartTime,
+  scheduledEndTime,
+  status,
+}: {
+  previousRecords: AttendanceRecordItem[];
+  studentId: string;
+  classId: string;
+  attendanceDate: string;
+  scheduledStartTime: string;
+  scheduledEndTime: string;
+  status: AttendanceStatus;
+}): AttendanceRecordItem {
+  const updateKey = getAttendanceUpdateKey({
+    studentId,
+    classId,
+    attendanceDate,
+    scheduledStartTime,
+    scheduledEndTime,
+  });
+  const currentRecord = previousRecords.find(
+    (record) =>
+      getAttendanceUpdateKey({
+        studentId: record.studentId,
+        classId: record.classId,
+        attendanceDate: record.attendanceDate,
+        scheduledStartTime: record.scheduledStartTime,
+        scheduledEndTime: record.scheduledEndTime,
+      }) === updateKey,
+  );
+  const checkedAt = status === "pending" ? null : new Date().toISOString();
+
+  return {
+    id: currentRecord?.id ?? `optimistic:${updateKey}`,
+    studentId,
+    classId,
+    teacherId: currentRecord?.teacherId ?? null,
+    attendanceDate,
+    scheduledStartTime,
+    scheduledEndTime,
+    status,
+    checkedAt,
+    arrivedAt: hasArrivedAttendanceStatus(status) ? checkedAt : null,
+    note: createDefaultNote(status),
+    followupId: currentRecord?.followupId ?? null,
+    followupStatus: currentRecord?.followupStatus ?? null,
+    followupSentAt: currentRecord?.followupSentAt ?? null,
+  };
+}
+
 function getAttendanceUpdateKey({
   studentId,
   classId,
@@ -2166,6 +2234,10 @@ function getAttendanceUpdateKey({
   scheduledEndTime: string;
 }) {
   return `${attendanceDate}:${classId}:${studentId}:${scheduledStartTime}:${scheduledEndTime}`;
+}
+
+function hasArrivedAttendanceStatus(status: AttendanceStatus) {
+  return status === "present" || status === "late" || status === "makeup";
 }
 
 function getSessionKey(classId: string, startTime: string, endTime: string) {
