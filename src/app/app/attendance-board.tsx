@@ -101,33 +101,10 @@ type AttendanceFollowupTarget = {
   reason: FollowupReason;
 };
 
-type AttendanceActionItem = {
-  key: string;
-  studentName: string;
-  className: string;
-  startTime: string;
-  endTime: string;
-  status: AttendanceStatus;
-  followupId: string | null;
-  followupStatus: string | null;
-  followupSentAt: string | null;
-};
-
-type AttendanceClassSummary = {
-  key: string;
-  className: string;
-  startTime: string;
-  endTime: string;
-  studentCount: number;
-  counts: Record<AttendanceStatus, number>;
-};
-
 type AttendanceOverview = {
   totalSessions: number;
   totalStudents: number;
   counts: Record<AttendanceStatus, number>;
-  actionItems: AttendanceActionItem[];
-  classSummaries: AttendanceClassSummary[];
 };
 
 type AttendanceFilter = "all" | "unchecked" | "attention";
@@ -218,6 +195,7 @@ export function AttendanceBoard({
   const attendanceRecordsRef = useRef(initialRecords);
   const [selectedSessionKey, setSelectedSessionKey] = useState("");
   const [attendanceFilter, setAttendanceFilter] = useState<AttendanceFilter>("all");
+  const [expandedExceptionKey, setExpandedExceptionKey] = useState("");
   const [loadState, setLoadState] = useState<{
     status: "idle" | "loading" | "error";
     error: string;
@@ -712,16 +690,15 @@ export function AttendanceBoard({
 
   return (
     <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
-      <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-3 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-medium text-[#315C7C]">{academyName}</p>
-            <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
+            <h2 className="mt-1 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
               반별 출석부
             </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-              {teacherName}님이 수업별 도착 여부를 체크합니다. 연락 필요 학생과 체크
-              필요 수업을 바로 확인합니다.
+            <p className="mt-1 text-sm leading-6 text-stone-600">
+              {teacherName}님, 수업을 선택하고 도착한 학생만 빠르게 체크합니다.
             </p>
           </div>
 
@@ -729,9 +706,9 @@ export function AttendanceBoard({
         </div>
       </section>
 
-      <AttendanceOverviewPanel overview={overview} />
+      <AttendanceOverviewStrip overview={overview} />
 
-      <section className="grid gap-4 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start xl:grid-cols-[17rem_minmax(0,1fr)_22rem]">
+      <section className="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start xl:grid-cols-[18rem_minmax(0,1fr)_22rem]">
         <SessionList
           sessions={sessions}
           selectedSessionKey={selectedSession?.key ?? ""}
@@ -740,11 +717,12 @@ export function AttendanceBoard({
           onSelect={(sessionKey) => {
             setSelectedSessionKey(sessionKey);
             setAttendanceFilter("all");
+            setExpandedExceptionKey("");
           }}
         />
 
         <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
-          <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
+          <div className="border-b border-stone-200 px-4 py-3 sm:px-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -786,10 +764,10 @@ export function AttendanceBoard({
 
           {selectedSession ? (
             <div>
-              <div className="hidden grid-cols-[minmax(14rem,1fr)_7.5rem_minmax(16rem,0.95fr)] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5">
+              <div className="hidden grid-cols-[minmax(16rem,1fr)_5.5rem_7rem] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5">
                 <span>학생</span>
                 <span>도착</span>
-                <span>예외 처리</span>
+                <span>상태</span>
               </div>
 
               <div className="divide-y divide-stone-200">
@@ -812,6 +790,7 @@ export function AttendanceBoard({
                       saveState.key === updateKey && saveState.status === "error"
                         ? saveState.error
                         : "";
+                    const isExceptionOpen = expandedExceptionKey === updateKey;
 
                     return (
                       <AttendanceStudentRow
@@ -822,9 +801,16 @@ export function AttendanceBoard({
                         isSaving={isSaving}
                         isSaved={isSaved}
                         saveError={saveError}
-                        onStatusChange={(nextStatus) =>
-                          handleStatusChange(student, nextStatus)
+                        isExceptionOpen={isExceptionOpen}
+                        onToggleException={() =>
+                          setExpandedExceptionKey((current) =>
+                            current === updateKey ? "" : updateKey,
+                          )
                         }
+                        onStatusChange={(nextStatus) => {
+                          setExpandedExceptionKey("");
+                          handleStatusChange(student, nextStatus);
+                        }}
                       />
                     );
                   })
@@ -994,6 +980,41 @@ function DateShortcutButton({
   );
 }
 
+function AttendanceOverviewStrip({ overview }: { overview: AttendanceOverview }) {
+  const uncheckedCount = overview.counts.pending;
+  const needsAttentionCount =
+    overview.counts.absent + overview.counts.late + overview.counts.needs_check;
+
+  return (
+    <section className="grid grid-cols-4 overflow-hidden rounded-lg border border-stone-200 bg-white text-center shadow-sm">
+      <CompactOverviewItem label="수업" value={`${overview.totalSessions}개`} />
+      <CompactOverviewItem label="학생" value={`${overview.totalStudents}명`} />
+      <CompactOverviewItem label="미체크" value={`${uncheckedCount}명`} />
+      <CompactOverviewItem
+        label="연락 필요"
+        value={`${needsAttentionCount}명`}
+      />
+    </section>
+  );
+}
+
+function CompactOverviewItem({
+  className = "",
+  label,
+  value,
+}: {
+  className?: string;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className={["border-r border-stone-200 px-3 py-3 last:border-r-0", className].join(" ")}>
+      <p className="text-xs font-medium text-stone-500">{label}</p>
+      <p className="mt-1 text-base font-semibold tabular-nums text-stone-950">{value}</p>
+    </div>
+  );
+}
+
 function SessionList({
   sessions,
   selectedSessionKey,
@@ -1011,7 +1032,7 @@ function SessionList({
     <section className="rounded-lg border border-stone-200 bg-white shadow-sm">
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-stone-950">수업 시간</h3>
+          <h3 className="text-sm font-semibold text-stone-950">오늘 수업</h3>
           {loadState === "loading" ? (
             <Loader2 size={16} className="animate-spin text-stone-400" />
           ) : (
@@ -1020,7 +1041,7 @@ function SessionList({
         </div>
       </div>
 
-      <div className="grid gap-2 p-3 sm:grid-cols-2 lg:block lg:space-y-2">
+      <div className="divide-y divide-stone-100">
         {sessions.length > 0 ? (
           sessions.map((session) => {
             const isSelected = session.key === selectedSessionKey;
@@ -1033,46 +1054,53 @@ function SessionList({
                 aria-pressed={isSelected}
                 onClick={() => onSelect(session.key)}
                 className={[
-                  "grid min-h-[4.5rem] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border px-3 py-3 text-left transition",
+                  "grid min-h-[4.25rem] w-full grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition",
                   isSelected
-                    ? "border-[#315C7C] bg-[#315C7C] text-white"
-                    : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50",
+                    ? "bg-[#EAF1F8] text-stone-950"
+                    : "bg-white text-stone-700 hover:bg-stone-50",
                 ].join(" ")}
               >
+                <span
+                  className={[
+                    "flex size-9 items-center justify-center rounded-full text-sm font-semibold",
+                    isSelected ? "bg-[#315C7C] text-white" : "bg-stone-100 text-stone-500",
+                  ].join(" ")}
+                >
+                  {getClassInitial(session.className)}
+                </span>
                 <span className="min-w-0">
-                  <span className="flex items-center gap-2 text-base font-semibold tabular-nums">
-                    <Clock3 size={16} className={isSelected ? "text-white/70" : "text-stone-400"} />
-                    {session.startTime} - {session.endTime}
-                  </span>
-                  <span className="mt-1 block truncate text-sm font-semibold">
+                  <span className="block truncate text-sm font-semibold">
                     {session.className}
                   </span>
                   <span
                     className={[
-                      "mt-1 block truncate text-xs",
-                      isSelected ? "text-white/70" : "text-stone-500",
+                      "mt-0.5 flex items-center gap-1 truncate text-xs",
+                      isSelected ? "text-[#315C7C]" : "text-stone-500",
                     ].join(" ")}
                   >
-                    {session.subject ?? "과목 미지정"} · {session.students.length}명
+                    <Clock3 size={13} className="shrink-0" />
+                    {session.startTime} · {session.subject ?? "과목 미지정"} ·{" "}
+                    {session.students.length}명
                   </span>
                 </span>
                 <span className="grid justify-items-end gap-1">
                   <span
                     className={[
-                      "rounded-md px-2 py-1 text-xs font-semibold",
-                      isSelected ? "bg-white/14 text-white" : "bg-stone-100 text-stone-500",
+                      "rounded-full px-2 py-1 text-xs font-semibold",
+                      progress.pending > 0
+                        ? "bg-stone-950 text-white"
+                        : "bg-stone-100 text-stone-500",
                     ].join(" ")}
                   >
-                    미체크 {progress.pending}명
+                    {progress.pending} 미체크
                   </span>
                   {progress.attention > 0 ? (
                     <span
                       className={[
-                        "rounded-md px-2 py-1 text-xs font-semibold",
-                        isSelected ? "bg-white/14 text-white" : "bg-red-50 text-red-800",
+                        "rounded-full bg-red-50 px-2 py-1 text-xs font-semibold text-red-800",
                       ].join(" ")}
                     >
-                      연락 {progress.attention}명
+                      {progress.attention} 연락
                     </span>
                   ) : null}
                 </span>
@@ -1162,186 +1190,6 @@ function AttendanceSummary({
   );
 }
 
-function AttendanceOverviewPanel({ overview }: { overview: AttendanceOverview }) {
-  const uncheckedCount = overview.counts.pending;
-  const needsAttentionCount =
-    overview.counts.absent + overview.counts.late + overview.counts.needs_check;
-
-  return (
-    <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
-      <div className="overflow-hidden border-y border-[#DED8CE] bg-white sm:rounded-lg sm:border sm:border-stone-200 sm:shadow-sm">
-        <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-[#315C7C]">오늘 출석 요약</p>
-              <h3 className="mt-1 text-lg font-semibold text-stone-950">
-                연락 필요 {needsAttentionCount}명 · 체크 필요 {uncheckedCount}명
-              </h3>
-              <p className="mt-1 text-sm leading-6 text-stone-600">
-                수업 직후 확인할 학생과 아직 체크하지 않은 수업만 빠르게 봅니다.
-              </p>
-            </div>
-
-            <dl className="grid grid-cols-3 divide-x divide-stone-200 rounded-md border border-stone-200 bg-stone-50 text-center text-xs sm:min-w-72">
-              <OverviewMetric label="수업" value={`${overview.totalSessions}개`} />
-              <OverviewMetric label="학생" value={`${overview.totalStudents}명`} />
-              <OverviewMetric label="체크 필요" value={`${uncheckedCount}명`} />
-            </dl>
-          </div>
-        </div>
-
-        <div className="border-b border-stone-200 px-4 py-3 sm:px-5">
-          <dl className="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
-            {(["present", "late", "absent", "needs_check", "pending"] as AttendanceStatus[]).map(
-              (status) => (
-                <CompactStatusMetric
-                  key={status}
-                  status={status}
-                  value={overview.counts[status]}
-                />
-              ),
-            )}
-          </dl>
-        </div>
-
-        <div>
-          <div className="hidden grid-cols-[minmax(8rem,1fr)_5.5rem_repeat(4,4.75rem)] gap-2 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 md:grid sm:px-5">
-            <span>수업</span>
-            <span>시간</span>
-            <span>출석</span>
-            <span>지각</span>
-            <span>결석</span>
-            <span>체크 필요</span>
-          </div>
-          <div className="divide-y divide-stone-200">
-            {overview.classSummaries.length > 0 ? (
-              overview.classSummaries.map((summary) => (
-                <div
-                  key={summary.key}
-                  className="grid gap-2 px-4 py-3 text-sm md:grid-cols-[minmax(8rem,1fr)_5.5rem_repeat(4,4.75rem)] md:items-center sm:px-5"
-                >
-                  <div className="min-w-0">
-                    <p className="font-semibold text-stone-950">{summary.className}</p>
-                    <p className="mt-0.5 text-xs text-stone-500">
-                      대상 {summary.studentCount}명
-                    </p>
-                  </div>
-                  <p className="text-sm font-semibold tabular-nums text-stone-700 md:text-base">
-                    {summary.startTime}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 md:contents">
-                    <StatusCount status="present" value={summary.counts.present} />
-                    <StatusCount status="late" value={summary.counts.late} />
-                    <StatusCount status="absent" value={summary.counts.absent} />
-                    <StatusCount status="pending" value={summary.counts.pending} />
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="px-4 py-5 text-sm leading-6 text-stone-600 sm:px-5">
-                선택한 날짜에 표시할 수업이 없습니다.
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="overflow-hidden border-y border-[#DED8CE] bg-white sm:rounded-lg sm:border sm:border-stone-200 sm:shadow-sm">
-        <div className="border-b border-stone-200 px-4 py-4">
-          <h3 className="text-sm font-semibold text-stone-950">오늘 연락 필요</h3>
-          <p className="mt-1 text-xs leading-5 text-stone-500">
-            결석/지각은 팔로업 저장 또는 발송 상태를 함께 표시합니다.
-          </p>
-        </div>
-
-        <div className="divide-y divide-stone-200">
-          {overview.actionItems.length > 0 ? (
-            overview.actionItems.map((item) => (
-              <div key={item.key} className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-stone-950">{item.studentName}</p>
-                    <p className="mt-1 text-xs text-stone-500">
-                      {item.className} · {item.startTime}-{item.endTime}
-                    </p>
-                  </div>
-                  <span
-                    className={[
-                      "shrink-0 rounded-md px-2 py-1 text-xs font-semibold",
-                      attendanceStatusClass(item.status),
-                    ].join(" ")}
-                  >
-                    {attendanceDisplayLabel(item.status)}
-                  </span>
-                </div>
-
-                <p
-                  className={[
-                    "mt-3 rounded-md px-2 py-2 text-xs font-semibold",
-                    contactStatusClass(item),
-                  ].join(" ")}
-                >
-                  {contactStatusLabel(item)}
-                </p>
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-sm leading-6 text-stone-600">
-              현재 연락 필요 학생이 없습니다.
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function OverviewMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="px-2.5 py-2">
-      <dt className="font-medium text-stone-500">{label}</dt>
-      <dd className="mt-1 text-base font-semibold text-stone-950">{value}</dd>
-    </div>
-  );
-}
-
-function CompactStatusMetric({
-  status,
-  value,
-}: {
-  status: AttendanceStatus;
-  value: number;
-}) {
-  return (
-    <div
-      className={[
-        "flex min-h-9 items-center justify-between gap-2 rounded-md px-2.5 text-sm",
-        value > 0 ? compactStatusActiveClass(status) : "bg-stone-50",
-      ].join(" ")}
-    >
-      <dt className="min-w-0 truncate text-xs font-semibold text-stone-600">
-        {attendanceDisplayLabel(status)}
-      </dt>
-      <dd className="shrink-0 text-base font-semibold tabular-nums text-stone-950">
-        {value}
-      </dd>
-    </div>
-  );
-}
-
-function StatusCount({ status, value }: { status: AttendanceStatus; value: number }) {
-  return (
-    <span
-      className={[
-        "inline-flex min-h-8 w-fit items-center rounded-md px-2.5 text-xs font-semibold sm:w-auto sm:justify-center",
-        attendanceStatusClass(status),
-      ].join(" ")}
-    >
-      {attendanceDisplayLabel(status)} {value}
-    </span>
-  );
-}
-
 function attendanceDisplayLabel(status: AttendanceStatus) {
   if (status === "pending") {
     return "체크 필요";
@@ -1356,7 +1204,9 @@ function AttendanceStudentRow({
   record,
   isSaving,
   isSaved,
+  isExceptionOpen,
   saveError,
+  onToggleException,
   onStatusChange,
 }: {
   student: AttendanceStudent;
@@ -1364,7 +1214,9 @@ function AttendanceStudentRow({
   record: AttendanceRecordItem | undefined;
   isSaving: boolean;
   isSaved: boolean;
+  isExceptionOpen: boolean;
   saveError: string;
+  onToggleException: () => void;
   onStatusChange: (status: AttendanceStatus) => void;
 }) {
   const isPresent = status === "present";
@@ -1372,47 +1224,70 @@ function AttendanceStudentRow({
   const isExceptionStatus = !isPresent && !isPending;
 
   return (
-    <article className="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(14rem,1fr)_7.5rem_minmax(16rem,0.95fr)] sm:items-center sm:gap-3 sm:px-5">
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:block">
+    <article className="px-4 py-3 sm:px-5">
+      <div className="grid grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-3">
+        <span className="flex size-9 items-center justify-center rounded-full bg-stone-100 text-sm font-semibold text-stone-600">
+          {getStudentInitial(student.name)}
+        </span>
+
         <div className="min-w-0">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <p className="text-base font-semibold text-stone-950">{student.name}</p>
-          {isExceptionStatus ? (
-            <span
-              className={[
-                "inline-flex min-h-6 items-center rounded-md px-2 text-xs font-semibold",
-                attendanceStatusClass(status),
-              ].join(" ")}
-            >
-              {attendanceDisplayLabel(status)}
-            </span>
-          ) : null}
+            <p className="truncate text-sm font-semibold text-stone-950 sm:text-base">
+              {student.name}
+            </p>
+            {isExceptionStatus ? (
+              <span
+                className={[
+                  "inline-flex min-h-5 items-center rounded-full px-2 text-[11px] font-semibold",
+                  attendanceStatusClass(status),
+                ].join(" ")}
+              >
+                {attendanceDisplayLabel(status)}
+              </span>
+            ) : null}
           </div>
-          <p className="mt-0.5 text-xs text-stone-500">
+          <p className="mt-0.5 truncate text-xs text-stone-500">
             {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
               "학년 정보 없음"}{" "}
             · {student.maskedParentPhone}
           </p>
+          <AttendanceSaveStatus
+            isSaving={isSaving}
+            isSaved={isSaved}
+            checkedAt={record?.checkedAt}
+          />
         </div>
 
-        <AttendanceArrivalToggle
-          isPresent={isPresent}
-          isSaving={isSaving}
-          onToggle={() => onStatusChange(isPresent ? "pending" : "present")}
-        />
+        <div className="grid justify-items-end gap-1.5">
+          <AttendanceArrivalToggle
+            isPresent={isPresent}
+            isSaving={isSaving}
+            onToggle={() => onStatusChange(isPresent ? "pending" : "present")}
+          />
+          <button
+            type="button"
+            disabled={isSaving}
+            aria-expanded={isExceptionOpen}
+            onClick={onToggleException}
+            className={[
+              "min-h-7 rounded-full border px-2.5 text-[11px] font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+              isExceptionOpen
+                ? "border-stone-950 bg-stone-950 text-white"
+                : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50",
+              isSaving ? "cursor-wait opacity-60" : "",
+            ].join(" ")}
+          >
+            예외
+          </button>
+        </div>
       </div>
 
-      <div className="hidden sm:block">
-        <AttendanceArrivalToggle
-          isPresent={isPresent}
-          isSaving={isSaving}
-          onToggle={() => onStatusChange(isPresent ? "pending" : "present")}
-        />
-        <AttendanceSaveStatus isSaving={isSaving} isSaved={isSaved} checkedAt={record?.checkedAt} />
-      </div>
-
-      <div className="min-w-0">
-        <div className="flex gap-1.5 overflow-x-auto pb-0.5" role="group" aria-label={`${student.name} 출석 상태 변경`}>
+      {isExceptionOpen ? (
+        <div
+          className="mt-3 flex gap-1.5 overflow-x-auto pl-12"
+          role="group"
+          aria-label={`${student.name} 출석 예외 상태 변경`}
+        >
           {exceptionStatuses.map((nextStatus) => {
             const isSelected = status === nextStatus;
 
@@ -1437,18 +1312,14 @@ function AttendanceStudentRow({
             );
           })}
         </div>
+      ) : null}
 
-        <div className="mt-1 sm:hidden">
-          <AttendanceSaveStatus isSaving={isSaving} isSaved={isSaved} checkedAt={record?.checkedAt} />
-        </div>
-
-        {saveError ? (
-          <p className="mt-2 flex items-start gap-1.5 text-xs leading-5 text-red-700">
-            <AlertCircle size={14} className="mt-0.5 shrink-0" />
-            {saveError}
-          </p>
-        ) : null}
-      </div>
+      {saveError ? (
+        <p className="mt-2 flex items-start gap-1.5 pl-12 text-xs leading-5 text-red-700">
+          <AlertCircle size={14} className="mt-0.5 shrink-0" />
+          {saveError}
+        </p>
+      ) : null}
     </article>
   );
 }
@@ -2016,13 +1887,19 @@ function getSessionProgress(session: AttendanceSession, records: AttendanceRecor
   };
 }
 
+function getClassInitial(className: string) {
+  return className.trim().charAt(0) || "수";
+}
+
+function getStudentInitial(studentName: string) {
+  return studentName.trim().charAt(0) || "학";
+}
+
 function buildAttendanceOverview(
   sessions: AttendanceSession[],
   records: AttendanceRecordItem[],
 ): AttendanceOverview {
   const counts = createEmptyAttendanceCounts();
-  const actionItems: AttendanceActionItem[] = [];
-  const classSummaries: AttendanceClassSummary[] = [];
 
   sessions.forEach((session) => {
     const recordsByStudent = new Map(
@@ -2041,52 +1918,12 @@ function buildAttendanceOverview(
       const status = key as AttendanceStatus;
       counts[status] += sessionCounts[status];
     });
-
-    classSummaries.push({
-      key: session.key,
-      className: session.className,
-      startTime: session.startTime,
-      endTime: session.endTime,
-      studentCount: session.students.length,
-      counts: sessionCounts,
-    });
-
-    session.students.forEach((student) => {
-      const record = recordsByStudent.get(student.id);
-      const status = normalizeAttendanceStatus(record?.status);
-
-      if (
-        !record ||
-        (status !== "absent" && status !== "late" && status !== "needs_check")
-      ) {
-        return;
-      }
-
-      actionItems.push({
-        key: `${session.key}:${student.id}:${status}`,
-        studentName: student.name,
-        className: session.className,
-        startTime: session.startTime,
-        endTime: session.endTime,
-        status,
-        followupId: record.followupId,
-        followupStatus: record.followupStatus,
-        followupSentAt: record.followupSentAt,
-      });
-    });
   });
 
   return {
     totalSessions: sessions.length,
     totalStudents: sessions.reduce((total, session) => total + session.students.length, 0),
     counts,
-    actionItems: actionItems.sort(
-      (first, second) =>
-        statusActionSortValue(first.status) - statusActionSortValue(second.status) ||
-        first.startTime.localeCompare(second.startTime) ||
-        first.studentName.localeCompare(second.studentName, "ko"),
-    ),
-    classSummaries,
   };
 }
 
@@ -2100,16 +1937,6 @@ function createEmptyAttendanceCounts(): Record<AttendanceStatus, number> {
     excused: 0,
     needs_check: 0,
   };
-}
-
-function statusActionSortValue(status: AttendanceStatus) {
-  const sortMap: Partial<Record<AttendanceStatus, number>> = {
-    absent: 0,
-    needs_check: 1,
-    late: 2,
-  };
-
-  return sortMap[status] ?? 9;
 }
 
 function normalizeAttendanceStatus(status: string | undefined): AttendanceStatus {
@@ -2309,62 +2136,6 @@ function attendanceStatusClass(status: AttendanceStatus) {
   };
 
   return classes[status];
-}
-
-function compactStatusActiveClass(status: AttendanceStatus) {
-  const classes: Record<AttendanceStatus, string> = {
-    pending: "border-stone-300 bg-stone-100",
-    present: "border-[#C9D6E2] bg-[#EAF1F8]",
-    late: "border-amber-200 bg-amber-50",
-    absent: "border-red-200 bg-red-50",
-    makeup: "border-blue-200 bg-blue-50",
-    excused: "border-purple-200 bg-purple-50",
-    needs_check: "border-orange-200 bg-orange-50",
-  };
-
-  return classes[status];
-}
-
-function contactStatusLabel(item: AttendanceActionItem) {
-  if (item.status === "needs_check") {
-    return "확인 대기: 결석 확정 전입니다.";
-  }
-
-  if (!item.followupId) {
-    return "연락 필요: 아직 문자 기록이 없습니다.";
-  }
-
-  if (item.followupStatus === "sent") {
-    return item.followupSentAt
-      ? `발송 기록 완료: ${formatTime(item.followupSentAt)}`
-      : "발송 기록 완료";
-  }
-
-  if (item.followupStatus === "failed") {
-    return "발송 실패: 다시 확인이 필요합니다.";
-  }
-
-  return "초안 저장됨: 발송 확인이 필요합니다.";
-}
-
-function contactStatusClass(item: AttendanceActionItem) {
-  if (item.status === "needs_check") {
-    return "bg-orange-50 text-orange-900";
-  }
-
-  if (!item.followupId) {
-    return "bg-red-50 text-red-900";
-  }
-
-  if (item.followupStatus === "sent") {
-    return "bg-[#EAF1F8] text-[#244B67]";
-  }
-
-  if (item.followupStatus === "failed") {
-    return "bg-red-50 text-red-900";
-  }
-
-  return "bg-amber-50 text-amber-900";
 }
 
 function reasonLabel(reasonId: FollowupReason) {
