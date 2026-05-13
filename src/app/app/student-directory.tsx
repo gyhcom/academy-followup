@@ -238,9 +238,25 @@ export function StudentDirectoryToolbar({
         </label>
 
         <div className="flex items-center justify-between gap-2 rounded-md border border-[#E6E0D5] bg-white px-3 py-2 text-xs font-semibold text-stone-600 sm:bg-[#F7F5F0]">
-          <span className="truncate">
-            {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
-          </span>
+          <button
+            type="button"
+            onClick={() =>
+              onScheduleFilterChange(
+                scheduleFilter === "missing_schedule" ? "all" : "missing_schedule",
+              )
+            }
+            className={[
+              "flex min-h-8 min-w-0 items-center gap-2 rounded-md px-2 text-left transition",
+              scheduleFilter === "missing_schedule"
+                ? "bg-[#315C7C] text-white"
+                : "bg-white text-stone-700 hover:bg-[#EAF1F8]",
+            ].join(" ")}
+          >
+            <CalendarDays size={13} className="shrink-0" />
+            <span className="truncate">
+              {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
+            </span>
+          </button>
           <button
             type="button"
             onClick={() => setIsFilterOpen((current) => !current)}
@@ -614,7 +630,18 @@ function StudentDetailPanel({
 
         {groupedSchedules.length === 0 ? (
           <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-4 text-sm text-stone-500">
-            등록된 스케줄이 없습니다.
+            <p className="font-semibold text-stone-900">등록된 스케줄이 없습니다.</p>
+            <p className="mt-1 leading-5">
+              이 학생은 출석부와 보강 후보에서 빠질 수 있습니다.
+            </p>
+            <button
+              type="button"
+              onClick={() => onCreateSchedule(student)}
+              className="mt-3 flex min-h-9 w-full items-center justify-center gap-1 rounded-md bg-[#315C7C] px-3 text-xs font-semibold text-white transition hover:bg-[#244B67]"
+            >
+              <CalendarDays size={13} />
+              스케줄 바로 추가
+            </button>
           </div>
         ) : (
           <div className="mt-3 divide-y divide-stone-100">

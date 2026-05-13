@@ -180,7 +180,7 @@ export function ClassForm({
             {form.mode === "create" ? "새 반 등록" : "반 정보 수정"}
           </p>
           <p className="mt-1 text-xs leading-5 text-stone-600">
-            반 이름은 필수이고, 과목·학년·담당자는 나중에 바꿀 수 있습니다.
+            반 이름을 먼저 정하고, 주 담당 선생님을 연결하면 선생님 권한과 출석부 필터가 같이 정리됩니다.
           </p>
         </div>
         <button
@@ -195,7 +195,7 @@ export function ClassForm({
 
       <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2">
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
-          반 이름
+          반 이름 <span className="text-xs font-normal text-stone-500">필수</span>
           <input
             value={form.name}
             onChange={(event) => onChange({ ...form, name: event.target.value })}
@@ -205,7 +205,7 @@ export function ClassForm({
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
-          담당 선생님
+          주 담당 선생님
           <select
             value={form.teacherId}
             onChange={(event) => onChange({ ...form, teacherId: event.target.value })}
@@ -300,7 +300,7 @@ export function StudentForm({
             {form.mode === "create" ? "새 학생 등록" : "학생 정보 수정"}
           </p>
           <p className="mt-1 text-xs leading-5 text-stone-600">
-            학생명과 학부모 연락처는 필수입니다. 저장 후 주간 스케줄을 이어서 입력합니다.
+            소속 반을 지정해야 출석, 문자, 선생님 권한 기준이 정확해집니다. 저장 후 주간 스케줄을 이어서 입력합니다.
           </p>
         </div>
         <button
@@ -325,13 +325,13 @@ export function StudentForm({
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
-          소속 반
+          소속 반 <span className="text-xs font-normal text-stone-500">출석/권한 기준</span>
           <select
             value={form.classId}
             onChange={(event) => onChange({ ...form, classId: event.target.value })}
             className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
           >
-            <option value="">미배정</option>
+            <option value="">미배정 - 나중에 배정</option>
             {classes.map((classItem) => (
               <option key={classItem.id} value={classItem.id}>
                 {classItem.name}
@@ -709,10 +709,10 @@ export function BulkScheduleForm({
     <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50/70 p-3 min-w-0 overflow-hidden">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-stone-950">반 스케줄 일괄 등록</p>
+          <p className="text-sm font-semibold text-stone-950">이 반 학생 전체 수업 시간 등록</p>
           <p className="mt-1 text-xs leading-5 text-stone-600">
-            {form.className} 재원 학생 전체에게 같은 주간 반복 스케줄을 등록합니다.
-            이미 같은 요일과 시간의 스케줄이 있으면 건너뜁니다.
+            {form.className} 재원 학생 전체에게 같은 요일·시간의 반복 수업을 등록합니다.
+            이미 같은 시간의 활성 스케줄이 있는 학생은 자동으로 건너뜁니다.
           </p>
         </div>
         <button
@@ -846,7 +846,7 @@ export function BulkScheduleForm({
           ].join(" ")}
         >
           <Save size={16} />
-          {status.status === "saving" ? "등록 중" : "반 전체 등록"}
+          {status.status === "saving" ? "등록 중" : "전체 학생에게 등록"}
         </button>
       </div>
     </div>

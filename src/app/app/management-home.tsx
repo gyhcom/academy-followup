@@ -3,8 +3,11 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  ArrowRight,
   CalendarDays,
+  CheckCircle2,
   ClipboardList,
+  CircleDashed,
   FileSpreadsheet,
   MessageSquareText,
   Pencil,
@@ -847,7 +850,7 @@ export function ManagementHome({
         onShowClasses={() => setActiveSection("classes")}
       />
 
-      <section className="border-b border-[#DED8CE] bg-transparent sm:rounded-lg sm:border sm:border-[#E2DED6] sm:bg-white sm:shadow-sm">
+      <section className="overflow-hidden border-b border-[#DED8CE] bg-transparent sm:rounded-lg sm:border sm:border-[#E2DED6] sm:bg-white sm:shadow-sm">
         <div className="hidden px-4 py-4 sm:block sm:px-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
             Academy Admin
@@ -870,24 +873,24 @@ export function ManagementHome({
         </div>
 
         <div className="px-0 py-2 sm:border-t sm:border-[#E2DED6] sm:px-5">
-          <div className="flex gap-1.5 overflow-x-auto">
+          <div className="grid max-w-full grid-cols-3 gap-1.5 sm:flex sm:overflow-x-auto">
           {managementSections.map((section) => (
             <button
               key={section.id}
               type="button"
               onClick={() => setActiveSection(section.id)}
               className={[
-                "shrink-0 rounded-md border px-3 py-2 text-left transition sm:px-3",
+                "min-w-0 rounded-md border px-2 py-2 text-left transition sm:shrink-0 sm:px-3",
                 activeSection === section.id
                   ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67]"
                   : "border-transparent bg-white text-stone-700 hover:bg-[#F2F5F8]",
               ].join(" ")}
             >
-              <span className="flex items-center gap-2">
-                <span className="text-sm font-semibold">{section.label}</span>
+              <span className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+                <span className="truncate text-sm font-semibold">{section.label}</span>
                 <span
                   className={[
-                    "rounded px-2 py-0.5 text-xs font-semibold",
+                    "shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold sm:px-2",
                     activeSection === section.id
                       ? "bg-white text-[#244B67]"
                       : "bg-[#F7F5F0] text-stone-600",
@@ -906,7 +909,7 @@ export function ManagementHome({
       {activeSection === "setup" ? (
         <ManagementPanel
           title="운영 초기 세팅"
-          description="파일럿 시작 전 원장이 입력해야 하는 구성원, 반, 학생, 스케줄 순서를 한 흐름으로 정리합니다."
+          description="원장이 실제 운영을 시작하기 전 필요한 계정, 반, 학생, 수업 시간을 순서대로 점검합니다."
           actionLabel="스케줄 미등록 보기"
           actionIcon={<CalendarDays size={14} />}
           onAction={openMissingScheduleStudents}
@@ -915,6 +918,7 @@ export function ManagementHome({
             memberCount={members.length}
             classCount={classes.length}
             activeStudentCount={activeStudents.length}
+            unassignedStudentCount={activeStudents.filter((student) => !student.classId).length}
             missingScheduleCount={
               activeStudents.filter(
                 (student) => student.schedules.filter((schedule) => schedule.isActive).length === 0,
@@ -1080,7 +1084,7 @@ export function ManagementHome({
       {activeSection === "classes" ? (
         <ManagementPanel
           title="반 관리"
-          description="반 이름, 과목, 학년, 담당 선생님을 등록하고 수정합니다."
+          description="반을 만들고 주 담당 선생님과 반 공통 수업 시간을 연결합니다."
           actionLabel="반 등록"
           actionIcon={<Plus size={14} />}
           onAction={openCreateClassForm}
@@ -1140,8 +1144,13 @@ export function ManagementHome({
             </p>
           ) : null}
 
+          <div className="mb-3 rounded-lg border border-[#C9D6E2] bg-[#F8FBFD] px-3 py-3 text-sm text-[#244B67]">
+            반을 만든 뒤 <span className="font-semibold">수업 시간 등록</span>을 누르면
+            그 반의 재원 학생 전체에게 같은 주간 스케줄이 추가됩니다.
+          </div>
+
           <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
-            <div className="hidden grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
+            <div className="hidden grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_220px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
               <span>반</span>
               <span>과목</span>
               <span>학년</span>
@@ -1151,7 +1160,7 @@ export function ManagementHome({
             {classes.map((classItem) => (
               <div
                 key={classItem.id}
-                className="grid min-w-0 gap-3 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_160px] md:items-center"
+                className="grid min-w-0 gap-3 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_220px] md:items-center"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-stone-950">{classItem.name}</p>
@@ -1169,10 +1178,10 @@ export function ManagementHome({
                   <button
                     type="button"
                     onClick={() => openBulkScheduleForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#C9D6E2] bg-white px-2.5 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8]"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md bg-[#315C7C] px-2.5 text-xs font-semibold text-white transition hover:bg-[#244B67]"
                   >
                     <ClipboardList size={13} />
-                    스케줄
+                    수업 시간 등록
                   </button>
                   <button
                     type="button"
@@ -1262,26 +1271,36 @@ export function ManagementHome({
       {activeSection === "students" ? (
       <ManagementPanel
         title="학생 관리"
-        description="학생과 학부모 연락처는 팔로업 발송의 기준 데이터입니다."
+        description="학생을 반에 배정하고, 출석과 보강 기준이 되는 수업 스케줄을 관리합니다."
         actionLabel="학생 등록"
         actionIcon={<Plus size={14} />}
         onAction={openCreateStudentForm}
       >
-        <div className="mb-3 flex items-center justify-between gap-2 rounded-md border border-[#E6E0D5] bg-white p-2.5 sm:mb-4 sm:bg-[#F7F5F0] sm:p-3">
+        <div className="mb-3 grid gap-2 rounded-md border border-[#E6E0D5] bg-white p-2.5 sm:mb-4 sm:bg-[#F7F5F0] sm:p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-stone-950">초기 세팅은 일괄 등록으로 시작합니다.</p>
+            <p className="text-sm font-semibold text-stone-950">학생 등록 후 반 배정과 스케줄까지 확인합니다.</p>
             <p className="mt-1 hidden text-xs leading-5 text-stone-500 sm:block">
-              200명 규모에서도 학생 목록, 검색, 스케줄 입력 화면이 깨지지 않는지 같이 확인합니다.
+              반이 없는 학생은 권한과 출석 흐름이 애매해지고, 스케줄이 없는 학생은 출석부에 나타나지 않습니다.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={openBulkStudentImport}
-            className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] sm:min-h-10"
-          >
-            <FileSpreadsheet size={14} />
-            CSV 일괄 등록
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={openMissingScheduleStudents}
+              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] sm:min-h-10"
+            >
+              <CalendarDays size={14} />
+              스케줄 미등록 보기
+            </button>
+            <button
+              type="button"
+              onClick={openBulkStudentImport}
+              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-md bg-[#315C7C] px-3 text-xs font-semibold text-white transition hover:bg-[#244B67] sm:min-h-10"
+            >
+              <FileSpreadsheet size={14} />
+              CSV 일괄 등록
+            </button>
+          </div>
         </div>
 
         {isBulkStudentImportOpen ? (
@@ -1566,6 +1585,7 @@ function SetupWorkflow({
   memberCount,
   classCount,
   activeStudentCount,
+  unassignedStudentCount,
   missingScheduleCount,
   onCreateMember,
   onCreateClass,
@@ -1576,6 +1596,7 @@ function SetupWorkflow({
   memberCount: number;
   classCount: number;
   activeStudentCount: number;
+  unassignedStudentCount: number;
   missingScheduleCount: number;
   onCreateMember: () => void;
   onCreateClass: () => void;
@@ -1589,6 +1610,7 @@ function SetupWorkflow({
       title: "선생님 계정 등록",
       description: "정규 선생님과 보조 선생님을 먼저 만들고 권한을 정합니다.",
       metric: `${memberCount}명`,
+      isDone: memberCount > 0,
       actionLabel: "구성원 등록",
       onAction: onCreateMember,
     },
@@ -1597,6 +1619,7 @@ function SetupWorkflow({
       title: "반 생성과 주 담당 배정",
       description: "반 이름, 과목, 학년을 만들고 주 담당 선생님을 연결합니다.",
       metric: `${classCount}개`,
+      isDone: classCount > 0,
       actionLabel: "반 등록",
       onAction: onCreateClass,
     },
@@ -1604,7 +1627,8 @@ function SetupWorkflow({
       step: "3",
       title: "학생 등록과 반 배정",
       description: "학생과 학부모 연락처를 입력하고 소속 반을 지정합니다.",
-      metric: `${activeStudentCount}명`,
+      metric: unassignedStudentCount > 0 ? `${unassignedStudentCount}명 미배정` : `${activeStudentCount}명`,
+      isDone: activeStudentCount > 0 && unassignedStudentCount === 0,
       actionLabel: "학생 등록",
       onAction: onCreateStudent,
     },
@@ -1612,7 +1636,8 @@ function SetupWorkflow({
       step: "4",
       title: "반 공통 수업 스케줄",
       description: "같은 반 학생에게 반복 수업 시간을 한 번에 등록합니다.",
-      metric: "일괄",
+      metric: missingScheduleCount > 0 ? "필요" : "완료",
+      isDone: activeStudentCount > 0 && missingScheduleCount === 0,
       actionLabel: "반 스케줄",
       onAction: onOpenClassSchedules,
     },
@@ -1621,27 +1646,71 @@ function SetupWorkflow({
       title: "학생별 예외 일정",
       description: "논술, 타 학원, 상담, 1회 보강처럼 개인별 일정을 추가합니다.",
       metric: `${missingScheduleCount}명 미등록`,
+      isDone: activeStudentCount > 0 && missingScheduleCount === 0,
       actionLabel: "미등록 보기",
       onAction: onOpenMissingSchedules,
     },
   ];
+  const completedCount = setupSteps.filter((step) => step.isDone).length;
+  const nextStep = setupSteps.find((step) => !step.isDone) ?? setupSteps[setupSteps.length - 1];
 
   return (
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
+      <div className="rounded-lg border border-[#C9D6E2] bg-[#F8FBFD] p-4 lg:col-span-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
+              Setup Progress
+            </p>
+            <h3 className="mt-1 text-lg font-semibold text-stone-950">
+              {completedCount} / {setupSteps.length} 단계 완료
+            </h3>
+            <p className="mt-1 text-sm leading-6 text-stone-600">
+              다음 작업은 <span className="font-semibold text-stone-900">{nextStep.title}</span>
+              입니다. 아래 버튼을 누르면 해당 관리 화면으로 바로 이동합니다.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={nextStep.onAction}
+            className="flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-[#315C7C] px-4 text-sm font-semibold text-white transition hover:bg-[#244B67]"
+          >
+            {nextStep.actionLabel}
+            <ArrowRight size={15} />
+          </button>
+        </div>
+      </div>
+
       <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
-        {setupSteps.map((step, index) => (
+        {setupSteps.map((step) => (
           <div
             key={step.step}
             className="grid gap-3 border-b border-[#EFE9DE] px-4 py-4 last:border-b-0 sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
           >
-            <div className="flex size-9 items-center justify-center rounded-md bg-[#111827] text-sm font-semibold text-white">
-              {step.step}
+            <div
+              className={[
+                "flex size-9 items-center justify-center rounded-md text-sm font-semibold",
+                step.isDone ? "bg-[#EAF1F8] text-[#244B67]" : "bg-[#111827] text-white",
+              ].join(" ")}
+            >
+              {step.isDone ? <CheckCircle2 size={17} /> : step.step}
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-sm font-semibold text-stone-950">{step.title}</p>
-                <span className="rounded bg-[#F7F5F0] px-2 py-0.5 text-xs font-semibold text-stone-600">
+                <span
+                  className={[
+                    "rounded px-2 py-0.5 text-xs font-semibold",
+                    step.isDone
+                      ? "bg-[#EAF1F8] text-[#244B67]"
+                      : "bg-amber-50 text-amber-800",
+                  ].join(" ")}
+                >
                   {step.metric}
+                </span>
+                <span className="flex items-center gap-1 text-xs font-semibold text-stone-500">
+                  {step.isDone ? <CheckCircle2 size={13} /> : <CircleDashed size={13} />}
+                  {step.isDone ? "완료" : "확인 필요"}
                 </span>
               </div>
               <p className="mt-1 text-sm leading-6 text-stone-600">{step.description}</p>
@@ -1651,8 +1720,8 @@ function SetupWorkflow({
               onClick={step.onAction}
               className={[
                 "min-h-10 rounded-md px-3 text-sm font-semibold transition",
-                index === 0
-                  ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                step.isDone
+                  ? "border border-[#D8D0C4] bg-white text-stone-800 hover:bg-[#F7F5F0]"
                   : "border border-[#D8D0C4] bg-white text-stone-800 hover:bg-[#F7F5F0]",
               ].join(" ")}
             >
