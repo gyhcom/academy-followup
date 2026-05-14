@@ -150,6 +150,10 @@ drop table if exists public.seed_pilot_volume_students;
 
 `supabase/seed-demo-operations.sql`은 원장 운영 리허설용 데이터입니다. 실행하면 오늘 날짜 기준으로 최근 6일, 오늘, 다음 6일의 수업/출석 기록을 생성합니다.
 
+Supabase SQL Editor에서는 파일 전체를 한 번에 실행합니다. 일부 구간만 선택 실행하면 seed 보조 테이블이 만들어지지 않아 `relation "seed_demo_operations_classes" does not exist` 오류가 날 수 있습니다.
+
+이 seed는 실행 중 `public.seed_demo_operations_classes`, `public.seed_demo_operations_students`, `public.seed_demo_operations_dates` 보조 테이블을 만들고, 마지막에 자동으로 삭제합니다. 중간에 실패해도 재실행 시 처음에 보조 테이블을 정리합니다.
+
 ```sql
 select
   (select count(*) from public.classes where name in (

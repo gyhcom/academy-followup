@@ -3,11 +3,11 @@
 -- 기존 MVP seed, volume seed와 분리해서 필요할 때만 Supabase SQL Editor에서 실행합니다.
 -- 반복 실행하면 이전 운영 데모 데이터만 정리한 뒤 오늘 날짜 기준으로 다시 생성합니다.
 
-drop table if exists seed_demo_operations_classes;
-drop table if exists seed_demo_operations_students;
-drop table if exists seed_demo_operations_dates;
+drop table if exists public.seed_demo_operations_classes;
+drop table if exists public.seed_demo_operations_students;
+drop table if exists public.seed_demo_operations_dates;
 
-create temporary table seed_demo_operations_classes (
+create table public.seed_demo_operations_classes (
   seq integer primary key,
   id uuid not null,
   name text not null,
@@ -18,7 +18,7 @@ create temporary table seed_demo_operations_classes (
   days smallint[] not null
 );
 
-create temporary table seed_demo_operations_students (
+create table public.seed_demo_operations_students (
   seq integer primary key,
   id uuid not null,
   class_seq integer not null,
@@ -28,13 +28,17 @@ create temporary table seed_demo_operations_students (
   grade_label text not null
 );
 
-create temporary table seed_demo_operations_dates (
+create table public.seed_demo_operations_dates (
   attendance_date date primary key,
   day_of_week smallint not null,
   date_offset integer not null
 );
 
-insert into seed_demo_operations_classes (
+alter table public.seed_demo_operations_classes enable row level security;
+alter table public.seed_demo_operations_students enable row level security;
+alter table public.seed_demo_operations_dates enable row level security;
+
+insert into public.seed_demo_operations_classes (
   seq,
   id,
   name,
@@ -53,7 +57,7 @@ insert into seed_demo_operations_classes (
   (7, md5('demo-operations-class-7')::uuid, '고1 영어 내신반', '영어', '고1', '20:00', '22:00', array[1, 3, 5]::smallint[]),
   (8, md5('demo-operations-class-8')::uuid, '고1 수학 개념반', '수학', '고1', '18:30', '20:30', array[0, 2, 4]::smallint[]);
 
-insert into seed_demo_operations_students (
+insert into public.seed_demo_operations_students (
   seq,
   id,
   class_seq,
@@ -75,14 +79,14 @@ select
     else '탕정중'
   end as school_name,
   class_item.grade_label
-from seed_demo_operations_classes class_item
+from public.seed_demo_operations_classes class_item
 join lateral (
   values
     (1, '강도윤'), (2, '권서준'), (3, '김나은'), (4, '김도현'),
     (5, '박서윤'), (6, '박시우'), (7, '이하린'), (8, '정민재')
 ) as student_item(student_order, name) on true;
 
-insert into seed_demo_operations_dates (
+insert into public.seed_demo_operations_dates (
   attendance_date,
   day_of_week,
   date_offset
@@ -99,32 +103,32 @@ where academy_id = '11111111-1111-4111-8111-111111111111'
   and followup_id in (
     select id
     from public.followups
-    where student_id in (select id from seed_demo_operations_students)
+    where student_id in (select id from public.seed_demo_operations_students)
   );
 
 delete from public.attendance_records
 where academy_id = '11111111-1111-4111-8111-111111111111'
-  and student_id in (select id from seed_demo_operations_students);
+  and student_id in (select id from public.seed_demo_operations_students);
 
 delete from public.student_schedules
 where academy_id = '11111111-1111-4111-8111-111111111111'
   and (
-    student_id in (select id from seed_demo_operations_students)
-    or class_id in (select id from seed_demo_operations_classes)
+    student_id in (select id from public.seed_demo_operations_students)
+    or class_id in (select id from public.seed_demo_operations_classes)
     or memo like '운영 데모:%'
   );
 
 delete from public.followups
 where academy_id = '11111111-1111-4111-8111-111111111111'
-  and student_id in (select id from seed_demo_operations_students);
+  and student_id in (select id from public.seed_demo_operations_students);
 
 delete from public.students
 where academy_id = '11111111-1111-4111-8111-111111111111'
-  and id in (select id from seed_demo_operations_students);
+  and id in (select id from public.seed_demo_operations_students);
 
 delete from public.classes
 where academy_id = '11111111-1111-4111-8111-111111111111'
-  and id in (select id from seed_demo_operations_classes);
+  and id in (select id from public.seed_demo_operations_classes);
 
 insert into public.academies (
   id,
@@ -190,7 +194,7 @@ select
   name,
   subject,
   grade_label
-from seed_demo_operations_classes
+from public.seed_demo_operations_classes
 on conflict (id) do update set
   name = excluded.name,
   subject = excluded.subject,
@@ -219,7 +223,7 @@ select
   '01088' || lpad(student_item.seq::text, 6, '0'),
   case when student_item.seq % 5 = 0 then '01099' || lpad(student_item.seq::text, 6, '0') else null end,
   'active'
-from seed_demo_operations_students student_item
+from public.seed_demo_operations_students student_item
 on conflict (id) do update set
   class_id = excluded.class_id,
   name = excluded.name,
@@ -255,8 +259,8 @@ select
   class_item.subject,
   class_item.name,
   '운영 데모: 반 공통 정규 수업'
-from seed_demo_operations_students student_item
-join seed_demo_operations_classes class_item on class_item.seq = student_item.class_seq
+from public.seed_demo_operations_students student_item
+join public.seed_demo_operations_classes class_item on class_item.seq = student_item.class_seq
 cross join lateral unnest(class_item.days) as day_value
 on conflict (id) do update set
   class_id = excluded.class_id,
@@ -295,7 +299,7 @@ select
   null,
   case when student_item.seq % 2 = 0 then '논술학원' else '개인 일정' end,
   '운영 데모: 보강 후보 제외 외부 일정'
-from seed_demo_operations_students student_item
+from public.seed_demo_operations_students student_item
 where student_item.seq % 6 = 0
 on conflict (id) do update set
   class_id = excluded.class_id,
@@ -368,9 +372,9 @@ select
     when date_item.date_offset = 0 and student_item.seq % 5 = 0 then '운영 데모: 아직 미체크'
     else '운영 데모: 정상 출석'
   end
-from seed_demo_operations_students student_item
-join seed_demo_operations_classes class_item on class_item.seq = student_item.class_seq
-join seed_demo_operations_dates date_item on date_item.day_of_week = any(class_item.days)
+from public.seed_demo_operations_students student_item
+join public.seed_demo_operations_classes class_item on class_item.seq = student_item.class_seq
+join public.seed_demo_operations_dates date_item on date_item.day_of_week = any(class_item.days)
 on conflict (
   academy_id,
   student_id,
@@ -416,7 +420,7 @@ from public.attendance_records attendance_item
 join public.students student_item on student_item.id = attendance_item.student_id
 where attendance_item.academy_id = '11111111-1111-4111-8111-111111111111'
   and attendance_item.attendance_date = current_date
-  and attendance_item.student_id in (select id from seed_demo_operations_students)
+  and attendance_item.student_id in (select id from public.seed_demo_operations_students)
   and attendance_item.status in ('absent', 'late')
 on conflict (id) do update set
   message_body = excluded.message_body,
@@ -445,7 +449,7 @@ select
   'dry_run'
 from public.followups followup_item
 join public.students student_item on student_item.id = followup_item.student_id
-where followup_item.student_id in (select id from seed_demo_operations_students)
+where followup_item.student_id in (select id from public.seed_demo_operations_students)
 on conflict (id) do update set
   recipient_phone = excluded.recipient_phone,
   recipient_type = excluded.recipient_type,
@@ -459,16 +463,16 @@ where attendance_item.academy_id = followup_item.academy_id
   and attendance_item.student_id = followup_item.student_id
   and attendance_item.class_id = followup_item.class_id
   and attendance_item.attendance_date = current_date
-  and attendance_item.student_id in (select id from seed_demo_operations_students)
+  and attendance_item.student_id in (select id from public.seed_demo_operations_students)
   and attendance_item.status in ('absent', 'late');
 
 select
-  (select count(*) from public.classes where id in (select id from seed_demo_operations_classes)) as demo_class_count,
-  (select count(*) from public.students where id in (select id from seed_demo_operations_students)) as demo_student_count,
-  (select count(*) from public.student_schedules where student_id in (select id from seed_demo_operations_students) and is_active = true) as demo_schedule_count,
-  (select count(*) from public.attendance_records where student_id in (select id from seed_demo_operations_students)) as demo_attendance_count,
-  (select count(*) from public.followups where student_id in (select id from seed_demo_operations_students)) as demo_followup_count;
+  (select count(*) from public.classes where id in (select id from public.seed_demo_operations_classes)) as demo_class_count,
+  (select count(*) from public.students where id in (select id from public.seed_demo_operations_students)) as demo_student_count,
+  (select count(*) from public.student_schedules where student_id in (select id from public.seed_demo_operations_students) and is_active = true) as demo_schedule_count,
+  (select count(*) from public.attendance_records where student_id in (select id from public.seed_demo_operations_students)) as demo_attendance_count,
+  (select count(*) from public.followups where student_id in (select id from public.seed_demo_operations_students)) as demo_followup_count;
 
-drop table if exists seed_demo_operations_dates;
-drop table if exists seed_demo_operations_students;
-drop table if exists seed_demo_operations_classes;
+drop table if exists public.seed_demo_operations_dates;
+drop table if exists public.seed_demo_operations_students;
+drop table if exists public.seed_demo_operations_classes;
