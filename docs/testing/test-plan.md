@@ -19,6 +19,7 @@
 - `students.student_phone` 컬럼 존재 여부 확인 SQL이 동작함
 - `supabase/seed.sql`만 실행하면 MVP 최소 학생 수로 유지됨
 - 볼륨 테스트 데이터는 `supabase/seed-volume.sql`을 실행해야만 추가됨
+- 운영 리허설 데이터는 `supabase/seed-demo-operations.sql`을 실행해야만 추가됨
 - seed 실행 후 반/학생/스케줄/출석 기록 수 확인 SQL이 동작함
 - 적용 순서는 `docs/engineering/supabase-setup.md`를 기준으로 확인함
 

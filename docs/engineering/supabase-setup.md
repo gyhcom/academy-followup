@@ -9,6 +9,7 @@
 3. `supabase/seed.sql`을 실행해 MVP 최소 데이터를 넣습니다.
 4. `/app`에서 학생, 스케줄, 출석부 화면이 열리는지 확인합니다.
 5. 많은 학생 수로 모바일/스크롤 테스트가 필요할 때만 `supabase/seed-volume.sql`을 추가 실행합니다.
+6. 운영 리허설처럼 매일 수업/출석/문자 기록이 필요할 때만 `supabase/seed-demo-operations.sql`을 추가 실행합니다.
 
 ## 필수 컬럼 확인
 
@@ -145,8 +146,75 @@ where id::text between '33333333-3333-4333-8333-333333333401'
 drop table if exists public.seed_pilot_volume_students;
 ```
 
+## Operations Demo Seed 확인
+
+`supabase/seed-demo-operations.sql`은 원장 운영 리허설용 데이터입니다. 실행하면 오늘 날짜 기준으로 최근 6일, 오늘, 다음 6일의 수업/출석 기록을 생성합니다.
+
+```sql
+select
+  (select count(*) from public.classes where name in (
+    '중1 수학 기본반',
+    '중1 영어 내신반',
+    '중2 수학 A반',
+    '중2 영어 독해반',
+    '중3 수학 심화반',
+    '중3 영어 문법반',
+    '고1 영어 내신반',
+    '고1 수학 개념반'
+  )) as demo_class_count,
+  (select count(*) from public.students where parent_phone like '01088%') as demo_student_count,
+  (select count(*) from public.student_schedules where memo like '운영 데모:%') as demo_schedule_count,
+  (select count(*) from public.attendance_records where note like '운영 데모:%') as demo_attendance_count,
+  (select count(*) from public.message_logs where provider = 'demo') as demo_message_log_count;
+```
+
+예상 규모:
+
+- 반 8개
+- 학생 64명
+- 주간 반복 스케줄 192개 이상
+- 오늘 기준 전후 13일 범위 출석 기록
+- 결석/지각 dry-run 팔로업 및 message log 일부
+
+## Operations Demo Seed 정리
+
+운영 데모 데이터를 지우고 MVP/볼륨 데이터만 남기고 싶을 때는 아래 SQL을 검토한 뒤 실행합니다.
+
+```sql
+delete from public.message_logs
+where provider = 'demo'
+  and provider_message_id like 'demo-operations-%';
+
+delete from public.attendance_records
+where note like '운영 데모:%';
+
+delete from public.student_schedules
+where memo like '운영 데모:%';
+
+delete from public.followups
+where student_id in (
+  select id from public.students where parent_phone like '01088%'
+);
+
+delete from public.students
+where parent_phone like '01088%';
+
+delete from public.classes
+where name in (
+  '중1 수학 기본반',
+  '중1 영어 내신반',
+  '중2 수학 A반',
+  '중2 영어 독해반',
+  '중3 수학 심화반',
+  '중3 영어 문법반',
+  '고1 영어 내신반',
+  '고1 수학 개념반'
+);
+```
+
 ## 운영 주의
 
 - 실제 DB에 destructive SQL을 자동 실행하지 않습니다.
 - schema 불일치 오류가 나면 앱 코드를 수정하기 전에 migration 적용 여부를 먼저 확인합니다.
 - seed는 파일럿 검증 데이터입니다. 실제 학원 데이터 입력 전에는 seed 실행 범위를 명확히 분리합니다.
+- `seed-demo-operations.sql`은 실제 학원 데이터가 들어간 DB에서 실행하지 않습니다.
