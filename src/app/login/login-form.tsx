@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function LoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -30,8 +28,7 @@ export function LoginForm() {
       return;
     }
 
-    router.replace("/app");
-    router.refresh();
+    window.location.assign("/app");
   }
 
   return (

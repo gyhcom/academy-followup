@@ -279,6 +279,7 @@ function WorkspaceNavButton({
     <button
       type="button"
       disabled={disabled}
+      aria-label={label}
       aria-pressed={isActive}
       onClick={onClick}
       className={[

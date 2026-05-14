@@ -340,6 +340,7 @@ function MobileHomeExperience({
                   alt=""
                   width={30}
                   height={30}
+                  style={{ width: 30, height: 30 }}
                   aria-hidden="true"
                 />
               </div>
@@ -642,10 +643,10 @@ function MobileActionCard({
             <Image
               src={iconSrc}
               alt=""
-              width={30}
-              height={30}
+              width={28}
+              height={28}
               aria-hidden="true"
-              className="size-7 object-contain"
+              style={{ width: 28, height: 28 }}
             />
           ) : (
             icon

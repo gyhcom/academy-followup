@@ -138,12 +138,19 @@ export function OperationsBoard({
   classes,
   initialSelection,
 }: OperationsBoardProps) {
+  const contactClasses = useMemo(
+    () => classes.filter((classItem) => classItem.students.length > 0),
+    [classes],
+  );
+  const visibleClasses = contactClasses.length > 0 ? contactClasses : classes;
   const [selectedClassId, setSelectedClassId] = useState(
-    initialSelection?.classId ?? classes[0]?.id ?? "",
+    initialSelection?.classId ?? visibleClasses[0]?.id ?? "",
   );
   const selectedClass = useMemo(
-    () => classes.find((classItem) => classItem.id === selectedClassId) ?? classes[0],
-    [classes, selectedClassId],
+    () =>
+      visibleClasses.find((classItem) => classItem.id === selectedClassId) ??
+      visibleClasses[0],
+    [selectedClassId, visibleClasses],
   );
   const [selectedStudentId, setSelectedStudentId] = useState(
     initialSelection?.studentId ?? selectedClass?.students[0]?.id ?? "",
@@ -458,7 +465,7 @@ export function OperationsBoard({
   }, [isMobileComposerOpen, isMobileViewport]);
 
   function handleClassSelect(classId: string) {
-    const nextClass = classes.find((classItem) => classItem.id === classId);
+    const nextClass = visibleClasses.find((classItem) => classItem.id === classId);
     setSelectedClassId(classId);
     setSelectedStudentId(nextClass?.students[0]?.id ?? "");
     setHasMobileFollowupSelection(false);
@@ -776,7 +783,7 @@ export function OperationsBoard({
       <OperationsDesktopView
         academyName={academyName}
         teacherName={teacherName}
-        classes={classes}
+        classes={visibleClasses}
         selectedClass={selectedClass}
         selectedStudent={selectedStudent}
         selectedReason={selectedReason}
@@ -808,7 +815,7 @@ export function OperationsBoard({
       <OperationsMobileView
         academyName={academyName}
         teacherName={teacherName}
-        classes={classes}
+        classes={visibleClasses}
         selectedClass={selectedClass}
         selectedStudent={selectedStudent}
         selectedReason={selectedReason}
