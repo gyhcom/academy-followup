@@ -43,6 +43,7 @@ import {
 import { roleLabel } from "@/app/app/management-utils";
 import { StudentBulkImportForm } from "@/app/app/student-bulk-import";
 import { StudentDirectory } from "@/app/app/student-directory";
+import { getMessageLengthMetrics } from "@/lib/message-length";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
 
 type ManagementSection =
@@ -1426,6 +1427,7 @@ function MessageTemplateForm({
   onSave: () => void;
 }) {
   const isSaving = status.status === "saving";
+  const bodyMetrics = getMessageLengthMetrics(form.body);
 
   return (
     <div className="mb-4 rounded-lg border border-[#C9D6E2] bg-[#F8FBFD] p-3 sm:p-4">
@@ -1470,6 +1472,24 @@ function MessageTemplateForm({
             rows={7}
             className="min-h-40 rounded-md border border-stone-300 bg-white px-3 py-2 text-sm leading-6 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
           />
+          <span
+            className={[
+              "text-xs font-medium",
+              bodyMetrics.isOverLimit
+                ? "text-red-700"
+                : bodyMetrics.transportType === "lms"
+                  ? "text-amber-700"
+                  : "text-stone-500",
+            ].join(" ")}
+          >
+            {bodyMetrics.charCount}자 · {bodyMetrics.byteCount}byte ·{" "}
+            {bodyMetrics.isOverLimit
+              ? "2000byte 초과"
+              : bodyMetrics.transportType === "lms"
+                ? "LMS 예상"
+                : "SMS 예상"}
+            {bodyMetrics.hasEmoji ? " · 이모지/특수문자 확인 필요" : ""}
+          </span>
         </label>
       </div>
 
@@ -1497,7 +1517,7 @@ function MessageTemplateForm({
         </button>
         <button
           type="button"
-          disabled={isSaving}
+          disabled={isSaving || bodyMetrics.isOverLimit}
           onClick={onSave}
           className="min-h-10 rounded-md bg-[#315C7C] px-4 text-sm font-semibold text-white transition hover:bg-[#244B67] disabled:cursor-not-allowed disabled:opacity-60"
         >

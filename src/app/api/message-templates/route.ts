@@ -6,6 +6,7 @@ import {
   isFollowupReason,
   type FollowupReason,
 } from "@/lib/followup-templates";
+import { getMessageLengthError } from "@/lib/message-length";
 import { canManageAcademy } from "@/lib/permissions";
 import { getRouteWorkspace } from "@/lib/server/route-workspace";
 
@@ -162,6 +163,12 @@ async function parseTemplateRequest(request: Request): Promise<
 
   if (body.body.trim().length > 1000) {
     return { ok: false, error: "템플릿 본문은 1000자 이하로 입력해 주세요." };
+  }
+
+  const messageLengthError = getMessageLengthError(body.body);
+
+  if (messageLengthError) {
+    return { ok: false, error: messageLengthError };
   }
 
   return {

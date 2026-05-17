@@ -207,10 +207,11 @@ Academy Follow-up은 단순 문자 발송 도구가 아니라, 학생별 주간 
 4. 모바일 390px 폭에서 출석부와 관리 폼이 가로로 밀리지 않는지 확인
 5. dry-run 발송 후 `followups`, `message_logs`에 기록이 남는지 확인
 6. `SMS_DRY_RUN` 또는 학원 설정 `sms_dry_run`이 실제 발송을 막고 있는지 확인
+7. 문자 본문이 2000byte를 넘을 때 UI/API 양쪽에서 저장과 발송이 차단되는지 확인
 
 ## 부분 완료 또는 보류
 
-- 문자 발송 API는 dry-run까지 완료, 실제 SMS 발송은 SOLAPI 환경변수와 `SMS_DRY_RUN=false` 전환 필요
+- 문자 발송 API는 dry-run, 중복 차단, 문자 길이 안전장치까지 완료. 실제 SMS 발송은 SOLAPI 환경변수와 `SMS_DRY_RUN=false` 전환 필요
 - 반 비활성화는 `classes.status` 컬럼이 필요해 보류
 - 선생님/구성원 등록과 테스트 계정 검증은 완료했지만, 이메일 초대 링크 방식은 보류
 - 운영 보드의 선택 학생 주간 시간표는 완료

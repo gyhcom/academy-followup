@@ -5,6 +5,10 @@ import {
   type MessageRecipientType,
 } from "@/lib/message-recipients";
 import {
+  getMessageLengthError,
+  normalizeMessageForSending,
+} from "@/lib/message-length";
+import {
   getRouteWorkspace,
   getStudentForFollowupAccess,
 } from "@/lib/server/route-workspace";
@@ -233,6 +237,13 @@ async function parseCreateFollowupRequest(request: Request): Promise<
     return { ok: false, error: "저장할 문자 본문이 필요합니다." };
   }
 
+  const messageBody = normalizeMessageForSending(body.messageBody);
+  const messageLengthError = getMessageLengthError(messageBody);
+
+  if (messageLengthError) {
+    return { ok: false, error: messageLengthError };
+  }
+
   const recipientType =
     body.recipientType === undefined ? "parent" : body.recipientType;
 
@@ -255,7 +266,7 @@ async function parseCreateFollowupRequest(request: Request): Promise<
     ok: true,
     studentId: body.studentId,
     reason: body.reason,
-    messageBody: body.messageBody.trim(),
+    messageBody,
     recipientType,
     attendanceRecordId,
   };

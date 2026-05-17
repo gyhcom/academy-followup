@@ -21,6 +21,7 @@ import {
   type AttendanceStatus,
 } from "@/lib/attendance";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
+import { getMessageLengthMetrics } from "@/lib/message-length";
 import {
   messageRecipientLabels,
   messageRecipientTypes,
@@ -1438,7 +1439,9 @@ function AttendanceFollowupPanel({
   onSaveFollowup: () => void;
   onSendMessage: () => void;
 }) {
-  const canSaveFollowup = isPreviewReady && !isMessageBlank && !isFollowupSaving;
+  const messageMetrics = getMessageLengthMetrics(messageBody);
+  const canSaveFollowup =
+    isPreviewReady && !isMessageBlank && !messageMetrics.isOverLimit && !isFollowupSaving;
   const canSendMessage = isFollowupSaved && !isMessageSending;
 
   return (
@@ -1585,13 +1588,22 @@ function AttendanceFollowupPanel({
             <p
               className={[
                 "mt-2 text-xs",
-                isMessageBlank ? "text-red-700" : "text-stone-500",
+                isMessageBlank || messageMetrics.isOverLimit
+                  ? "text-red-700"
+                  : messageMetrics.transportType === "lms"
+                    ? "text-amber-700"
+                    : "text-stone-500",
               ].join(" ")}
             >
-              {messageBody.length}자 ·{" "}
+              {messageMetrics.charCount}자 · {messageMetrics.byteCount}byte ·{" "}
               {isMessageBlank
                 ? "본문이 비어 있으면 발송할 수 없습니다."
-                : "발송 전 문구를 직접 수정할 수 있습니다."}
+                : messageMetrics.isOverLimit
+                  ? "2000byte를 초과해 저장할 수 없습니다."
+                  : messageMetrics.transportType === "lms"
+                    ? "LMS로 발송될 수 있습니다."
+                    : "SMS 예상"}
+              {messageMetrics.hasEmoji ? " · 이모지/특수문자 확인 필요" : ""}
             </p>
           </div>
 

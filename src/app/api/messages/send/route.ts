@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { MessageRecipientType } from "@/lib/message-recipients";
+import { getMessageLengthError } from "@/lib/message-length";
 import { canSendFollowupMessage } from "@/lib/permissions";
 import { getRouteWorkspace } from "@/lib/server/route-workspace";
 import { sendSms } from "@/lib/sms/solapi";
@@ -114,6 +115,12 @@ export async function POST(request: Request) {
       { error: "발송 가능한 수신자 연락처가 없습니다." },
       { status: 400 },
     );
+  }
+
+  const messageLengthError = getMessageLengthError(followup.message_body);
+
+  if (messageLengthError) {
+    return NextResponse.json({ error: messageLengthError }, { status: 400 });
   }
 
   const duplicateCheck = await getDuplicateSendCheck({

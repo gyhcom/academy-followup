@@ -10,6 +10,7 @@ import {
   getRouteWorkspace,
   getStudentForFollowupAccess,
 } from "@/lib/server/route-workspace";
+import { getMessageLengthMetrics } from "@/lib/message-length";
 
 type PreviewMessageRequest = {
   studentId?: unknown;
@@ -112,6 +113,7 @@ export async function POST(request: Request) {
     templateId: templateResult.data?.id ?? null,
     title: templateTitle,
     body,
+    metrics: getMessageLengthMetrics(body),
     reason: parsedRequest.reason,
     student: {
       id: accessResult.student.id,
