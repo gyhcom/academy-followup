@@ -151,7 +151,7 @@ export type BulkScheduleFormState = {
   className: string;
   teacherId: string;
   scheduleType: string;
-  dayOfWeek: number;
+  dayOfWeeks: number[];
   startTime: string;
   endTime: string;
   subject: string;

@@ -15,6 +15,7 @@ type BulkScheduleRequest = {
   teacherId?: unknown;
   scheduleType?: unknown;
   dayOfWeek?: unknown;
+  dayOfWeeks?: unknown;
   startTime?: unknown;
   endTime?: unknown;
   subject?: unknown;
@@ -26,7 +27,7 @@ type BulkSchedulePayload = {
   classId: string;
   teacherId: string | null;
   scheduleType: ScheduleType;
-  dayOfWeek: number;
+  dayOfWeeks: number[];
   startTime: string;
   endTime: string;
   subject: string | null;
@@ -52,6 +53,7 @@ type StudentRecord = {
 
 type ExistingScheduleRecord = {
   student_id: string;
+  day_of_week: number;
 };
 
 export async function POST(request: Request) {
@@ -121,11 +123,11 @@ export async function POST(request: Request) {
   const studentIds = students.map((student) => student.id);
   const { data: existingSchedules, error: existingError } = await workspace.admin
     .from("student_schedules")
-    .select("student_id")
+    .select("student_id, day_of_week")
     .eq("academy_id", workspace.profile.academy_id)
     .eq("class_id", classItem.id)
     .eq("schedule_type", parsedRequest.data.scheduleType)
-    .eq("day_of_week", parsedRequest.data.dayOfWeek)
+    .in("day_of_week", parsedRequest.data.dayOfWeeks)
     .eq("start_time", parsedRequest.data.startTime)
     .eq("end_time", parsedRequest.data.endTime)
     .eq("is_active", true)
@@ -137,29 +139,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: existingError.message }, { status: 500 });
   }
 
-  const duplicateStudentIds = new Set(
-    (existingSchedules ?? []).map((schedule) => schedule.student_id),
+  const duplicateScheduleKeys = new Set(
+    (existingSchedules ?? []).map((schedule) => scheduleKey(schedule.student_id, schedule.day_of_week)),
   );
-  const insertTargets = students.filter((student) => !duplicateStudentIds.has(student.id));
+  const insertTargets = students.flatMap((student) =>
+    parsedRequest.data.dayOfWeeks
+      .filter((dayOfWeek) => !duplicateScheduleKeys.has(scheduleKey(student.id, dayOfWeek)))
+      .map((dayOfWeek) => ({ studentId: student.id, dayOfWeek })),
+  );
+  const totalTargets = students.length * parsedRequest.data.dayOfWeeks.length;
+  const skippedCount = totalTargets - insertTargets.length;
 
   if (insertTargets.length === 0) {
     return NextResponse.json({
       totalStudents: students.length,
+      totalTargets,
       insertedCount: 0,
-      skippedCount: students.length,
-      message: "모든 학생에게 같은 시간의 활성 스케줄이 이미 등록되어 있습니다.",
+      skippedCount,
+      message: "선택한 요일 모두에 같은 시간의 활성 스케줄이 이미 등록되어 있습니다.",
     });
   }
 
   const { error: insertError } = await workspace.admin.from("student_schedules").insert(
-    insertTargets.map((student) => ({
+    insertTargets.map((target) => ({
       academy_id: workspace.profile.academy_id,
-      student_id: student.id,
+      student_id: target.studentId,
       class_id: classItem.id,
       teacher_id: parsedRequest.data.teacherId || classItem.teacher_id,
       schedule_type: parsedRequest.data.scheduleType,
       schedule_date: null,
-      day_of_week: parsedRequest.data.dayOfWeek,
+      day_of_week: target.dayOfWeek,
       start_time: parsedRequest.data.startTime,
       end_time: parsedRequest.data.endTime,
       subject: parsedRequest.data.subject || classItem.subject,
@@ -176,9 +185,11 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     totalStudents: students.length,
+    totalTargets,
+    dayCount: parsedRequest.data.dayOfWeeks.length,
     insertedCount: insertTargets.length,
-    skippedCount: duplicateStudentIds.size,
-    message: `${insertTargets.length}명에게 스케줄을 등록했습니다.`,
+    skippedCount,
+    message: `${students.length}명 기준 ${parsedRequest.data.dayOfWeeks.length}개 요일 중 ${insertTargets.length}건을 등록했습니다. 중복 ${skippedCount}건은 건너뛰었습니다.`,
   });
 }
 
@@ -247,10 +258,10 @@ async function parseBulkScheduleRequest(
     return { ok: false, error: "지원하지 않는 스케줄 유형입니다." };
   }
 
-  const dayOfWeek = parseDayOfWeek(body.dayOfWeek);
+  const dayOfWeeks = parseDayOfWeeks(body.dayOfWeeks ?? body.dayOfWeek);
 
-  if (dayOfWeek === null) {
-    return { ok: false, error: "요일은 0부터 6 사이로 입력해 주세요." };
+  if (dayOfWeeks.length === 0) {
+    return { ok: false, error: "요일을 하나 이상 선택해 주세요." };
   }
 
   const startTime = parseTime(body.startTime);
@@ -291,7 +302,7 @@ async function parseBulkScheduleRequest(
       classId,
       teacherId: optionalText(body.teacherId),
       scheduleType: body.scheduleType,
-      dayOfWeek,
+      dayOfWeeks,
       startTime,
       endTime,
       subject,
@@ -353,6 +364,19 @@ function parseDayOfWeek(value: unknown) {
   }
 
   return numberValue;
+}
+
+function parseDayOfWeeks(value: unknown) {
+  const values = Array.isArray(value) ? value : [value];
+  const dayOfWeeks = values
+    .map((item) => parseDayOfWeek(item))
+    .filter((item): item is number => item !== null);
+
+  return [...new Set(dayOfWeeks)].sort((a, b) => a - b);
+}
+
+function scheduleKey(studentId: string, dayOfWeek: number) {
+  return `${studentId}:${dayOfWeek}`;
 }
 
 function parseTime(value: unknown) {

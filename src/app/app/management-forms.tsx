@@ -12,6 +12,11 @@ import type {
 import { roleLabel, weekDayOptions } from "@/app/app/management-utils";
 
 const gradeOptions = ["무학년", "초등", "중1", "중2", "중3", "고1", "고2", "고3", "기타"];
+const dayGroupOptions = [
+  { label: "월수금", values: [1, 3, 5] },
+  { label: "화목", values: [2, 4] },
+  { label: "월수", values: [1, 3] },
+];
 
 export function MemberForm({
   form,
@@ -373,12 +378,18 @@ export function StudentForm({
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
           학년
-          <input
+          <select
             value={form.gradeLabel}
             onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
-            placeholder="예: 중2"
             className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
-          />
+          >
+            <option value="">학년 선택</option>
+            {gradeOptions.map((grade) => (
+              <option key={grade} value={grade}>
+                {grade}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
@@ -709,9 +720,26 @@ export function BulkScheduleForm({
 }) {
   const canSave =
     form.title.trim().length > 0 &&
+    form.dayOfWeeks.length > 0 &&
     form.startTime.trim().length > 0 &&
     form.endTime.trim().length > 0 &&
     status.status !== "saving";
+  const sortedDayOfWeeks = [...form.dayOfWeeks].sort((a, b) => a - b);
+  const selectedDayLabels = weekDayOptions
+    .filter((day) => form.dayOfWeeks.includes(day.value))
+    .map((day) => day.label)
+    .join(", ");
+  const setDayOfWeeks = (dayOfWeeks: number[]) => {
+    onChange({ ...form, dayOfWeeks: [...new Set(dayOfWeeks)].sort((a, b) => a - b) });
+  };
+  const toggleDayOfWeek = (dayOfWeek: number) => {
+    if (form.dayOfWeeks.includes(dayOfWeek)) {
+      setDayOfWeeks(form.dayOfWeeks.filter((value) => value !== dayOfWeek));
+      return;
+    }
+
+    setDayOfWeeks([...form.dayOfWeeks, dayOfWeek]);
+  };
 
   return (
     <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50/70 p-3 min-w-0 overflow-hidden">
@@ -748,20 +776,59 @@ export function BulkScheduleForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
-          요일
-          <select
-            value={form.dayOfWeek}
-            onChange={(event) => onChange({ ...form, dayOfWeek: Number(event.target.value) })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
-          >
-            {weekDayOptions.map((day) => (
-              <option key={day.value} value={day.value}>
-                {day.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="grid min-w-0 gap-2 text-sm font-medium text-stone-800 sm:col-span-2 xl:col-span-3">
+          <div className="flex min-w-0 items-center justify-between gap-2">
+            <span>요일</span>
+            <span className="truncate text-xs font-normal text-stone-500">
+              {selectedDayLabels || "요일을 선택해 주세요"}
+            </span>
+          </div>
+          <div className="flex min-w-0 flex-wrap gap-2">
+            {dayGroupOptions.map((group) => {
+              const isSelected =
+                group.values.length === sortedDayOfWeeks.length &&
+                group.values.every((value, index) => value === sortedDayOfWeeks[index]);
+
+              return (
+                <button
+                  key={group.label}
+                  type="button"
+                  onClick={() => setDayOfWeeks(group.values)}
+                  className={[
+                    "min-h-9 rounded-full border px-3 text-xs font-semibold transition",
+                    isSelected
+                      ? "border-violet-700 bg-violet-700 text-white"
+                      : "border-violet-200 bg-white text-violet-800",
+                  ].join(" ")}
+                >
+                  {group.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
+            {weekDayOptions.map((day) => {
+              const isSelected = form.dayOfWeeks.includes(day.value);
+
+              return (
+                <button
+                  key={day.value}
+                  type="button"
+                  onClick={() => toggleDayOfWeek(day.value)}
+                  className={[
+                    "min-h-10 rounded-md border text-sm font-semibold transition",
+                    isSelected
+                      ? "border-violet-700 bg-violet-700 text-white"
+                      : "border-stone-300 bg-white text-stone-700",
+                  ].join(" ")}
+                  aria-pressed={isSelected}
+                >
+                  {day.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
           시작
