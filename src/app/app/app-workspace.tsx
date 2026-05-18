@@ -146,9 +146,17 @@ export function AppWorkspace({
     };
   }, [selectedDate]);
 
+  function handleViewChange(view: WorkspaceView) {
+    setActiveView(view);
+
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+  }
+
   function handleHomeStudentSelect(selection: OperationsSelection) {
     setOperationsSelection(selection);
-    setActiveView("operations");
+    handleViewChange("operations");
   }
 
   return (
@@ -156,7 +164,7 @@ export function AppWorkspace({
       <WorkspaceNavigation
         activeView={visibleView}
         canManage={canManage}
-        onChange={setActiveView}
+        onChange={handleViewChange}
       />
 
       {visibleView === "home" ? (
@@ -172,7 +180,7 @@ export function AppWorkspace({
           records={workspaceAttendanceRecords}
           loadState={attendanceLoadState}
           onDateChange={setSelectedDate}
-          onNavigate={setActiveView}
+          onNavigate={handleViewChange}
           onStudentSelect={handleHomeStudentSelect}
         />
       ) : visibleView === "operations" ? (
