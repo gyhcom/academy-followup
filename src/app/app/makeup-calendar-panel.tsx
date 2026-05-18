@@ -63,6 +63,7 @@ export function MakeupCalendarPanel({
           endTime,
         })
       : [];
+  const hasConflicts = conflicts.length > 0;
   const candidate = planner.createCandidate({
     date: selectedDate,
     startTime,
@@ -224,11 +225,11 @@ export function MakeupCalendarPanel({
 
         <button
           type="button"
-          disabled={!selectedStudent || !isTimeRangeValid}
+          disabled={!selectedStudent || !isTimeRangeValid || hasConflicts}
           onClick={() => onCandidateSelect(candidate)}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition",
-            selectedStudent && isTimeRangeValid
+            selectedStudent && isTimeRangeValid && !hasConflicts
               ? isSelected
                 ? "bg-[#244B67] text-white"
                 : "bg-[#315C7C] text-white hover:bg-[#244B67]"
@@ -236,7 +237,11 @@ export function MakeupCalendarPanel({
           ].join(" ")}
         >
           <Clock3 size={16} />
-          {isSelected ? "보강 후보 선택됨" : "이 날짜/시간으로 보강 문자"}
+          {hasConflicts
+            ? "기존 일정과 겹쳐 선택 불가"
+            : isSelected
+              ? "보강 후보 선택됨"
+              : "이 날짜/시간으로 보강 문자"}
         </button>
 
         {!isTimeRangeValid ? (
@@ -292,7 +297,7 @@ function ScheduleConflictWarning({ conflicts }: { conflicts: ScheduleConflict[] 
             </p>
           ) : null}
           <p className="mt-2 text-[11px] leading-4 text-amber-900">
-            필요하면 그대로 보강 후보를 선택할 수 있습니다.
+            이 시간은 보강 후보로 선택할 수 없습니다. 겹치지 않는 시간을 입력해 주세요.
           </p>
         </div>
       </div>

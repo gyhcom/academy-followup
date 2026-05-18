@@ -154,13 +154,10 @@ export function WeeklySchedulePanel({
 
 function ScheduleRow({
   schedule,
-  onMakeupCandidateSelect,
 }: {
   schedule: OperationsStudentSchedule;
   onMakeupCandidateSelect: (schedule: OperationsStudentSchedule) => void;
 }) {
-  const canUseAsMakeupCandidate = schedule.scheduleType !== "external";
-
   return (
     <div className="rounded-md border border-stone-200 bg-white p-3">
       <div className="flex items-start justify-between gap-2">
@@ -196,19 +193,9 @@ function ScheduleRow({
         </p>
       ) : null}
 
-      {canUseAsMakeupCandidate ? (
-        <button
-          type="button"
-          onClick={() => onMakeupCandidateSelect(schedule)}
-          className="mt-3 min-h-9 w-full rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-3 text-xs font-semibold text-[#315C7C] transition hover:border-[#315C7C] hover:bg-[#EAF1F8]"
-        >
-          이 시간으로 보강 안내
-        </button>
-      ) : (
-        <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
-          외부 일정 시간은 보강 후보에서 제외합니다.
-        </p>
-      )}
+      <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+        이미 등록된 일정입니다. 이 시간은 보강 후보에서 제외합니다.
+      </p>
     </div>
   );
 }
