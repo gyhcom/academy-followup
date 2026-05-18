@@ -11,6 +11,8 @@ import type {
 } from "@/app/app/management-types";
 import { roleLabel, weekDayOptions } from "@/app/app/management-utils";
 
+const gradeOptions = ["무학년", "초등", "중1", "중2", "중3", "고1", "고2", "고3", "기타"];
+
 export function MemberForm({
   form,
   status,
@@ -26,7 +28,7 @@ export function MemberForm({
 }) {
   const canSave =
     form.name.trim().length > 0 &&
-    form.email.trim().length > 0 &&
+    (form.mode === "create" || form.email.trim().length > 0) &&
     (form.mode === "edit" || form.password.trim().length >= 8) &&
     status.status !== "saving";
 
@@ -38,8 +40,7 @@ export function MemberForm({
             {form.mode === "create" ? "새 구성원 등록" : "구성원 정보 수정"}
           </p>
           <p className="mt-1 text-xs leading-5 text-stone-600">
-            MVP에서는 임시 비밀번호를 원장이 직접 전달하는 수동 계정 생성 방식으로
-            시작합니다.
+            신규 등록은 이름, 연락처, 직위, 임시 비밀번호만 입력합니다. 시스템 로그인 ID는 자동 생성됩니다.
           </p>
         </div>
         <button
@@ -63,16 +64,17 @@ export function MemberForm({
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
-          이메일
-          <input
-            type="email"
-            value={form.email}
-            onChange={(event) => onChange({ ...form, email: event.target.value })}
-            placeholder="teacher@example.com"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
-          />
-        </label>
+        {form.mode === "edit" ? (
+          <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+            시스템 로그인 ID
+            <input
+              type="email"
+              value={form.email}
+              readOnly
+              className="min-h-11 w-full min-w-0 rounded-md border border-stone-200 bg-stone-50 px-3 text-sm text-stone-500 outline-none"
+            />
+          </label>
+        ) : null}
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
           전화번호
@@ -85,7 +87,7 @@ export function MemberForm({
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
-          역할
+          직위
           <select
             value={form.role}
             onChange={(event) => onChange({ ...form, role: event.target.value })}
@@ -232,12 +234,18 @@ export function ClassForm({
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
           학년
-          <input
+          <select
             value={form.gradeLabel}
             onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
-            placeholder="예: 중2"
             className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
-          />
+          >
+            <option value="">학년 선택</option>
+            {gradeOptions.map((grade) => (
+              <option key={grade} value={grade}>
+                {grade}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
 

@@ -283,10 +283,12 @@ async function parseMemberRequest(
     return { ok: false, error: "이름은 40자 이하로 입력해 주세요." };
   }
 
-  const email = optionalText(body.email)?.toLowerCase();
+  const email =
+    optionalText(body.email)?.toLowerCase() ??
+    (mode === "create" ? createInternalMemberEmail() : undefined);
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { ok: false, error: "올바른 이메일을 입력해 주세요." };
+    return { ok: false, error: "구성원 로그인 ID를 생성하지 못했습니다." };
   }
 
   const phone = optionalPhone(body.phone);
@@ -320,6 +322,10 @@ async function parseMemberRequest(
       password: password ?? undefined,
     },
   };
+}
+
+function createInternalMemberEmail() {
+  return `member-${crypto.randomUUID()}@academy-followup.internal.test`;
 }
 
 function optionalText(value: unknown) {

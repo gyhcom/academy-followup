@@ -188,6 +188,7 @@ export function AppWorkspace({
           academyName={academyName}
           teacherName={teacherName}
           roleLabel={roleLabel}
+          canManage={canManage}
           classes={classes}
           initialSelection={operationsSelection}
         />

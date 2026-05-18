@@ -730,7 +730,7 @@ export function ManagementHome({
         status: "saved",
         message:
           memberForm.mode === "create"
-            ? "구성원 계정을 생성했습니다. 이메일과 임시 비밀번호로 로그인할 수 있습니다."
+            ? "구성원 계정을 생성했습니다. 자동 생성된 로그인 ID와 임시 비밀번호로 로그인할 수 있습니다."
             : "구성원 정보를 수정했습니다.",
       });
       setMemberForm(null);
@@ -1237,7 +1237,7 @@ export function ManagementHome({
             <div className="hidden grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
               <span>이름</span>
               <span>이메일</span>
-              <span>역할</span>
+              <span>직위</span>
               <span>전화번호</span>
               <span>담당 반</span>
               <span className="text-right">작업</span>

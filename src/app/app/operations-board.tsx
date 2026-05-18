@@ -55,6 +55,7 @@ type OperationsBoardProps = {
   academyName: string;
   teacherName: string;
   roleLabel: string;
+  canManage: boolean;
   classes: OperationsClass[];
   initialSelection?: {
     classId: string;
@@ -111,6 +112,27 @@ type SendMessageResponse = {
   error?: string;
 };
 
+type BulkMessageState = {
+  status: "idle" | "sending" | "sent" | "error";
+  message: string;
+  error: string;
+  dryRun: boolean;
+  targetStudentCount: number;
+  candidateRecipientCount: number;
+  recipientCount: number;
+  duplicateExcludedCount: number;
+};
+
+type BulkMessageResponse = {
+  dryRun?: boolean;
+  message?: string;
+  targetStudentCount?: number;
+  candidateRecipientCount?: number;
+  recipientCount?: number;
+  duplicateExcludedCount?: number;
+  error?: string;
+};
+
 type ScheduleCreateResponse = {
   schedule?: {
     id: string;
@@ -137,9 +159,11 @@ export function OperationsBoard({
   academyName,
   teacherName,
   roleLabel,
+  canManage,
   classes,
   initialSelection,
 }: OperationsBoardProps) {
+  const [messageMode, setMessageMode] = useState<"individual" | "bulk">("individual");
   const contactClasses = useMemo(
     () => classes.filter((classItem) => classItem.students.length > 0),
     [classes],
@@ -221,6 +245,25 @@ export function OperationsBoard({
     status: "idle",
     items: [],
     error: "",
+  });
+  const [bulkTargetType, setBulkTargetType] = useState<"all" | "class" | "grade">("all");
+  const [bulkClassId, setBulkClassId] = useState(visibleClasses[0]?.id ?? "");
+  const [bulkGradeLabel, setBulkGradeLabel] = useState("");
+  const [bulkRecipientType, setBulkRecipientType] =
+    useState<MessageRecipientType>("parent");
+  const [bulkExcludeDuplicates, setBulkExcludeDuplicates] = useState(true);
+  const [bulkMessageBody, setBulkMessageBody] = useState(
+    `[${academyName}] 안녕하세요. 학원 공지 안내드립니다.\n확인 부탁드립니다.`,
+  );
+  const [bulkMessageState, setBulkMessageState] = useState<BulkMessageState>({
+    status: "idle",
+    message: "",
+    error: "",
+    dryRun: true,
+    targetStudentCount: 0,
+    candidateRecipientCount: 0,
+    recipientCount: 0,
+    duplicateExcludedCount: 0,
   });
 
   const messageBody =
@@ -304,6 +347,23 @@ export function OperationsBoard({
   const duplicateDraftWarning = duplicateDraft
     ? "같은 학생에게 같은 내용의 저장된 초안이 있습니다. 기존 초안을 발송하거나 문구를 수정해 새 기록으로 저장해 주세요."
     : "";
+  const bulkGradeOptions = useMemo(() => {
+    const grades = new Set<string>();
+
+    visibleClasses.forEach((classItem) => {
+      if (classItem.gradeLabel) {
+        grades.add(classItem.gradeLabel);
+      }
+
+      classItem.students.forEach((student) => {
+        if (student.gradeLabel) {
+          grades.add(student.gradeLabel);
+        }
+      });
+    });
+
+    return Array.from(grades).sort((left, right) => left.localeCompare(right, "ko"));
+  }, [visibleClasses]);
 
   useEffect(() => {
     if (!selectedStudentIdForPreview) {
@@ -475,6 +535,72 @@ export function OperationsBoard({
     setMakeupCandidateTime("");
     setSelectedMakeupCandidate(null);
     setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
+  }
+
+  async function handleSendBulkMessage() {
+    const normalizedBody = bulkMessageBody.trim();
+
+    if (!canManage || !normalizedBody || bulkMessageState.status === "sending") {
+      return;
+    }
+
+    setBulkMessageState({
+      status: "sending",
+      message: "",
+      error: "",
+      dryRun: true,
+      targetStudentCount: 0,
+      candidateRecipientCount: 0,
+      recipientCount: 0,
+      duplicateExcludedCount: 0,
+    });
+
+    try {
+      const response = await fetch("/api/bulk-messages/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          targetType: bulkTargetType,
+          classId: bulkTargetType === "class" ? bulkClassId : undefined,
+          gradeLabel: bulkTargetType === "grade" ? bulkGradeLabel : undefined,
+          recipientType: bulkRecipientType,
+          messageBody: normalizedBody,
+          excludeDuplicateRecipients: bulkExcludeDuplicates,
+        }),
+      });
+      const payload = (await response.json()) as BulkMessageResponse;
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "전체문자를 처리하지 못했습니다.");
+      }
+
+      setBulkMessageState({
+        status: "sent",
+        message:
+          payload.message ??
+          (payload.dryRun ? "dry-run 전체문자를 기록했습니다." : "전체문자를 발송했습니다."),
+        error: "",
+        dryRun: payload.dryRun ?? true,
+        targetStudentCount: payload.targetStudentCount ?? 0,
+        candidateRecipientCount: payload.candidateRecipientCount ?? 0,
+        recipientCount: payload.recipientCount ?? 0,
+        duplicateExcludedCount: payload.duplicateExcludedCount ?? 0,
+      });
+    } catch (error) {
+      setBulkMessageState({
+        status: "error",
+        message: "",
+        error:
+          error instanceof Error ? error.message : "전체문자를 처리하지 못했습니다.",
+        dryRun: true,
+        targetStudentCount: 0,
+        candidateRecipientCount: 0,
+        recipientCount: 0,
+        duplicateExcludedCount: 0,
+      });
+    }
   }
 
   function handleStudentSelect(studentId: string) {
@@ -782,6 +908,31 @@ export function OperationsBoard({
           : "pb-[max(1rem,env(safe-area-inset-bottom))]",
       ].join(" ")}
     >
+      {canManage ? (
+        <MessageModeTabs activeMode={messageMode} onChange={setMessageMode} />
+      ) : null}
+
+      {canManage && messageMode === "bulk" ? (
+        <BulkMessagePanel
+          classes={visibleClasses}
+          gradeOptions={bulkGradeOptions}
+          targetType={bulkTargetType}
+          classId={bulkClassId}
+          gradeLabel={bulkGradeLabel}
+          recipientType={bulkRecipientType}
+          excludeDuplicates={bulkExcludeDuplicates}
+          messageBody={bulkMessageBody}
+          state={bulkMessageState}
+          onTargetTypeChange={setBulkTargetType}
+          onClassIdChange={setBulkClassId}
+          onGradeLabelChange={setBulkGradeLabel}
+          onRecipientTypeChange={setBulkRecipientType}
+          onExcludeDuplicatesChange={setBulkExcludeDuplicates}
+          onMessageBodyChange={setBulkMessageBody}
+          onSend={handleSendBulkMessage}
+        />
+      ) : (
+        <>
       <OperationsDesktopView
         academyName={academyName}
         teacherName={teacherName}
@@ -846,7 +997,267 @@ export function OperationsBoard({
         onOpenMobileComposer={() => setIsMobileComposerOpen(true)}
         onCloseMobileComposer={() => setIsMobileComposerOpen(false)}
       />
+        </>
+      )}
     </div>
+  );
+}
+
+function MessageModeTabs({
+  activeMode,
+  onChange,
+}: {
+  activeMode: "individual" | "bulk";
+  onChange: (mode: "individual" | "bulk") => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2 rounded-lg border border-[#DED8CE] bg-white p-1 shadow-sm">
+      {[
+        { id: "individual" as const, label: "개별 연락", detail: "학생별 문자" },
+        { id: "bulk" as const, label: "전체문자", detail: "중복 번호 제외" },
+      ].map((item) => {
+        const isActive = activeMode === item.id;
+
+        return (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={isActive}
+            onClick={() => onChange(item.id)}
+            className={[
+              "min-h-12 rounded-md px-3 text-left transition",
+              isActive
+                ? "bg-[#111827] text-white"
+                : "bg-white text-stone-700 hover:bg-[#F7F5F0]",
+            ].join(" ")}
+          >
+            <span className="block text-sm font-semibold">{item.label}</span>
+            <span className={["mt-0.5 block text-xs", isActive ? "text-white/70" : "text-stone-500"].join(" ")}>
+              {item.detail}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function BulkMessagePanel({
+  classes,
+  gradeOptions,
+  targetType,
+  classId,
+  gradeLabel,
+  recipientType,
+  excludeDuplicates,
+  messageBody,
+  state,
+  onTargetTypeChange,
+  onClassIdChange,
+  onGradeLabelChange,
+  onRecipientTypeChange,
+  onExcludeDuplicatesChange,
+  onMessageBodyChange,
+  onSend,
+}: {
+  classes: OperationsClass[];
+  gradeOptions: string[];
+  targetType: "all" | "class" | "grade";
+  classId: string;
+  gradeLabel: string;
+  recipientType: MessageRecipientType;
+  excludeDuplicates: boolean;
+  messageBody: string;
+  state: BulkMessageState;
+  onTargetTypeChange: (targetType: "all" | "class" | "grade") => void;
+  onClassIdChange: (classId: string) => void;
+  onGradeLabelChange: (gradeLabel: string) => void;
+  onRecipientTypeChange: (recipientType: MessageRecipientType) => void;
+  onExcludeDuplicatesChange: (enabled: boolean) => void;
+  onMessageBodyChange: (body: string) => void;
+  onSend: () => void;
+}) {
+  const metrics = getMessageLengthMetrics(messageBody);
+  const canSend =
+    messageBody.trim().length > 0 &&
+    !metrics.isOverLimit &&
+    state.status !== "sending" &&
+    (targetType !== "class" || Boolean(classId)) &&
+    (targetType !== "grade" || Boolean(gradeLabel));
+
+  return (
+    <section className="rounded-lg border border-stone-200 bg-white shadow-sm">
+      <div className="border-b border-stone-200 px-4 py-4">
+        <p className="text-sm font-semibold text-[#315C7C]">전체문자</p>
+        <h2 className="mt-1 text-xl font-semibold text-stone-950">
+          여러 반에 같은 안내를 한 번에 보냅니다
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-stone-600">
+          같은 학생이 여러 반에 있거나 같은 보호자 번호가 반복되면 중복 제외 기준으로 1건만 발송 후보에 남깁니다.
+        </p>
+      </div>
+
+      <div className="grid gap-4 p-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div className="space-y-4">
+          <fieldset>
+            <legend className="text-sm font-semibold text-stone-800">대상 범위</legend>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {[
+                { id: "all" as const, label: "전체 학생" },
+                { id: "class" as const, label: "반 선택" },
+                { id: "grade" as const, label: "학년 선택" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-pressed={targetType === item.id}
+                  onClick={() => onTargetTypeChange(item.id)}
+                  className={[
+                    "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                    targetType === item.id
+                      ? "border-[#315C7C] bg-[#315C7C] text-white"
+                      : "border-stone-200 bg-white text-stone-700 hover:bg-[#F7F5F0]",
+                  ].join(" ")}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          {targetType === "class" ? (
+            <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+              반
+              <select
+                value={classId}
+                onChange={(event) => onClassIdChange(event.target.value)}
+                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              >
+                {classes.map((classItem) => (
+                  <option key={classItem.id} value={classItem.id}>
+                    {classItem.name} · {classItem.students.length}명
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
+          {targetType === "grade" ? (
+            <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+              학년
+              <select
+                value={gradeLabel}
+                onChange={(event) => onGradeLabelChange(event.target.value)}
+                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              >
+                <option value="">학년 선택</option>
+                {gradeOptions.map((grade) => (
+                  <option key={grade} value={grade}>
+                    {grade}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
+          <fieldset>
+            <legend className="text-sm font-semibold text-stone-800">수신자</legend>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {messageRecipientTypes.map((nextType) => (
+                <button
+                  key={nextType}
+                  type="button"
+                  aria-pressed={recipientType === nextType}
+                  onClick={() => onRecipientTypeChange(nextType)}
+                  className={[
+                    "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                    recipientType === nextType
+                      ? "border-[#315C7C] bg-[#315C7C] text-white"
+                      : "border-stone-200 bg-white text-stone-700 hover:bg-[#F7F5F0]",
+                  ].join(" ")}
+                >
+                  {messageRecipientLabels[nextType]}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <label className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
+            <input
+              type="checkbox"
+              checked={excludeDuplicates}
+              onChange={(event) => onExcludeDuplicatesChange(event.target.checked)}
+              className="mt-1 size-4 accent-[#315C7C]"
+            />
+            <span>
+              <span className="block font-semibold">중복 수신자 제외</span>
+              <span className="mt-1 block leading-6">
+                같은 전화번호가 여러 반/학생에 있으면 발송 후보에서 한 번만 남깁니다.
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div className="space-y-3">
+          <label className="grid gap-1.5 text-sm font-semibold text-stone-800">
+            문자 본문
+            <textarea
+              value={messageBody}
+              onChange={(event) => onMessageBodyChange(event.target.value)}
+              rows={9}
+              className="min-h-52 rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            />
+          </label>
+          <p
+            className={[
+              "text-xs",
+              metrics.isOverLimit
+                ? "text-red-700"
+                : metrics.transportType === "lms"
+                  ? "text-amber-700"
+                  : "text-stone-500",
+            ].join(" ")}
+          >
+            {metrics.charCount}자 · {metrics.byteCount}byte ·{" "}
+            {metrics.isOverLimit
+              ? "2000byte 초과"
+              : metrics.transportType === "lms"
+                ? "LMS 예상"
+                : "SMS 예상"}
+          </p>
+
+          {state.status === "sent" ? (
+            <div className="rounded-md border border-[#C9D6E2] bg-[#EAF1F8] p-3 text-sm leading-6 text-[#244B67]">
+              <p className="font-semibold">{state.message}</p>
+              <p className="mt-1">
+                대상 {state.targetStudentCount}명 · 후보 {state.candidateRecipientCount}건 · 실제 {state.recipientCount}건 · 중복 제외 {state.duplicateExcludedCount}건
+              </p>
+            </div>
+          ) : null}
+
+          {state.status === "error" ? (
+            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm leading-6 text-red-900">
+              {state.error}
+            </div>
+          ) : null}
+
+          <button
+            type="button"
+            disabled={!canSend}
+            onClick={onSend}
+            className={[
+              "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+              canSend
+                ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                : "bg-stone-300 text-stone-600",
+            ].join(" ")}
+          >
+            <Send size={17} />
+            {state.status === "sending" ? "전체문자 처리 중" : "전체문자 dry-run 발송"}
+          </button>
+        </div>
+      </div>
+    </section>
   );
 }
 

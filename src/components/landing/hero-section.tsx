@@ -69,14 +69,14 @@ function DesktopHeroContent() {
   return (
     <div className="mx-auto hidden max-w-7xl gap-10 px-8 pb-24 pt-20 lg:grid lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
       <div className="flex min-w-0 flex-col justify-center">
-        <p className="text-base font-semibold text-white/86">학원 운영을 위한 커뮤니케이션 OS</p>
+        <p className="text-base font-semibold text-white/86">모바일 학원 운영 · 출석 · 연락 SaaS</p>
         <h1 className="mt-5 max-w-3xl text-7xl font-semibold leading-[1.08] tracking-normal">
-          <span className="block">학생 관리부터</span>
-          <span className="block">학부모 연락까지</span>
+          <span className="block">출석 체크부터</span>
+          <span className="block">전체문자까지</span>
           <span className="block">한 곳에서</span>
         </h1>
         <p className="mt-6 max-w-2xl break-keep text-lg font-medium leading-8 text-white/82">
-          결석 문자로 시작해 학생·반·선생님 기록까지 연결하는 운영 SaaS입니다.
+          선생님은 휴대폰으로 도착·지각을 빠르게 체크하고, 원장은 결석 연락과 전체 공지를 기록으로 확인합니다.
         </p>
 
         <div className="mt-8 flex gap-3">
@@ -176,7 +176,7 @@ function ResponsiveDeviceShowcase() {
           <div>
             <p className="break-keep text-sm font-semibold">앱 설치 없이 웹으로 접속합니다.</p>
             <p className="mt-1 text-xs leading-5 text-[#68709b]">
-              PC에서는 원장 보드, 태블릿에서는 출결, 휴대폰에서는 수업 후 연락을 빠르게 처리합니다.
+              휴대폰에서는 출석 체크와 문자 작성, PC에서는 학생·반·스케줄 세팅을 보조로 처리합니다.
             </p>
           </div>
         </div>
