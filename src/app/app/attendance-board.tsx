@@ -176,7 +176,7 @@ const editableStatuses: AttendanceStatus[] = [
   "needs_check",
   "makeup",
 ];
-const exceptionStatuses: AttendanceStatus[] = ["late", "absent", "needs_check", "makeup"];
+const exceptionStatuses: AttendanceStatus[] = ["absent", "needs_check", "makeup"];
 const attendanceFilterLabels: Record<AttendanceFilter, string> = {
   all: "전체",
   unchecked: "미체크만",
@@ -1221,6 +1221,7 @@ function AttendanceStudentRow({
   onStatusChange: (status: AttendanceStatus) => void;
 }) {
   const isPresent = status === "present";
+  const isLate = status === "late";
   const isPending = status === "pending";
   const isExceptionStatus = !isPresent && !isPending;
 
@@ -1260,11 +1261,28 @@ function AttendanceStudentRow({
         </div>
 
         <div className="grid justify-items-end gap-1">
-          <AttendanceArrivalToggle
-            isPresent={isPresent}
-            isSaving={isSaving}
-            onToggle={() => onStatusChange(isPresent ? "pending" : "present")}
-          />
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              disabled={isSaving}
+              aria-pressed={isLate}
+              onClick={() => onStatusChange(isLate ? "pending" : "late")}
+              className={[
+                "inline-flex min-h-8 items-center rounded-full border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+                isLate
+                  ? "border-amber-300 bg-amber-50 text-amber-900"
+                  : "border-stone-200 bg-white text-stone-600 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900",
+                isSaving ? "cursor-wait opacity-60" : "",
+              ].join(" ")}
+            >
+              지각
+            </button>
+            <AttendanceArrivalToggle
+              isPresent={isPresent}
+              isSaving={isSaving}
+              onToggle={() => onStatusChange(isPresent ? "pending" : "present")}
+            />
+          </div>
           <button
             type="button"
             disabled={isSaving}

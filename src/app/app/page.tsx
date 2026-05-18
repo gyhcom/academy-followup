@@ -19,7 +19,7 @@ import {
   getDefaultFollowupTitle,
   type FollowupReason,
 } from "@/lib/followup-templates";
-import { canViewAllClasses, roleLabel } from "@/lib/permissions";
+import { canManageAcademy, canViewAllClasses, roleLabel } from "@/lib/permissions";
 import {
   createSupabaseServerClient,
   hasSupabaseServerEnv,
@@ -280,6 +280,7 @@ export default async function AppPage() {
   const schedules = (schedulesResult.data ?? []) as StudentScheduleRecord[];
   const attendanceRecords = (attendanceResult.data ?? []) as AttendanceRecord[];
   const templates = (templatesResult.data ?? []) as MessageTemplateRecord[];
+  const canManage = canManageAcademy(profile.role);
   const operationsClasses = buildOperationsClasses({
     classes,
     students,
@@ -287,9 +288,15 @@ export default async function AppPage() {
     profileId: user.id,
     role: profile.role,
   });
-  const managementClasses = buildManagementClasses({ classes, students, members });
-  const managementStudents = buildManagementStudents({ classes, students, schedules });
-  const managementMembers = buildManagementMembers({ classes, members });
+  const managementClasses = canManage
+    ? buildManagementClasses({ classes, students, members })
+    : [];
+  const managementStudents = canManage
+    ? buildManagementStudents({ classes, students, schedules })
+    : [];
+  const managementMembers = canManage
+    ? buildManagementMembers({ classes, members })
+    : [];
   const managementSettings = buildManagementSettings({
     academyName: profile.academies.name,
     senderName: profile.academies.sender_name,
@@ -416,6 +423,7 @@ function buildOperationsClasses({
   profileId: string;
   role: string;
 }): OperationsClass[] {
+  const canViewPhoneNumbers = canManageAcademy(role);
   const scopedClasses = canViewAllClasses(role)
     ? classes
     : classes.filter((classItem) => classItem.teacher_id === profileId);
@@ -436,8 +444,18 @@ function buildOperationsClasses({
         schoolName: student.school_name,
         gradeLabel: student.grade_label,
         parentName: student.parent_name,
-        maskedParentPhone: maskPhone(student.parent_phone),
-        maskedStudentPhone: student.student_phone ? maskPhone(student.student_phone) : null,
+        maskedParentPhone: displayPhoneStatus({
+          phone: student.parent_phone,
+          label: "학부모",
+          canViewPhoneNumbers,
+        }),
+        maskedStudentPhone: student.student_phone
+          ? displayPhoneStatus({
+              phone: student.student_phone,
+              label: "학생",
+              canViewPhoneNumbers,
+            })
+          : null,
         schedules: schedules
           .filter((schedule) => schedule.student_id === student.id)
           .map((schedule) => ({
@@ -602,6 +620,22 @@ function maskPhone(phone: string) {
   }
 
   return `${digits.slice(0, 3)}-****-${digits.slice(-4)}`;
+}
+
+function displayPhoneStatus({
+  phone,
+  label,
+  canViewPhoneNumbers,
+}: {
+  phone: string;
+  label: "학부모" | "학생";
+  canViewPhoneNumbers: boolean;
+}) {
+  if (canViewPhoneNumbers) {
+    return maskPhone(phone);
+  }
+
+  return phone ? `${label} 연락처 등록됨` : `${label} 연락처 미등록`;
 }
 
 function getTodayDateInTimeZone(timeZone: string) {
