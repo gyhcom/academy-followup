@@ -18,6 +18,7 @@ Academy Follow-up은 단순 문자 발송 도구가 아니라, 학생별 주간 
 
 - GitHub `main`에 지금까지 만든 기능 브랜치를 모두 반영했습니다.
 - 로컬/원격 브랜치는 `main`만 남도록 정리했습니다.
+- 기능별 완료/예정/보류 상태는 `docs/planning/feature-status.md`에서 한눈에 확인합니다.
 - 2026-05-12 기준 `npm run lint`, `npx tsc --noEmit`, `npm run build`를 통과했습니다.
 - Vercel은 `main` push 기준으로 배포됩니다.
 - 실제 Supabase DB 필수 컬럼은 파일럿 테스트 과정에서 적용 확인을 마쳤습니다.
