@@ -11,7 +11,7 @@ import type {
 } from "@/app/app/management-types";
 import { roleLabel, weekDayOptions } from "@/app/app/management-utils";
 
-const gradeOptions = ["무학년", "초등", "중1", "중2", "중3", "고1", "고2", "고3", "기타"];
+const gradeOptions = ["무학년제", "초등", "중1", "중2", "중3", "고1", "고2", "고3", "기타"];
 const dayGroupOptions = [
   { label: "월수금", values: [1, 3, 5] },
   { label: "화목", values: [2, 4] },

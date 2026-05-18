@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { ClipboardCheck, Home, MessageSquareText, Settings } from "lucide-react";
 import {
@@ -80,6 +80,16 @@ export function AppWorkspace({
   const [selectedDate, setSelectedDate] = useState(attendanceDate);
   const [workspaceAttendanceRecords, setWorkspaceAttendanceRecords] =
     useState(attendanceRecords);
+  const attendanceSessionCount = useMemo(() => {
+    const sessionKeys = new Set(
+      workspaceAttendanceRecords.map(
+        (record) =>
+          `${record.classId}:${record.scheduledStartTime}:${record.scheduledEndTime}`,
+      ),
+    );
+
+    return sessionKeys.size;
+  }, [workspaceAttendanceRecords]);
   const [attendanceLoadState, setAttendanceLoadState] = useState<{
     status: "idle" | "loading" | "error";
     error: string;
@@ -210,6 +220,8 @@ export function AppWorkspace({
           students={managementStudents}
           settings={managementSettings}
           templates={managementTemplates}
+          attendanceSessionCount={attendanceSessionCount}
+          onNavigate={handleViewChange}
         />
       )}
     </div>

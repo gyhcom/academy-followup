@@ -61,6 +61,8 @@ export function ManagementHome({
   students,
   settings,
   templates,
+  attendanceSessionCount,
+  onNavigate,
 }: {
   academyName: string;
   classes: ManagementClass[];
@@ -68,6 +70,8 @@ export function ManagementHome({
   students: ManagementStudent[];
   settings: ManagementSettings;
   templates: ManagementMessageTemplate[];
+  attendanceSessionCount: number;
+  onNavigate: (view: "home" | "operations" | "attendance" | "management") => void;
 }) {
   const router = useRouter();
   const [classForm, setClassForm] = useState<ClassFormState | null>(null);
@@ -171,7 +175,7 @@ export function ManagementHome({
       classId: classItem.id,
       name: classItem.name,
       subject: classItem.subject ?? "",
-      gradeLabel: classItem.gradeLabel ?? "",
+      gradeLabel: normalizeGradeLabel(classItem.gradeLabel),
       teacherId: classItem.teacherId ?? "",
     });
     setClassFormStatus({ status: "idle", message: "" });
@@ -341,7 +345,7 @@ export function ManagementHome({
       classId: student.classId ?? "",
       name: student.name,
       schoolName: student.schoolName ?? "",
-      gradeLabel: student.gradeLabel ?? "",
+      gradeLabel: normalizeGradeLabel(student.gradeLabel),
       parentName: student.parentName ?? "",
       parentPhone: student.parentPhone,
       studentPhone: student.studentPhone ?? "",
@@ -653,6 +657,14 @@ export function ManagementHome({
     setStudentSortMode("class");
   }
 
+  function openSetupClassScheduleForm() {
+    setActiveSection("classes");
+
+    if (classes[0]) {
+      openBulkScheduleForm(classes[0]);
+    }
+  }
+
   function openCreateMemberForm() {
     setClassForm(null);
     setClassFormStatus({ status: "idle", message: "" });
@@ -832,7 +844,7 @@ export function ManagementHome({
     detail: string;
     count: string;
   }> = [
-    { id: "setup", label: "초기 세팅", detail: "구성원·반·학생·스케줄 순서", count: "순서" },
+    { id: "setup", label: "원장 시작", detail: "선생님·반·학생·수업·출석", count: "순서" },
     { id: "students", label: "학생", detail: "명단·스케줄·연락처", count: `${activeStudents.length}` },
     { id: "classes", label: "반", detail: "반·담당·일괄 스케줄", count: `${classes.length}` },
     { id: "members", label: "구성원", detail: "권한·계정·담당 반", count: `${members.length}` },
@@ -909,17 +921,18 @@ export function ManagementHome({
 
       {activeSection === "setup" ? (
         <ManagementPanel
-          title="운영 초기 세팅"
-          description="원장이 실제 운영을 시작하기 전 필요한 계정, 반, 학생, 수업 시간을 순서대로 점검합니다."
-          actionLabel="스케줄 미등록 보기"
-          actionIcon={<CalendarDays size={14} />}
-          onAction={openMissingScheduleStudents}
+          title="원장 시작 순서"
+          description="처음 운영을 시작할 때 필요한 선생님, 반, 학생, 수업 시간, 출석 확인을 순서대로 점검합니다."
+          actionLabel="출석 확인"
+          actionIcon={<ClipboardList size={14} />}
+          onAction={() => onNavigate("attendance")}
         >
           <SetupWorkflow
             memberCount={members.length}
             classCount={classes.length}
             activeStudentCount={activeStudents.length}
             unassignedStudentCount={activeStudents.filter((student) => !student.classId).length}
+            attendanceSessionCount={attendanceSessionCount}
             missingScheduleCount={
               activeStudents.filter(
                 (student) => student.schedules.filter((schedule) => schedule.isActive).length === 0,
@@ -928,8 +941,8 @@ export function ManagementHome({
             onCreateMember={openSetupMemberForm}
             onCreateClass={openSetupClassForm}
             onCreateStudent={openSetupStudentForm}
-            onOpenClassSchedules={() => setActiveSection("classes")}
-            onOpenMissingSchedules={openMissingScheduleStudents}
+            onOpenClassSchedules={openSetupClassScheduleForm}
+            onOpenAttendance={() => onNavigate("attendance")}
           />
         </ManagementPanel>
       ) : null}
@@ -1166,11 +1179,11 @@ export function ManagementHome({
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-stone-950">{classItem.name}</p>
                   <p className="mt-1 text-xs text-stone-500 md:hidden">
-                    {[classItem.subject, classItem.gradeLabel, classItem.teacherName ?? "담당 미지정"].filter(Boolean).join(" · ")}
+                    {[classItem.subject, displayGradeLabel(classItem.gradeLabel), classItem.teacherName ?? "담당 미지정"].filter(Boolean).join(" · ")}
                   </p>
                 </div>
                 <p className="hidden text-sm text-stone-700 md:block">{classItem.subject ?? "-"}</p>
-                <p className="hidden text-sm text-stone-700 md:block">{classItem.gradeLabel ?? "-"}</p>
+                <p className="hidden text-sm text-stone-700 md:block">{displayGradeLabel(classItem.gradeLabel) ?? "-"}</p>
                 <p className="hidden truncate text-sm text-stone-700 md:block">{classItem.teacherName ?? "미지정"}</p>
                 <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
                   <span className="w-fit shrink-0 rounded-md bg-[#F7F5F0] px-2.5 py-1 text-xs font-semibold text-stone-700">
@@ -1601,51 +1614,67 @@ function Metric({ label, value }: { label: string; value: string }) {
   );
 }
 
+function normalizeGradeLabel(gradeLabel: string | null) {
+  if (!gradeLabel) {
+    return "";
+  }
+
+  return gradeLabel === "무학년" ? "무학년제" : gradeLabel;
+}
+
+function displayGradeLabel(gradeLabel: string | null) {
+  const normalized = normalizeGradeLabel(gradeLabel);
+
+  return normalized || null;
+}
+
 function SetupWorkflow({
   memberCount,
   classCount,
   activeStudentCount,
   unassignedStudentCount,
   missingScheduleCount,
+  attendanceSessionCount,
   onCreateMember,
   onCreateClass,
   onCreateStudent,
   onOpenClassSchedules,
-  onOpenMissingSchedules,
+  onOpenAttendance,
 }: {
   memberCount: number;
   classCount: number;
   activeStudentCount: number;
   unassignedStudentCount: number;
   missingScheduleCount: number;
+  attendanceSessionCount: number;
   onCreateMember: () => void;
   onCreateClass: () => void;
   onCreateStudent: () => void;
   onOpenClassSchedules: () => void;
-  onOpenMissingSchedules: () => void;
+  onOpenAttendance: () => void;
 }) {
   const setupSteps = [
     {
       step: "1",
-      title: "선생님 계정 등록",
-      description: "정규 선생님과 보조 선생님을 먼저 만들고 권한을 정합니다.",
+      title: "선생님 등록",
+      description: "정규 선생님과 보조 선생님을 먼저 등록하고 직위를 정합니다.",
       metric: `${memberCount}명`,
       isDone: memberCount > 0,
-      actionLabel: "구성원 등록",
+      actionLabel: "선생님 등록",
       onAction: onCreateMember,
     },
     {
       step: "2",
-      title: "반 생성과 주 담당 배정",
-      description: "반 이름, 과목, 학년을 만들고 주 담당 선생님을 연결합니다.",
+      title: "반 만들기",
+      description: "반 이름, 과목, 학년, 주 담당 선생님을 연결합니다.",
       metric: `${classCount}개`,
       isDone: classCount > 0,
-      actionLabel: "반 등록",
+      actionLabel: "반 만들기",
       onAction: onCreateClass,
     },
     {
       step: "3",
-      title: "학생 등록과 반 배정",
+      title: "학생 등록",
       description: "학생과 학부모 연락처를 입력하고 소속 반을 지정합니다.",
       metric: unassignedStudentCount > 0 ? `${unassignedStudentCount}명 미배정` : `${activeStudentCount}명`,
       isDone: activeStudentCount > 0 && unassignedStudentCount === 0,
@@ -1654,21 +1683,21 @@ function SetupWorkflow({
     },
     {
       step: "4",
-      title: "반 공통 수업 스케줄",
-      description: "같은 반 학생에게 반복 수업 시간을 한 번에 등록합니다.",
+      title: "수업 시간 등록",
+      description: "월수금, 화목 같은 요일 묶음으로 반 전체 수업 시간을 등록합니다.",
       metric: missingScheduleCount > 0 ? "필요" : "완료",
       isDone: activeStudentCount > 0 && missingScheduleCount === 0,
-      actionLabel: "반 스케줄",
+      actionLabel: "수업 시간 등록",
       onAction: onOpenClassSchedules,
     },
     {
       step: "5",
-      title: "학생별 예외 일정",
-      description: "논술, 타 학원, 상담, 1회 보강처럼 개인별 일정을 추가합니다.",
-      metric: `${missingScheduleCount}명 미등록`,
-      isDone: activeStudentCount > 0 && missingScheduleCount === 0,
-      actionLabel: "미등록 보기",
-      onAction: onOpenMissingSchedules,
+      title: "출석 확인",
+      description: "오늘 수업별 출석부에서 도착, 지각, 결석을 확인합니다.",
+      metric: attendanceSessionCount > 0 ? `${attendanceSessionCount}개 수업` : "수업 확인",
+      isDone: attendanceSessionCount > 0,
+      actionLabel: "출석 확인",
+      onAction: onOpenAttendance,
     },
   ];
   const completedCount = setupSteps.filter((step) => step.isDone).length;
@@ -1680,14 +1709,14 @@ function SetupWorkflow({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
-              Setup Progress
+              Director Setup
             </p>
             <h3 className="mt-1 text-lg font-semibold text-stone-950">
               {completedCount} / {setupSteps.length} 단계 완료
             </h3>
             <p className="mt-1 text-sm leading-6 text-stone-600">
-              다음 작업은 <span className="font-semibold text-stone-900">{nextStep.title}</span>
-              입니다. 아래 버튼을 누르면 해당 관리 화면으로 바로 이동합니다.
+              원장님이 처음 운영을 시작할 때는 <span className="font-semibold text-stone-900">선생님 등록 → 반 만들기 → 학생 등록 → 수업 시간 등록 → 출석 확인</span>
+              순서로 진행하면 됩니다. 다음 작업은 <span className="font-semibold text-stone-900">{nextStep.title}</span>입니다.
             </p>
           </div>
           <button
