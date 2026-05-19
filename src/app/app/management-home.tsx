@@ -1715,7 +1715,7 @@ function SetupWorkflow({
               {completedCount} / {setupSteps.length} 단계 완료
             </h3>
             <p className="mt-1 text-sm leading-6 text-stone-600">
-              원장님이 처음 운영을 시작할 때는 <span className="font-semibold text-stone-900">선생님 등록 → 반 만들기 → 학생 등록 → 수업 시간 등록 → 출석 확인</span>
+              원장님이 처음 운영을 시작할 때는 <span className="font-semibold text-stone-900">선생님 등록 → 반 만들기 → 학생 등록 → 수업 시간 등록 → 출석 확인</span>{" "}
               순서로 진행하면 됩니다. 다음 작업은 <span className="font-semibold text-stone-900">{nextStep.title}</span>입니다.
             </p>
           </div>

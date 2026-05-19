@@ -81,15 +81,28 @@ export function AppWorkspace({
   const [workspaceAttendanceRecords, setWorkspaceAttendanceRecords] =
     useState(attendanceRecords);
   const attendanceSessionCount = useMemo(() => {
-    const sessionKeys = new Set(
-      workspaceAttendanceRecords.map(
-        (record) =>
-          `${record.classId}:${record.scheduledStartTime}:${record.scheduledEndTime}`,
-      ),
-    );
+    const selectedDayOfWeek = getDayOfWeek(selectedDate);
+    const sessionKeys = new Set<string>();
+
+    classes.forEach((classItem) => {
+      classItem.students.forEach((student) => {
+        student.schedules
+          .filter((schedule) => schedule.isActive)
+          .filter(
+            (schedule) =>
+              schedule.classId === classItem.id &&
+              schedule.dayOfWeek === selectedDayOfWeek &&
+              (schedule.scheduleType === "regular_class" ||
+                schedule.scheduleType === "makeup"),
+          )
+          .forEach((schedule) => {
+            sessionKeys.add(`${classItem.id}:${schedule.startTime}:${schedule.endTime}`);
+          });
+      });
+    });
 
     return sessionKeys.size;
-  }, [workspaceAttendanceRecords]);
+  }, [classes, selectedDate]);
   const [attendanceLoadState, setAttendanceLoadState] = useState<{
     status: "idle" | "loading" | "error";
     error: string;
@@ -226,6 +239,17 @@ export function AppWorkspace({
       )}
     </div>
   );
+}
+
+function getDayOfWeek(dateValue: string) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (Number.isNaN(date.getTime())) {
+    return 1;
+  }
+
+  return date.getDay();
 }
 
 function WorkspaceNavigation({
