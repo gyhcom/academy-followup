@@ -24,6 +24,13 @@ type ShareTokenRecord = {
   expires_at: string;
 };
 
+type SharedStudentIdentity = {
+  id: string;
+  name: string;
+  school_name: string | null;
+  grade_label: string | null;
+};
+
 type ShareLinkRecord = {
   id: string;
   source_academy_id: string;
@@ -55,6 +62,8 @@ type SharedScheduleRecord = {
 };
 
 const tokenLifetimeDays = 14;
+const studentIdentityMismatchMessage =
+  "공유 코드의 학생 정보와 현재 선택한 학생 정보가 다릅니다. 이름, 학교, 학년을 확인해 주세요.";
 
 export async function GET(request: Request) {
   const workspaceResult = await getRouteWorkspace();
@@ -223,6 +232,21 @@ async function connectWithShareCode({
     return NextResponse.json(
       { error: "같은 학원 또는 같은 학생에는 공유 코드를 연결할 수 없습니다." },
       { status: 400 },
+    );
+  }
+
+  const identityCheck = await verifySameStudentIdentity({
+    workspace,
+    sourceAcademyId: token.academy_id,
+    sourceStudentId: token.student_id,
+    targetAcademyId: workspace.profile.academy_id,
+    targetStudentId: studentId,
+  });
+
+  if (!identityCheck.ok) {
+    return NextResponse.json(
+      { error: identityCheck.error },
+      { status: identityCheck.status },
     );
   }
 
@@ -461,6 +485,84 @@ async function assertManageableStudent({
   }
 
   return { ok: true };
+}
+
+async function verifySameStudentIdentity({
+  workspace,
+  sourceAcademyId,
+  sourceStudentId,
+  targetAcademyId,
+  targetStudentId,
+}: {
+  workspace: RouteWorkspaceContext;
+  sourceAcademyId: string;
+  sourceStudentId: string;
+  targetAcademyId: string;
+  targetStudentId: string;
+}): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
+  const [sourceResult, targetResult] = await Promise.all([
+    workspace.admin
+      .from("students")
+      .select("id, name, school_name, grade_label")
+      .eq("id", sourceStudentId)
+      .eq("academy_id", sourceAcademyId)
+      .maybeSingle<SharedStudentIdentity>(),
+    workspace.admin
+      .from("students")
+      .select("id, name, school_name, grade_label")
+      .eq("id", targetStudentId)
+      .eq("academy_id", targetAcademyId)
+      .maybeSingle<SharedStudentIdentity>(),
+  ]);
+
+  if (sourceResult.error || targetResult.error) {
+    return {
+      ok: false,
+      status: 500,
+      error: sourceResult.error?.message ?? targetResult.error?.message ?? "",
+    };
+  }
+
+  if (!sourceResult.data || !targetResult.data) {
+    return {
+      ok: false,
+      status: 404,
+      error: "학생 정보를 찾을 수 없습니다.",
+    };
+  }
+
+  if (!isSameStudentIdentity(sourceResult.data, targetResult.data)) {
+    return {
+      ok: false,
+      status: 400,
+      error: studentIdentityMismatchMessage,
+    };
+  }
+
+  return { ok: true };
+}
+
+function isSameStudentIdentity(source: SharedStudentIdentity, target: SharedStudentIdentity) {
+  const sourceName = normalizeStudentIdentityValue(source.name);
+  const sourceSchool = normalizeStudentIdentityValue(source.school_name);
+  const sourceGrade = normalizeStudentIdentityValue(source.grade_label);
+  const targetName = normalizeStudentIdentityValue(target.name);
+  const targetSchool = normalizeStudentIdentityValue(target.school_name);
+  const targetGrade = normalizeStudentIdentityValue(target.grade_label);
+
+  if (!sourceName || !sourceSchool || !sourceGrade || !targetName || !targetSchool || !targetGrade) {
+    return false;
+  }
+
+  return (
+    sourceName === targetName &&
+    sourceSchool === targetSchool &&
+    sourceGrade === targetGrade
+  );
+}
+
+function normalizeStudentIdentityValue(value: string | null) {
+  return (value ?? "").replace(/\s+/g, "").trim().toLowerCase();
 }
 
 async function parseShareRequest(

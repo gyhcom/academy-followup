@@ -895,6 +895,9 @@ function SharedSchedulePanel({
               코드로 연결
             </button>
           </div>
+          <p className="text-[11px] leading-4 text-stone-500">
+            이름·학교·학년이 같은 학생에게만 연결됩니다.
+          </p>
           {state.actionMessage ? (
             <p
               className={[
