@@ -216,6 +216,32 @@ where name in (
 );
 ```
 
+## Shared Schedule Demo Seed 확인
+
+`supabase/seed-shared-schedule-demo.sql`은 학원 간 학생 스케줄 공유를 실제로 눌러보기 위한 타 학원 더미 데이터입니다.
+
+실행 전 Supabase Dashboard > Authentication > Users에서 아래 사용자를 먼저 만듭니다.
+
+- 이메일: `other-owner@test.com`
+- 비밀번호: `1234`
+
+그 다음 SQL Editor에서 `supabase/seed-shared-schedule-demo.sql` 전체를 실행합니다. 이 seed는 `auth.users.email = 'other-owner@test.com'`인 사용자를 찾아 `다솜수학학원` 원장 profile로 연결합니다. 사용자가 없으면 명확한 에러를 내고 중단합니다.
+
+실행 후 결과 row가 아래처럼 나와야 합니다.
+
+```sql
+academy_count | owner_profile_count | class_count | student_count | schedule_count
+1             | 1                   | 1           | 1             | 2
+```
+
+테스트 흐름:
+
+1. `owner@test.com / 1234`로 로그인해 더배움 학생 상세에서 공유 코드를 만듭니다.
+2. 로그아웃 후 `other-owner@test.com / 1234`로 로그인합니다.
+3. `관리 > 학생 > 김민준` 상세에서 공유 코드를 입력합니다.
+4. 연결 후 양쪽 학원 학생 상세에서 상대 학원 스케줄이 보이는지 확인합니다.
+5. 문자 탭 보강 달력에서 화/목 `19:30-20:30`과 겹치는 시간이 선택 차단되는지 확인합니다.
+
 ## 운영 주의
 
 - 실제 DB에 destructive SQL을 자동 실행하지 않습니다.
