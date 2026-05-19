@@ -28,6 +28,8 @@ export type DateScheduleSummary = {
 export type ScheduleConflict = {
   id: string;
   title: string;
+  sharedAcademyName?: string;
+  isShared?: boolean;
   scheduleType: string;
   startTime: string;
   endTime: string;
@@ -173,6 +175,8 @@ export class MakeupSchedulePlanner {
       .map((schedule) => ({
         id: schedule.id,
         title: schedule.title,
+        sharedAcademyName: schedule.sharedAcademyName,
+        isShared: schedule.isShared,
         scheduleType: schedule.scheduleType,
         startTime: schedule.startTime,
         endTime: schedule.endTime,

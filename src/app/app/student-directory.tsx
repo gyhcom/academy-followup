@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ChevronRight, Pencil, Search, SlidersHorizontal, X } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronRight,
+  Link2,
+  Pencil,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import {
   type FollowupHistoryItem,
   type FollowupHistoryState,
@@ -26,6 +34,46 @@ import {
 
 type FollowupHistoryResponse = {
   followups?: FollowupHistoryItem[];
+  error?: string;
+};
+
+type SharedSchedule = {
+  id: string;
+  academyName: string;
+  scheduleType: string;
+  scheduleDate: string | null;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  subject: string | null;
+  title: string;
+};
+
+type SharedScheduleLink = {
+  id: string;
+  academyName: string;
+  connectedAt: string;
+  schedules: SharedSchedule[];
+};
+
+type SharedScheduleState = {
+  studentId: string;
+  status: "idle" | "loading" | "ready" | "error";
+  canManage: boolean;
+  links: SharedScheduleLink[];
+  error: string;
+  generatedCode: string;
+  expiresAt: string;
+  actionStatus: "idle" | "saving" | "error";
+  actionMessage: string;
+};
+
+type SharedScheduleResponse = {
+  canManage?: boolean;
+  links?: SharedScheduleLink[];
+  code?: string;
+  expiresAt?: string;
+  message?: string;
   error?: string;
 };
 
@@ -572,6 +620,7 @@ function StudentDetailPanel({
   onEditSchedule: (student: ManagementStudent, schedule: ManagementStudentSchedule) => void;
 }) {
   const history = useStudentHistory(student?.id ?? null);
+  const sharedSchedules = useSharedSchedules(student?.id ?? null);
 
   if (!student) {
     return (
@@ -678,7 +727,193 @@ function StudentDetailPanel({
       <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
         <StudentFollowupHistory selectedStudentName={student.name} history={history} />
       </div>
+
+      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
+        <SharedSchedulePanel
+          student={student}
+          state={sharedSchedules}
+          onCreateCode={sharedSchedules.createCode}
+          onConnect={sharedSchedules.connect}
+          onRevoke={sharedSchedules.revoke}
+        />
+      </div>
     </aside>
+  );
+}
+
+function SharedSchedulePanel({
+  student,
+  state,
+  onCreateCode,
+  onConnect,
+  onRevoke,
+}: {
+  student: ManagementStudent;
+  state: SharedScheduleState & {
+    createCode: () => Promise<void>;
+    connect: (code: string) => Promise<void>;
+    revoke: (linkId: string) => Promise<void>;
+  };
+  onCreateCode: () => Promise<void>;
+  onConnect: (code: string) => Promise<void>;
+  onRevoke: (linkId: string) => Promise<void>;
+}) {
+  const [codeInput, setCodeInput] = useState("");
+  const isSaving = state.actionStatus === "saving";
+
+  async function handleConnect() {
+    await onConnect(codeInput);
+    setCodeInput("");
+  }
+
+  return (
+    <section aria-labelledby="shared-schedule-title">
+      <div className="flex items-center gap-2">
+        <Link2 className="text-[#315C7C]" size={16} />
+        <div className="min-w-0">
+          <p id="shared-schedule-title" className="text-sm font-semibold text-stone-950">
+            타 학원 스케줄 공유
+          </p>
+          <p className="mt-0.5 text-xs leading-5 text-stone-500">
+            보호자 동의가 확인된 학생끼리 학원명과 바쁜 시간을 공유합니다.
+          </p>
+        </div>
+      </div>
+
+      {state.status === "loading" ? (
+        <p className="mt-3 rounded-md bg-stone-50 px-3 py-2 text-xs font-medium text-stone-500">
+          공유 스케줄을 불러오는 중입니다.
+        </p>
+      ) : null}
+
+      {state.status === "error" ? (
+        <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-xs font-semibold text-red-800">
+          {state.error}
+        </p>
+      ) : null}
+
+      {state.links.length === 0 && state.status !== "loading" ? (
+        <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-3 text-xs leading-5 text-stone-600">
+          연결된 학원이 없습니다. 상대 학원도 이 서비스를 쓰는 경우, 보호자 동의 확인 후 공유 코드로 연결하세요.
+        </div>
+      ) : (
+        <div className="mt-3 space-y-2">
+          {state.links.map((link) => (
+            <div key={link.id} className="rounded-md border border-stone-200 bg-stone-50 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-stone-950">
+                    {link.academyName}
+                  </p>
+                  <p className="mt-0.5 text-[11px] font-medium text-stone-500">
+                    연결일 {formatDate(link.connectedAt)}
+                  </p>
+                </div>
+                {state.canManage ? (
+                  <button
+                    type="button"
+                    disabled={isSaving}
+                    onClick={() => onRevoke(link.id)}
+                    className="shrink-0 rounded-md border border-stone-200 bg-white px-2 py-1 text-[11px] font-semibold text-stone-600 disabled:opacity-50"
+                  >
+                    해제
+                  </button>
+                ) : null}
+              </div>
+              {link.schedules.length > 0 ? (
+                <div className="mt-2 space-y-1.5">
+                  {link.schedules.slice(0, 4).map((schedule) => (
+                    <div
+                      key={`${link.id}:${schedule.id}`}
+                      className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 rounded bg-white px-2 py-1.5"
+                    >
+                      <span className="text-xs font-semibold tabular-nums text-stone-900">
+                        {schedule.startTime}
+                      </span>
+                      <span className="min-w-0 truncate text-xs font-medium text-stone-600">
+                        {schedule.scheduleDate
+                          ? `${schedule.scheduleDate} · ${schedule.title}`
+                          : `${weekDayShortLabel(schedule.dayOfWeek)} · ${schedule.title}`}
+                      </span>
+                      <span className="rounded bg-[#EAF1F8] px-1.5 py-0.5 text-[11px] font-semibold text-[#315C7C]">
+                        {scheduleTypeLabel(schedule.scheduleType)}
+                      </span>
+                    </div>
+                  ))}
+                  {link.schedules.length > 4 ? (
+                    <p className="text-[11px] font-medium text-stone-500">
+                      외 {link.schedules.length - 4}개 일정
+                    </p>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="mt-2 rounded bg-white px-2 py-1.5 text-xs text-stone-500">
+                  연결된 학생의 활성 스케줄이 없습니다.
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {state.canManage ? (
+        <div className="mt-3 space-y-2 border-t border-stone-100 pt-3">
+          <button
+            type="button"
+            disabled={isSaving}
+            onClick={onCreateCode}
+            className="flex min-h-9 w-full items-center justify-center rounded-md bg-[#315C7C] px-3 text-xs font-semibold text-white disabled:opacity-50"
+          >
+            공유 코드 만들기
+          </button>
+          {state.generatedCode ? (
+            <div className="rounded-md border border-[#C9D6E2] bg-[#EAF1F8] p-3">
+              <p className="text-xs font-semibold text-[#315C7C]">
+                {student.name} 학생 공유 코드
+              </p>
+              <p className="mt-1 break-all font-mono text-lg font-bold tracking-wide text-stone-950">
+                {state.generatedCode}
+              </p>
+              <p className="mt-1 text-[11px] leading-4 text-stone-600">
+                {formatDate(state.expiresAt)}까지 유효합니다. 보호자 동의가 확인된 상대 학원에만 전달하세요.
+              </p>
+            </div>
+          ) : null}
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <input
+              value={codeInput}
+              onChange={(event) => setCodeInput(event.target.value)}
+              placeholder="상대 학원 공유 코드"
+              className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            />
+            <button
+              type="button"
+              disabled={isSaving || !codeInput.trim()}
+              onClick={handleConnect}
+              className="min-h-10 rounded-md border border-[#315C7C] px-3 text-xs font-semibold text-[#315C7C] disabled:border-stone-200 disabled:text-stone-400"
+            >
+              코드로 연결
+            </button>
+          </div>
+          {state.actionMessage ? (
+            <p
+              className={[
+                "rounded-md px-3 py-2 text-xs font-semibold",
+                state.actionStatus === "error"
+                  ? "bg-red-50 text-red-800"
+                  : "bg-emerald-50 text-emerald-800",
+              ].join(" ")}
+            >
+              {state.actionMessage}
+            </p>
+          ) : null}
+        </div>
+      ) : (
+        <p className="mt-3 rounded-md bg-stone-50 px-3 py-2 text-xs leading-5 text-stone-500">
+          공유 코드 발급과 연결 해제는 원장/관리자만 가능합니다.
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -747,6 +982,148 @@ function useStudentHistory(studentId: string | null): FollowupHistoryState {
   }, [studentId]);
 
   return history;
+}
+
+function useSharedSchedules(studentId: string | null) {
+  const [refreshToken, setRefreshToken] = useState(0);
+  const [state, setState] = useState<SharedScheduleState>({
+    studentId: studentId ?? "",
+    status: "idle",
+    canManage: false,
+    links: [],
+    error: "",
+    generatedCode: "",
+    expiresAt: "",
+    actionStatus: "idle",
+    actionMessage: "",
+  });
+
+  useEffect(() => {
+    if (!studentId) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const activeStudentId = studentId;
+
+    async function loadSharedSchedules() {
+      setState((current) => ({
+        ...current,
+        studentId: activeStudentId,
+        status: "loading",
+        links: current.studentId === activeStudentId ? current.links : [],
+        error: "",
+      }));
+
+      try {
+        const response = await fetch(
+          `/api/student-schedule-sharing?studentId=${activeStudentId}`,
+          { signal: controller.signal },
+        );
+        const payload = (await response.json()) as SharedScheduleResponse;
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "공유 스케줄을 불러오지 못했습니다.");
+        }
+
+        setState((current) => ({
+          ...current,
+          studentId: activeStudentId,
+          status: "ready",
+          canManage: payload.canManage ?? false,
+          links: payload.links ?? [],
+          error: "",
+        }));
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setState((current) => ({
+          ...current,
+          studentId: activeStudentId,
+          status: "error",
+          links: [],
+          error:
+            error instanceof Error
+              ? error.message
+              : "공유 스케줄을 불러오지 못했습니다.",
+        }));
+      }
+    }
+
+    void loadSharedSchedules();
+
+    return () => {
+      controller.abort();
+    };
+  }, [refreshToken, studentId]);
+
+  async function runAction(body: Record<string, string>) {
+    if (!studentId || state.actionStatus === "saving") {
+      return;
+    }
+
+    setState((current) => ({
+      ...current,
+      actionStatus: "saving",
+      actionMessage: "",
+    }));
+
+    try {
+      const response = await fetch("/api/student-schedule-sharing", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ studentId, ...body }),
+      });
+      const payload = (await response.json()) as SharedScheduleResponse;
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "스케줄 공유 요청을 처리하지 못했습니다.");
+      }
+
+      setState((current) => ({
+        ...current,
+        actionStatus: "idle",
+        actionMessage: payload.message ?? "스케줄 공유 요청을 처리했습니다.",
+        generatedCode: payload.code ?? current.generatedCode,
+        expiresAt: payload.expiresAt ?? current.expiresAt,
+      }));
+      setRefreshToken((value) => value + 1);
+    } catch (error) {
+      setState((current) => ({
+        ...current,
+        actionStatus: "error",
+        actionMessage:
+          error instanceof Error
+            ? error.message
+            : "스케줄 공유 요청을 처리하지 못했습니다.",
+      }));
+    }
+  }
+
+  return {
+    ...state,
+    createCode: async () => {
+      await runAction({ action: "create_token" });
+    },
+    connect: async (code: string) => {
+      await runAction({ action: "connect", code });
+    },
+    revoke: async (linkId: string) => {
+      await runAction({ action: "revoke", linkId });
+    },
+  };
+}
+
+function formatDate(value: string) {
+  if (!value) {
+    return "-";
+  }
+
+  return value.slice(0, 10).replaceAll("-", ".");
 }
 
 function formatShortDate(dateValue: string) {

@@ -11,6 +11,8 @@ import {
 export type OperationsStudentSchedule = {
   id: string;
   classId: string | null;
+  sharedAcademyName?: string;
+  isShared?: boolean;
   scheduleType: string;
   scheduleDate: string | null;
   dayOfWeek: number;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   CalendarDays,
@@ -24,12 +24,31 @@ import {
 type MakeupCalendarPanelProps = {
   selectedStudent:
     | {
+        id: string;
         name: string;
         schedules: OperationsStudentSchedule[];
       }
     | undefined;
   selectedCandidate: MakeupCandidate | null;
   onCandidateSelect: (candidate: MakeupCandidate) => void;
+};
+
+type SharedScheduleResponse = {
+  links?: Array<{
+    academyName: string;
+    schedules: Array<{
+      id: string;
+      academyName: string;
+      scheduleType: string;
+      scheduleDate: string | null;
+      dayOfWeek: number;
+      startTime: string;
+      endTime: string;
+      subject: string | null;
+      title: string;
+    }>;
+  }>;
+  error?: string;
 };
 
 const weekDayHeaders = [1, 2, 3, 4, 5, 6, 0];
@@ -46,9 +65,14 @@ export function MakeupCalendarPanel({
   );
   const [startTime, setStartTime] = useState("20:30");
   const [endTime, setEndTime] = useState("21:30");
+  const sharedSchedules = useSharedSchedules(selectedStudent?.id ?? null);
+  const scheduleSource = useMemo(
+    () => [...(selectedStudent?.schedules ?? []), ...sharedSchedules.schedules],
+    [selectedStudent?.schedules, sharedSchedules.schedules],
+  );
   const planner = useMemo(
-    () => new MakeupSchedulePlanner({ schedules: selectedStudent?.schedules ?? [], today }),
-    [selectedStudent?.schedules, today],
+    () => new MakeupSchedulePlanner({ schedules: scheduleSource, today }),
+    [scheduleSource, today],
   );
   const days = planner.getCalendarDays(displayMonth);
   const selectedSummary = selectedStudent
@@ -185,6 +209,8 @@ export function MakeupCalendarPanel({
           <SelectedDateSchedule
             date={selectedDate}
             schedules={selectedSummary.schedules}
+            isSharedLoading={sharedSchedules.status === "loading"}
+            sharedError={sharedSchedules.error}
           />
         ) : (
           <div className="rounded-md border border-dashed border-stone-300 bg-stone-50 p-3 text-sm leading-6 text-stone-600">
@@ -274,7 +300,9 @@ function ScheduleConflictWarning({ conflicts }: { conflicts: ScheduleConflict[] 
               >
                 <div className="min-w-0">
                   <p className="truncate text-xs font-semibold text-stone-900">
-                    {conflict.title}
+                    {conflict.isShared && conflict.sharedAcademyName
+                      ? `${conflict.sharedAcademyName} · ${conflict.title}`
+                      : conflict.title}
                   </p>
                   <p className="mt-0.5 text-[11px] font-medium tabular-nums text-stone-500">
                     {conflict.startTime}-{conflict.endTime}
@@ -298,6 +326,9 @@ function ScheduleConflictWarning({ conflicts }: { conflicts: ScheduleConflict[] 
           ) : null}
           <p className="mt-2 text-[11px] leading-4 text-amber-900">
             이 시간은 보강 후보로 선택할 수 없습니다. 겹치지 않는 시간을 입력해 주세요.
+            {conflicts.some((conflict) => conflict.isShared)
+              ? " 연결 학원 일정과 겹치는 시간도 제외됩니다."
+              : ""}
           </p>
         </div>
       </div>
@@ -308,9 +339,13 @@ function ScheduleConflictWarning({ conflicts }: { conflicts: ScheduleConflict[] 
 function SelectedDateSchedule({
   date,
   schedules,
+  isSharedLoading,
+  sharedError,
 }: {
   date: string;
   schedules: OperationsStudentSchedule[];
+  isSharedLoading: boolean;
+  sharedError: string;
 }) {
   return (
     <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
@@ -335,7 +370,9 @@ function SelectedDateSchedule({
                 {schedule.startTime}
               </span>
               <span className="min-w-0 truncate text-xs font-medium text-stone-600">
-                {schedule.title}
+                {schedule.isShared && schedule.sharedAcademyName
+                  ? `${schedule.sharedAcademyName} · ${schedule.title}`
+                  : schedule.title}
               </span>
               <span
                 className={[
@@ -353,6 +390,99 @@ function SelectedDateSchedule({
           이 날짜에 겹치는 등록 일정이 없습니다.
         </p>
       )}
+      {isSharedLoading ? (
+        <p className="mt-2 rounded-md bg-white px-3 py-2 text-[11px] font-medium text-stone-500">
+          연결 학원 일정을 불러오는 중입니다.
+        </p>
+      ) : null}
+      {sharedError ? (
+        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-[11px] font-semibold text-red-800">
+          {sharedError}
+        </p>
+      ) : null}
     </div>
   );
+}
+
+function useSharedSchedules(studentId: string | null) {
+  const [state, setState] = useState<{
+    status: "idle" | "loading" | "ready" | "error";
+    schedules: OperationsStudentSchedule[];
+    error: string;
+  }>({
+    status: "idle",
+    schedules: [],
+    error: "",
+  });
+
+  useEffect(() => {
+    if (!studentId) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function loadSharedSchedules() {
+      setState((current) => ({
+        status: "loading",
+        schedules: current.schedules,
+        error: "",
+      }));
+
+      try {
+        const response = await fetch(`/api/student-schedule-sharing?studentId=${studentId}`, {
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as SharedScheduleResponse;
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "연결 학원 일정을 불러오지 못했습니다.");
+        }
+
+        setState({
+          status: "ready",
+          schedules: (payload.links ?? []).flatMap((link) =>
+            link.schedules.map((schedule) => ({
+              id: `shared:${schedule.id}`,
+              classId: null,
+              sharedAcademyName: schedule.academyName,
+              isShared: true,
+              scheduleType: schedule.scheduleType,
+              scheduleDate: schedule.scheduleDate,
+              dayOfWeek: schedule.dayOfWeek,
+              startTime: schedule.startTime,
+              endTime: schedule.endTime,
+              subject: schedule.subject,
+              title: schedule.title,
+              memo: null,
+              isActive: true,
+              sourceFollowupId: null,
+            })),
+          ),
+          error: "",
+        });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setState({
+          status: "error",
+          schedules: [],
+          error:
+            error instanceof Error
+              ? error.message
+              : "연결 학원 일정을 불러오지 못했습니다.",
+        });
+      }
+    }
+
+    void loadSharedSchedules();
+
+    return () => {
+      controller.abort();
+    };
+  }, [studentId]);
+
+  return studentId ? state : { status: "idle" as const, schedules: [], error: "" };
 }
