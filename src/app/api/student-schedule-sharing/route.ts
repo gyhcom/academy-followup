@@ -64,6 +64,8 @@ type SharedScheduleRecord = {
 const tokenLifetimeDays = 14;
 const studentIdentityMismatchMessage =
   "공유 코드의 학생 정보와 현재 선택한 학생 정보가 다릅니다. 이름, 학교, 학년을 확인해 주세요.";
+const studentWorkspaceMismatchMessage =
+  "현재 로그인한 학원과 선택한 학생 정보가 맞지 않습니다. 다른 학원 계정으로 로그인했거나 화면이 오래된 상태일 수 있습니다. 새로고침 후 다시 확인해 주세요.";
 
 export async function GET(request: Request) {
   const workspaceResult = await getRouteWorkspace();
@@ -90,7 +92,10 @@ export async function GET(request: Request) {
   });
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return NextResponse.json(
+      { error: getStudentContextError(access.error) },
+      { status: access.status },
+    );
   }
 
   const sharedData = await getSharedSchedules({
@@ -481,10 +486,19 @@ async function assertManageableStudent({
   });
 
   if (!access.ok) {
-    return access;
+    return {
+      ...access,
+      error: getStudentContextError(access.error),
+    };
   }
 
   return { ok: true };
+}
+
+function getStudentContextError(error: string) {
+  return error === "선택한 학생을 찾을 수 없습니다."
+    ? studentWorkspaceMismatchMessage
+    : error;
 }
 
 async function verifySameStudentIdentity({

@@ -77,6 +77,9 @@ type SharedScheduleResponse = {
   error?: string;
 };
 
+const staleStudentContextMessage =
+  "현재 로그인한 학원과 선택한 학생 정보가 맞지 않습니다. 다른 학원 계정으로 로그인했거나 화면이 오래된 상태일 수 있습니다. 새로고침 후 다시 확인해 주세요.";
+
 export function StudentDirectory({
   students,
   classes,
@@ -816,10 +819,13 @@ function SharedSchedulePanel({
                     onClick={() => onRevoke(link.id)}
                     className="shrink-0 rounded-md border border-stone-200 bg-white px-2 py-1 text-[11px] font-semibold text-stone-600 disabled:opacity-50"
                   >
-                    해제
+                    공유 해제
                   </button>
                 ) : null}
               </div>
+              <p className="mt-1 text-[11px] leading-4 text-stone-500">
+                양쪽 학원 모두 이 학생의 바쁜 시간대를 볼 수 있습니다. 공유 해제 시 양쪽 모두 상대 스케줄을 볼 수 없습니다.
+              </p>
               {link.schedules.length > 0 ? (
                 <div className="mt-2 space-y-1.5">
                   {link.schedules.slice(0, 4).map((schedule) => (
@@ -858,6 +864,9 @@ function SharedSchedulePanel({
 
       {state.canManage ? (
         <div className="mt-3 space-y-2 border-t border-stone-100 pt-3">
+          <p className="rounded-md bg-[#F7F5F0] px-3 py-2 text-[11px] leading-4 text-stone-600">
+            이 학원에서 코드를 만들어 상대 학원에 전달하거나, 상대 학원에서 받은 코드를 아래에 입력할 수 있습니다.
+          </p>
           <button
             type="button"
             disabled={isSaving}
@@ -897,6 +906,9 @@ function SharedSchedulePanel({
           </div>
           <p className="text-[11px] leading-4 text-stone-500">
             이름·학교·학년이 같은 학생에게만 연결됩니다.
+          </p>
+          <p className="text-[11px] leading-4 text-stone-500">
+            연결 후 어느 한쪽에서 공유를 해제하면 양쪽 학원의 공유가 함께 종료됩니다.
           </p>
           {state.actionMessage ? (
             <p
@@ -969,10 +981,9 @@ function useStudentHistory(studentId: string | null): FollowupHistoryState {
           studentId: activeStudentId,
           status: "error",
           items: [],
-          error:
-            error instanceof Error
-              ? error.message
-              : "연락 기록을 불러오지 못했습니다.",
+          error: mapStudentContextError(
+            error instanceof Error ? error.message : "연락 기록을 불러오지 못했습니다.",
+          ),
         });
       }
     }
@@ -1047,10 +1058,9 @@ function useSharedSchedules(studentId: string | null) {
           studentId: activeStudentId,
           status: "error",
           links: [],
-          error:
-            error instanceof Error
-              ? error.message
-              : "공유 스케줄을 불러오지 못했습니다.",
+          error: mapStudentContextError(
+            error instanceof Error ? error.message : "공유 스케줄을 불러오지 못했습니다.",
+          ),
         }));
       }
     }
@@ -1099,10 +1109,9 @@ function useSharedSchedules(studentId: string | null) {
       setState((current) => ({
         ...current,
         actionStatus: "error",
-        actionMessage:
-          error instanceof Error
-            ? error.message
-            : "스케줄 공유 요청을 처리하지 못했습니다.",
+        actionMessage: mapStudentContextError(
+          error instanceof Error ? error.message : "스케줄 공유 요청을 처리하지 못했습니다.",
+        ),
       }));
     }
   }
@@ -1119,6 +1128,12 @@ function useSharedSchedules(studentId: string | null) {
       await runAction({ action: "revoke", linkId });
     },
   };
+}
+
+function mapStudentContextError(message: string) {
+  return message === "선택한 학생을 찾을 수 없습니다."
+    ? staleStudentContextMessage
+    : message;
 }
 
 function formatDate(value: string) {
