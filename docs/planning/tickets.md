@@ -1474,19 +1474,20 @@
 
 ### T-604 Production 릴리즈 체크리스트
 
-상태: 예정
+상태: 부분 완료
 
 목표:
 - 친구에게 보여주기 전 배포 상태를 빠르게 점검
 
 체크:
-- `npm run build` 통과
-- GitHub main push 완료
-- Vercel latest deployment READY
-- `/login` 200
-- `/api/health/supabase` connected
-- 테스트 계정 로그인 가능
-- 핵심 시나리오 dry-run 완료
+- `npm run build` 통과: 완료
+- `npm run lint`, `npx tsc --noEmit` 통과: 완료
+- `/login` 접속 및 `owner@test.com` 로그인 가능: 완료
+- `/api/health/supabase` connected: 완료
+- 모바일 390px 홈/출석/문자/전체문자/관리 smoke: 완료
+- 실제 CSV 일부 투입 후 핵심 시나리오 dry-run: 남음
+- Vercel latest deployment READY 확인: 남음
+- SOLAPI 실제 발송 전 설정 점검: 남음
 
 완료 기준:
 - 시연 직전 10분 안에 체크 가능한 릴리즈 절차 확보
