@@ -19,6 +19,7 @@ type StudentRequest = {
   parentName?: unknown;
   parentPhone?: unknown;
   studentPhone?: unknown;
+  scheduleShareConsentConfirmed?: unknown;
   status?: unknown;
 };
 
@@ -36,6 +37,7 @@ type StudentPayload = {
   parentName: string | null;
   parentPhone: string;
   studentPhone: string | null;
+  scheduleShareConsentConfirmed: boolean;
   status: StudentStatus;
 };
 
@@ -48,6 +50,7 @@ type StudentRecord = {
   parent_name: string | null;
   parent_phone: string;
   student_phone: string | null;
+  schedule_share_consent_confirmed: boolean;
   status: string;
 };
 
@@ -85,10 +88,17 @@ export async function POST(request: Request) {
       parent_name: parsedRequest.data.parentName,
       parent_phone: parsedRequest.data.parentPhone,
       student_phone: parsedRequest.data.studentPhone,
+      schedule_share_consent_confirmed: parsedRequest.data.scheduleShareConsentConfirmed,
+      schedule_share_consent_confirmed_at: parsedRequest.data.scheduleShareConsentConfirmed
+        ? new Date().toISOString()
+        : null,
+      schedule_share_consent_confirmed_by: parsedRequest.data.scheduleShareConsentConfirmed
+        ? workspace.userId
+        : null,
       status: parsedRequest.data.status,
     })
     .select(
-      "id, class_id, name, school_name, grade_label, parent_name, parent_phone, student_phone, status",
+      "id, class_id, name, school_name, grade_label, parent_name, parent_phone, student_phone, schedule_share_consent_confirmed, status",
     )
     .single<StudentRecord>();
 
@@ -132,12 +142,19 @@ export async function PATCH(request: Request) {
       parent_name: parsedRequest.data.parentName,
       parent_phone: parsedRequest.data.parentPhone,
       student_phone: parsedRequest.data.studentPhone,
+      schedule_share_consent_confirmed: parsedRequest.data.scheduleShareConsentConfirmed,
+      schedule_share_consent_confirmed_at: parsedRequest.data.scheduleShareConsentConfirmed
+        ? new Date().toISOString()
+        : null,
+      schedule_share_consent_confirmed_by: parsedRequest.data.scheduleShareConsentConfirmed
+        ? workspace.userId
+        : null,
       status: parsedRequest.data.status,
     })
     .eq("id", parsedRequest.data.studentId)
     .eq("academy_id", workspace.profile.academy_id)
     .select(
-      "id, class_id, name, school_name, grade_label, parent_name, parent_phone, student_phone, status",
+      "id, class_id, name, school_name, grade_label, parent_name, parent_phone, student_phone, schedule_share_consent_confirmed, status",
     )
     .maybeSingle<StudentRecord>();
 
@@ -157,6 +174,7 @@ async function getAuthorizedWorkspace(): Promise<
       ok: true;
       admin: ReturnType<typeof createSupabaseAdminClient>;
       profile: ProfileRecord;
+      userId: string;
     }
   | { ok: false; status: number; error: string }
 > {
@@ -196,7 +214,7 @@ async function getAuthorizedWorkspace(): Promise<
     return { ok: false, status: 403, error: "학생 관리는 원장 또는 관리자만 할 수 있습니다." };
   }
 
-  return { ok: true, admin, profile };
+  return { ok: true, admin, profile, userId: user.id };
 }
 
 async function parseStudentRequest(
@@ -254,6 +272,7 @@ async function parseStudentRequest(
       parentName: optionalText(body.parentName),
       parentPhone,
       studentPhone,
+      scheduleShareConsentConfirmed: body.scheduleShareConsentConfirmed === true,
       status: body.status,
     },
   };
@@ -337,6 +356,7 @@ function toStudentResponse(student: StudentRecord) {
     parentName: student.parent_name,
     parentPhone: student.parent_phone,
     studentPhone: student.student_phone,
+    scheduleShareConsentConfirmed: student.schedule_share_consent_confirmed,
     status: student.status,
   };
 }

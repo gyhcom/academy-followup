@@ -56,6 +56,7 @@ type StudentRecord = {
   parent_name: string | null;
   parent_phone: string;
   student_phone: string | null;
+  schedule_share_consent_confirmed: boolean;
   status: string;
 };
 
@@ -209,7 +210,7 @@ export default async function AppPage() {
       .order("name"),
     admin
       .from("students")
-      .select("id, class_id, name, school_name, grade_label, parent_name, parent_phone, student_phone, status")
+      .select("id, class_id, name, school_name, grade_label, parent_name, parent_phone, student_phone, schedule_share_consent_confirmed, status")
       .eq("academy_id", profile.academy_id)
       .order("name"),
     admin
@@ -549,6 +550,7 @@ function buildManagementStudents({
       maskedParentPhone: maskPhone(student.parent_phone),
       studentPhone: student.student_phone,
       maskedStudentPhone: student.student_phone ? maskPhone(student.student_phone) : null,
+      scheduleShareConsentConfirmed: student.schedule_share_consent_confirmed,
       status: student.status,
       schedules: schedules
         .filter((schedule) => schedule.student_id === student.id)

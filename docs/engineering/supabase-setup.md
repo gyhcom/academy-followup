@@ -20,6 +20,9 @@ where table_schema = 'public'
   and table_name in ('students', 'followups', 'message_logs', 'profiles', 'academies', 'academy_settings')
   and column_name in (
     'student_phone',
+    'schedule_share_consent_confirmed',
+    'schedule_share_consent_confirmed_at',
+    'schedule_share_consent_confirmed_by',
     'recipient_type',
     'phone',
     'status',
@@ -34,6 +37,9 @@ order by table_name, column_name;
 필수 확인 결과:
 
 - `students.student_phone`
+- `students.schedule_share_consent_confirmed`
+- `students.schedule_share_consent_confirmed_at`
+- `students.schedule_share_consent_confirmed_by`
 - `followups.recipient_type`
 - `message_logs.recipient_type`
 - `profiles.phone`
@@ -84,6 +90,19 @@ end $$;
 ```
 
 이 SQL은 `add column if not exists`와 constraint 존재 확인을 사용하므로 같은 DB에서 반복 실행해도 기존 컬럼을 다시 만들지 않습니다.
+
+## 타 학원 스케줄 공유 동의 컬럼 복구 SQL
+
+학생 등록/수정 또는 공유 코드 생성 시 `schedule_share_consent_confirmed does not exist`가 나오면 아래 SQL을 Supabase SQL Editor에서 실행합니다.
+
+```sql
+alter table public.students
+  add column if not exists schedule_share_consent_confirmed boolean not null default false,
+  add column if not exists schedule_share_consent_confirmed_at timestamptz,
+  add column if not exists schedule_share_consent_confirmed_by uuid references public.profiles(id) on delete set null;
+```
+
+이 컬럼은 파일럿 단계에서 원장이 종이 동의서 수령 여부를 수동 확인한 기록입니다. 동의 확인 전에는 학원 간 스케줄 공유 코드 생성/연결을 막습니다.
 
 ## 구성원/설정 컬럼 복구 SQL
 

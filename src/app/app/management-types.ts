@@ -37,6 +37,7 @@ export type ManagementStudent = {
   maskedParentPhone: string;
   studentPhone: string | null;
   maskedStudentPhone: string | null;
+  scheduleShareConsentConfirmed: boolean;
   status: string;
   schedules: ManagementStudentSchedule[];
 };
@@ -98,6 +99,7 @@ export type StudentFormState = {
   parentName: string;
   parentPhone: string;
   studentPhone: string;
+  scheduleShareConsentConfirmed: boolean;
   status: string;
 };
 

@@ -323,6 +323,7 @@ export function ManagementHome({
       parentName: "",
       parentPhone: "",
       studentPhone: "",
+      scheduleShareConsentConfirmed: false,
       status: "active",
     });
     setStudentFormStatus({ status: "idle", message: "" });
@@ -349,6 +350,7 @@ export function ManagementHome({
       parentName: student.parentName ?? "",
       parentPhone: student.parentPhone,
       studentPhone: student.studentPhone ?? "",
+      scheduleShareConsentConfirmed: student.scheduleShareConsentConfirmed,
       status: student.status,
     });
     setStudentFormStatus({ status: "idle", message: "" });
@@ -376,6 +378,7 @@ export function ManagementHome({
           parentName: studentForm.parentName,
           parentPhone: studentForm.parentPhone,
           studentPhone: studentForm.studentPhone,
+          scheduleShareConsentConfirmed: studentForm.scheduleShareConsentConfirmed,
           status: studentForm.status,
         }),
       });

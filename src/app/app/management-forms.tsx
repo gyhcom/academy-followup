@@ -425,6 +425,28 @@ export function StudentForm({
         </label>
       </div>
 
+      <label className="mt-3 flex items-start gap-3 rounded-lg border border-sky-200 bg-white p-3 text-sm text-stone-700">
+        <input
+          type="checkbox"
+          checked={form.scheduleShareConsentConfirmed}
+          onChange={(event) =>
+            onChange({ ...form, scheduleShareConsentConfirmed: event.target.checked })
+          }
+          className="mt-1 size-4 shrink-0 accent-[#315C7C]"
+        />
+        <span className="min-w-0">
+          <span className="block font-semibold text-stone-950">
+            타 학원 스케줄 공유 동의 확인
+          </span>
+          <span className="mt-1 block leading-5">
+            보호자에게 타 학원 스케줄 공유 목적과 범위를 안내했고 동의를 확인했습니다.
+          </span>
+          <span className="mt-1 block text-xs leading-5 text-stone-500">
+            공유되는 정보는 보강 시간 확인을 위한 바쁜 시간대이며, 학생 연락처와 학부모 정보는 공유되지 않습니다.
+          </span>
+        </span>
+      </label>
+
       {status.status === "error" ? (
         <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
           {status.message}

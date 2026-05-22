@@ -109,6 +109,9 @@ create table public.students (
   parent_name text,
   parent_phone text not null,
   student_phone text,
+  schedule_share_consent_confirmed boolean not null default false,
+  schedule_share_consent_confirmed_at timestamptz,
+  schedule_share_consent_confirmed_by uuid references public.profiles(id) on delete set null,
   status text not null default 'active',
   created_at timestamptz not null default now()
 );

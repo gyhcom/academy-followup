@@ -763,8 +763,13 @@ function SharedSchedulePanel({
 }) {
   const [codeInput, setCodeInput] = useState("");
   const isSaving = state.actionStatus === "saving";
+  const hasShareConsent = student.scheduleShareConsentConfirmed;
 
   async function handleConnect() {
+    if (!hasShareConsent) {
+      return;
+    }
+
     await onConnect(codeInput);
     setCodeInput("");
   }
@@ -778,10 +783,22 @@ function SharedSchedulePanel({
             타 학원 스케줄 공유
           </p>
           <p className="mt-0.5 text-xs leading-5 text-stone-500">
-            보호자 동의가 확인된 학생끼리 학원명과 바쁜 시간을 공유합니다.
+            보호자 동의가 확인된 학생끼리 보강 시간 확인용 바쁜 시간만 공유합니다.
           </p>
         </div>
       </div>
+
+      {!hasShareConsent ? (
+        <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+          보호자 동의 확인 후 공유 코드를 만들거나 연결할 수 있습니다. 학생 정보 수정에서
+          `타 학원 스케줄 공유 동의 확인`을 체크해 주세요.
+        </div>
+      ) : (
+        <div className="mt-3 rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-3 py-2 text-xs leading-5 text-[#315C7C]">
+          연결 전에는 다른 학원 존재 여부를 확인하지 않습니다. 연결 후에도 실제 학원명은 숨기고
+          바쁜 시간대만 표시합니다.
+        </div>
+      )}
 
       {state.status === "loading" ? (
         <p className="mt-3 rounded-md bg-stone-50 px-3 py-2 text-xs font-medium text-stone-500">
@@ -797,7 +814,9 @@ function SharedSchedulePanel({
 
       {state.links.length === 0 && state.status !== "loading" ? (
         <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-3 text-xs leading-5 text-stone-600">
-          연결된 학원이 없습니다. 상대 학원도 이 서비스를 쓰는 경우, 보호자 동의 확인 후 공유 코드로 연결하세요.
+          {hasShareConsent
+            ? "연결된 학원이 없습니다. 상대 학원도 이 서비스를 쓰는 경우, 보호자 동의 확인 후 공유 코드로 연결하세요."
+            : "동의 확인 전에는 공유 연결을 만들지 않습니다."}
         </div>
       ) : (
         <div className="mt-3 space-y-2">
@@ -869,7 +888,7 @@ function SharedSchedulePanel({
           </p>
           <button
             type="button"
-            disabled={isSaving}
+            disabled={isSaving || !hasShareConsent}
             onClick={onCreateCode}
             className="flex min-h-9 w-full items-center justify-center rounded-md bg-[#315C7C] px-3 text-xs font-semibold text-white disabled:opacity-50"
           >
@@ -892,12 +911,13 @@ function SharedSchedulePanel({
             <input
               value={codeInput}
               onChange={(event) => setCodeInput(event.target.value)}
+              disabled={!hasShareConsent}
               placeholder="상대 학원 공유 코드"
               className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
             <button
               type="button"
-              disabled={isSaving || !codeInput.trim()}
+              disabled={isSaving || !hasShareConsent || !codeInput.trim()}
               onClick={handleConnect}
               className="min-h-10 rounded-md border border-[#315C7C] px-3 text-xs font-semibold text-[#315C7C] disabled:border-stone-200 disabled:text-stone-400"
             >

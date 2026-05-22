@@ -29,6 +29,7 @@ type SharedStudentIdentity = {
   name: string;
   school_name: string | null;
   grade_label: string | null;
+  schedule_share_consent_confirmed: boolean;
 };
 
 type ShareLinkRecord = {
@@ -42,9 +43,10 @@ type ShareLinkRecord = {
   created_at: string;
 };
 
-type AcademyRecord = {
+type StudentShareConsentRecord = {
   id: string;
-  name: string;
+  academy_id: string;
+  schedule_share_consent_confirmed: boolean;
 };
 
 type SharedScheduleRecord = {
@@ -66,6 +68,8 @@ const studentIdentityMismatchMessage =
   "공유 코드의 학생 정보와 현재 선택한 학생 정보가 다릅니다. 이름, 학교, 학년을 확인해 주세요.";
 const studentWorkspaceMismatchMessage =
   "현재 로그인한 학원과 선택한 학생 정보가 맞지 않습니다. 다른 학원 계정으로 로그인했거나 화면이 오래된 상태일 수 있습니다. 새로고침 후 다시 확인해 주세요.";
+const scheduleShareConsentRequiredMessage =
+  "보호자 동의 확인 후 공유 코드를 만들 수 있습니다.";
 
 export async function GET(request: Request) {
   const workspaceResult = await getRouteWorkspace();
@@ -169,6 +173,19 @@ async function createShareToken({
 
   if (!student.ok) {
     return NextResponse.json({ error: student.error }, { status: student.status });
+  }
+
+  const consentCheck = await verifyStudentShareConsent({
+    workspace,
+    academyId: workspace.profile.academy_id,
+    studentId,
+  });
+
+  if (!consentCheck.ok) {
+    return NextResponse.json(
+      { error: consentCheck.error },
+      { status: consentCheck.status },
+    );
   }
 
   const code = createShareCode();
@@ -401,42 +418,66 @@ async function getSharedSchedules({
     return { ok: true, links: [] };
   }
 
-  const academyIds = [...new Set(remoteRefs.map((ref) => ref.academyId))];
   const studentIds = [...new Set(remoteRefs.map((ref) => ref.studentId))];
 
-  const [academiesResult, schedulesResult] = await Promise.all([
-    workspace.admin
-      .from("academies")
-      .select("id, name")
-      .in("id", academyIds)
-      .returns<AcademyRecord[]>(),
-    workspace.admin
-      .from("student_schedules")
-      .select(
-        "id, academy_id, student_id, schedule_type, schedule_date, day_of_week, start_time, end_time, subject, title, is_active",
-      )
-      .in("student_id", studentIds)
-      .eq("is_active", true)
-      .order("day_of_week", { ascending: true })
-      .order("start_time", { ascending: true })
-      .returns<SharedScheduleRecord[]>(),
-  ]);
+  const localConsent = await verifyStudentShareConsent({
+    workspace,
+    academyId: workspace.profile.academy_id,
+    studentId,
+  });
 
-  if (academiesResult.error || schedulesResult.error) {
+  if (!localConsent.ok) {
+    if (localConsent.status === 400) {
+      return { ok: true, links: [] };
+    }
+
+    return { ok: false, error: localConsent.error };
+  }
+
+  const remoteConsentResult = await workspace.admin
+    .from("students")
+    .select("id, academy_id, schedule_share_consent_confirmed")
+    .in("id", studentIds)
+    .returns<StudentShareConsentRecord[]>();
+
+  if (remoteConsentResult.error) {
     return {
       ok: false,
-      error: academiesResult.error?.message ?? schedulesResult.error?.message ?? "",
+      error: remoteConsentResult.error.message,
     };
   }
 
-  const academiesById = new Map((academiesResult.data ?? []).map((academy) => [academy.id, academy]));
+  const consentedRemoteStudents = new Set(
+    (remoteConsentResult.data ?? [])
+      .filter((student) => student.schedule_share_consent_confirmed)
+      .map((student) => `${student.academy_id}:${student.id}`),
+  );
+
+  const schedulesResult = await workspace.admin
+    .from("student_schedules")
+    .select(
+      "id, academy_id, student_id, schedule_type, schedule_date, day_of_week, start_time, end_time, subject, title, is_active",
+    )
+    .in("student_id", studentIds)
+    .eq("is_active", true)
+    .order("day_of_week", { ascending: true })
+    .order("start_time", { ascending: true })
+    .returns<SharedScheduleRecord[]>();
+
+  if (schedulesResult.error) {
+    return {
+      ok: false,
+      error: schedulesResult.error.message,
+    };
+  }
+
   const schedules = schedulesResult.data ?? [];
 
   return {
     ok: true,
-    links: links.map((link) => {
+    links: links.map((link, index) => {
       const remote = getRemoteRef(link, workspace.profile.academy_id, studentId);
-      const academyName = academiesById.get(remote.academyId)?.name ?? "연결 학원";
+      const academyName = `연결 학원 ${index + 1}`;
 
       return {
         id: link.id,
@@ -446,6 +487,9 @@ async function getSharedSchedules({
           .filter(
             (schedule) =>
               schedule.student_id === remote.studentId && schedule.academy_id === remote.academyId,
+          )
+          .filter((schedule) =>
+            consentedRemoteStudents.has(`${schedule.academy_id}:${schedule.student_id}`),
           )
           .map((schedule) => ({
             id: schedule.id,
@@ -495,6 +539,49 @@ async function assertManageableStudent({
   return { ok: true };
 }
 
+async function verifyStudentShareConsent({
+  workspace,
+  academyId,
+  studentId,
+}: {
+  workspace: RouteWorkspaceContext;
+  academyId: string;
+  studentId: string;
+}): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
+  const { data, error } = await workspace.admin
+    .from("students")
+    .select("id, schedule_share_consent_confirmed")
+    .eq("id", studentId)
+    .eq("academy_id", academyId)
+    .maybeSingle<{ id: string; schedule_share_consent_confirmed: boolean }>();
+
+  if (error) {
+    return {
+      ok: false,
+      status: 500,
+      error: error.message,
+    };
+  }
+
+  if (!data) {
+    return {
+      ok: false,
+      status: 404,
+      error: "학생 정보를 찾을 수 없습니다.",
+    };
+  }
+
+  if (!data.schedule_share_consent_confirmed) {
+    return {
+      ok: false,
+      status: 400,
+      error: scheduleShareConsentRequiredMessage,
+    };
+  }
+
+  return { ok: true };
+}
+
 function getStudentContextError(error: string) {
   return error === "선택한 학생을 찾을 수 없습니다."
     ? studentWorkspaceMismatchMessage
@@ -517,13 +604,13 @@ async function verifySameStudentIdentity({
   const [sourceResult, targetResult] = await Promise.all([
     workspace.admin
       .from("students")
-      .select("id, name, school_name, grade_label")
+      .select("id, name, school_name, grade_label, schedule_share_consent_confirmed")
       .eq("id", sourceStudentId)
       .eq("academy_id", sourceAcademyId)
       .maybeSingle<SharedStudentIdentity>(),
     workspace.admin
       .from("students")
-      .select("id, name, school_name, grade_label")
+      .select("id, name, school_name, grade_label, schedule_share_consent_confirmed")
       .eq("id", targetStudentId)
       .eq("academy_id", targetAcademyId)
       .maybeSingle<SharedStudentIdentity>(),
@@ -550,6 +637,17 @@ async function verifySameStudentIdentity({
       ok: false,
       status: 400,
       error: studentIdentityMismatchMessage,
+    };
+  }
+
+  if (
+    !sourceResult.data.schedule_share_consent_confirmed ||
+    !targetResult.data.schedule_share_consent_confirmed
+  ) {
+    return {
+      ok: false,
+      status: 400,
+      error: scheduleShareConsentRequiredMessage,
     };
   }
 
