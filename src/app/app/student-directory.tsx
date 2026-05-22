@@ -795,8 +795,8 @@ function SharedSchedulePanel({
         </div>
       ) : (
         <div className="mt-3 rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-3 py-2 text-xs leading-5 text-[#315C7C]">
-          연결 전에는 다른 학원 존재 여부를 확인하지 않습니다. 연결 후에도 실제 학원명은 숨기고
-          바쁜 시간대만 표시합니다.
+          같은 학생으로 확인되는 다른 학원 일정은 자동으로 연결됩니다. 연결 전에는 다른 학원
+          존재 여부를 확인하지 않고, 연결 후에도 실제 학원명은 숨깁니다.
         </div>
       )}
 
@@ -815,7 +815,7 @@ function SharedSchedulePanel({
       {state.links.length === 0 && state.status !== "loading" ? (
         <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-3 text-xs leading-5 text-stone-600">
           {hasShareConsent
-            ? "연결된 학원이 없습니다. 상대 학원도 이 서비스를 쓰는 경우, 보호자 동의 확인 후 공유 코드로 연결하세요."
+            ? "동의 확인된 같은 학생이 다른 학원에 등록되면 자동으로 바쁜 시간이 연결됩니다."
             : "동의 확인 전에는 공유 연결을 만들지 않습니다."}
         </div>
       ) : (
@@ -884,7 +884,8 @@ function SharedSchedulePanel({
       {state.canManage ? (
         <div className="mt-3 space-y-2 border-t border-stone-100 pt-3">
           <p className="rounded-md bg-[#F7F5F0] px-3 py-2 text-[11px] leading-4 text-stone-600">
-            이 학원에서 코드를 만들어 상대 학원에 전달하거나, 상대 학원에서 받은 코드를 아래에 입력할 수 있습니다.
+            자동 연결이 되지 않는 경우에만 공유 코드를 만들어 상대 학원에 전달하거나, 상대
+            학원에서 받은 코드를 아래에 입력합니다.
           </p>
           <button
             type="button"

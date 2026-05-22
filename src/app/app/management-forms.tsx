@@ -442,7 +442,8 @@ export function StudentForm({
             보호자에게 타 학원 스케줄 공유 목적과 범위를 안내했고 동의를 확인했습니다.
           </span>
           <span className="mt-1 block text-xs leading-5 text-stone-500">
-            공유되는 정보는 보강 시간 확인을 위한 바쁜 시간대이며, 학생 연락처와 학부모 정보는 공유되지 않습니다.
+            체크하면 같은 학생으로 확인되는 다른 학원 일정이 자동으로 연결됩니다. 전화번호는
+            동일 학생 확인에만 사용되며 상대 학원에 노출되지 않습니다.
           </span>
         </span>
       </label>
