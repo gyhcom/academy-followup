@@ -12,13 +12,15 @@ export type StudentImportDraft = {
   parentName: string;
   parentPhone: string;
   studentPhone: string;
+  scheduleShareConsentConfirmed: string;
   status: string;
 };
 
-export type StudentImportValidatedRow = StudentImportDraft & {
+export type StudentImportValidatedRow = Omit<StudentImportDraft, "scheduleShareConsentConfirmed"> & {
   classId: string | null;
   normalizedParentPhone: string;
   normalizedStudentPhone: string | null;
+  scheduleShareConsentConfirmed: boolean;
   status: "active" | "paused" | "left";
   errors: string[];
 };
@@ -56,6 +58,11 @@ const headerMap: Record<string, keyof Omit<StudentImportDraft, "rowNumber">> = {
   "학생연락처": "studentPhone",
   "학생전화": "studentPhone",
   "studentphone": "studentPhone",
+  "타학원공유동의": "scheduleShareConsentConfirmed",
+  "스케줄공유동의": "scheduleShareConsentConfirmed",
+  "공유동의": "scheduleShareConsentConfirmed",
+  "shareconsent": "scheduleShareConsentConfirmed",
+  "scheduleshareconsent": "scheduleShareConsentConfirmed",
   "상태": "status",
   "status": "status",
 };
@@ -70,11 +77,13 @@ const statusMap: Record<string, "active" | "paused" | "left"> = {
   "left": "left",
 };
 
+const consentTrueValues = new Set(["y", "yes", "true", "1", "동의", "확인", "확인완료", "o", "ㅇ"]);
+
 export const studentImportTemplate =
-  "학생명,반,학교,학년,학부모명,학부모연락처,학생연락처,상태\n" +
-  "테스트학생01,UAT 중2 수학 A반,한들중,중2,테스트학생01 보호자,010-9100-0001,010-9200-0001,재원\n" +
-  "테스트학생02,UAT 중2 수학 A반,한들중,중2,테스트학생02 보호자,010-9100-0002,,재원\n" +
-  "테스트학생03,UAT 중2 수학 A반,설화고,고1,테스트학생03 보호자,010-9100-0003,010-9200-0003,재원";
+  "학생명,반,학교,학년,학부모명,학부모연락처,학생연락처,타학원공유동의,상태\n" +
+  "테스트학생01,UAT 중2 수학 A반,한들중,중2,테스트학생01 보호자,010-9100-0001,010-9200-0001,동의,재원\n" +
+  "테스트학생02,UAT 중2 수학 A반,한들중,중2,테스트학생02 보호자,010-9100-0002,,미동의,재원\n" +
+  "테스트학생03,UAT 중2 수학 A반,설화고,고1,테스트학생03 보호자,010-9100-0003,010-9200-0003,동의,재원";
 
 export function validateStudentImportCsv(
   csvText: string,
@@ -225,6 +234,7 @@ function toDraftRow(
     parentName: getValue("parentName"),
     parentPhone: getValue("parentPhone"),
     studentPhone: getValue("studentPhone"),
+    scheduleShareConsentConfirmed: getValue("scheduleShareConsentConfirmed"),
     status: getValue("status"),
   };
 }
@@ -242,6 +252,7 @@ function validateDraftRow(
   const normalizedStudentPhone = row.studentPhone.trim()
     ? normalizePhone(row.studentPhone)
     : null;
+  const scheduleShareConsentConfirmed = parseConsentValue(row.scheduleShareConsentConfirmed);
   const normalizedStatus = statusMap[row.status.trim().toLowerCase()];
 
   if (!name) {
@@ -286,9 +297,15 @@ function validateDraftRow(
     classId: classItem?.id ?? null,
     normalizedParentPhone: normalizedParentPhone ?? "",
     normalizedStudentPhone,
+    scheduleShareConsentConfirmed,
     status: normalizedStatus ?? "active",
     errors,
   };
+}
+
+function parseConsentValue(value: string) {
+  const normalized = value.replace(/\s/g, "").trim().toLowerCase();
+  return consentTrueValues.has(normalized);
 }
 
 function hasAnyValue(row: StudentImportDraft) {
@@ -300,6 +317,7 @@ function hasAnyValue(row: StudentImportDraft) {
     row.parentName,
     row.parentPhone,
     row.studentPhone,
+    row.scheduleShareConsentConfirmed,
     row.status,
   ].some((value) => value.trim().length > 0);
 }

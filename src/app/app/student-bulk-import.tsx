@@ -89,7 +89,8 @@ export function StudentBulkImportForm({
           <p className="text-sm font-semibold text-stone-950">학생 CSV 일괄 등록</p>
           <p className="mt-1 text-xs leading-5 text-stone-600">
             엑셀에서 CSV로 저장한 뒤 붙여넣거나 파일을 선택합니다. 반 이름은 현재 등록된 반 이름과
-            정확히 일치해야 하며, 이미 등록된 학생은 미리보기에서 제외됩니다.
+            정확히 일치해야 하며, 이미 등록된 학생은 미리보기에서 제외됩니다. 타 학원 공유
+            동의는 `동의`, `Y`, `true` 중 하나로 입력하면 반영됩니다.
           </p>
         </div>
         <button
@@ -265,7 +266,10 @@ function ImportPreviewRow({ row }: { row: StudentImportValidatedRow }) {
         ) : null}
       </div>
       <div className="text-left text-xs font-medium text-stone-500 sm:text-right">
-        {row.status === "active" ? "재원" : row.status === "paused" ? "휴원" : "퇴원"}
+        <p>{row.status === "active" ? "재원" : row.status === "paused" ? "휴원" : "퇴원"}</p>
+        <p className={row.scheduleShareConsentConfirmed ? "text-[#315C7C]" : "text-stone-400"}>
+          {row.scheduleShareConsentConfirmed ? "공유 동의" : "공유 미동의"}
+        </p>
       </div>
     </div>
   );

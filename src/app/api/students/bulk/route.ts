@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { canManageAcademy } from "@/lib/permissions";
 import {
+  syncAutomaticScheduleLinks,
+  type ShareableStudentRecord,
+} from "@/lib/server/automatic-schedule-sharing";
+import {
   type StudentImportDraft,
   validateStudentImportDrafts,
 } from "@/lib/student-import";
@@ -29,6 +33,10 @@ type ClassRecord = {
 type ExistingStudentRecord = {
   name: string;
   parent_phone: string;
+};
+
+type InsertedStudentRecord = ShareableStudentRecord & {
+  id: string;
 };
 
 export async function POST(request: Request) {
@@ -110,13 +118,35 @@ export async function POST(request: Request) {
         parent_name: row.parentName || null,
         parent_phone: row.normalizedParentPhone,
         student_phone: row.normalizedStudentPhone,
+        schedule_share_consent_confirmed: row.scheduleShareConsentConfirmed,
+        schedule_share_consent_confirmed_at: row.scheduleShareConsentConfirmed
+          ? new Date().toISOString()
+          : null,
+        schedule_share_consent_confirmed_by: row.scheduleShareConsentConfirmed
+          ? workspace.userId
+          : null,
         status: row.status,
       })),
     )
-    .select("id");
+    .select(
+      "id, academy_id, name, school_name, grade_label, parent_phone, student_phone, schedule_share_consent_confirmed",
+    )
+    .returns<InsertedStudentRecord[]>();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  for (const student of data ?? []) {
+    const syncResult = await syncAutomaticScheduleLinks({
+      admin: workspace.admin,
+      student,
+      userId: workspace.userId,
+    });
+
+    if (!syncResult.ok) {
+      return NextResponse.json({ error: syncResult.error }, { status: 500 });
+    }
   }
 
   return NextResponse.json({
@@ -133,6 +163,7 @@ async function getAuthorizedWorkspace(): Promise<
       ok: true;
       admin: ReturnType<typeof createSupabaseAdminClient>;
       profile: ProfileRecord;
+      userId: string;
     }
   | { ok: false; status: number; error: string }
 > {
@@ -172,7 +203,7 @@ async function getAuthorizedWorkspace(): Promise<
     return { ok: false, status: 403, error: "학생 일괄 등록은 원장 또는 관리자만 할 수 있습니다." };
   }
 
-  return { ok: true, admin, profile };
+  return { ok: true, admin, profile, userId: user.id };
 }
 
 async function parseBulkStudentRequest(
@@ -211,6 +242,10 @@ function toStudentImportDraft(value: unknown, fallbackRowNumber: number): Studen
     parentName: toText(row.parentName),
     parentPhone: toText(row.parentPhone),
     studentPhone: toText(row.studentPhone),
+    scheduleShareConsentConfirmed:
+      row.scheduleShareConsentConfirmed === true
+        ? "동의"
+        : toText(row.scheduleShareConsentConfirmed),
     status: toText(row.status),
   };
 }

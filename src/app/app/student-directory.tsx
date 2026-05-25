@@ -795,8 +795,8 @@ function SharedSchedulePanel({
         </div>
       ) : (
         <div className="mt-3 rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-3 py-2 text-xs leading-5 text-[#315C7C]">
-          같은 학생으로 확인되는 다른 학원 일정은 자동으로 연결됩니다. 연결 전에는 다른 학원
-          존재 여부를 확인하지 않고, 연결 후에도 실제 학원명은 숨깁니다.
+          같은 학생으로 확인되는 다른 학원 일정은 자동으로 연결됩니다. 연결 기준은
+          이름·학교·학년·전화번호이며, 상대 학원명과 전화번호는 공개되지 않습니다.
         </div>
       )}
 
@@ -843,8 +843,19 @@ function SharedSchedulePanel({
                 ) : null}
               </div>
               <p className="mt-1 text-[11px] leading-4 text-stone-500">
-                양쪽 학원 모두 이 학생의 바쁜 시간대를 볼 수 있습니다. 공유 해제 시 양쪽 모두 상대 스케줄을 볼 수 없습니다.
+                동의 확인된 동일 학생과 자동 연결됐습니다. 양쪽 학원 모두 바쁜 시간대만 볼 수
+                있으며, 공유 해제 시 양쪽 모두 상대 스케줄을 볼 수 없습니다.
               </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {["동의 확인", "이름·학교·학년·전화번호 기준", "상대 학원명 비공개"].map((label) => (
+                  <span
+                    key={label}
+                    className="rounded bg-white px-1.5 py-0.5 text-[11px] font-semibold text-stone-500"
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
               {link.schedules.length > 0 ? (
                 <div className="mt-2 space-y-1.5">
                   {link.schedules.slice(0, 4).map((schedule) => (
