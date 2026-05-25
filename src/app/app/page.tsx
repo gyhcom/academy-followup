@@ -3,6 +3,7 @@ import { AlertCircle, School } from "lucide-react";
 import type { ReactNode } from "react";
 import {
   AppWorkspace,
+  type HomeScheduleItem,
   type ManagementClass,
   type ManagementMessageTemplate,
   type ManagementMember,
@@ -116,6 +117,34 @@ type MessageTemplateRecord = {
   reason: FollowupReason;
   title: string;
   body: string;
+  is_active: boolean;
+};
+
+type ShareLinkRecord = {
+  id: string;
+  source_academy_id: string;
+  source_student_id: string;
+  target_academy_id: string;
+  target_student_id: string;
+};
+
+type SharedStudentConsentRecord = {
+  id: string;
+  academy_id: string;
+  schedule_share_consent_confirmed: boolean;
+};
+
+type SharedScheduleRecord = {
+  id: string;
+  academy_id: string;
+  student_id: string;
+  schedule_type: string;
+  schedule_date: string | null;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  subject: string | null;
+  title: string;
   is_active: boolean;
 };
 
@@ -289,6 +318,30 @@ export default async function AppPage() {
     profileId: user.id,
     role: profile.role,
   });
+  const sharedScheduleItems = await buildSharedHomeScheduleItems({
+    admin,
+    academyId: profile.academy_id,
+    students,
+  });
+  const homeScheduleSummaryItems = buildHomeScheduleItems({
+    classes,
+    students,
+    schedules,
+    sharedScheduleItems,
+  });
+  const homeScheduleItems = buildHomeScheduleItems({
+    classes,
+    students: canViewAllClasses(profile.role)
+      ? students
+      : students.filter((student) =>
+          classes.some(
+            (classItem) =>
+              classItem.id === student.class_id && classItem.teacher_id === user.id,
+          ),
+        ),
+    schedules,
+    sharedScheduleItems,
+  });
   const managementClasses = canManage
     ? buildManagementClasses({ classes, students, members })
     : [];
@@ -318,6 +371,8 @@ export default async function AppPage() {
         role={profile.role}
         roleLabel={roleLabel(profile.role)}
         classes={operationsClasses}
+        homeScheduleItems={homeScheduleItems}
+        homeScheduleSummaryItems={homeScheduleSummaryItems}
         attendanceDate={attendanceDate}
         attendanceRecords={buildAttendanceRecords(attendanceRecords)}
         managementClasses={managementClasses}
@@ -349,6 +404,261 @@ function buildManagementTemplates(
       isActive: template?.is_active ?? true,
     };
   });
+}
+
+function buildHomeScheduleItems({
+  classes,
+  students,
+  schedules,
+  sharedScheduleItems,
+}: {
+  classes: ClassRecord[];
+  students: StudentRecord[];
+  schedules: StudentScheduleRecord[];
+  sharedScheduleItems: HomeScheduleItem[];
+}): HomeScheduleItem[] {
+  const activeStudents = students.filter((student) => student.status === "active");
+  const studentIds = new Set(activeStudents.map((student) => student.id));
+  const classById = new Map(classes.map((classItem) => [classItem.id, classItem]));
+  const groupedClassSchedules = new Map<string, HomeScheduleItem>();
+  const studentScheduleItems: HomeScheduleItem[] = [];
+
+  schedules
+    .filter((schedule) => schedule.is_active)
+    .filter((schedule) => studentIds.has(schedule.student_id))
+    .forEach((schedule) => {
+      const student = activeStudents.find((item) => item.id === schedule.student_id);
+      const classItem = schedule.class_id ? classById.get(schedule.class_id) : null;
+      const isClassSession =
+        Boolean(classItem) &&
+        (schedule.schedule_type === "regular_class" || schedule.schedule_type === "makeup");
+
+      if (isClassSession && classItem) {
+        const key = [
+          schedule.class_id,
+          schedule.schedule_type,
+          schedule.schedule_date ?? "weekly",
+          schedule.day_of_week,
+          schedule.start_time.slice(0, 5),
+          schedule.end_time.slice(0, 5),
+        ].join(":");
+        const existing = groupedClassSchedules.get(key);
+
+        if (existing) {
+          groupedClassSchedules.set(key, {
+            ...existing,
+            studentCount: (existing.studentCount ?? 0) + 1,
+          });
+          return;
+        }
+
+        groupedClassSchedules.set(key, {
+          id: `class:${key}`,
+          kind: "class_session",
+          scheduleType: schedule.schedule_type,
+          scheduleDate: schedule.schedule_date,
+          dayOfWeek: schedule.day_of_week,
+          startTime: schedule.start_time.slice(0, 5),
+          endTime: schedule.end_time.slice(0, 5),
+          title: classItem.name,
+          subtitle: [classItem.grade_label, classItem.subject].filter(Boolean).join(" · "),
+          studentName: null,
+          className: classItem.name,
+          classId: classItem.id,
+          studentId: null,
+          studentCount: 1,
+          isShared: false,
+          canOpenAttendance: true,
+        });
+        return;
+      }
+
+      if (!student) {
+        return;
+      }
+
+      studentScheduleItems.push({
+        id: `student:${schedule.id}`,
+        kind: "student_schedule",
+        scheduleType: schedule.schedule_type,
+        scheduleDate: schedule.schedule_date,
+        dayOfWeek: schedule.day_of_week,
+        startTime: schedule.start_time.slice(0, 5),
+        endTime: schedule.end_time.slice(0, 5),
+        title: student.name,
+        subtitle: schedule.title || [schedule.subject, student.grade_label].filter(Boolean).join(" · "),
+        studentName: student.name,
+        className: classItem?.name ?? null,
+        classId: schedule.class_id,
+        studentId: student.id,
+        studentCount: null,
+        isShared: false,
+        canOpenAttendance: false,
+      });
+    });
+
+  return [
+    ...Array.from(groupedClassSchedules.values()),
+    ...studentScheduleItems,
+    ...sharedScheduleItems.filter((item) => item.studentId && studentIds.has(item.studentId)),
+  ].sort(compareHomeScheduleItems);
+}
+
+async function buildSharedHomeScheduleItems({
+  admin,
+  academyId,
+  students,
+}: {
+  admin: ReturnType<typeof createSupabaseAdminClient>;
+  academyId: string;
+  students: StudentRecord[];
+}): Promise<HomeScheduleItem[]> {
+  const localStudents = students.filter(
+    (student) => student.status === "active" && student.schedule_share_consent_confirmed,
+  );
+  const localStudentById = new Map(localStudents.map((student) => [student.id, student]));
+
+  if (localStudents.length === 0) {
+    return [];
+  }
+
+  const localStudentIds = localStudents.map((student) => student.id);
+  const [sourceResult, targetResult] = await Promise.all([
+    admin
+      .from("student_schedule_links")
+      .select("id, source_academy_id, source_student_id, target_academy_id, target_student_id")
+      .eq("source_academy_id", academyId)
+      .in("source_student_id", localStudentIds)
+      .eq("status", "active")
+      .returns<ShareLinkRecord[]>(),
+    admin
+      .from("student_schedule_links")
+      .select("id, source_academy_id, source_student_id, target_academy_id, target_student_id")
+      .eq("target_academy_id", academyId)
+      .in("target_student_id", localStudentIds)
+      .eq("status", "active")
+      .returns<ShareLinkRecord[]>(),
+  ]);
+
+  if (sourceResult.error || targetResult.error) {
+    if (isMissingSharingTable(sourceResult.error) || isMissingSharingTable(targetResult.error)) {
+      return [];
+    }
+
+    return [];
+  }
+
+  const links = [...(sourceResult.data ?? []), ...(targetResult.data ?? [])];
+
+  if (links.length === 0) {
+    return [];
+  }
+
+  const remoteRefs = links.map((link) => getRemoteScheduleRef({ link, academyId }));
+  const remoteStudentIds = [...new Set(remoteRefs.map((ref) => ref.remoteStudentId))];
+
+  const [remoteConsentResult, remoteSchedulesResult] = await Promise.all([
+    admin
+      .from("students")
+      .select("id, academy_id, schedule_share_consent_confirmed")
+      .in("id", remoteStudentIds)
+      .returns<SharedStudentConsentRecord[]>(),
+    admin
+      .from("student_schedules")
+      .select(
+        "id, academy_id, student_id, schedule_type, schedule_date, day_of_week, start_time, end_time, subject, title, is_active",
+      )
+      .in("student_id", remoteStudentIds)
+      .eq("is_active", true)
+      .returns<SharedScheduleRecord[]>(),
+  ]);
+
+  if (remoteConsentResult.error || remoteSchedulesResult.error) {
+    return [];
+  }
+
+  const consentedRemoteStudentKeys = new Set(
+    (remoteConsentResult.data ?? [])
+      .filter((student) => student.schedule_share_consent_confirmed)
+      .map((student) => `${student.academy_id}:${student.id}`),
+  );
+  const localStudentIdByRemoteKey = new Map(
+    remoteRefs.map((ref) => [`${ref.remoteAcademyId}:${ref.remoteStudentId}`, ref.localStudentId]),
+  );
+
+  return (remoteSchedulesResult.data ?? [])
+    .filter((schedule) =>
+      consentedRemoteStudentKeys.has(`${schedule.academy_id}:${schedule.student_id}`),
+    )
+    .map((schedule): HomeScheduleItem | null => {
+      const localStudentId = localStudentIdByRemoteKey.get(
+        `${schedule.academy_id}:${schedule.student_id}`,
+      );
+      const localStudent = localStudentId ? localStudentById.get(localStudentId) : null;
+
+      if (!localStudent) {
+        return null;
+      }
+
+      return {
+        id: `shared:${schedule.id}`,
+        kind: "shared_schedule" as const,
+        scheduleType: schedule.schedule_type,
+        scheduleDate: schedule.schedule_date,
+        dayOfWeek: schedule.day_of_week,
+        startTime: schedule.start_time.slice(0, 5),
+        endTime: schedule.end_time.slice(0, 5),
+        title: localStudent.name,
+        subtitle: schedule.title || "연결 학원 일정",
+        studentName: localStudent.name,
+        className: null,
+        classId: localStudent.class_id,
+        studentId: localStudent.id,
+        studentCount: null,
+        isShared: true,
+        canOpenAttendance: false,
+      };
+    })
+    .filter((item): item is HomeScheduleItem => Boolean(item));
+}
+
+function compareHomeScheduleItems(first: HomeScheduleItem, second: HomeScheduleItem) {
+  return (
+    first.startTime.localeCompare(second.startTime) ||
+    first.endTime.localeCompare(second.endTime) ||
+    first.title.localeCompare(second.title, "ko") ||
+    first.kind.localeCompare(second.kind)
+  );
+}
+
+function getRemoteScheduleRef({
+  link,
+  academyId,
+}: {
+  link: ShareLinkRecord;
+  academyId: string;
+}) {
+  if (link.source_academy_id === academyId) {
+    return {
+      localStudentId: link.source_student_id,
+      remoteAcademyId: link.target_academy_id,
+      remoteStudentId: link.target_student_id,
+    };
+  }
+
+  return {
+    localStudentId: link.target_student_id,
+    remoteAcademyId: link.source_academy_id,
+    remoteStudentId: link.source_student_id,
+  };
+}
+
+function isMissingSharingTable(error: { code?: string; message?: string } | null) {
+  return (
+    error?.code === "42P01" ||
+    Boolean(error?.message?.includes("student_schedule_links")) ||
+    Boolean(error?.message?.includes("student_share_tokens"))
+  );
 }
 
 function AppShell({

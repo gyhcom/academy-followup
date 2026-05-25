@@ -34,6 +34,8 @@ type WorkspaceHomeProps = {
   roleLabel: string;
   canManage: boolean;
   classes: OperationsClass[];
+  scheduleItems: HomeScheduleItem[];
+  scheduleSummaryItems: HomeScheduleItem[];
   selectedDate: string;
   records: AttendanceRecordItem[];
   loadState: {
@@ -63,6 +65,33 @@ type HomeFollowupItem = {
   followupSentAt: string | null;
 };
 
+type HomeScheduleKind = "class_session" | "student_schedule" | "shared_schedule";
+
+type HomeScheduleItem = {
+  id: string;
+  kind: HomeScheduleKind;
+  scheduleType: string;
+  scheduleDate: string | null;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  title: string;
+  subtitle: string;
+  studentName: string | null;
+  className: string | null;
+  classId: string | null;
+  studentId: string | null;
+  studentCount: number | null;
+  isShared: boolean;
+  canOpenAttendance: boolean;
+};
+
+type HomeScheduleSummary = {
+  classSessionCount: number;
+  sharedCount: number;
+  totalCount: number;
+};
+
 const actionableStatuses: AttendanceStatus[] = [
   "needs_check",
   "late",
@@ -78,6 +107,8 @@ export function WorkspaceHome({
   roleLabel,
   canManage,
   classes,
+  scheduleItems,
+  scheduleSummaryItems,
   selectedDate,
   records,
   loadState,
@@ -89,6 +120,14 @@ export function WorkspaceHome({
   const followupItems = useMemo(
     () => buildHomeFollowupItems(classes, records),
     [classes, records],
+  );
+  const selectedScheduleItems = useMemo(
+    () => filterScheduleItemsForDate(scheduleItems, selectedDate),
+    [scheduleItems, selectedDate],
+  );
+  const selectedScheduleSummary = useMemo(
+    () => buildHomeScheduleSummary(scheduleSummaryItems, selectedDate),
+    [scheduleSummaryItems, selectedDate],
   );
   const sentCount = followupItems.filter((item) => item.followupStatus === "sent").length;
   const unsentCount = followupItems.length - sentCount;
@@ -110,6 +149,8 @@ export function WorkspaceHome({
         records={records}
         loadState={loadState}
         followupItems={followupItems}
+        scheduleItems={selectedScheduleItems}
+        scheduleSummary={selectedScheduleSummary}
         unsentCount={unsentCount}
         sentCount={sentCount}
         expandedFilter={expandedFilter}
@@ -165,6 +206,14 @@ export function WorkspaceHome({
           />
         ) : null}
       </section>
+
+      <TodayScheduleSection
+        className="hidden sm:block"
+        items={selectedScheduleItems}
+        summary={selectedScheduleSummary}
+        selectedDate={selectedDate}
+        onNavigate={onNavigate}
+      />
 
       <section className="hidden overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm sm:block">
         <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
@@ -268,6 +317,8 @@ function MobileHomeExperience({
   records,
   loadState,
   followupItems,
+  scheduleItems,
+  scheduleSummary,
   unsentCount,
   sentCount,
   expandedFilter,
@@ -288,6 +339,8 @@ function MobileHomeExperience({
     error: string;
   };
   followupItems: HomeFollowupItem[];
+  scheduleItems: HomeScheduleItem[];
+  scheduleSummary: HomeScheduleSummary;
   unsentCount: number;
   sentCount: number;
   expandedFilter: FollowupFilter | null;
@@ -331,6 +384,9 @@ function MobileHomeExperience({
             <MobileHeroMetric label="확인할 학생" value={`${followupItems.length}명`} />
             <MobileHeroMetric label="연락 전" value={`${unsentCount}명`} tone="warm" />
           </div>
+          <p className="mt-3 text-xs font-bold text-white/80">
+            오늘 수업 {scheduleSummary.classSessionCount}개 · 공유 일정 {scheduleSummary.sharedCount}건
+          </p>
 
           <div className="mt-4 rounded-2xl bg-white/95 p-3 text-stone-950 shadow-[0_14px_32px_rgba(20,83,45,0.16)]">
             <div className="flex items-center gap-3">
@@ -356,6 +412,13 @@ function MobileHomeExperience({
       </section>
 
       <HomeDateControl value={selectedDate} onChange={onDateChange} />
+
+      <TodayScheduleSection
+        items={scheduleItems}
+        summary={scheduleSummary}
+        selectedDate={selectedDate}
+        onNavigate={onNavigate}
+      />
 
       <section aria-label="오늘 바로가기" className="space-y-2">
         <div className="flex items-center justify-between gap-3 px-1">
@@ -657,6 +720,138 @@ function MobileActionCard({
       <span className="mt-4 block text-lg font-black leading-none">{title}</span>
       <span className="mt-1.5 block text-xs font-bold opacity-[0.82]">{description}</span>
     </button>
+  );
+}
+
+function TodayScheduleSection({
+  items,
+  summary,
+  selectedDate,
+  className = "",
+  onNavigate,
+}: {
+  items: HomeScheduleItem[];
+  summary: HomeScheduleSummary;
+  selectedDate: string;
+  className?: string;
+  onNavigate: (view: WorkspaceView) => void;
+}) {
+  const visibleItems = items.slice(0, 6);
+  const hiddenCount = Math.max(0, items.length - visibleItems.length);
+
+  return (
+    <section
+      aria-label="오늘 일정"
+      className={[
+        "overflow-hidden rounded-[1.5rem] border border-[#E6E0D5] bg-white shadow-[0_14px_42px_rgba(33,32,30,0.08)] sm:rounded-lg sm:shadow-sm",
+        className,
+      ].join(" ")}
+    >
+      <div className="border-b border-stone-100 px-4 py-4 sm:px-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-wide text-[#315C7C]">
+              오늘 일정
+            </p>
+            <h3 className="mt-1 text-lg font-black leading-tight text-stone-950 sm:text-xl">
+              {formatHomeDate(selectedDate)} 시간순
+            </h3>
+          </div>
+          <span className="shrink-0 rounded-full bg-[#EAF1F8] px-2.5 py-1 text-xs font-bold text-[#315C7C]">
+            수업 {summary.classSessionCount} · 공유 {summary.sharedCount}
+          </span>
+        </div>
+      </div>
+
+      {visibleItems.length === 0 ? (
+        <div className="px-4 py-5 text-sm leading-6 text-stone-600 sm:px-5">
+          이 날짜에는 표시할 일정이 없습니다.
+        </div>
+      ) : (
+        <div className="divide-y divide-stone-100">
+          {visibleItems.map((item) => (
+            <TodayScheduleRow key={item.id} item={item} onNavigate={onNavigate} />
+          ))}
+          {hiddenCount > 0 ? (
+            <div className="bg-[#FBFAF7] px-4 py-3 text-center text-xs font-bold text-stone-500 sm:px-5">
+              그 외 일정 {hiddenCount}건은 출석/관리 화면에서 확인하세요.
+            </div>
+          ) : null}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function TodayScheduleRow({
+  item,
+  onNavigate,
+}: {
+  item: HomeScheduleItem;
+  onNavigate: (view: WorkspaceView) => void;
+}) {
+  const content = (
+    <>
+      <span className="flex min-w-0 flex-1 items-start gap-3">
+        <span className="mt-0.5 flex w-[4.6rem] shrink-0 flex-col text-left">
+          <span className="text-base font-black tabular-nums text-stone-950">
+            {item.startTime}
+          </span>
+          <span className="text-xs font-semibold tabular-nums text-stone-400">
+            {item.endTime}
+          </span>
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="flex min-w-0 items-center gap-1.5">
+            <span className="truncate text-sm font-black text-stone-950">
+              {item.title}
+            </span>
+            <span
+              className={[
+                "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-black",
+                item.isShared ? "bg-[#EAF1F8] text-[#315C7C]" : scheduleTypeTone(item.scheduleType),
+              ].join(" ")}
+            >
+              {item.isShared ? "공유" : scheduleTypeLabel(item.scheduleType)}
+            </span>
+          </span>
+          <span className="mt-1 block truncate text-xs font-medium text-stone-500">
+            {item.isShared
+              ? "연결 학원 일정 · 보강 불가 시간"
+              : item.subtitle || item.className || "일정"}
+            {item.studentCount ? ` · ${item.studentCount}명` : ""}
+          </span>
+        </span>
+      </span>
+      <span
+        className={[
+          "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black",
+          item.canOpenAttendance
+            ? "bg-stone-950 text-white"
+            : "bg-stone-100 text-stone-500",
+        ].join(" ")}
+      >
+        {item.canOpenAttendance ? "출석 보기" : "읽기 전용"}
+      </span>
+    </>
+  );
+
+  if (item.canOpenAttendance) {
+    return (
+      <button
+        type="button"
+        onClick={() => onNavigate("attendance")}
+        className="flex min-h-[4.5rem] w-full items-start gap-3 px-4 py-3 text-left transition active:bg-stone-50 sm:px-5"
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex min-h-[4.5rem] items-start gap-3 px-4 py-3 sm:px-5">
+      {content}
+    </div>
   );
 }
 
@@ -1002,6 +1197,29 @@ function buildHomeFollowupItems(
     });
 }
 
+function filterScheduleItemsForDate(items: HomeScheduleItem[], dateValue: string) {
+  const dayOfWeek = getDayOfWeek(dateValue);
+
+  return items
+    .filter((item) => item.scheduleDate === dateValue || (!item.scheduleDate && item.dayOfWeek === dayOfWeek))
+    .sort(
+      (first, second) =>
+        first.startTime.localeCompare(second.startTime) ||
+        first.endTime.localeCompare(second.endTime) ||
+        first.title.localeCompare(second.title, "ko"),
+    );
+}
+
+function buildHomeScheduleSummary(items: HomeScheduleItem[], dateValue: string): HomeScheduleSummary {
+  const filteredItems = filterScheduleItemsForDate(items, dateValue);
+
+  return {
+    classSessionCount: filteredItems.filter((item) => item.kind === "class_session").length,
+    sharedCount: filteredItems.filter((item) => item.isShared).length,
+    totalCount: filteredItems.length,
+  };
+}
+
 function getFilteredItems(items: HomeFollowupItem[], filter: FollowupFilter | null) {
   if (filter === "unsent") {
     return items.filter((item) => item.followupStatus !== "sent");
@@ -1038,6 +1256,28 @@ function statusTone(status: AttendanceStatus) {
   }
 
   return "bg-violet-50 text-violet-800";
+}
+
+function scheduleTypeLabel(scheduleType: string) {
+  const labels: Record<string, string> = {
+    regular_class: "정규",
+    makeup: "보강",
+    external: "외부",
+    consultation: "상담",
+  };
+
+  return labels[scheduleType] ?? scheduleType;
+}
+
+function scheduleTypeTone(scheduleType: string) {
+  const tones: Record<string, string> = {
+    regular_class: "bg-blue-50 text-blue-800",
+    makeup: "bg-[#EAF1F8] text-[#244B67]",
+    external: "bg-amber-50 text-amber-800",
+    consultation: "bg-violet-50 text-violet-800",
+  };
+
+  return tones[scheduleType] ?? "bg-stone-100 text-stone-700";
 }
 
 function followupReasonForStatus(status: AttendanceStatus): FollowupReason {
@@ -1079,6 +1319,17 @@ function getTodayDate() {
   const day = `${date.getDate()}`.padStart(2, "0");
 
   return `${year}-${month}-${day}`;
+}
+
+function getDayOfWeek(dateValue: string) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (Number.isNaN(date.getTime())) {
+    return 1;
+  }
+
+  return date.getDay();
 }
 
 function shiftDate(dateValue: string, amount: number) {

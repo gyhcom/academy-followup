@@ -33,12 +33,35 @@ export type {
   ManagementStudentSchedule,
 };
 
+export type HomeScheduleKind = "class_session" | "student_schedule" | "shared_schedule";
+
+export type HomeScheduleItem = {
+  id: string;
+  kind: HomeScheduleKind;
+  scheduleType: string;
+  scheduleDate: string | null;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  title: string;
+  subtitle: string;
+  studentName: string | null;
+  className: string | null;
+  classId: string | null;
+  studentId: string | null;
+  studentCount: number | null;
+  isShared: boolean;
+  canOpenAttendance: boolean;
+};
+
 type AppWorkspaceProps = {
   academyName: string;
   teacherName: string;
   role: string;
   roleLabel: string;
   classes: OperationsClass[];
+  homeScheduleItems: HomeScheduleItem[];
+  homeScheduleSummaryItems: HomeScheduleItem[];
   attendanceDate: string;
   attendanceRecords: AttendanceRecordItem[];
   managementClasses: ManagementClass[];
@@ -67,6 +90,8 @@ export function AppWorkspace({
   role,
   roleLabel,
   classes,
+  homeScheduleItems,
+  homeScheduleSummaryItems,
   attendanceDate,
   attendanceRecords,
   managementClasses,
@@ -199,6 +224,8 @@ export function AppWorkspace({
           roleLabel={roleLabel}
           canManage={canManage}
           classes={classes}
+          scheduleItems={homeScheduleItems}
+          scheduleSummaryItems={homeScheduleSummaryItems}
           selectedDate={selectedDate}
           records={workspaceAttendanceRecords}
           loadState={attendanceLoadState}
