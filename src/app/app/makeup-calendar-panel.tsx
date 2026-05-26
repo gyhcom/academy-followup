@@ -122,7 +122,7 @@ export function MakeupCalendarPanel({
           </h2>
         </div>
         <p className="mt-1 text-xs leading-5 text-stone-500">
-          날짜를 누르고 그날의 수업·외부 일정을 보면서 보강 시간을 정합니다.
+          날짜를 누르고 그날의 수업·보강 불가 시간을 보면서 보강 시간을 정합니다.
         </p>
       </div>
 

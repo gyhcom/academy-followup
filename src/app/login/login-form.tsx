@@ -28,7 +28,16 @@ export function LoginForm() {
       return;
     }
 
-    window.location.assign("/app");
+    try {
+      const redirectResponse = await fetch("/api/auth/redirect-target", {
+        cache: "no-store",
+      });
+      const payload = (await redirectResponse.json()) as { target?: string };
+
+      window.location.assign(payload.target ?? "/app");
+    } catch {
+      window.location.assign("/app");
+    }
   }
 
   return (

@@ -65,7 +65,11 @@ type HomeFollowupItem = {
   followupSentAt: string | null;
 };
 
-type HomeScheduleKind = "class_session" | "student_schedule" | "shared_schedule";
+type HomeScheduleKind =
+  | "class_session"
+  | "student_schedule"
+  | "manual_external_class"
+  | "shared_schedule";
 
 type HomeScheduleItem = {
   id: string;
@@ -816,7 +820,9 @@ function TodayScheduleRow({
             </span>
           </span>
           <span className="mt-1 block truncate text-xs font-medium text-stone-500">
-            {item.isShared
+            {item.kind === "manual_external_class"
+              ? `타 학원 수업 · ${item.subtitle || "보강 불가 시간"}`
+              : item.isShared
               ? "연결 학원 일정 · 보강 불가 시간"
               : item.subtitle || item.className || "일정"}
             {item.studentCount ? ` · ${item.studentCount}명` : ""}
@@ -1262,7 +1268,8 @@ function scheduleTypeLabel(scheduleType: string) {
   const labels: Record<string, string> = {
     regular_class: "정규",
     makeup: "보강",
-    external: "외부",
+    external: "개인/기타",
+    manual_external_class: "타 학원",
     consultation: "상담",
   };
 
@@ -1273,7 +1280,8 @@ function scheduleTypeTone(scheduleType: string) {
   const tones: Record<string, string> = {
     regular_class: "bg-blue-50 text-blue-800",
     makeup: "bg-[#EAF1F8] text-[#244B67]",
-    external: "bg-amber-50 text-amber-800",
+    external: "bg-stone-100 text-stone-700",
+    manual_external_class: "bg-amber-50 text-amber-800",
     consultation: "bg-violet-50 text-violet-800",
   };
 

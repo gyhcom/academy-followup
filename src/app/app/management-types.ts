@@ -25,6 +25,21 @@ export type ManagementStudentSchedule = {
   sourceFollowupId: string | null;
 };
 
+export type ManagementExternalClassEnrollment = {
+  id: string;
+  externalAcademyId: string;
+  externalAcademyName: string;
+  externalClassId: string;
+  title: string;
+  subject: string | null;
+  scheduleDate: string | null;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  memo: string | null;
+  isActive: boolean;
+};
+
 export type ManagementStudent = {
   id: string;
   classId: string | null;
@@ -40,6 +55,7 @@ export type ManagementStudent = {
   scheduleShareConsentConfirmed: boolean;
   status: string;
   schedules: ManagementStudentSchedule[];
+  externalClassEnrollments: ManagementExternalClassEnrollment[];
 };
 
 export type ManagementMember = {

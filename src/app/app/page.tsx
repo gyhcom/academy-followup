@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { AlertCircle, School } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -146,6 +147,50 @@ type SharedScheduleRecord = {
   subject: string | null;
   title: string;
   is_active: boolean;
+};
+
+type ExternalAcademyRecord = {
+  id: string;
+  name: string;
+  category: string | null;
+  memo: string | null;
+  is_active: boolean;
+};
+
+type ExternalAcademyClassRecord = {
+  id: string;
+  external_academy_id: string;
+  title: string;
+  subject: string | null;
+  schedule_date: string | null;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  memo: string | null;
+  is_active: boolean;
+};
+
+type StudentExternalClassEnrollmentRecord = {
+  id: string;
+  student_id: string;
+  external_academy_class_id: string;
+  is_active: boolean;
+};
+
+type ManualExternalScheduleRecord = {
+  enrollmentId: string;
+  studentId: string;
+  externalAcademyId: string;
+  externalAcademyName: string;
+  externalClassId: string;
+  title: string;
+  subject: string | null;
+  scheduleDate: string | null;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  memo: string | null;
+  isActive: boolean;
 };
 
 export default async function AppPage() {
@@ -310,11 +355,22 @@ export default async function AppPage() {
   const schedules = (schedulesResult.data ?? []) as StudentScheduleRecord[];
   const attendanceRecords = (attendanceResult.data ?? []) as AttendanceRecord[];
   const templates = (templatesResult.data ?? []) as MessageTemplateRecord[];
+  const { data: platformAdmin } = await admin
+    .from("platform_admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle<{ user_id: string }>();
   const canManage = canManageAcademy(profile.role);
+  const externalData = await loadExternalAcademyData({
+    admin,
+    academyId: profile.academy_id,
+  });
+  const manualExternalSchedules = buildManualExternalSchedules(externalData);
   const operationsClasses = buildOperationsClasses({
     classes,
     students,
     schedules,
+    manualExternalSchedules,
     profileId: user.id,
     role: profile.role,
   });
@@ -327,6 +383,7 @@ export default async function AppPage() {
     classes,
     students,
     schedules,
+    manualExternalSchedules,
     sharedScheduleItems,
   });
   const homeScheduleItems = buildHomeScheduleItems({
@@ -340,13 +397,19 @@ export default async function AppPage() {
           ),
         ),
     schedules,
+    manualExternalSchedules,
     sharedScheduleItems,
   });
   const managementClasses = canManage
     ? buildManagementClasses({ classes, students, members })
     : [];
   const managementStudents = canManage
-    ? buildManagementStudents({ classes, students, schedules })
+    ? buildManagementStudents({
+        classes,
+        students,
+        schedules,
+        manualExternalSchedules,
+      })
     : [];
   const managementMembers = canManage
     ? buildManagementMembers({ classes, members })
@@ -364,6 +427,7 @@ export default async function AppPage() {
       email={user.email ?? ""}
       title={profile.academies.name}
       subtitle={profile.academies.category ?? "학원 워크스페이스"}
+      hasPlatformAdmin={Boolean(platformAdmin)}
     >
       <AppWorkspace
         academyName={profile.academies.name}
@@ -383,6 +447,99 @@ export default async function AppPage() {
       />
     </AppShell>
   );
+}
+
+async function loadExternalAcademyData({
+  admin,
+  academyId,
+}: {
+  admin: ReturnType<typeof createSupabaseAdminClient>;
+  academyId: string;
+}): Promise<{
+  externalAcademies: ExternalAcademyRecord[];
+  externalClasses: ExternalAcademyClassRecord[];
+  externalEnrollments: StudentExternalClassEnrollmentRecord[];
+}> {
+  const [academiesResult, classesResult, enrollmentsResult] = await Promise.all([
+    admin
+      .from("external_academies")
+      .select("id, name, category, memo, is_active")
+      .eq("academy_id", academyId)
+      .returns<ExternalAcademyRecord[]>(),
+    admin
+      .from("external_academy_classes")
+      .select(
+        "id, external_academy_id, title, subject, schedule_date, day_of_week, start_time, end_time, memo, is_active",
+      )
+      .eq("academy_id", academyId)
+      .returns<ExternalAcademyClassRecord[]>(),
+    admin
+      .from("student_external_class_enrollments")
+      .select("id, student_id, external_academy_class_id, is_active")
+      .eq("academy_id", academyId)
+      .returns<StudentExternalClassEnrollmentRecord[]>(),
+  ]);
+
+  if (
+    isMissingExternalAcademyTable(academiesResult.error) ||
+    isMissingExternalAcademyTable(classesResult.error) ||
+    isMissingExternalAcademyTable(enrollmentsResult.error)
+  ) {
+    return {
+      externalAcademies: [],
+      externalClasses: [],
+      externalEnrollments: [],
+    };
+  }
+
+  return {
+    externalAcademies: academiesResult.data ?? [],
+    externalClasses: classesResult.data ?? [],
+    externalEnrollments: enrollmentsResult.data ?? [],
+  };
+}
+
+function buildManualExternalSchedules({
+  externalAcademies,
+  externalClasses,
+  externalEnrollments,
+}: {
+  externalAcademies: ExternalAcademyRecord[];
+  externalClasses: ExternalAcademyClassRecord[];
+  externalEnrollments: StudentExternalClassEnrollmentRecord[];
+}): ManualExternalScheduleRecord[] {
+  const academyById = new Map(externalAcademies.map((academy) => [academy.id, academy]));
+  const classById = new Map(externalClasses.map((classItem) => [classItem.id, classItem]));
+
+  return externalEnrollments
+    .filter((enrollment) => enrollment.is_active)
+    .map((enrollment): ManualExternalScheduleRecord | null => {
+      const classItem = classById.get(enrollment.external_academy_class_id);
+      const externalAcademy = classItem
+        ? academyById.get(classItem.external_academy_id)
+        : null;
+
+      if (!classItem || !classItem.is_active || !externalAcademy?.is_active) {
+        return null;
+      }
+
+      return {
+        enrollmentId: enrollment.id,
+        studentId: enrollment.student_id,
+        externalAcademyId: externalAcademy.id,
+        externalAcademyName: externalAcademy.name,
+        externalClassId: classItem.id,
+        title: classItem.title,
+        subject: classItem.subject,
+        scheduleDate: classItem.schedule_date,
+        dayOfWeek: classItem.day_of_week,
+        startTime: classItem.start_time.slice(0, 5),
+        endTime: classItem.end_time.slice(0, 5),
+        memo: classItem.memo,
+        isActive: true,
+      };
+    })
+    .filter((schedule): schedule is ManualExternalScheduleRecord => Boolean(schedule));
 }
 
 function buildManagementTemplates(
@@ -410,11 +567,13 @@ function buildHomeScheduleItems({
   classes,
   students,
   schedules,
+  manualExternalSchedules,
   sharedScheduleItems,
 }: {
   classes: ClassRecord[];
   students: StudentRecord[];
   schedules: StudentScheduleRecord[];
+  manualExternalSchedules: ManualExternalScheduleRecord[];
   sharedScheduleItems: HomeScheduleItem[];
 }): HomeScheduleItem[] {
   const activeStudents = students.filter((student) => student.status === "active");
@@ -500,6 +659,33 @@ function buildHomeScheduleItems({
   return [
     ...Array.from(groupedClassSchedules.values()),
     ...studentScheduleItems,
+    ...manualExternalSchedules
+      .filter((schedule) => schedule.isActive)
+      .filter((schedule) => studentIds.has(schedule.studentId))
+      .map((schedule) => {
+        const student = activeStudents.find((item) => item.id === schedule.studentId);
+
+        return {
+          id: `manual-external:${schedule.enrollmentId}`,
+          kind: "manual_external_class" as const,
+          scheduleType: "manual_external_class",
+          scheduleDate: schedule.scheduleDate,
+          dayOfWeek: schedule.dayOfWeek,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+          title: student?.name ?? "학생",
+          subtitle: [schedule.externalAcademyName, schedule.title, schedule.subject]
+            .filter(Boolean)
+            .join(" · "),
+          studentName: student?.name ?? null,
+          className: null,
+          classId: student?.class_id ?? null,
+          studentId: schedule.studentId,
+          studentCount: null,
+          isShared: false,
+          canOpenAttendance: false,
+        };
+      }),
     ...sharedScheduleItems.filter((item) => item.studentId && studentIds.has(item.studentId)),
   ].sort(compareHomeScheduleItems);
 }
@@ -661,15 +847,26 @@ function isMissingSharingTable(error: { code?: string; message?: string } | null
   );
 }
 
+function isMissingExternalAcademyTable(error: { code?: string; message?: string } | null) {
+  return (
+    error?.code === "42P01" ||
+    Boolean(error?.message?.includes("external_academies")) ||
+    Boolean(error?.message?.includes("external_academy_classes")) ||
+    Boolean(error?.message?.includes("student_external_class_enrollments"))
+  );
+}
+
 function AppShell({
   email,
   title = "내 학원 운영 보드",
   subtitle = "Academy Follow-up",
+  hasPlatformAdmin = false,
   children,
 }: {
   email: string;
   title?: string;
   subtitle?: string;
+  hasPlatformAdmin?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -688,7 +885,17 @@ function AppShell({
               <p className="mt-1 break-all text-xs text-stone-500">{email}</p>
             </div>
           </div>
-          <LogoutButton />
+          <div className="flex shrink-0 items-center gap-2">
+            {hasPlatformAdmin ? (
+              <Link
+                href="/platform"
+                className="hidden min-h-10 items-center rounded-md border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-700 sm:flex"
+              >
+                플랫폼 관리
+              </Link>
+            ) : null}
+            <LogoutButton />
+          </div>
         </header>
 
         <div className="py-4 sm:py-6">{children}</div>
@@ -725,12 +932,14 @@ function buildOperationsClasses({
   classes,
   students,
   schedules,
+  manualExternalSchedules,
   profileId,
   role,
 }: {
   classes: ClassRecord[];
   students: StudentRecord[];
   schedules: StudentScheduleRecord[];
+  manualExternalSchedules: ManualExternalScheduleRecord[];
   profileId: string;
   role: string;
 }): OperationsClass[] {
@@ -783,6 +992,24 @@ function buildOperationsClasses({
             isActive: schedule.is_active,
             sourceFollowupId: schedule.source_followup_id,
           })),
+          ...manualExternalSchedules
+            .filter((schedule) => schedule.studentId === student.id)
+            .map((schedule) => ({
+              id: `manual-external:${schedule.enrollmentId}`,
+              classId: null,
+              sharedAcademyName: schedule.externalAcademyName,
+              isShared: false,
+              scheduleType: "manual_external_class",
+              scheduleDate: schedule.scheduleDate,
+              dayOfWeek: schedule.dayOfWeek,
+              startTime: schedule.startTime,
+              endTime: schedule.endTime,
+              subject: schedule.subject,
+              title: schedule.title,
+              memo: schedule.externalAcademyName,
+              isActive: schedule.isActive,
+              sourceFollowupId: null,
+            })),
       })),
   }));
 }
@@ -840,10 +1067,12 @@ function buildManagementStudents({
   classes,
   students,
   schedules,
+  manualExternalSchedules,
 }: {
   classes: ClassRecord[];
   students: StudentRecord[];
   schedules: StudentScheduleRecord[];
+  manualExternalSchedules: ManualExternalScheduleRecord[];
 }): ManagementStudent[] {
   return students.map((student) => {
     const classItem = classes.find((item) => item.id === student.class_id);
@@ -879,6 +1108,22 @@ function buildManagementStudents({
           memo: schedule.memo,
           isActive: schedule.is_active,
           sourceFollowupId: schedule.source_followup_id,
+        })),
+      externalClassEnrollments: manualExternalSchedules
+        .filter((schedule) => schedule.studentId === student.id)
+        .map((schedule) => ({
+          id: schedule.enrollmentId,
+          externalAcademyId: schedule.externalAcademyId,
+          externalAcademyName: schedule.externalAcademyName,
+          externalClassId: schedule.externalClassId,
+          title: schedule.title,
+          subject: schedule.subject,
+          scheduleDate: schedule.scheduleDate,
+          dayOfWeek: schedule.dayOfWeek,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+          memo: schedule.memo,
+          isActive: schedule.isActive,
         })),
     };
   });

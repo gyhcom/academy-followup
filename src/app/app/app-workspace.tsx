@@ -33,7 +33,11 @@ export type {
   ManagementStudentSchedule,
 };
 
-export type HomeScheduleKind = "class_session" | "student_schedule" | "shared_schedule";
+export type HomeScheduleKind =
+  | "class_session"
+  | "student_schedule"
+  | "manual_external_class"
+  | "shared_schedule";
 
 export type HomeScheduleItem = {
   id: string;

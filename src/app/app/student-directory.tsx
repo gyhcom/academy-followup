@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CalendarDays,
   ChevronRight,
   Link2,
   Pencil,
+  Plus,
   Search,
   SlidersHorizontal,
+  Trash2,
   X,
 } from "lucide-react";
 import {
@@ -368,7 +371,7 @@ export function StudentDirectoryToolbar({
           <option value="all">전체 스케줄</option>
           <option value="has_schedule">스케줄 있음</option>
           <option value="missing_schedule">스케줄 미등록</option>
-          <option value="external">외부 일정 있음</option>
+          <option value="external">개인/기타 일정 있음</option>
         </select>
 
         <select
@@ -530,7 +533,7 @@ function scheduleFilterLabel(filter: StudentScheduleFilter) {
     all: "전체 스케줄",
     has_schedule: "스케줄 있음",
     missing_schedule: "스케줄 미등록",
-    external: "외부 일정 있음",
+    external: "개인/기타 일정 있음",
   };
 
   return labels[filter];
@@ -732,6 +735,10 @@ function StudentDetailPanel({
       </div>
 
       <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
+        <ExternalClassPanel student={student} />
+      </div>
+
+      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
         <SharedSchedulePanel
           student={student}
           state={sharedSchedules}
@@ -741,6 +748,303 @@ function StudentDetailPanel({
         />
       </div>
     </aside>
+  );
+}
+
+type ExternalClassFormState = {
+  academyName: string;
+  classTitle: string;
+  subject: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  memo: string;
+};
+
+function ExternalClassPanel({ student }: { student: ManagementStudent }) {
+  const router = useRouter();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [form, setForm] = useState<ExternalClassFormState>({
+    academyName: "",
+    classTitle: "",
+    subject: "",
+    dayOfWeek: 2,
+    startTime: "19:30",
+    endTime: "20:30",
+    memo: "",
+  });
+  const [status, setStatus] = useState<{
+    state: "idle" | "saving" | "saved" | "error";
+    message: string;
+  }>({ state: "idle", message: "" });
+  const activeEnrollments = student.externalClassEnrollments.filter(
+    (enrollment) => enrollment.isActive,
+  );
+  const isSaving = status.state === "saving";
+
+  async function saveExternalClass() {
+    setStatus({ state: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/external-academy-classes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "create_class_and_enroll",
+          studentId: student.id,
+          academyName: form.academyName,
+          classTitle: form.classTitle,
+          subject: form.subject,
+          dayOfWeek: form.dayOfWeek,
+          startTime: form.startTime,
+          endTime: form.endTime,
+          memo: form.memo,
+        }),
+      });
+      const payload = (await response.json()) as { error?: string; message?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "타 학원 수업을 저장하지 못했습니다.");
+      }
+
+      setStatus({
+        state: "saved",
+        message: payload.message ?? "타 학원 수업을 연결했습니다.",
+      });
+      setIsFormOpen(false);
+      setForm({
+        academyName: "",
+        classTitle: "",
+        subject: "",
+        dayOfWeek: 2,
+        startTime: "19:30",
+        endTime: "20:30",
+        memo: "",
+      });
+      router.refresh();
+    } catch (error) {
+      setStatus({
+        state: "error",
+        message: error instanceof Error ? error.message : "타 학원 수업을 저장하지 못했습니다.",
+      });
+    }
+  }
+
+  async function deactivateEnrollment(enrollmentId: string) {
+    setStatus({ state: "saving", message: "" });
+
+    try {
+      const response = await fetch("/api/external-academy-classes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "deactivate_enrollment",
+          enrollmentId,
+        }),
+      });
+      const payload = (await response.json()) as { error?: string; message?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "타 학원 수업 연결을 해제하지 못했습니다.");
+      }
+
+      setStatus({
+        state: "saved",
+        message: payload.message ?? "타 학원 수업 연결을 해제했습니다.",
+      });
+      router.refresh();
+    } catch (error) {
+      setStatus({
+        state: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "타 학원 수업 연결을 해제하지 못했습니다.",
+      });
+    }
+  }
+
+  return (
+    <section aria-labelledby="external-class-title">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p id="external-class-title" className="text-sm font-semibold text-stone-950">
+            타 학원 수업
+          </p>
+          <p className="mt-0.5 text-xs leading-5 text-stone-500">
+            SaaS를 쓰지 않는 학원의 수업은 원장이 직접 등록해 보강 불가 시간으로
+            관리합니다.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsFormOpen((current) => !current)}
+          className="flex min-h-8 shrink-0 items-center gap-1 rounded-md bg-[#315C7C] px-2.5 text-[11px] font-semibold text-white"
+        >
+          <Plus size={13} />
+          등록
+        </button>
+      </div>
+
+      {activeEnrollments.length === 0 ? (
+        <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-3 text-xs leading-5 text-stone-600">
+          등록된 타 학원 수업이 없습니다. 예: 논술학원 화/목 19:30-20:30.
+        </div>
+      ) : (
+        <div className="mt-3 space-y-1.5">
+          {activeEnrollments.map((enrollment) => (
+            <div
+              key={enrollment.id}
+              className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-stone-200 bg-stone-50 px-2 py-2"
+            >
+              <span className="text-xs font-semibold tabular-nums text-stone-950">
+                {enrollment.startTime}
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-xs font-semibold text-stone-900">
+                  {weekDayShortLabel(enrollment.dayOfWeek)} · {enrollment.title}
+                </span>
+                <span className="mt-0.5 block truncate text-[11px] text-stone-500">
+                  {enrollment.externalAcademyName}
+                  {enrollment.subject ? ` · ${enrollment.subject}` : ""}
+                  {` · ${enrollment.endTime}까지`}
+                </span>
+              </span>
+              <button
+                type="button"
+                disabled={isSaving}
+                onClick={() => deactivateEnrollment(enrollment.id)}
+                className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-500 disabled:opacity-50"
+                aria-label={`${enrollment.title} 연결 해제`}
+              >
+                <Trash2 size={13} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {isFormOpen ? (
+        <div className="mt-3 space-y-2 rounded-md border border-[#D8D0C4] bg-[#FBFAF7] p-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className="grid gap-1 text-xs font-semibold text-stone-600">
+              타 학원명
+              <input
+                value={form.academyName}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, academyName: event.target.value }))
+                }
+                placeholder="예: 논술학원"
+                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-semibold text-stone-600">
+              수업명
+              <input
+                value={form.classTitle}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, classTitle: event.target.value }))
+                }
+                placeholder="예: 논술 정규반"
+                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+              />
+            </label>
+          </div>
+          <div className="grid grid-cols-[1fr_1fr_1fr] gap-2">
+            <label className="grid gap-1 text-xs font-semibold text-stone-600">
+              요일
+              <select
+                value={form.dayOfWeek}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    dayOfWeek: Number(event.target.value),
+                  }))
+                }
+                className="min-h-10 rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+              >
+                {[1, 2, 3, 4, 5, 6, 0].map((dayOfWeek) => (
+                  <option key={dayOfWeek} value={dayOfWeek}>
+                    {weekDayShortLabel(dayOfWeek)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-1 text-xs font-semibold text-stone-600">
+              시작
+              <input
+                type="time"
+                value={form.startTime}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, startTime: event.target.value }))
+                }
+                className="min-h-10 rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-semibold text-stone-600">
+              종료
+              <input
+                type="time"
+                value={form.endTime}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, endTime: event.target.value }))
+                }
+                className="min-h-10 rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+              />
+            </label>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className="grid gap-1 text-xs font-semibold text-stone-600">
+              과목
+              <input
+                value={form.subject}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, subject: event.target.value }))
+                }
+                placeholder="예: 논술"
+                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-semibold text-stone-600">
+              메모
+              <input
+                value={form.memo}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, memo: event.target.value }))
+                }
+                placeholder="선택 입력"
+                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+              />
+            </label>
+          </div>
+          <button
+            type="button"
+            disabled={isSaving}
+            onClick={saveExternalClass}
+            className="min-h-10 w-full rounded-md bg-stone-950 px-3 text-xs font-semibold text-white disabled:opacity-50"
+          >
+            {isSaving ? "저장 중" : "학생에게 연결"}
+          </button>
+        </div>
+      ) : null}
+
+      {status.message ? (
+        <p
+          className={[
+            "mt-3 rounded-md px-3 py-2 text-xs font-semibold",
+            status.state === "error"
+              ? "bg-red-50 text-red-800"
+              : "bg-emerald-50 text-emerald-800",
+          ].join(" ")}
+        >
+          {status.message}
+        </p>
+      ) : null}
+    </section>
   );
 }
 

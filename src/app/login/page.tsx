@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AlertCircle, School } from "lucide-react";
 import { LoginForm } from "@/app/login/login-form";
+import { getPostLoginRedirectTarget } from "@/lib/server/platform-admin";
 import {
   createSupabaseServerClient,
   hasSupabaseServerEnv,
@@ -14,7 +15,7 @@ export default async function LoginPage() {
     } = await supabase.auth.getUser();
 
     if (user) {
-      redirect("/app");
+      redirect(await getPostLoginRedirectTarget());
     }
   }
 

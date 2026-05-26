@@ -141,7 +141,8 @@ export function scheduleTypeLabel(scheduleType: string) {
   const labels: Record<string, string> = {
     regular_class: "정규",
     makeup: "보강",
-    external: "외부",
+    external: "개인/기타",
+    manual_external_class: "타 학원",
     consultation: "상담",
   };
 
@@ -152,7 +153,8 @@ export function scheduleTypeChipClass(scheduleType: string) {
   const styles: Record<string, string> = {
     regular_class: "bg-blue-50 text-blue-800",
     makeup: "bg-[#EAF1F8] text-[#244B67]",
-    external: "bg-amber-50 text-amber-800",
+    external: "bg-stone-100 text-stone-700",
+    manual_external_class: "bg-amber-50 text-amber-800",
     consultation: "bg-violet-50 text-violet-800",
   };
 

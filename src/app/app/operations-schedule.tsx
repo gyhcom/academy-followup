@@ -84,7 +84,7 @@ export function WeeklySchedulePanel({
         </div>
         <p className="mt-1 text-xs text-stone-500">
           {selectedStudent
-            ? `${selectedStudent.name} 학생의 수업과 외부 일정을 확인합니다.`
+            ? `${selectedStudent.name} 학생의 수업과 보강 불가 시간을 확인합니다.`
             : "학생을 선택하면 스케줄이 표시됩니다."}
         </p>
       </div>
@@ -103,7 +103,7 @@ export function WeeklySchedulePanel({
 
         {selectedStudent && activeSchedules.length === 0 ? (
           <div className="rounded-md border border-dashed border-stone-300 bg-stone-50 p-4 text-sm leading-6 text-stone-600">
-            등록된 스케줄이 없습니다. 관리 탭에서 정규 수업이나 외부 일정을 먼저
+            등록된 스케줄이 없습니다. 관리 탭에서 정규 수업이나 개인/기타 일정을 먼저
             입력해 주세요.
           </div>
         ) : null}

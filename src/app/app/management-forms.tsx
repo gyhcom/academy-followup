@@ -524,7 +524,7 @@ export function ScheduleForm({
             {form.mode === "create" ? "스케줄 등록" : "스케줄 수정"}
           </p>
           <p className="mt-1 text-xs leading-5 text-stone-600">
-            {form.studentName} 학생의 반복 수업, 날짜 지정 보강, 외부 일정을 관리합니다.
+            {form.studentName} 학생의 반복 수업, 날짜 지정 보강, 개인/기타 일정을 관리합니다.
           </p>
         </div>
         <button
@@ -547,7 +547,7 @@ export function ScheduleForm({
           >
             <option value="regular_class">정규 수업</option>
             <option value="makeup">보강</option>
-            <option value="external">외부 일정</option>
+            <option value="external">개인/기타 일정</option>
             <option value="consultation">상담</option>
           </select>
         </label>
@@ -664,7 +664,7 @@ export function ScheduleForm({
           <input
             value={form.memo}
             onChange={(event) => onChange({ ...form, memo: event.target.value })}
-            placeholder="예: 보강 후보에서 제외할 외부 일정"
+            placeholder="예: 보강 후보에서 제외할 개인 일정"
             className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
           />
         </label>
@@ -794,7 +794,7 @@ export function BulkScheduleForm({
           >
             <option value="regular_class">정규 수업</option>
             <option value="makeup">보강</option>
-            <option value="external">외부 일정</option>
+            <option value="external">개인/기타 일정</option>
             <option value="consultation">상담</option>
           </select>
         </label>
