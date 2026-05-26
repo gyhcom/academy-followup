@@ -105,9 +105,54 @@ async function createAcademy({
     );
   }
 
+  const { data: existingAcademy, error: existingAcademyError } = await context.admin
+    .from("academies")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle<{ id: string }>();
+
+  if (existingAcademyError) {
+    return NextResponse.json(
+      { error: "학원 slug 중복 여부를 확인하지 못했습니다." },
+      { status: 500 },
+    );
+  }
+
+  if (existingAcademy) {
+    return NextResponse.json(
+      { error: "이미 사용 중인 slug입니다. 다른 slug를 입력해 주세요." },
+      { status: 409 },
+    );
+  }
+
+  const { data: existingUsers, error: existingUserError } =
+    await context.admin.auth.admin.listUsers();
+
+  if (existingUserError) {
+    return NextResponse.json(
+      { error: "원장 이메일 중복 여부를 확인하지 못했습니다." },
+      { status: 500 },
+    );
+  }
+
+  const normalizedOwnerEmail = ownerEmail.toLowerCase();
+  const existingUser = existingUsers.users.find(
+    (user) => user.email?.toLowerCase() === normalizedOwnerEmail,
+  );
+
+  if (existingUser) {
+    return NextResponse.json(
+      {
+        error:
+          "이미 Supabase Auth에 등록된 이메일입니다. 다른 이메일을 사용하거나 기존 계정 연결 정책을 별도로 정해야 합니다.",
+      },
+      { status: 409 },
+    );
+  }
+
   const { data: createdUser, error: userError } =
     await context.admin.auth.admin.createUser({
-      email: ownerEmail,
+      email: normalizedOwnerEmail,
       password: ownerPassword,
       email_confirm: true,
       user_metadata: {
@@ -157,7 +202,7 @@ async function createAcademy({
     context.admin.from("profiles").insert({
       id: ownerUserId,
       academy_id: createdAcademyId,
-      email: ownerEmail,
+      email: normalizedOwnerEmail,
       name: ownerName,
       role: "owner",
       status: "active",

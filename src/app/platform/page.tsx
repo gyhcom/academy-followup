@@ -39,6 +39,10 @@ type StudentRecord = {
   status: string;
 };
 
+type AcademySettingRecord = {
+  academy_id: string;
+};
+
 export default async function PlatformPage() {
   const context = await getPlatformAdminContext();
 
@@ -54,7 +58,14 @@ export default async function PlatformPage() {
     );
   }
 
-  const [academiesResult, profilesResult, classesResult, studentsResult, myProfileResult] =
+  const [
+    academiesResult,
+    profilesResult,
+    classesResult,
+    studentsResult,
+    settingsResult,
+    myProfileResult,
+  ] =
     await Promise.all([
       context.admin
         .from("academies")
@@ -68,6 +79,10 @@ export default async function PlatformPage() {
       context.admin.from("classes").select("id, academy_id").returns<ClassRecord[]>(),
       context.admin.from("students").select("id, academy_id, status").returns<StudentRecord[]>(),
       context.admin
+        .from("academy_settings")
+        .select("academy_id")
+        .returns<AcademySettingRecord[]>(),
+      context.admin
         .from("profiles")
         .select("id")
         .eq("id", context.userId)
@@ -78,7 +93,8 @@ export default async function PlatformPage() {
     academiesResult.error ||
     profilesResult.error ||
     classesResult.error ||
-    studentsResult.error
+    studentsResult.error ||
+    settingsResult.error
   ) {
     return (
       <PlatformShell email={context.email}>
@@ -89,6 +105,7 @@ export default async function PlatformPage() {
             profilesResult.error?.message ??
             classesResult.error?.message ??
             studentsResult.error?.message ??
+            settingsResult.error?.message ??
             "학원 현황을 불러오지 못했습니다."
           }
         />
@@ -101,6 +118,7 @@ export default async function PlatformPage() {
     profiles: profilesResult.data ?? [],
     classes: classesResult.data ?? [],
     students: studentsResult.data ?? [],
+    settings: settingsResult.data ?? [],
   });
 
   return (
@@ -115,11 +133,13 @@ function buildAcademySummaries({
   profiles,
   classes,
   students,
+  settings,
 }: {
   academies: AcademyRecord[];
   profiles: ProfileRecord[];
   classes: ClassRecord[];
   students: StudentRecord[];
+  settings: AcademySettingRecord[];
 }): PlatformAcademySummary[] {
   return academies.map((academy) => {
     const academyProfiles = profiles.filter((profile) => profile.academy_id === academy.id);
@@ -142,6 +162,7 @@ function buildAcademySummaries({
       studentCount: students.filter(
         (student) => student.academy_id === academy.id && student.status === "active",
       ).length,
+      hasSettings: settings.some((setting) => setting.academy_id === academy.id),
       createdAt: academy.created_at,
     };
   });

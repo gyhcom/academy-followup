@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Loader2, Plus } from "lucide-react";
+import { Building2, CheckCircle2, ClipboardList, Loader2, Plus } from "lucide-react";
 
 export type PlatformAcademySummary = {
   id: string;
@@ -16,6 +16,7 @@ export type PlatformAcademySummary = {
   memberCount: number;
   classCount: number;
   studentCount: number;
+  hasSettings: boolean;
   createdAt: string;
 };
 
@@ -48,10 +49,20 @@ const initialForm: FormState = {
 const academyPlans = ["pilot", "free", "starter", "standard", "pro"];
 const academyStatuses = ["active", "trialing", "paused", "cancelled"];
 
+type CreatedAcademyInfo = {
+  academyName: string;
+  slug: string;
+  ownerEmail: string;
+  ownerPassword: string;
+  loginUrl: string;
+};
+
 export function PlatformConsole({ academies }: PlatformConsoleProps) {
   const router = useRouter();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [form, setForm] = useState<FormState>(initialForm);
+  const [isSlugEdited, setIsSlugEdited] = useState(false);
+  const [createdAcademy, setCreatedAcademy] = useState<CreatedAcademyInfo | null>(null);
   const [status, setStatus] = useState<{
     state: "idle" | "saving" | "saved" | "error";
     message: string;
@@ -66,8 +77,27 @@ export function PlatformConsole({ academies }: PlatformConsoleProps) {
     [academies],
   );
 
+  const loginUrl =
+    typeof window === "undefined" ? "/login" : `${window.location.origin}/login`;
+
+  function updateAcademyName(value: string) {
+    setForm((current) => ({
+      ...current,
+      name: value,
+      slug: isSlugEdited ? current.slug : createSlugSuggestion(value),
+    }));
+  }
+
+  function generateTemporaryPassword() {
+    setForm((current) => ({
+      ...current,
+      ownerPassword: createTemporaryPassword(),
+    }));
+  }
+
   async function createAcademy() {
     setStatus({ state: "saving", message: "" });
+    setCreatedAcademy(null);
 
     try {
       const response = await fetch("/api/platform/academies", {
@@ -90,7 +120,15 @@ export function PlatformConsole({ academies }: PlatformConsoleProps) {
         state: "saved",
         message: payload.message ?? "학원과 원장 계정을 생성했습니다.",
       });
+      setCreatedAcademy({
+        academyName: form.name.trim(),
+        slug: form.slug.trim(),
+        ownerEmail: form.ownerEmail.trim().toLowerCase(),
+        ownerPassword: form.ownerPassword,
+        loginUrl,
+      });
       setForm(initialForm);
+      setIsSlugEdited(false);
       setIsCreateOpen(false);
       router.refresh();
     } catch (error) {
@@ -185,15 +223,23 @@ export function PlatformConsole({ academies }: PlatformConsoleProps) {
             <TextField
               label="학원명"
               value={form.name}
-              onChange={(value) => setForm((current) => ({ ...current, name: value }))}
+              onChange={updateAcademyName}
               placeholder="예: 더배움프라임영수학원"
             />
-            <TextField
-              label="Slug"
-              value={form.slug}
-              onChange={(value) => setForm((current) => ({ ...current, slug: value }))}
-              placeholder="예: thebaeum-prime"
-            />
+            <div className="grid gap-1">
+              <TextField
+                label="Slug"
+                value={form.slug}
+                onChange={(value) => {
+                  setIsSlugEdited(true);
+                  setForm((current) => ({ ...current, slug: value }));
+                }}
+                placeholder="예: thebaeum-prime"
+              />
+              <p className="text-xs leading-5 text-stone-500">
+                영문 소문자, 숫자, 하이픈만 사용합니다. 학원명 입력 시 자동 후보를 채웁니다.
+              </p>
+            </div>
             <TextField
               label="카테고리"
               value={form.category}
@@ -213,15 +259,24 @@ export function PlatformConsole({ academies }: PlatformConsoleProps) {
               placeholder="owner@example.com"
               type="email"
             />
-            <TextField
-              label="임시 비밀번호"
-              value={form.ownerPassword}
-              onChange={(value) =>
-                setForm((current) => ({ ...current, ownerPassword: value }))
-              }
-              placeholder="8자 이상"
-              type="password"
-            />
+            <div className="grid gap-1">
+              <TextField
+                label="임시 비밀번호"
+                value={form.ownerPassword}
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, ownerPassword: value }))
+                }
+                placeholder="8자 이상"
+                type="text"
+              />
+              <button
+                type="button"
+                onClick={generateTemporaryPassword}
+                className="min-h-9 rounded-md border border-stone-200 bg-stone-50 px-3 text-xs font-semibold text-stone-700"
+              >
+                임시 비밀번호 자동 생성
+              </button>
+            </div>
             <SelectField
               label="플랜"
               value={form.plan}
@@ -260,6 +315,8 @@ export function PlatformConsole({ academies }: PlatformConsoleProps) {
         </p>
       ) : null}
 
+      {createdAcademy ? <DeliveryCard info={createdAcademy} /> : null}
+
       <section className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
         <div className="border-b border-stone-200 px-4 py-3">
           <h2 className="text-base font-black text-stone-950">학원 목록</h2>
@@ -276,6 +333,7 @@ export function PlatformConsole({ academies }: PlatformConsoleProps) {
                 academy={academy}
                 disabled={isSaving}
                 onUpdate={updateAcademyStatus}
+                loginUrl={loginUrl}
               />
             ))}
           </div>
@@ -298,6 +356,7 @@ function AcademyRow({
   academy,
   disabled,
   onUpdate,
+  loginUrl,
 }: {
   academy: PlatformAcademySummary;
   disabled: boolean;
@@ -306,9 +365,11 @@ function AcademyRow({
     statusValue: string;
     planValue: string;
   }) => Promise<void>;
+  loginUrl: string;
 }) {
   const [statusValue, setStatusValue] = useState(academy.status);
   const [planValue, setPlanValue] = useState(academy.plan);
+  const [isDeliveryOpen, setIsDeliveryOpen] = useState(false);
   const isChanged = statusValue !== academy.status || planValue !== academy.plan;
 
   return (
@@ -364,7 +425,85 @@ function AcademyRow({
       <p className="text-xs text-stone-500 lg:col-span-3">
         원장: {academy.ownerName ?? "미지정"} · {academy.ownerEmail ?? "이메일 없음"}
       </p>
+      <div className="flex flex-wrap gap-1.5 lg:col-span-3">
+        <StatusBadge active={Boolean(academy.ownerEmail)} label="원장 연결됨" />
+        <StatusBadge active={academy.hasSettings} label="설정 생성됨" />
+        <StatusBadge active={academy.classCount === 0} label="반 0개" />
+        <StatusBadge active={academy.studentCount === 0} label="학생 0명" />
+        <StatusBadge active={Boolean(academy.ownerEmail && academy.hasSettings)} label="/app 연결 준비" />
+      </div>
+      <div className="lg:col-span-3">
+        <button
+          type="button"
+          onClick={() => setIsDeliveryOpen((current) => !current)}
+          className="inline-flex min-h-9 items-center gap-2 rounded-md border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700"
+        >
+          <ClipboardList size={14} />
+          원장에게 전달할 정보 보기
+        </button>
+        {isDeliveryOpen ? (
+          <div className="mt-2 rounded-lg border border-[#D8E6F1] bg-[#F5FAFE] p-3 text-xs leading-6 text-stone-700">
+            <p className="font-black text-stone-950">{academy.name} 전달 정보</p>
+            <p>로그인 주소: {loginUrl}</p>
+            <p>로그인 이메일: {academy.ownerEmail ?? "원장 이메일 없음"}</p>
+            <p>임시 비밀번호: 생성 직후 카드에서만 확인 가능합니다.</p>
+            <p className="mt-1 text-stone-500">
+              원장이 로그인하면 `/app`에서 이 학원 워크스페이스로 바로 연결됩니다.
+            </p>
+          </div>
+        ) : null}
+      </div>
     </div>
+  );
+}
+
+function DeliveryCard({ info }: { info: CreatedAcademyInfo }) {
+  return (
+    <section className="rounded-xl border border-[#BFD7EA] bg-[#F4FAFF] p-4 shadow-sm sm:p-5">
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#315C7C] text-white">
+          <CheckCircle2 size={18} />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-black text-stone-950">
+            {info.academyName} 생성 완료
+          </p>
+          <p className="mt-1 text-sm leading-6 text-stone-600">
+            아래 정보를 원장에게 전달하면 바로 로그인해서 학원 워크스페이스를 확인할 수 있습니다.
+          </p>
+          <div className="mt-3 grid gap-2 rounded-lg border border-[#D8E6F1] bg-white p-3 text-sm">
+            <CopyLine label="로그인 주소" value={info.loginUrl} />
+            <CopyLine label="로그인 이메일" value={info.ownerEmail} />
+            <CopyLine label="임시 비밀번호" value={info.ownerPassword} />
+            <CopyLine label="학원 slug" value={info.slug} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CopyLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid gap-1 sm:grid-cols-[120px_1fr] sm:items-center">
+      <span className="text-xs font-semibold text-stone-500">{label}</span>
+      <code className="break-all rounded bg-stone-50 px-2 py-1 text-xs font-semibold text-stone-950">
+        {value}
+      </code>
+    </div>
+  );
+}
+
+function StatusBadge({ active, label }: { active: boolean; label: string }) {
+  return (
+    <span
+      className={[
+        "rounded-full px-2.5 py-1 text-[11px] font-bold",
+        active ? "bg-emerald-50 text-emerald-800" : "bg-stone-100 text-stone-500",
+      ].join(" ")}
+    >
+      {label}
+    </span>
   );
 }
 
@@ -375,6 +514,33 @@ function SmallMetric({ label, value }: { label: string; value: number }) {
       <span className="mt-0.5 block text-sm font-black text-stone-950">{value}</span>
     </span>
   );
+}
+
+function createSlugSuggestion(value: string) {
+  const normalized = value
+    .toLowerCase()
+    .trim()
+    .replace(/academy|학원/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  if (normalized) {
+    return normalized;
+  }
+
+  const hash = Array.from(value.trim())
+    .reduce((sum, char) => sum + char.charCodeAt(0), 0)
+    .toString(36);
+
+  return hash === "0" ? "" : `academy-${hash}`;
+}
+
+function createTemporaryPassword() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+  const bytes = new Uint32Array(10);
+  window.crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
 }
 
 function TextField({

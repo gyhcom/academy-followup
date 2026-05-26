@@ -11,6 +11,38 @@
 5. 많은 학생 수로 모바일/스크롤 테스트가 필요할 때만 `supabase/seed-volume.sql`을 추가 실행합니다.
 6. 운영 리허설처럼 매일 수업/출석/문자 기록이 필요할 때만 `supabase/seed-demo-operations.sql`을 추가 실행합니다.
 
+## 슈퍼어드민 계정 등록
+
+`/platform` 접근 권한은 Supabase Auth 사용자에 `platform_admins` 권한을 붙여 부여합니다. 비밀번호는 Supabase Authentication에서 관리하고, `platform_admins`에는 권한만 저장합니다.
+
+1. Supabase Dashboard > Authentication > Users에서 슈퍼어드민으로 쓸 이메일 계정을 먼저 생성합니다.
+2. SQL Editor에서 아래 SQL을 실행합니다.
+
+```sql
+insert into public.platform_admins (user_id, role)
+select id, 'super_admin'
+from auth.users
+where email = 'admin@test.com'
+on conflict (user_id) do update
+set role = excluded.role;
+```
+
+등록 확인:
+
+```sql
+select
+  u.email,
+  pa.role as platform_role,
+  p.role as academy_role,
+  p.academy_id
+from auth.users u
+left join public.platform_admins pa on pa.user_id = u.id
+left join public.profiles p on p.id = u.id
+where u.email = 'admin@test.com';
+```
+
+슈퍼어드민 전용 계정은 `academy_role`, `academy_id`가 비어 있어도 정상입니다. 학원 앱까지 같이 쓰는 계정만 `profiles`에도 연결합니다.
+
 ## 필수 컬럼 확인
 
 ```sql
