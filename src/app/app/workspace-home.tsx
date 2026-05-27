@@ -91,6 +91,7 @@ type HomeScheduleItem = {
 };
 
 type HomeScheduleSummary = {
+  academyScheduleCount: number;
   classSessionCount: number;
   manualExternalCount: number;
   sharedCount: number;
@@ -391,8 +392,8 @@ function MobileHomeExperience({
             <MobileHeroMetric label="연락 전" value={`${unsentCount}명`} tone="warm" />
           </div>
           <p className="mt-3 text-xs font-bold text-white/80">
-            오늘 수업 {scheduleSummary.classSessionCount}개 · 타 학원{" "}
-            {scheduleSummary.manualExternalCount}건 · 연결 공유 {scheduleSummary.sharedCount}건
+            오늘 학원 일정 {scheduleSummary.academyScheduleCount}개 · 보강 불가{" "}
+            {scheduleSummary.blockedScheduleCount}건
           </p>
 
           <div className="mt-4 rounded-2xl bg-white/95 p-3 text-stone-950 shadow-[0_14px_32px_rgba(20,83,45,0.16)]">
@@ -743,9 +744,14 @@ function TodayScheduleSection({
   className?: string;
   onNavigate: (view: WorkspaceView) => void;
 }) {
-  const visibleItems = items.slice(0, 6);
-  const hiddenCount = Math.max(0, items.length - visibleItems.length);
-  const hasBlockedSchedules = summary.blockedScheduleCount > 0;
+  const academyItems = items.filter(isAcademyScheduleItem);
+  const blockedItems = items.filter(isBlockedScheduleItem);
+  const visibleAcademyItems = academyItems.slice(0, 6);
+  const hiddenAcademyCount = Math.max(0, academyItems.length - visibleAcademyItems.length);
+  const visibleBlockedItems = blockedItems.slice(0, 3);
+  const hiddenBlockedCount = Math.max(0, blockedItems.length - visibleBlockedItems.length);
+  const hasAnySchedule = academyItems.length > 0 || blockedItems.length > 0;
+  const hasBlockedSchedules = blockedItems.length > 0;
 
   return (
     <section
@@ -766,8 +772,8 @@ function TodayScheduleSection({
             </h3>
           </div>
           <span className="shrink-0 rounded-full bg-[#EAF1F8] px-2.5 py-1 text-xs font-bold text-[#315C7C]">
-            수업 {summary.classSessionCount} · 타학원 {summary.manualExternalCount} · 연결{" "}
-            {summary.sharedCount}
+            학원 일정 {summary.academyScheduleCount} · 보강 불가{" "}
+            {summary.blockedScheduleCount}
           </span>
         </div>
       </div>
@@ -776,24 +782,78 @@ function TodayScheduleSection({
         <div className="border-b border-[#F4DEC1] bg-[#FFF8EA] px-4 py-3 text-sm leading-6 text-[#7A4A08] sm:px-5">
           <p className="font-black">보강 불가 일정이 있습니다</p>
           <p className="mt-0.5 text-xs font-bold text-[#98610F]">
-            타 학원 수업 {summary.manualExternalCount}건 · 연결 학원 공유{" "}
+            타 학원 수업 {summary.manualExternalCount}건 · 연결 학원 수업{" "}
             {summary.sharedCount}건
           </p>
         </div>
       ) : null}
 
-      {visibleItems.length === 0 ? (
+      {!hasAnySchedule ? (
         <div className="px-4 py-5 text-sm leading-6 text-stone-600 sm:px-5">
           이 날짜에는 표시할 일정이 없습니다.
         </div>
       ) : (
         <div className="divide-y divide-stone-100">
-          {visibleItems.map((item) => (
-            <TodayScheduleRow key={item.id} item={item} onNavigate={onNavigate} />
-          ))}
-          {hiddenCount > 0 ? (
-            <div className="bg-[#FBFAF7] px-4 py-3 text-center text-xs font-bold text-stone-500 sm:px-5">
-              그 외 일정 {hiddenCount}건은 출석/관리 화면에서 확인하세요.
+          <div className="px-4 py-3 sm:px-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-black text-stone-950">학원 일정</p>
+                <p className="mt-0.5 text-xs font-medium text-stone-500">
+                  출석 체크가 필요한 우리 학원 일정입니다.
+                </p>
+              </div>
+              <span className="rounded-full bg-stone-100 px-2 py-1 text-[11px] font-black text-stone-600">
+                {academyItems.length}개
+              </span>
+            </div>
+          </div>
+          {visibleAcademyItems.length === 0 ? (
+            <div className="px-4 pb-4 text-sm leading-6 text-stone-500 sm:px-5">
+              이 날짜에는 학원 일정이 없습니다.
+            </div>
+          ) : (
+            <div className="divide-y divide-stone-100">
+              {visibleAcademyItems.map((item) => (
+                <TodayScheduleRow key={item.id} item={item} onNavigate={onNavigate} />
+              ))}
+              {hiddenAcademyCount > 0 ? (
+                <div className="bg-[#FBFAF7] px-4 py-3 text-center text-xs font-bold text-stone-500 sm:px-5">
+                  그 외 학원 일정 {hiddenAcademyCount}건은 출석/관리 화면에서 확인하세요.
+                </div>
+              ) : null}
+            </div>
+          )}
+
+          {hasBlockedSchedules ? (
+            <div className="bg-[#FFFCF5]">
+              <div className="border-t border-[#F5E3C7] px-4 py-3 sm:px-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-black text-[#7A4A08]">보강 불가 일정</p>
+                    <p className="mt-0.5 text-xs font-medium text-[#98610F]">
+                      타 학원/연결 학원 수업과 개인 일정입니다.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-[#FFECC7] px-2 py-1 text-[11px] font-black text-[#8A5206]">
+                    {blockedItems.length}건
+                  </span>
+                </div>
+              </div>
+              <div className="divide-y divide-[#F5E3C7]">
+                {visibleBlockedItems.map((item) => (
+                  <TodayScheduleRow
+                    key={item.id}
+                    item={item}
+                    onNavigate={onNavigate}
+                    variant="blocked"
+                  />
+                ))}
+                {hiddenBlockedCount > 0 ? (
+                  <div className="px-4 py-3 text-center text-xs font-bold text-[#98610F] sm:px-5">
+                    그 외 보강 불가 {hiddenBlockedCount}건은 학생 상세에서 확인하세요.
+                  </div>
+                ) : null}
+              </div>
             </div>
           ) : null}
         </div>
@@ -805,29 +865,47 @@ function TodayScheduleSection({
 function TodayScheduleRow({
   item,
   onNavigate,
+  variant = "academy",
 }: {
   item: HomeScheduleItem;
   onNavigate: (view: WorkspaceView) => void;
+  variant?: "academy" | "blocked";
 }) {
   const isManualExternal = item.kind === "manual_external_class";
   const isSharedSchedule = item.isShared;
-  const isBlockedSchedule = isManualExternal || isSharedSchedule;
+  const isPersonalExternal = item.scheduleType === "external";
+  const isBlockedSchedule = isBlockedScheduleItem(item);
   const badgeLabel = isManualExternal
     ? "타 학원 수업"
     : isSharedSchedule
-    ? "연결 공유"
+    ? "연결 학원 수업"
+    : isPersonalExternal
+    ? "개인/기타 일정"
     : scheduleTypeLabel(item.scheduleType);
   const badgeTone = isManualExternal
     ? "bg-[#FFF4E4] text-[#A05A00]"
     : isSharedSchedule
     ? "bg-[#EAF1F8] text-[#315C7C]"
+    : isPersonalExternal
+    ? "bg-stone-100 text-stone-700"
     : scheduleTypeTone(item.scheduleType);
   const detailLabel = isManualExternal
-    ? `보강 불가 · ${item.subtitle || "타 학원 수업"}`
+    ? `${item.subtitle || "타 학원 수업"} · 보강 불가`
     : isSharedSchedule
-    ? "연결 학원 수업 · 익명 공유 · 보강 불가"
+    ? "학원명 비공개 · 보강 불가"
+    : isPersonalExternal
+    ? `${item.subtitle || "개인/기타 일정"} · 보강 불가`
     : item.subtitle || item.className || "일정";
   const actionLabel = item.canOpenAttendance ? "출석 보기" : isBlockedSchedule ? "보강 불가" : "읽기 전용";
+  const rowClassName =
+    variant === "blocked" || isBlockedSchedule
+      ? "flex min-h-[4.1rem] w-full items-start gap-3 bg-[#FFF8EA] px-4 py-3 text-left sm:px-5"
+      : "flex min-h-[4.5rem] w-full items-start gap-3 px-4 py-3 text-left sm:px-5";
+  const actionClassName = item.canOpenAttendance
+    ? "bg-stone-950 text-white"
+    : isBlockedSchedule
+    ? "bg-[#FFECC7] text-[#7A4A08]"
+    : "bg-stone-100 text-stone-500";
 
   const content = (
     <>
@@ -863,9 +941,7 @@ function TodayScheduleRow({
       <span
         className={[
           "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black",
-          item.canOpenAttendance
-            ? "bg-stone-950 text-white"
-            : "bg-stone-100 text-stone-500",
+          actionClassName,
         ].join(" ")}
       >
         {actionLabel}
@@ -878,7 +954,7 @@ function TodayScheduleRow({
       <button
         type="button"
         onClick={() => onNavigate("attendance")}
-        className="flex min-h-[4.5rem] w-full items-start gap-3 px-4 py-3 text-left transition active:bg-stone-50 sm:px-5"
+        className={`${rowClassName} transition active:bg-stone-50`}
       >
         {content}
       </button>
@@ -886,7 +962,7 @@ function TodayScheduleRow({
   }
 
   return (
-    <div className="flex min-h-[4.5rem] items-start gap-3 px-4 py-3 sm:px-5">
+    <div className={rowClassName}>
       {content}
     </div>
   );
@@ -1251,14 +1327,24 @@ function buildHomeScheduleSummary(items: HomeScheduleItem[], dateValue: string):
   const filteredItems = filterScheduleItemsForDate(items, dateValue);
   const manualExternalCount = filteredItems.filter((item) => item.kind === "manual_external_class").length;
   const sharedCount = filteredItems.filter((item) => item.isShared).length;
+  const blockedScheduleCount = filteredItems.filter(isBlockedScheduleItem).length;
 
   return {
+    academyScheduleCount: filteredItems.length - blockedScheduleCount,
     classSessionCount: filteredItems.filter((item) => item.kind === "class_session").length,
     manualExternalCount,
     sharedCount,
-    blockedScheduleCount: manualExternalCount + sharedCount,
+    blockedScheduleCount,
     totalCount: filteredItems.length,
   };
+}
+
+function isBlockedScheduleItem(item: HomeScheduleItem) {
+  return item.kind === "manual_external_class" || item.isShared || item.scheduleType === "external";
+}
+
+function isAcademyScheduleItem(item: HomeScheduleItem) {
+  return !isBlockedScheduleItem(item);
 }
 
 function getFilteredItems(items: HomeFollowupItem[], filter: FollowupFilter | null) {
