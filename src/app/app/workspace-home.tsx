@@ -841,7 +841,7 @@ function TodayScheduleSection({
                 ) : null}
                 {summary.sharedCount > 0 ? (
                   <div className="border-t border-[#F1E7D6] px-4 py-2.5 text-[11px] font-semibold text-[#98610F] sm:px-5">
-                    연결 학원명과 전화번호는 공개되지 않습니다.
+                    공유 일정은 상대 학원명과 전화번호가 공개되지 않습니다.
                   </div>
                 ) : null}
               </div>
@@ -866,10 +866,11 @@ function TodayScheduleRow({
   const isSharedSchedule = item.isShared;
   const isPersonalExternal = item.scheduleType === "external";
   const isBlockedSchedule = isBlockedScheduleItem(item);
+  const isRegularAcademyClass = !isBlockedSchedule && item.scheduleType === "regular_class";
   const badgeLabel = isManualExternal
-    ? "타 학원"
+    ? "직접등록"
     : isSharedSchedule
-    ? "연결 학원"
+    ? "공유됨"
     : isPersonalExternal
     ? "개인"
     : scheduleTypeLabel(item.scheduleType);
@@ -880,7 +881,13 @@ function TodayScheduleRow({
     : isPersonalExternal
     ? "bg-stone-100 text-stone-700"
     : scheduleTypeTone(item.scheduleType);
-  const detailLabel = item.subtitle || item.className || "일정";
+  const detailLabel = isManualExternal
+    ? `${item.subtitle || "타 학원 수업"} · 보강 불가 시간`
+    : isSharedSchedule
+    ? "학원명 비공개 · 보강 불가 시간"
+    : isPersonalExternal
+    ? `${item.subtitle || "개인/기타 일정"} · 보강 불가 시간`
+    : item.subtitle || item.className || "일정";
   const actionLabel = item.canOpenAttendance ? "출석 보기" : isBlockedSchedule ? "보강 불가" : "읽기 전용";
   const rowClassName =
     variant === "blocked" || isBlockedSchedule
@@ -908,14 +915,16 @@ function TodayScheduleRow({
             <span className="truncate text-sm font-black text-stone-950">
               {item.title}
             </span>
-            <span
-              className={[
-                "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-black",
-                badgeTone,
-              ].join(" ")}
-            >
-              {badgeLabel}
-            </span>
+            {!isRegularAcademyClass ? (
+              <span
+                className={[
+                  "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-black",
+                  badgeTone,
+                ].join(" ")}
+              >
+                {badgeLabel}
+              </span>
+            ) : null}
           </span>
           <span className="mt-1 block truncate text-xs font-medium text-stone-500">
             {detailLabel}
