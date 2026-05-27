@@ -748,7 +748,7 @@ function TodayScheduleSection({
   const blockedItems = items.filter(isBlockedScheduleItem);
   const visibleAcademyItems = academyItems.slice(0, 6);
   const hiddenAcademyCount = Math.max(0, academyItems.length - visibleAcademyItems.length);
-  const visibleBlockedItems = blockedItems.slice(0, 3);
+  const visibleBlockedItems = blockedItems.slice(0, 2);
   const hiddenBlockedCount = Math.max(0, blockedItems.length - visibleBlockedItems.length);
   const hasAnySchedule = academyItems.length > 0 || blockedItems.length > 0;
   const hasBlockedSchedules = blockedItems.length > 0;
@@ -761,7 +761,7 @@ function TodayScheduleSection({
         className,
       ].join(" ")}
     >
-      <div className="border-b border-stone-100 px-4 py-4 sm:px-5">
+      <div className="border-b border-stone-100 px-4 py-3.5 sm:px-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-wide text-[#315C7C]">
@@ -772,21 +772,11 @@ function TodayScheduleSection({
             </h3>
           </div>
           <span className="shrink-0 rounded-full bg-[#EAF1F8] px-2.5 py-1 text-xs font-bold text-[#315C7C]">
-            학원 일정 {summary.academyScheduleCount} · 보강 불가{" "}
+            수업 {summary.academyScheduleCount} · 보강불가{" "}
             {summary.blockedScheduleCount}
           </span>
         </div>
       </div>
-
-      {hasBlockedSchedules ? (
-        <div className="border-b border-[#F4DEC1] bg-[#FFF8EA] px-4 py-3 text-sm leading-6 text-[#7A4A08] sm:px-5">
-          <p className="font-black">보강 불가 일정이 있습니다</p>
-          <p className="mt-0.5 text-xs font-bold text-[#98610F]">
-            타 학원 수업 {summary.manualExternalCount}건 · 연결 학원 수업{" "}
-            {summary.sharedCount}건
-          </p>
-        </div>
-      ) : null}
 
       {!hasAnySchedule ? (
         <div className="px-4 py-5 text-sm leading-6 text-stone-600 sm:px-5">
@@ -794,13 +784,11 @@ function TodayScheduleSection({
         </div>
       ) : (
         <div className="divide-y divide-stone-100">
-          <div className="px-4 py-3 sm:px-5">
+          <div className="px-4 py-2.5 sm:px-5">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-black text-stone-950">학원 일정</p>
-                <p className="mt-0.5 text-xs font-medium text-stone-500">
-                  출석 체크가 필요한 우리 학원 일정입니다.
-                </p>
+                <p className="mt-0.5 text-xs font-medium text-stone-500">출석 체크</p>
               </div>
               <span className="rounded-full bg-stone-100 px-2 py-1 text-[11px] font-black text-stone-600">
                 {academyItems.length}개
@@ -825,14 +813,12 @@ function TodayScheduleSection({
           )}
 
           {hasBlockedSchedules ? (
-            <div className="bg-[#FFFCF5]">
-              <div className="border-t border-[#F5E3C7] px-4 py-3 sm:px-5">
+            <div className="bg-[#FFFDF8]">
+              <div className="border-t border-[#F1E7D6] px-4 py-2.5 sm:px-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-black text-[#7A4A08]">보강 불가 일정</p>
-                    <p className="mt-0.5 text-xs font-medium text-[#98610F]">
-                      타 학원/연결 학원 수업과 개인 일정입니다.
-                    </p>
+                    <p className="text-sm font-black text-[#7A4A08]">보강 불가</p>
+                    <p className="mt-0.5 text-xs font-medium text-[#98610F]">보강 시간 제외</p>
                   </div>
                   <span className="rounded-full bg-[#FFECC7] px-2 py-1 text-[11px] font-black text-[#8A5206]">
                     {blockedItems.length}건
@@ -851,6 +837,11 @@ function TodayScheduleSection({
                 {hiddenBlockedCount > 0 ? (
                   <div className="px-4 py-3 text-center text-xs font-bold text-[#98610F] sm:px-5">
                     그 외 보강 불가 {hiddenBlockedCount}건은 학생 상세에서 확인하세요.
+                  </div>
+                ) : null}
+                {summary.sharedCount > 0 ? (
+                  <div className="border-t border-[#F1E7D6] px-4 py-2.5 text-[11px] font-semibold text-[#98610F] sm:px-5">
+                    연결 학원명과 전화번호는 공개되지 않습니다.
                   </div>
                 ) : null}
               </div>
@@ -876,11 +867,11 @@ function TodayScheduleRow({
   const isPersonalExternal = item.scheduleType === "external";
   const isBlockedSchedule = isBlockedScheduleItem(item);
   const badgeLabel = isManualExternal
-    ? "타 학원 수업"
+    ? "타 학원"
     : isSharedSchedule
-    ? "연결 학원 수업"
+    ? "연결 학원"
     : isPersonalExternal
-    ? "개인/기타 일정"
+    ? "개인"
     : scheduleTypeLabel(item.scheduleType);
   const badgeTone = isManualExternal
     ? "bg-[#FFF4E4] text-[#A05A00]"
@@ -889,18 +880,12 @@ function TodayScheduleRow({
     : isPersonalExternal
     ? "bg-stone-100 text-stone-700"
     : scheduleTypeTone(item.scheduleType);
-  const detailLabel = isManualExternal
-    ? `${item.subtitle || "타 학원 수업"} · 보강 불가`
-    : isSharedSchedule
-    ? "학원명 비공개 · 보강 불가"
-    : isPersonalExternal
-    ? `${item.subtitle || "개인/기타 일정"} · 보강 불가`
-    : item.subtitle || item.className || "일정";
+  const detailLabel = item.subtitle || item.className || "일정";
   const actionLabel = item.canOpenAttendance ? "출석 보기" : isBlockedSchedule ? "보강 불가" : "읽기 전용";
   const rowClassName =
     variant === "blocked" || isBlockedSchedule
-      ? "flex min-h-[4.1rem] w-full items-start gap-3 bg-[#FFF8EA] px-4 py-3 text-left sm:px-5"
-      : "flex min-h-[4.5rem] w-full items-start gap-3 px-4 py-3 text-left sm:px-5";
+      ? "flex min-h-[3.75rem] w-full items-start gap-3 bg-[#FFFDF8] px-4 py-2.5 text-left sm:px-5"
+      : "flex min-h-[4rem] w-full items-start gap-3 px-4 py-2.5 text-left sm:px-5";
   const actionClassName = item.canOpenAttendance
     ? "bg-stone-950 text-white"
     : isBlockedSchedule
