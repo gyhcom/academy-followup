@@ -92,7 +92,9 @@ type HomeScheduleItem = {
 
 type HomeScheduleSummary = {
   classSessionCount: number;
+  manualExternalCount: number;
   sharedCount: number;
+  blockedScheduleCount: number;
   totalCount: number;
 };
 
@@ -389,7 +391,8 @@ function MobileHomeExperience({
             <MobileHeroMetric label="연락 전" value={`${unsentCount}명`} tone="warm" />
           </div>
           <p className="mt-3 text-xs font-bold text-white/80">
-            오늘 수업 {scheduleSummary.classSessionCount}개 · 공유 일정 {scheduleSummary.sharedCount}건
+            오늘 수업 {scheduleSummary.classSessionCount}개 · 타 학원{" "}
+            {scheduleSummary.manualExternalCount}건 · 연결 공유 {scheduleSummary.sharedCount}건
           </p>
 
           <div className="mt-4 rounded-2xl bg-white/95 p-3 text-stone-950 shadow-[0_14px_32px_rgba(20,83,45,0.16)]">
@@ -742,6 +745,7 @@ function TodayScheduleSection({
 }) {
   const visibleItems = items.slice(0, 6);
   const hiddenCount = Math.max(0, items.length - visibleItems.length);
+  const hasBlockedSchedules = summary.blockedScheduleCount > 0;
 
   return (
     <section
@@ -762,10 +766,21 @@ function TodayScheduleSection({
             </h3>
           </div>
           <span className="shrink-0 rounded-full bg-[#EAF1F8] px-2.5 py-1 text-xs font-bold text-[#315C7C]">
-            수업 {summary.classSessionCount} · 공유 {summary.sharedCount}
+            수업 {summary.classSessionCount} · 타학원 {summary.manualExternalCount} · 연결{" "}
+            {summary.sharedCount}
           </span>
         </div>
       </div>
+
+      {hasBlockedSchedules ? (
+        <div className="border-b border-[#F4DEC1] bg-[#FFF8EA] px-4 py-3 text-sm leading-6 text-[#7A4A08] sm:px-5">
+          <p className="font-black">보강 불가 일정이 있습니다</p>
+          <p className="mt-0.5 text-xs font-bold text-[#98610F]">
+            타 학원 수업 {summary.manualExternalCount}건 · 연결 학원 공유{" "}
+            {summary.sharedCount}건
+          </p>
+        </div>
+      ) : null}
 
       {visibleItems.length === 0 ? (
         <div className="px-4 py-5 text-sm leading-6 text-stone-600 sm:px-5">
@@ -794,6 +809,26 @@ function TodayScheduleRow({
   item: HomeScheduleItem;
   onNavigate: (view: WorkspaceView) => void;
 }) {
+  const isManualExternal = item.kind === "manual_external_class";
+  const isSharedSchedule = item.isShared;
+  const isBlockedSchedule = isManualExternal || isSharedSchedule;
+  const badgeLabel = isManualExternal
+    ? "타 학원 수업"
+    : isSharedSchedule
+    ? "연결 공유"
+    : scheduleTypeLabel(item.scheduleType);
+  const badgeTone = isManualExternal
+    ? "bg-[#FFF4E4] text-[#A05A00]"
+    : isSharedSchedule
+    ? "bg-[#EAF1F8] text-[#315C7C]"
+    : scheduleTypeTone(item.scheduleType);
+  const detailLabel = isManualExternal
+    ? `보강 불가 · ${item.subtitle || "타 학원 수업"}`
+    : isSharedSchedule
+    ? "연결 학원 수업 · 익명 공유 · 보강 불가"
+    : item.subtitle || item.className || "일정";
+  const actionLabel = item.canOpenAttendance ? "출석 보기" : isBlockedSchedule ? "보강 불가" : "읽기 전용";
+
   const content = (
     <>
       <span className="flex min-w-0 flex-1 items-start gap-3">
@@ -813,18 +848,14 @@ function TodayScheduleRow({
             <span
               className={[
                 "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-black",
-                item.isShared ? "bg-[#EAF1F8] text-[#315C7C]" : scheduleTypeTone(item.scheduleType),
+                badgeTone,
               ].join(" ")}
             >
-              {item.isShared ? "공유" : scheduleTypeLabel(item.scheduleType)}
+              {badgeLabel}
             </span>
           </span>
           <span className="mt-1 block truncate text-xs font-medium text-stone-500">
-            {item.kind === "manual_external_class"
-              ? `타 학원 수업 · ${item.subtitle || "보강 불가 시간"}`
-              : item.isShared
-              ? "연결 학원 일정 · 보강 불가 시간"
-              : item.subtitle || item.className || "일정"}
+            {detailLabel}
             {item.studentCount ? ` · ${item.studentCount}명` : ""}
           </span>
         </span>
@@ -837,7 +868,7 @@ function TodayScheduleRow({
             : "bg-stone-100 text-stone-500",
         ].join(" ")}
       >
-        {item.canOpenAttendance ? "출석 보기" : "읽기 전용"}
+        {actionLabel}
       </span>
     </>
   );
@@ -1218,10 +1249,14 @@ function filterScheduleItemsForDate(items: HomeScheduleItem[], dateValue: string
 
 function buildHomeScheduleSummary(items: HomeScheduleItem[], dateValue: string): HomeScheduleSummary {
   const filteredItems = filterScheduleItemsForDate(items, dateValue);
+  const manualExternalCount = filteredItems.filter((item) => item.kind === "manual_external_class").length;
+  const sharedCount = filteredItems.filter((item) => item.isShared).length;
 
   return {
     classSessionCount: filteredItems.filter((item) => item.kind === "class_session").length,
-    sharedCount: filteredItems.filter((item) => item.isShared).length,
+    manualExternalCount,
+    sharedCount,
+    blockedScheduleCount: manualExternalCount + sharedCount,
     totalCount: filteredItems.length,
   };
 }
