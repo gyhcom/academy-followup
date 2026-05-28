@@ -772,7 +772,7 @@ function TodayScheduleSection({
             </h3>
           </div>
           <span className="shrink-0 rounded-full bg-[#EAF1F8] px-2.5 py-1 text-xs font-bold text-[#315C7C]">
-            수업 {summary.academyScheduleCount} · 보강불가{" "}
+            수업 {summary.academyScheduleCount} · 공유일정{" "}
             {summary.blockedScheduleCount}
           </span>
         </div>
@@ -817,8 +817,8 @@ function TodayScheduleSection({
               <div className="border-t border-[#F1E7D6] px-4 py-2.5 sm:px-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-black text-[#7A4A08]">보강 불가</p>
-                    <p className="mt-0.5 text-xs font-medium text-[#98610F]">보강 시간 제외</p>
+                    <p className="text-sm font-black text-[#7A4A08]">공유된 타 학원 일정</p>
+                    <p className="mt-0.5 text-xs font-medium text-[#98610F]">보강 시간에서 제외됩니다</p>
                   </div>
                   <span className="rounded-full bg-[#FFECC7] px-2 py-1 text-[11px] font-black text-[#8A5206]">
                     {blockedItems.length}건
@@ -841,7 +841,7 @@ function TodayScheduleSection({
                 ) : null}
                 {summary.sharedCount > 0 ? (
                   <div className="border-t border-[#F1E7D6] px-4 py-2.5 text-[11px] font-semibold text-[#98610F] sm:px-5">
-                    공유 일정은 상대 학원명과 전화번호가 공개되지 않습니다.
+                    공유된 일정은 상대 학원명과 전화번호 없이 시간만 표시됩니다.
                   </div>
                 ) : null}
               </div>
@@ -882,13 +882,13 @@ function TodayScheduleRow({
     ? "bg-stone-100 text-stone-700"
     : scheduleTypeTone(item.scheduleType);
   const detailLabel = isManualExternal
-    ? `${item.subtitle || "타 학원 수업"} · 보강 불가 시간`
+    ? `${item.subtitle || "타 학원 수업"} · 타 학원 수업`
     : isSharedSchedule
-    ? "학원명 비공개 · 보강 불가 시간"
+    ? "연결 학원 수업 · 학원명 비공개"
     : isPersonalExternal
-    ? `${item.subtitle || "개인/기타 일정"} · 보강 불가 시간`
+    ? `${item.subtitle || "개인/기타 일정"} · 개인 일정`
     : item.subtitle || item.className || "일정";
-  const actionLabel = item.canOpenAttendance ? "출석 보기" : isBlockedSchedule ? "보강 불가" : "읽기 전용";
+  const actionLabel = item.canOpenAttendance ? "출석 보기" : isBlockedSchedule ? "보강 제외" : "읽기 전용";
   const rowClassName =
     variant === "blocked" || isBlockedSchedule
       ? "flex min-h-[3.75rem] w-full items-start gap-3 bg-[#FFFDF8] px-4 py-2.5 text-left sm:px-5"
