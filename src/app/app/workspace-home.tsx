@@ -12,9 +12,11 @@ import {
   ChevronRight,
   Loader2,
   MessageSquareText,
+  Search,
   Settings,
   Sparkles,
   Users,
+  X,
 } from "lucide-react";
 import {
   attendanceStatusLabels,
@@ -52,6 +54,7 @@ type WorkspaceHomeProps = {
 };
 
 type FollowupFilter = "all" | "unsent" | "sent";
+type BlockedScheduleFilter = "all" | "shared" | "manual" | "personal";
 
 type HomeFollowupItem = {
   key: string;
@@ -744,8 +747,12 @@ function TodayScheduleSection({
   className?: string;
   onNavigate: (view: WorkspaceView) => void;
 }) {
+  const [isBlockedSheetOpen, setIsBlockedSheetOpen] = useState(false);
+  const [blockedFilter, setBlockedFilter] = useState<BlockedScheduleFilter>("all");
+  const [blockedQuery, setBlockedQuery] = useState("");
   const academyItems = items.filter(isAcademyScheduleItem);
   const blockedItems = items.filter(isBlockedScheduleItem);
+  const blockedCounts = getBlockedScheduleCounts(blockedItems);
   const visibleAcademyItems = academyItems.slice(0, 6);
   const hiddenAcademyCount = Math.max(0, academyItems.length - visibleAcademyItems.length);
   const visibleBlockedItems = blockedItems.slice(0, 2);
@@ -824,6 +831,11 @@ function TodayScheduleSection({
                     {blockedItems.length}건
                   </span>
                 </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  <BlockedSummaryChip label="공유됨" count={blockedCounts.shared} />
+                  <BlockedSummaryChip label="직접등록" count={blockedCounts.manual} />
+                  <BlockedSummaryChip label="개인" count={blockedCounts.personal} />
+                </div>
               </div>
               <div className="divide-y divide-[#F5E3C7]">
                 {visibleBlockedItems.map((item) => (
@@ -835,9 +847,16 @@ function TodayScheduleSection({
                   />
                 ))}
                 {hiddenBlockedCount > 0 ? (
-                  <div className="px-4 py-3 text-center text-xs font-bold text-[#98610F] sm:px-5">
-                    그 외 보강 불가 {hiddenBlockedCount}건은 학생 상세에서 확인하세요.
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsBlockedSheetOpen(true)}
+                    className="flex w-full items-center justify-center gap-2 px-4 py-3 text-center text-xs font-black text-[#7A4A08] transition active:bg-[#FFF7EA] sm:px-5"
+                  >
+                    전체 보기
+                    <span className="rounded-full bg-[#FFECC7] px-2 py-0.5 text-[11px]">
+                      +{hiddenBlockedCount}건
+                    </span>
+                  </button>
                 ) : null}
                 {summary.sharedCount > 0 ? (
                   <div className="border-t border-[#F1E7D6] px-4 py-2.5 text-[11px] font-semibold text-[#98610F] sm:px-5">
@@ -849,7 +868,181 @@ function TodayScheduleSection({
           ) : null}
         </div>
       )}
+      {isBlockedSheetOpen ? (
+        <BlockedScheduleSheet
+          items={blockedItems}
+          selectedDate={selectedDate}
+          filter={blockedFilter}
+          query={blockedQuery}
+          onFilterChange={setBlockedFilter}
+          onQueryChange={setBlockedQuery}
+          onClose={() => setIsBlockedSheetOpen(false)}
+        />
+      ) : null}
     </section>
+  );
+}
+
+function BlockedSummaryChip({ label, count }: { label: string; count: number }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2 py-1 text-[11px] font-black text-[#8A5206] ring-1 ring-[#F3DEB7]">
+      {label}
+      <span className="tabular-nums">{count}</span>
+    </span>
+  );
+}
+
+function BlockedScheduleSheet({
+  items,
+  selectedDate,
+  filter,
+  query,
+  onFilterChange,
+  onQueryChange,
+  onClose,
+}: {
+  items: HomeScheduleItem[];
+  selectedDate: string;
+  filter: BlockedScheduleFilter;
+  query: string;
+  onFilterChange: (filter: BlockedScheduleFilter) => void;
+  onQueryChange: (query: string) => void;
+  onClose: () => void;
+}) {
+  const normalizedQuery = normalizeText(query);
+  const filteredItems = items.filter((item) => {
+    const category = getBlockedScheduleCategory(item);
+    const matchesFilter = filter === "all" || category === filter;
+    if (!matchesFilter) {
+      return false;
+    }
+
+    if (!normalizedQuery) {
+      return true;
+    }
+
+    return normalizeText(getBlockedScheduleStudentName(item)).includes(normalizedQuery);
+  });
+  const filterOptions: Array<{ value: BlockedScheduleFilter; label: string }> = [
+    { value: "all", label: "전체" },
+    { value: "shared", label: "공유됨" },
+    { value: "manual", label: "직접등록" },
+    { value: "personal", label: "개인" },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end bg-stone-950/35 px-0 sm:items-center sm:justify-center sm:px-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="blocked-schedule-sheet-title"
+    >
+      <div className="max-h-[82vh] w-full overflow-hidden rounded-t-[1.75rem] bg-white shadow-[0_-18px_48px_rgba(28,25,23,0.25)] sm:max-w-xl sm:rounded-2xl">
+        <div className="flex items-start justify-between gap-3 border-b border-stone-100 px-4 py-4">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-wide text-[#98610F]">
+              {formatHomeDate(selectedDate)}
+            </p>
+            <h4
+              id="blocked-schedule-sheet-title"
+              className="mt-1 text-lg font-black text-stone-950"
+            >
+              공유된 타 학원 일정
+            </h4>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="공유 일정 전체 보기 닫기"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600 shadow-sm transition active:bg-stone-100"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="space-y-3 border-b border-stone-100 px-4 py-3">
+          <label className="block">
+            <span className="sr-only">학생명으로 공유 일정 검색</span>
+            <span className="flex min-h-11 items-center gap-2 rounded-xl border border-stone-200 bg-stone-50 px-3 text-sm text-stone-700">
+              <Search size={16} className="shrink-0 text-stone-400" />
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => onQueryChange(event.target.value)}
+                placeholder="학생명 검색"
+                className="min-w-0 flex-1 bg-transparent font-semibold outline-none placeholder:text-stone-400"
+              />
+            </span>
+          </label>
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label="공유 일정 필터">
+            {filterOptions.map((option) => {
+              const isActive = filter === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => onFilterChange(option.value)}
+                  className={[
+                    "shrink-0 rounded-full px-3 py-1.5 text-xs font-black transition",
+                    isActive
+                      ? "bg-stone-950 text-white"
+                      : "bg-stone-100 text-stone-600 active:bg-stone-200",
+                  ].join(" ")}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="max-h-[52vh] overflow-y-auto">
+          {filteredItems.length > 0 ? (
+            <div className="divide-y divide-stone-100">
+              {filteredItems.map((item) => (
+                <BlockedScheduleSheetRow key={item.id} item={item} />
+              ))}
+            </div>
+          ) : (
+            <div className="px-4 py-8 text-center text-sm font-semibold text-stone-500">
+              조건에 맞는 공유 일정이 없습니다.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BlockedScheduleSheetRow({ item }: { item: HomeScheduleItem }) {
+  return (
+    <div className="flex min-h-[4.25rem] items-start gap-3 px-4 py-3">
+      <div className="w-[4.35rem] shrink-0 pt-0.5">
+        <p className="text-base font-black tabular-nums text-stone-950">{item.startTime}</p>
+        <p className="text-xs font-semibold tabular-nums text-stone-400">{item.endTime}</p>
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <p className="truncate text-sm font-black text-stone-950">
+            {getBlockedScheduleStudentName(item)}
+          </p>
+          <span
+            className={[
+              "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-black",
+              getBlockedScheduleBadgeTone(item),
+            ].join(" ")}
+          >
+            {getBlockedScheduleBadgeLabel(item)}
+          </span>
+        </div>
+        <p className="mt-1 truncate text-xs font-semibold text-stone-500">
+          {getBlockedScheduleDetail(item)}
+        </p>
+      </div>
+      <span className="shrink-0 rounded-full bg-[#FFECC7] px-2.5 py-1 text-[11px] font-black text-[#7A4A08]">
+        보강 제외
+      </span>
+    </div>
   );
 }
 
@@ -862,31 +1055,16 @@ function TodayScheduleRow({
   onNavigate: (view: WorkspaceView) => void;
   variant?: "academy" | "blocked";
 }) {
-  const isManualExternal = item.kind === "manual_external_class";
-  const isSharedSchedule = item.isShared;
-  const isPersonalExternal = item.scheduleType === "external";
   const isBlockedSchedule = isBlockedScheduleItem(item);
   const isRegularAcademyClass = !isBlockedSchedule && item.scheduleType === "regular_class";
-  const badgeLabel = isManualExternal
-    ? "직접등록"
-    : isSharedSchedule
-    ? "공유됨"
-    : isPersonalExternal
-    ? "개인"
+  const badgeLabel = isBlockedSchedule
+    ? getBlockedScheduleBadgeLabel(item)
     : scheduleTypeLabel(item.scheduleType);
-  const badgeTone = isManualExternal
-    ? "bg-[#FFF4E4] text-[#A05A00]"
-    : isSharedSchedule
-    ? "bg-[#EAF1F8] text-[#315C7C]"
-    : isPersonalExternal
-    ? "bg-stone-100 text-stone-700"
+  const badgeTone = isBlockedSchedule
+    ? getBlockedScheduleBadgeTone(item)
     : scheduleTypeTone(item.scheduleType);
-  const detailLabel = isManualExternal
-    ? `${item.subtitle || "타 학원 수업"} · 타 학원 수업`
-    : isSharedSchedule
-    ? "연결 학원 수업 · 학원명 비공개"
-    : isPersonalExternal
-    ? `${item.subtitle || "개인/기타 일정"} · 개인 일정`
+  const detailLabel = isBlockedSchedule
+    ? getBlockedScheduleDetail(item)
     : item.subtitle || item.className || "일정";
   const actionLabel = item.canOpenAttendance ? "출석 보기" : isBlockedSchedule ? "보강 제외" : "읽기 전용";
   const attendanceLabel = `${item.title} 출석 보기`;
@@ -1350,6 +1528,78 @@ function isBlockedScheduleItem(item: HomeScheduleItem) {
 
 function isAcademyScheduleItem(item: HomeScheduleItem) {
   return !isBlockedScheduleItem(item);
+}
+
+function getBlockedScheduleCategory(item: HomeScheduleItem): Exclude<BlockedScheduleFilter, "all"> {
+  if (item.isShared) {
+    return "shared";
+  }
+
+  if (item.kind === "manual_external_class") {
+    return "manual";
+  }
+
+  return "personal";
+}
+
+function getBlockedScheduleCounts(items: HomeScheduleItem[]) {
+  return items.reduce(
+    (counts, item) => {
+      counts[getBlockedScheduleCategory(item)] += 1;
+      return counts;
+    },
+    { shared: 0, manual: 0, personal: 0 },
+  );
+}
+
+function getBlockedScheduleBadgeLabel(item: HomeScheduleItem) {
+  const category = getBlockedScheduleCategory(item);
+
+  if (category === "shared") {
+    return "공유됨";
+  }
+
+  if (category === "manual") {
+    return "직접등록";
+  }
+
+  return "개인";
+}
+
+function getBlockedScheduleBadgeTone(item: HomeScheduleItem) {
+  const category = getBlockedScheduleCategory(item);
+
+  if (category === "shared") {
+    return "bg-[#EAF1F8] text-[#315C7C]";
+  }
+
+  if (category === "manual") {
+    return "bg-[#FFF4E4] text-[#A05A00]";
+  }
+
+  return "bg-stone-100 text-stone-700";
+}
+
+function getBlockedScheduleDetail(item: HomeScheduleItem) {
+  const category = getBlockedScheduleCategory(item);
+
+  if (category === "shared") {
+    return "연결 학원 수업 · 학원명 비공개";
+  }
+
+  if (category === "manual") {
+    return `${item.subtitle || "타 학원 수업"} · 타 학원 수업`;
+  }
+
+  return `${item.subtitle || "개인/기타 일정"} · 개인 일정`;
+}
+
+function getBlockedScheduleStudentName(item: HomeScheduleItem) {
+  return item.studentName || item.title;
+}
+
+function normalizeText(value: string) {
+  return value.replace(/\s+/g, "").toLowerCase();
 }
 
 function getFilteredItems(items: HomeFollowupItem[], filter: FollowupFilter | null) {
