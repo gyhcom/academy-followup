@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { ClipboardCheck, Home, MessageSquareText, Settings } from "lucide-react";
+import {
+  ChevronLeft,
+  ClipboardCheck,
+  Home,
+  MessageSquareText,
+  Settings,
+} from "lucide-react";
 import {
   AttendanceBoard,
   type AttendanceRecordItem,
@@ -106,6 +112,7 @@ export function AppWorkspace({
 }: AppWorkspaceProps) {
   const canManage = canManageAcademy(role);
   const [activeView, setActiveView] = useState<WorkspaceView>("home");
+  const [viewHistory, setViewHistory] = useState<WorkspaceView[]>([]);
   const [selectedDate, setSelectedDate] = useState(attendanceDate);
   const [workspaceAttendanceRecords, setWorkspaceAttendanceRecords] =
     useState(attendanceRecords);
@@ -139,6 +146,10 @@ export function AppWorkspace({
   const [operationsSelection, setOperationsSelection] =
     useState<OperationsSelection | null>(null);
   const visibleView = !canManage && activeView === "management" ? "home" : activeView;
+  const previousView = viewHistory.length > 0
+    ? normalizeWorkspaceView(viewHistory[viewHistory.length - 1], canManage)
+    : null;
+  const canGoBack = Boolean(previousView && previousView !== visibleView);
 
   useEffect(() => {
     function syncVisualViewportHeight() {
@@ -198,12 +209,35 @@ export function AppWorkspace({
     };
   }, [selectedDate]);
 
-  function handleViewChange(view: WorkspaceView) {
-    setActiveView(view);
-
+  function scrollToTop() {
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     });
+  }
+
+  function handleViewChange(view: WorkspaceView) {
+    const nextView = normalizeWorkspaceView(view, canManage);
+    const currentView = normalizeWorkspaceView(activeView, canManage);
+
+    if (nextView === currentView) {
+      return;
+    }
+
+    setViewHistory((history) => [...history, currentView].slice(-12));
+    setActiveView(nextView);
+    scrollToTop();
+  }
+
+  function handleBack() {
+    const previous = viewHistory[viewHistory.length - 1];
+
+    if (!previous) {
+      return;
+    }
+
+    setViewHistory((history) => history.slice(0, -1));
+    setActiveView(normalizeWorkspaceView(previous, canManage));
+    scrollToTop();
   }
 
   function handleHomeStudentSelect(selection: OperationsSelection) {
@@ -218,6 +252,10 @@ export function AppWorkspace({
         canManage={canManage}
         onChange={handleViewChange}
       />
+
+      {canGoBack && previousView ? (
+        <WorkspaceBackBar previousView={previousView} onBack={handleBack} />
+      ) : null}
 
       {visibleView === "home" ? (
         <WorkspaceHome
@@ -270,6 +308,54 @@ export function AppWorkspace({
       )}
     </div>
   );
+}
+
+function normalizeWorkspaceView(view: WorkspaceView, canManage: boolean): WorkspaceView {
+  if (!canManage && view === "management") {
+    return "home";
+  }
+
+  return view;
+}
+
+function WorkspaceBackBar({
+  previousView,
+  onBack,
+}: {
+  previousView: WorkspaceView;
+  onBack: () => void;
+}) {
+  return (
+    <section className="rounded-[1.25rem] border border-[#E6E0D5] bg-white/90 px-2 py-2 shadow-sm backdrop-blur sm:rounded-lg sm:px-3">
+      <button
+        type="button"
+        onClick={onBack}
+        className="flex min-h-10 w-full items-center gap-2 rounded-xl px-2 text-left text-stone-800 transition active:bg-stone-100 sm:w-auto sm:rounded-md sm:px-3 sm:hover:bg-[#F2F5F8]"
+        aria-label={`${workspaceViewShortLabel(previousView)} 화면으로 돌아가기`}
+      >
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#F2F5F8] text-[#315C7C]">
+          <ChevronLeft size={18} />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-black text-stone-950">이전</span>
+          <span className="block truncate text-xs font-semibold text-stone-500">
+            {workspaceViewShortLabel(previousView)}로 돌아가기
+          </span>
+        </span>
+      </button>
+    </section>
+  );
+}
+
+function workspaceViewShortLabel(view: WorkspaceView) {
+  const labels: Record<WorkspaceView, string> = {
+    home: "홈",
+    operations: "문자",
+    attendance: "출석",
+    management: "관리",
+  };
+
+  return labels[view];
 }
 
 function getDayOfWeek(dateValue: string) {
