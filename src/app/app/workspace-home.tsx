@@ -889,10 +889,11 @@ function TodayScheduleRow({
     ? `${item.subtitle || "개인/기타 일정"} · 개인 일정`
     : item.subtitle || item.className || "일정";
   const actionLabel = item.canOpenAttendance ? "출석 보기" : isBlockedSchedule ? "보강 제외" : "읽기 전용";
+  const attendanceLabel = `${item.title} 출석 보기`;
   const rowClassName =
     variant === "blocked" || isBlockedSchedule
       ? "flex min-h-[3.75rem] w-full items-start gap-3 bg-[#FFFDF8] px-4 py-2.5 text-left sm:px-5"
-      : "flex min-h-[4rem] w-full items-start gap-3 px-4 py-2.5 text-left sm:px-5";
+      : "flex min-h-[4rem] w-full items-center gap-2.5 px-4 py-2.5 text-left sm:px-5";
   const actionClassName = item.canOpenAttendance
     ? "bg-stone-950 text-white"
     : isBlockedSchedule
@@ -901,8 +902,8 @@ function TodayScheduleRow({
 
   const content = (
     <>
-      <span className="flex min-w-0 flex-1 items-start gap-3">
-        <span className="mt-0.5 flex w-[4.6rem] shrink-0 flex-col text-left">
+      <span className="flex min-w-0 flex-1 items-start gap-2.5">
+        <span className="mt-0.5 flex w-[4.1rem] shrink-0 flex-col text-left">
           <span className="text-base font-black tabular-nums text-stone-950">
             {item.startTime}
           </span>
@@ -932,14 +933,23 @@ function TodayScheduleRow({
           </span>
         </span>
       </span>
-      <span
-        className={[
-          "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black",
-          actionClassName,
-        ].join(" ")}
-      >
-        {actionLabel}
-      </span>
+      {item.canOpenAttendance ? (
+        <span
+          aria-hidden="true"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-stone-950 text-white shadow-sm"
+        >
+          <ClipboardCheck size={18} strokeWidth={2.4} />
+        </span>
+      ) : (
+        <span
+          className={[
+            "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black",
+            actionClassName,
+          ].join(" ")}
+        >
+          {actionLabel}
+        </span>
+      )}
     </>
   );
 
@@ -947,6 +957,7 @@ function TodayScheduleRow({
     return (
       <button
         type="button"
+        aria-label={attendanceLabel}
         onClick={() => onNavigate("attendance")}
         className={`${rowClassName} transition active:bg-stone-50`}
       >
