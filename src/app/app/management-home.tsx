@@ -132,6 +132,10 @@ export function ManagementHome({
     () => students.filter((student) => student.status === "active"),
     [students],
   );
+  const missingScheduleCount = activeStudents.filter(
+    (student) => student.schedules.filter((schedule) => schedule.isActive).length === 0,
+  ).length;
+  const unassignedStudentCount = activeStudents.filter((student) => !student.classId).length;
   const teacherOptions = members.filter((member) =>
     member.status === "active" &&
     ["owner", "manager", "teacher", "assistant"].includes(member.role),
@@ -844,83 +848,78 @@ export function ManagementHome({
   const managementSections: Array<{
     id: ManagementSection;
     label: string;
+    group: string;
     detail: string;
     count: string;
+    status: string;
   }> = [
-    { id: "setup", label: "원장 시작", detail: "선생님·반·학생·수업·출석", count: "순서" },
-    { id: "students", label: "학생", detail: "명단·스케줄·연락처", count: `${activeStudents.length}` },
-    { id: "classes", label: "반", detail: "반·담당·일괄 스케줄", count: `${classes.length}` },
-    { id: "members", label: "구성원", detail: "권한·계정·담당 반", count: `${members.length}` },
-    { id: "templates", label: "문자", detail: "사유별 템플릿", count: `${templates.length}` },
-    { id: "settings", label: "설정", detail: "발신·정책·권한", count: "정책" },
+    {
+      id: "setup",
+      label: "시작",
+      group: "운영 세팅",
+      detail: "선생님 등록부터 출석 확인까지 초기 순서",
+      count: "순서",
+      status: attendanceSessionCount > 0 ? "출석 준비됨" : "출석 확인 필요",
+    },
+    {
+      id: "students",
+      label: "명단",
+      group: "명단/배정",
+      detail: "학생, CSV, 스케줄, 공유 동의",
+      count: `${activeStudents.length}명`,
+      status:
+        missingScheduleCount > 0
+          ? `스케줄 미등록 ${missingScheduleCount}명`
+          : unassignedStudentCount > 0
+            ? `미배정 ${unassignedStudentCount}명`
+            : "학생 세팅 완료",
+    },
+    {
+      id: "classes",
+      label: "수업",
+      group: "반/시간표",
+      detail: "반, 담당 선생님, 반 공통 수업 시간",
+      count: `${classes.length}개`,
+      status: classes.length > 0 ? "반 관리 가능" : "반 생성 필요",
+    },
+    {
+      id: "members",
+      label: "직원",
+      group: "구성원",
+      detail: "직위, 권한, 담당 반",
+      count: `${members.length}명`,
+      status: members.length > 0 ? "계정 관리 가능" : "직원 등록 필요",
+    },
+    {
+      id: "templates",
+      label: "문자",
+      group: "커뮤니케이션",
+      detail: "결석, 지각, 보강 안내 템플릿",
+      count: `${templates.length}개`,
+      status: "템플릿 관리",
+    },
+    {
+      id: "settings",
+      label: "정책",
+      group: "운영 정책",
+      detail: "발신 정보, dry-run, 보조 선생님 발송 권한",
+      count: settings.smsDryRun ? "테스트" : "실발송",
+      status: settings.allowAssistantSend ? "보조 발송 허용" : "보조 발송 제한",
+    },
   ];
 
   return (
     <div className="space-y-4 text-[#1C1917] sm:space-y-5">
-      <MobileAdminInbox
+      <ManagementCommandCenter
+        academyName={academyName}
         activeStudents={activeStudents.length}
-        missingSchedules={students.filter((student) => student.schedules.filter((schedule) => schedule.isActive).length === 0).length}
+        missingScheduleCount={missingScheduleCount}
         classCount={classes.length}
         memberCount={members.length}
-        onShowStudents={() => setActiveSection("students")}
-        onShowClasses={() => setActiveSection("classes")}
+        activeSection={activeSection}
+        sections={managementSections}
+        onSelectSection={setActiveSection}
       />
-
-      <section className="overflow-hidden border-b border-[#DED8CE] bg-transparent sm:rounded-lg sm:border sm:border-[#E2DED6] sm:bg-white sm:shadow-sm">
-        <div className="hidden px-4 py-4 sm:block sm:px-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
-            Academy Admin
-          </p>
-          <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-w-0">
-              <h2 className="text-xl font-semibold leading-tight text-stone-950 sm:text-2xl">
-                {academyName}
-              </h2>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-stone-600">
-                학생, 반, 구성원, 발송 정책을 한 곳에서 관리합니다.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-4 rounded-md border border-[#E2DED6] bg-[#F7F5F0] px-4 py-2.5 text-sm sm:gap-6">
-              <Metric label="재원" value={`${activeStudents.length}명`} />
-              <Metric label="스케줄 미등록" value={`${students.filter((student) => student.schedules.filter((schedule) => schedule.isActive).length === 0).length}명`} />
-              <Metric label="반" value={`${classes.length}개`} />
-            </div>
-          </div>
-        </div>
-
-        <div className="px-0 py-2 sm:border-t sm:border-[#E2DED6] sm:px-5">
-          <div className="grid max-w-full grid-cols-3 gap-1.5 sm:flex sm:overflow-x-auto">
-          {managementSections.map((section) => (
-            <button
-              key={section.id}
-              type="button"
-              onClick={() => setActiveSection(section.id)}
-              className={[
-                "min-w-0 rounded-md border px-2 py-2 text-left transition sm:shrink-0 sm:px-3",
-                activeSection === section.id
-                  ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67]"
-                  : "border-transparent bg-white text-stone-700 hover:bg-[#F2F5F8]",
-              ].join(" ")}
-            >
-              <span className="flex min-w-0 items-center gap-1.5 sm:gap-2">
-                <span className="truncate text-sm font-semibold">{section.label}</span>
-                <span
-                  className={[
-                    "shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold sm:px-2",
-                    activeSection === section.id
-                      ? "bg-white text-[#244B67]"
-                      : "bg-[#F7F5F0] text-stone-600",
-                  ].join(" ")}
-                >
-                  {section.count}
-                </span>
-              </span>
-              <span className="sr-only">{section.detail}</span>
-            </button>
-          ))}
-          </div>
-        </div>
-      </section>
 
       {activeSection === "setup" ? (
         <ManagementPanel
@@ -934,13 +933,9 @@ export function ManagementHome({
             memberCount={members.length}
             classCount={classes.length}
             activeStudentCount={activeStudents.length}
-            unassignedStudentCount={activeStudents.filter((student) => !student.classId).length}
+            unassignedStudentCount={unassignedStudentCount}
             attendanceSessionCount={attendanceSessionCount}
-            missingScheduleCount={
-              activeStudents.filter(
-                (student) => student.schedules.filter((schedule) => schedule.isActive).length === 0,
-              ).length
-            }
+            missingScheduleCount={missingScheduleCount}
             onCreateMember={openSetupMemberForm}
             onCreateClass={openSetupClassForm}
             onCreateStudent={openSetupStudentForm}
@@ -1810,84 +1805,105 @@ function SetupWorkflow({
   );
 }
 
-function MobileAdminInbox({
+function ManagementCommandCenter({
+  academyName,
   activeStudents,
-  missingSchedules,
+  missingScheduleCount,
   classCount,
   memberCount,
-  onShowStudents,
-  onShowClasses,
+  activeSection,
+  sections,
+  onSelectSection,
 }: {
+  academyName: string;
   activeStudents: number;
-  missingSchedules: number;
+  missingScheduleCount: number;
   classCount: number;
   memberCount: number;
-  onShowStudents: () => void;
-  onShowClasses: () => void;
+  activeSection: ManagementSection;
+  sections: Array<{
+    id: ManagementSection;
+    label: string;
+    group: string;
+    detail: string;
+    count: string;
+    status: string;
+  }>;
+  onSelectSection: (section: ManagementSection) => void;
 }) {
   return (
-    <section className="space-y-3 sm:hidden">
-      <div>
+    <section className="overflow-hidden rounded-2xl border border-[#DED8CE] bg-white shadow-sm">
+      <div className="border-b border-[#EEE7DC] bg-[#FBFAF7] px-4 py-4 sm:px-5">
         <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
-          오늘 관리 큐
+          Academy Admin
         </p>
-        <h2 className="mt-1 text-2xl font-semibold text-stone-950">처리할 항목</h2>
+        <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <h2 className="text-2xl font-semibold leading-tight text-stone-950 sm:text-2xl">
+              {academyName}
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-stone-600">
+              운영 세팅, 명단, 수업, 직원, 문자, 정책을 업무 단위로 관리합니다.
+            </p>
+          </div>
+          <div className="grid grid-cols-4 gap-2 rounded-xl border border-[#E2DED6] bg-white p-2 text-center">
+            <Metric label="학생" value={`${activeStudents}명`} />
+            <Metric label="미등록" value={`${missingScheduleCount}명`} />
+            <Metric label="반" value={`${classCount}개`} />
+            <Metric label="직원" value={`${memberCount}명`} />
+          </div>
+        </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white">
-        <button
-          type="button"
-          onClick={onShowStudents}
-          className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[#EEE7DC] px-4 py-3 text-left"
-        >
-          <span className="min-w-0">
-            <span className="block text-sm font-semibold text-stone-950">
-              스케줄 미등록 학생
-            </span>
-            <span className="mt-0.5 block text-xs text-stone-500">
-              학생 상세에서 수업 스케줄을 바로 추가합니다.
-            </span>
-          </span>
-          <span className="text-lg font-semibold tabular-nums text-[#315C7C]">
-            {missingSchedules}명
-          </span>
-        </button>
+      <div className="grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">
+        {sections.map((section) => {
+          const isActive = activeSection === section.id;
 
-        <button
-          type="button"
-          onClick={onShowStudents}
-          className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[#EEE7DC] px-4 py-3 text-left"
-        >
-          <span className="min-w-0">
-            <span className="block text-sm font-semibold text-stone-950">
-              재원 학생 명단
-            </span>
-            <span className="mt-0.5 block text-xs text-stone-500">
-              검색과 필터로 학생, 학부모, 반 정보를 확인합니다.
-            </span>
-          </span>
-          <span className="text-lg font-semibold tabular-nums text-stone-900">
-            {activeStudents}명
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onShowClasses}
-          className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left"
-        >
-          <span className="min-w-0">
-            <span className="block text-sm font-semibold text-stone-950">
-              반 / 구성원 세팅
-            </span>
-            <span className="mt-0.5 block text-xs text-stone-500">
-              반 {classCount}개 · 구성원 {memberCount}명
-            </span>
-          </span>
-          <span className="rounded-full bg-[#F3EFE7] px-2.5 py-1 text-xs font-semibold text-stone-700">
-            관리
-          </span>
-        </button>
+          return (
+            <button
+              key={section.id}
+              type="button"
+              onClick={() => onSelectSection(section.id)}
+              className={[
+                "group grid min-h-[5.25rem] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border p-3 text-left transition",
+                isActive
+                  ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67] shadow-sm"
+                  : "border-[#ECE6DC] bg-white text-stone-800 hover:border-[#C9D6E2] hover:bg-[#F8FBFD]",
+              ].join(" ")}
+            >
+              <span className="min-w-0">
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className="truncate text-base font-semibold">{section.label}</span>
+                  <span
+                    className={[
+                      "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                      isActive ? "bg-white text-[#244B67]" : "bg-[#F3EFE7] text-stone-600",
+                    ].join(" ")}
+                  >
+                    {section.count}
+                  </span>
+                </span>
+                <span className="mt-1 block truncate text-xs font-semibold text-[#315C7C]">
+                  {section.group}
+                </span>
+                <span className="mt-1 block truncate text-xs text-stone-500">
+                  {section.status}
+                </span>
+                <span className="sr-only">{section.detail}</span>
+              </span>
+              <span
+                className={[
+                  "flex size-9 items-center justify-center rounded-full transition",
+                  isActive
+                    ? "bg-[#315C7C] text-white"
+                    : "bg-[#F7F5F0] text-stone-500 group-hover:bg-[#EAF1F8] group-hover:text-[#315C7C]",
+                ].join(" ")}
+              >
+                <ArrowRight size={16} />
+              </span>
+            </button>
+          );
+        })}
       </div>
     </section>
   );
