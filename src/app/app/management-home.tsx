@@ -18,6 +18,7 @@ import type {
   BulkScheduleFormState,
   ClassFormState,
   FormStatus,
+  ManagementAuditLog,
   ManagementClass,
   ManagementMessageTemplate,
   ManagementMember,
@@ -52,7 +53,8 @@ type ManagementSection =
   | "classes"
   | "members"
   | "templates"
-  | "settings";
+  | "settings"
+  | "history";
 
 export function ManagementHome({
   academyName,
@@ -61,6 +63,7 @@ export function ManagementHome({
   students,
   settings,
   templates,
+  auditLogs,
   attendanceSessionCount,
   onNavigate,
 }: {
@@ -70,6 +73,7 @@ export function ManagementHome({
   students: ManagementStudent[];
   settings: ManagementSettings;
   templates: ManagementMessageTemplate[];
+  auditLogs: ManagementAuditLog[];
   attendanceSessionCount: number;
   onNavigate: (view: "home" | "operations" | "attendance" | "management") => void;
 }) {
@@ -906,6 +910,14 @@ export function ManagementHome({
       count: settings.smsDryRun ? "테스트" : "실발송",
       status: settings.allowAssistantSend ? "보조 발송 허용" : "보조 발송 제한",
     },
+    {
+      id: "history",
+      label: "이력",
+      group: "운영 로그",
+      detail: "학생, 반, 스케줄, 설정 최근 변경",
+      count: `${auditLogs.length}건`,
+      status: auditLogs.length > 0 ? "최근 변경 확인" : "기록 대기",
+    },
   ];
 
   return (
@@ -1091,6 +1103,15 @@ export function ManagementHome({
           </p>
         ) : null}
       </ManagementPanel>
+      ) : null}
+
+      {activeSection === "history" ? (
+        <ManagementPanel
+          title="최근 변경 이력"
+          description="학생, 반, 스케줄, 문자 템플릿, 학원 설정처럼 운영 데이터가 바뀐 기록을 확인합니다."
+        >
+          <AuditLogList auditLogs={auditLogs} />
+        </ManagementPanel>
       ) : null}
 
       {activeSection === "classes" ? (
@@ -1803,6 +1824,105 @@ function SetupWorkflow({
       </aside>
     </div>
   );
+}
+
+function AuditLogList({ auditLogs }: { auditLogs: ManagementAuditLog[] }) {
+  if (auditLogs.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-[#DED8CE] bg-[#FBFAF7] px-4 py-8 text-center">
+        <p className="text-sm font-semibold text-stone-900">
+          아직 기록된 변경 이력이 없습니다.
+        </p>
+        <p className="mt-2 text-sm leading-6 text-stone-600">
+          학생, 반, 스케줄, 템플릿, 설정을 수정하면 이곳에 최근 20건이 표시됩니다.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+      {auditLogs.map((log) => (
+        <div
+          key={log.id}
+          className="grid gap-2 border-b border-[#EFE9DE] px-3 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+        >
+          <div className="min-w-0">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <span className="rounded-md bg-[#F3EFE7] px-2 py-0.5 text-[11px] font-semibold text-stone-700">
+                {getAuditActionLabel(log.action)}
+              </span>
+              <span className="truncate text-sm font-semibold text-stone-950">
+                {log.summary}
+              </span>
+            </div>
+            <p className="mt-1 text-xs leading-5 text-stone-500">
+              {log.actorName} · {getAuditEntityLabel(log.entityType)}
+            </p>
+          </div>
+          <time className="text-xs font-medium text-stone-500" dateTime={log.createdAt}>
+            {formatAuditDate(log.createdAt)}
+          </time>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function getAuditActionLabel(action: string) {
+  if (action.startsWith("student.")) {
+    return "학생";
+  }
+
+  if (action.startsWith("class.")) {
+    return "반";
+  }
+
+  if (action.startsWith("schedule.")) {
+    return "스케줄";
+  }
+
+  if (action.startsWith("external_class.")) {
+    return "타 학원";
+  }
+
+  if (action.startsWith("message_template.")) {
+    return "문자";
+  }
+
+  if (action.startsWith("academy_settings.")) {
+    return "정책";
+  }
+
+  return "변경";
+}
+
+function getAuditEntityLabel(entityType: string) {
+  const labels: Record<string, string> = {
+    student: "학생 정보",
+    class: "반 정보",
+    student_schedule: "학생 스케줄",
+    external_class: "타 학원 수업",
+    message_template: "문자 템플릿",
+    academy_settings: "학원 설정",
+  };
+
+  return labels[entityType] ?? "운영 데이터";
+}
+
+function formatAuditDate(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  const hour = `${date.getHours()}`.padStart(2, "0");
+  const minute = `${date.getMinutes()}`.padStart(2, "0");
+
+  return `${month}.${day} ${hour}:${minute}`;
 }
 
 function ManagementCommandCenter({

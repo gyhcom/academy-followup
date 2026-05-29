@@ -15,6 +15,7 @@ import {
 import { ManagementHome } from "@/app/app/management-home";
 import { WorkspaceHome } from "@/app/app/workspace-home";
 import type {
+  ManagementAuditLog,
   ManagementClass,
   ManagementMessageTemplate,
   ManagementMember,
@@ -30,6 +31,7 @@ import type { FollowupReason } from "@/lib/followup-templates";
 import { canManageAcademy } from "@/lib/permissions";
 
 export type {
+  ManagementAuditLog,
   ManagementClass,
   ManagementMessageTemplate,
   ManagementMember,
@@ -78,6 +80,7 @@ type AppWorkspaceProps = {
   managementMembers: ManagementMember[];
   managementSettings: ManagementSettings;
   managementTemplates: ManagementMessageTemplate[];
+  managementAuditLogs: ManagementAuditLog[];
 };
 
 type WorkspaceView = "home" | "operations" | "attendance" | "management";
@@ -108,6 +111,7 @@ export function AppWorkspace({
   managementMembers,
   managementSettings,
   managementTemplates,
+  managementAuditLogs,
 }: AppWorkspaceProps) {
   const canManage = canManageAcademy(role);
   const [activeView, setActiveView] = useState<WorkspaceView>("home");
@@ -279,6 +283,7 @@ export function AppWorkspace({
           students={managementStudents}
           settings={managementSettings}
           templates={managementTemplates}
+          auditLogs={managementAuditLogs}
           attendanceSessionCount={attendanceSessionCount}
           onNavigate={handleViewChange}
         />

@@ -38,7 +38,7 @@ export function ManagementPanel({
 }: {
   title: string;
   description: string;
-  actionLabel: string;
+  actionLabel?: string;
   actionIcon?: ReactNode;
   onAction?: () => void;
   children: ReactNode;
@@ -50,21 +50,23 @@ export function ManagementPanel({
           <h3 className="text-lg font-semibold text-stone-950 sm:text-base">{title}</h3>
           <p className="mt-1 hidden text-sm leading-6 text-stone-600 sm:block">{description}</p>
         </div>
-        <button
-          type="button"
-          disabled={!onAction}
-          onClick={onAction}
-          className={[
-            "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:min-h-10",
-            onAction
-              ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm transition hover:border-[#244B67] hover:bg-[#244B67]"
-              : "cursor-not-allowed border-[#E2DED6] bg-[#F7F5F0] text-stone-500",
-          ].join(" ")}
-        >
-          {actionIcon}
-          {actionLabel}
-          <ChevronRight size={14} />
-        </button>
+        {actionLabel ? (
+          <button
+            type="button"
+            disabled={!onAction}
+            onClick={onAction}
+            className={[
+              "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:min-h-10",
+              onAction
+                ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm transition hover:border-[#244B67] hover:bg-[#244B67]"
+                : "cursor-not-allowed border-[#E2DED6] bg-[#F7F5F0] text-stone-500",
+            ].join(" ")}
+          >
+            {actionIcon}
+            {actionLabel}
+            <ChevronRight size={14} />
+          </button>
+        ) : null}
       </div>
       <div className="min-w-0 pt-0 sm:pt-4">{children}</div>
     </section>

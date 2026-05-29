@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { canManageAcademy } from "@/lib/permissions";
+import { writeAuditLog } from "@/lib/server/audit-log";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -74,6 +75,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: "class.create",
+    entityType: "class",
+    entityId: data.id,
+    summary: `${data.name} 반을 등록했습니다.`,
+  });
+
   return NextResponse.json({ class: toClassResponse(data) });
 }
 
@@ -121,6 +132,16 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "수정할 반을 찾을 수 없습니다." }, { status: 404 });
   }
 
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: "class.update",
+    entityType: "class",
+    entityId: data.id,
+    summary: `${data.name} 반 정보를 수정했습니다.`,
+  });
+
   return NextResponse.json({ class: toClassResponse(data) });
 }
 
@@ -129,6 +150,7 @@ async function getAuthorizedWorkspace(): Promise<
       ok: true;
       admin: ReturnType<typeof createSupabaseAdminClient>;
       profile: ProfileRecord;
+      userId: string;
     }
   | { ok: false; status: number; error: string }
 > {
@@ -168,7 +190,7 @@ async function getAuthorizedWorkspace(): Promise<
     return { ok: false, status: 403, error: "반 관리는 원장 또는 관리자만 할 수 있습니다." };
   }
 
-  return { ok: true, admin, profile };
+  return { ok: true, admin, profile, userId: user.id };
 }
 
 async function parseClassRequest(
