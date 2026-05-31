@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -8,7 +8,9 @@ import {
   CheckCircle2,
   ClipboardList,
   CircleDashed,
+  Download,
   FileSpreadsheet,
+  FileText,
   MessageSquareText,
   Pencil,
   Plus,
@@ -54,7 +56,43 @@ type ManagementSection =
   | "members"
   | "templates"
   | "settings"
+  | "reports"
   | "history";
+
+type ReportRange = "today" | "7d" | "month";
+type ReportExportType = "students" | "attendance" | "messages" | "audit";
+
+type ReportSummary = {
+  range: ReportRange;
+  label: string;
+  attendance: {
+    total: number;
+    present: number;
+    late: number;
+    absent: number;
+    needsCheck: number;
+    makeup: number;
+    pending: number;
+  };
+  messages: {
+    followups: number;
+    logs: number;
+    dryRun: number;
+    sent: number;
+    failed: number;
+    sms: number;
+    lms: number;
+    overLimit: number;
+  };
+  students: {
+    active: number;
+    classes: number;
+    missingSchedule: number;
+  };
+  audit: {
+    count: number;
+  };
+};
 
 export function ManagementHome({
   academyName,
@@ -911,6 +949,14 @@ export function ManagementHome({
       status: settings.allowAssistantSend ? "보조 발송 허용" : "보조 발송 제한",
     },
     {
+      id: "reports",
+      label: "리포트",
+      group: "운영 증거",
+      detail: "출석, 문자, 명단, 이력 CSV 보관",
+      count: "CSV",
+      status: "운영 기록 확인",
+    },
+    {
       id: "history",
       label: "이력",
       group: "운영 로그",
@@ -1103,6 +1149,15 @@ export function ManagementHome({
           </p>
         ) : null}
       </ManagementPanel>
+      ) : null}
+
+      {activeSection === "reports" ? (
+        <ManagementPanel
+          title="운영 리포트"
+          description="출석, 문자, 학생 명단, 최근 변경 이력을 요약하고 CSV로 내려받습니다."
+        >
+          <OperationalReportPanel auditLogs={auditLogs} />
+        </ManagementPanel>
       ) : null}
 
       {activeSection === "history" ? (
@@ -1441,6 +1496,246 @@ export function ManagementHome({
         />
       </ManagementPanel>
       ) : null}
+    </div>
+  );
+}
+
+function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[] }) {
+  const [range, setRange] = useState<ReportRange>("today");
+  const [includePrivate, setIncludePrivate] = useState(false);
+  const [summary, setSummary] = useState<ReportSummary | null>(null);
+  const [status, setStatus] = useState<FormStatus>({ status: "idle", message: "" });
+  const [downloadType, setDownloadType] = useState<ReportExportType | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadSummary() {
+      setStatus({ status: "saving", message: "" });
+
+      try {
+        const response = await fetch(`/api/reports/summary?range=${range}`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as {
+          summary?: ReportSummary;
+          error?: string;
+        };
+
+        if (!response.ok || !payload.summary) {
+          throw new Error(payload.error ?? "운영 리포트를 불러오지 못했습니다.");
+        }
+
+        setSummary(payload.summary);
+        setStatus({ status: "idle", message: "" });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setSummary(null);
+        setStatus({
+          status: "error",
+          message:
+            error instanceof Error ? error.message : "운영 리포트를 불러오지 못했습니다.",
+        });
+      }
+    }
+
+    void loadSummary();
+
+    return () => {
+      controller.abort();
+    };
+  }, [range]);
+
+  async function downloadReport(type: ReportExportType) {
+    setDownloadType(type);
+    setStatus({ status: "saving", message: "" });
+
+    try {
+      const params = new URLSearchParams({
+        type,
+        range,
+        includePrivate: String(includePrivate),
+      });
+      const response = await fetch(`/api/reports/export?${params.toString()}`, {
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw new Error(payload?.error ?? "CSV를 내려받지 못했습니다.");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const disposition = response.headers.get("Content-Disposition") ?? "";
+      const filename =
+        disposition.match(/filename="([^"]+)"/)?.[1] ?? `academy-${type}.csv`;
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      setStatus({ status: "saved", message: "CSV 다운로드를 시작했습니다." });
+    } catch (error) {
+      setStatus({
+        status: "error",
+        message: error instanceof Error ? error.message : "CSV를 내려받지 못했습니다.",
+      });
+    } finally {
+      setDownloadType(null);
+    }
+  }
+
+  const reportCards = summary
+    ? [
+        {
+          title: "출석 처리",
+          value: `${summary.attendance.total}건`,
+          detail: `출석 ${summary.attendance.present} · 지각 ${summary.attendance.late} · 결석 ${summary.attendance.absent} · 미체크 ${summary.attendance.pending}`,
+        },
+        {
+          title: "문자 기록",
+          value: `${summary.messages.logs}건`,
+          detail: `dry-run ${summary.messages.dryRun} · 실발송 ${summary.messages.sent} · 실패 ${summary.messages.failed} · LMS ${summary.messages.lms}`,
+        },
+        {
+          title: "학생 운영",
+          value: `${summary.students.active}명`,
+          detail: `반 ${summary.students.classes}개 · 스케줄 미등록 ${summary.students.missingSchedule}명`,
+        },
+        {
+          title: "최근 변경",
+          value: `${summary.audit.count}건`,
+          detail: `최근 목록 ${auditLogs.length}건 표시 중`,
+        },
+      ]
+    : [];
+
+  return (
+    <div className="grid gap-4">
+      <div className="rounded-lg border border-[#E6E0D5] bg-white p-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-stone-950">조회 기간</p>
+            <p className="mt-1 text-xs leading-5 text-stone-500">
+              파일럿 기간 동안 남은 출석, 문자, 변경 기록을 요약합니다.
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-1 rounded-md bg-[#F7F5F0] p-1">
+            {[
+              ["today", "오늘"],
+              ["7d", "7일"],
+              ["month", "이번 달"],
+            ].map(([rangeValue, label]) => (
+              <button
+                key={rangeValue}
+                type="button"
+                aria-pressed={range === rangeValue}
+                onClick={() => setRange(rangeValue as ReportRange)}
+                className={[
+                  "min-h-9 rounded px-3 text-xs font-semibold transition",
+                  range === rangeValue
+                    ? "bg-white text-[#315C7C] shadow-sm"
+                    : "text-stone-600 hover:bg-white/70",
+                ].join(" ")}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {status.status === "error" ? (
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+          {status.message}
+        </p>
+      ) : null}
+
+      {summary ? (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {reportCards.map((card) => (
+            <article
+              key={card.title}
+              className="rounded-lg border border-[#E6E0D5] bg-white px-3 py-3"
+            >
+              <p className="text-xs font-semibold text-[#315C7C]">{card.title}</p>
+              <p className="mt-2 text-2xl font-semibold text-stone-950">{card.value}</p>
+              <p className="mt-2 text-xs leading-5 text-stone-500">{card.detail}</p>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-lg border border-[#E6E0D5] bg-white px-3 py-4 text-sm text-stone-600">
+          {status.status === "saving" ? "운영 리포트를 불러오는 중입니다." : "조회할 리포트가 없습니다."}
+        </div>
+      )}
+
+      <div className="rounded-lg border border-[#E6E0D5] bg-white p-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-stone-950">CSV 내보내기</p>
+            <p className="mt-1 text-xs leading-5 text-stone-500">
+              기본은 전화번호 마스킹입니다. 원장 보관용이 필요할 때만 원문 포함을 켭니다.
+            </p>
+          </div>
+          <label className="flex shrink-0 items-center gap-2 rounded-md border border-[#E6E0D5] px-2.5 py-2 text-xs font-semibold text-stone-700">
+            <input
+              type="checkbox"
+              checked={includePrivate}
+              onChange={(event) => setIncludePrivate(event.target.checked)}
+              className="size-4 accent-[#315C7C]"
+            />
+            원문 포함
+          </label>
+        </div>
+
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {[
+            ["students", "학생 목록", "반, 연락처, 공유 동의"],
+            ["attendance", "출석 기록", "날짜, 수업, 상태"],
+            ["messages", "문자 기록", "초안, 발송 로그, 본문"],
+            ["audit", "변경 이력", "누가 무엇을 바꿨는지"],
+          ].map(([type, title, detail]) => (
+            <button
+              key={type}
+              type="button"
+              disabled={downloadType === type}
+              onClick={() => void downloadReport(type as ReportExportType)}
+              className="flex min-h-14 items-center justify-between gap-3 rounded-md border border-[#E6E0D5] bg-[#FBFAF7] px-3 text-left transition hover:border-[#C9D6E2] hover:bg-[#F8FBFD] disabled:cursor-wait disabled:opacity-70"
+            >
+              <span className="flex min-w-0 items-center gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-white text-[#315C7C]">
+                  <FileText size={17} />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-stone-950">
+                    {title}
+                  </span>
+                  <span className="mt-0.5 block truncate text-xs text-stone-500">
+                    {detail}
+                  </span>
+                </span>
+              </span>
+              <Download size={16} className="shrink-0 text-stone-500" />
+            </button>
+          ))}
+        </div>
+
+        {status.status === "saved" ? (
+          <p className="mt-3 rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-3 py-2 text-sm text-[#244B67]">
+            {status.message}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }
