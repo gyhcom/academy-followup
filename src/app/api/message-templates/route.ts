@@ -8,6 +8,7 @@ import {
 } from "@/lib/followup-templates";
 import { getMessageLengthError } from "@/lib/message-length";
 import { canManageAcademy } from "@/lib/permissions";
+import { writeAuditLog } from "@/lib/server/audit-log";
 import { getRouteWorkspace } from "@/lib/server/route-workspace";
 
 type TemplateRequest = {
@@ -116,6 +117,16 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  await writeAuditLog({
+    admin: workspaceResult.workspace.admin,
+    academyId: workspaceResult.workspace.profile.academy_id,
+    actorUserId: workspaceResult.workspace.userId,
+    action: "message_template.update",
+    entityType: "message_template",
+    entityId: data.id,
+    summary: `${getTemplateReasonLabel(data.reason)} 문자 템플릿을 수정했습니다.`,
+  });
+
   return NextResponse.json({
     template: {
       id: data.id,
@@ -178,4 +189,8 @@ async function parseTemplateRequest(request: Request): Promise<
     body: body.body.trim(),
     isActive: body.isActive !== false,
   };
+}
+
+function getTemplateReasonLabel(reason: FollowupReason) {
+  return followupReasons.find((item) => item.id === reason)?.label ?? reason;
 }

@@ -574,11 +574,6 @@ function HomeDateControl({
   value: string;
   onChange: (date: string) => void;
 }) {
-  const todayDate = getTodayDate();
-  const yesterdayDate = shiftDate(todayDate, -1);
-  const isTodaySelected = value === todayDate;
-  const isYesterdaySelected = value === yesterdayDate;
-
   return (
     <div className="w-full rounded-lg border border-[#DED8CE] bg-[#F8FAFC] p-3">
       <span className="mb-2 block text-xs font-semibold text-stone-500">운영 기준 날짜</span>
@@ -620,36 +615,6 @@ function HomeDateControl({
           className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
         >
           <ChevronRight size={18} />
-        </button>
-      </div>
-      <div className="mt-2 grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          disabled={isYesterdaySelected}
-          aria-pressed={isYesterdaySelected}
-          onClick={() => onChange(yesterdayDate)}
-          className={[
-            "min-h-9 rounded-md border px-2 text-xs font-semibold transition",
-            isYesterdaySelected
-              ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#315C7C]"
-              : "border-stone-200 bg-white text-stone-600 hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C]",
-          ].join(" ")}
-        >
-          어제 보기
-        </button>
-        <button
-          type="button"
-          disabled={isTodaySelected}
-          aria-pressed={isTodaySelected}
-          onClick={() => onChange(todayDate)}
-          className={[
-            "min-h-9 rounded-md border px-2 text-xs font-semibold transition",
-            isTodaySelected
-              ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#315C7C]"
-              : "border-stone-200 bg-white text-stone-600 hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C]",
-          ].join(" ")}
-        >
-          오늘 보기
         </button>
       </div>
     </div>

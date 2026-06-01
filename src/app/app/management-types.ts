@@ -87,6 +87,16 @@ export type ManagementMessageTemplate = {
   isActive: boolean;
 };
 
+export type ManagementAuditLog = {
+  id: string;
+  actorName: string;
+  action: string;
+  entityType: string;
+  entityId: string | null;
+  summary: string;
+  createdAt: string;
+};
+
 export type FormStatus = {
   status: "idle" | "saving" | "saved" | "error";
   message: string;

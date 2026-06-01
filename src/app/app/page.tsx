@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import {
   AppWorkspace,
   type HomeScheduleItem,
+  type ManagementAuditLog,
   type ManagementClass,
   type ManagementMessageTemplate,
   type ManagementMember,
@@ -119,6 +120,16 @@ type MessageTemplateRecord = {
   title: string;
   body: string;
   is_active: boolean;
+};
+
+type AuditLogRecord = {
+  id: string;
+  actor_user_id: string | null;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  summary: string;
+  created_at: string;
 };
 
 type ShareLinkRecord = {
@@ -268,6 +279,7 @@ export default async function AppPage() {
   }
 
   const attendanceDate = getTodayDateInTimeZone("Asia/Seoul");
+  const canManage = canManageAcademy(profile.role);
   const [
     classesResult,
     studentsResult,
@@ -276,6 +288,7 @@ export default async function AppPage() {
     attendanceResult,
     settingsResult,
     templatesResult,
+    auditLogsResult,
   ] = await Promise.all([
     admin
       .from("classes")
@@ -319,6 +332,15 @@ export default async function AppPage() {
       .eq("academy_id", profile.academy_id)
       .order("created_at", { ascending: true })
       .returns<MessageTemplateRecord[]>(),
+    canManage
+      ? admin
+          .from("audit_logs")
+          .select("id, actor_user_id, action, entity_type, entity_id, summary, created_at")
+          .eq("academy_id", profile.academy_id)
+          .order("created_at", { ascending: false })
+          .limit(20)
+          .returns<AuditLogRecord[]>()
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   if (
@@ -328,7 +350,8 @@ export default async function AppPage() {
     schedulesResult.error ||
     attendanceResult.error ||
     settingsResult.error ||
-    templatesResult.error
+    templatesResult.error ||
+    (auditLogsResult.error && !isMissingAuditLogsTable(auditLogsResult.error))
   ) {
     return (
       <AppShell email={user.email ?? ""}>
@@ -342,6 +365,7 @@ export default async function AppPage() {
             attendanceResult.error?.message ??
             settingsResult.error?.message ??
             templatesResult.error?.message ??
+            auditLogsResult.error?.message ??
             "반과 학생 정보를 가져오지 못했습니다."
           }
         />
@@ -355,12 +379,14 @@ export default async function AppPage() {
   const schedules = (schedulesResult.data ?? []) as StudentScheduleRecord[];
   const attendanceRecords = (attendanceResult.data ?? []) as AttendanceRecord[];
   const templates = (templatesResult.data ?? []) as MessageTemplateRecord[];
+  const auditLogs = isMissingAuditLogsTable(auditLogsResult.error)
+    ? []
+    : ((auditLogsResult.data ?? []) as AuditLogRecord[]);
   const { data: platformAdmin } = await admin
     .from("platform_admins")
     .select("user_id")
     .eq("user_id", user.id)
     .maybeSingle<{ user_id: string }>();
-  const canManage = canManageAcademy(profile.role);
   const externalData = await loadExternalAcademyData({
     admin,
     academyId: profile.academy_id,
@@ -421,6 +447,14 @@ export default async function AppPage() {
     settings: settingsResult.data,
   });
   const managementTemplates = buildManagementTemplates(templates);
+  const managementAuditLogs = canManage
+    ? buildManagementAuditLogs({
+        logs: auditLogs,
+        members,
+        currentUserId: user.id,
+        currentUserName: profile.name,
+      })
+    : [];
 
   return (
     <AppShell
@@ -444,6 +478,7 @@ export default async function AppPage() {
         managementMembers={managementMembers}
         managementSettings={managementSettings}
         managementTemplates={managementTemplates}
+        managementAuditLogs={managementAuditLogs}
       />
     </AppShell>
   );
@@ -561,6 +596,32 @@ function buildManagementTemplates(
       isActive: template?.is_active ?? true,
     };
   });
+}
+
+function buildManagementAuditLogs({
+  logs,
+  members,
+  currentUserId,
+  currentUserName,
+}: {
+  logs: AuditLogRecord[];
+  members: MemberRecord[];
+  currentUserId: string;
+  currentUserName: string;
+}): ManagementAuditLog[] {
+  const memberNameById = new Map(members.map((member) => [member.id, member.name]));
+
+  return logs.map((log) => ({
+    id: log.id,
+    actorName:
+      (log.actor_user_id ? memberNameById.get(log.actor_user_id) : null) ??
+      (log.actor_user_id === currentUserId ? currentUserName : "시스템"),
+    action: log.action,
+    entityType: log.entity_type,
+    entityId: log.entity_id,
+    summary: log.summary,
+    createdAt: log.created_at,
+  }));
 }
 
 function buildHomeScheduleItems({
@@ -844,6 +905,14 @@ function isMissingSharingTable(error: { code?: string; message?: string } | null
     error?.code === "42P01" ||
     Boolean(error?.message?.includes("student_schedule_links")) ||
     Boolean(error?.message?.includes("student_share_tokens"))
+  );
+}
+
+function isMissingAuditLogsTable(error: { code?: string; message?: string } | null) {
+  return (
+    error?.code === "42P01" ||
+    error?.code === "PGRST205" ||
+    Boolean(error?.message?.includes("audit_logs"))
   );
 }
 

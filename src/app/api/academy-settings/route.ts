@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { canManageAcademy } from "@/lib/permissions";
+import { writeAuditLog } from "@/lib/server/audit-log";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -74,6 +75,16 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: settingsResult.error.message }, { status: 500 });
   }
 
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: "academy_settings.update",
+    entityType: "academy_settings",
+    entityId: workspace.profile.academy_id,
+    summary: "학원 운영 설정을 수정했습니다.",
+  });
+
   return NextResponse.json({
     settings: {
       academyName: parsedRequest.data.academyName,
@@ -91,6 +102,7 @@ async function getAuthorizedWorkspace(): Promise<
       ok: true;
       admin: ReturnType<typeof createSupabaseAdminClient>;
       profile: ProfileRecord;
+      userId: string;
     }
   | { ok: false; status: number; error: string }
 > {
@@ -130,7 +142,7 @@ async function getAuthorizedWorkspace(): Promise<
     return { ok: false, status: 403, error: "설정 관리는 원장 또는 관리자만 할 수 있습니다." };
   }
 
-  return { ok: true, admin, profile };
+  return { ok: true, admin, profile, userId: user.id };
 }
 
 async function parseSettingsRequest(

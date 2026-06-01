@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { canManageAcademy } from "@/lib/permissions";
+import { writeAuditLog } from "@/lib/server/audit-log";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -189,6 +190,16 @@ async function createClassAndEnroll({
     return NextResponse.json({ error: enrollment.error }, { status: 500 });
   }
 
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: "external_class.create",
+    entityType: "external_class",
+    entityId: externalClass.data.id,
+    summary: `${academyName} ${classTitle} 타 학원 수업을 연결했습니다.`,
+  });
+
   return NextResponse.json({
     message: "타 학원 수업을 학생에게 연결했습니다.",
     enrollmentId: enrollment.data.id,
@@ -226,6 +237,16 @@ async function deactivateEnrollment({
   if (!data) {
     return NextResponse.json({ error: "해제할 타 학원 수업 연결을 찾을 수 없습니다." }, { status: 404 });
   }
+
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: "external_class.delete",
+    entityType: "external_class",
+    entityId: data.id,
+    summary: "타 학원 수업 연결을 해제했습니다.",
+  });
 
   return NextResponse.json({ message: "타 학원 수업 연결을 해제했습니다." });
 }

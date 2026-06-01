@@ -4,6 +4,7 @@ import {
   syncAutomaticScheduleLinks,
   type ShareableStudentRecord,
 } from "@/lib/server/automatic-schedule-sharing";
+import { writeAuditLog } from "@/lib/server/audit-log";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -121,6 +122,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: syncResult.error }, { status: 500 });
   }
 
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: "student.create",
+    entityType: "student",
+    entityId: data.id,
+    summary: `${data.name} 학생을 등록했습니다.`,
+  });
+
   return NextResponse.json({ student: toStudentResponse(data) });
 }
 
@@ -190,6 +201,18 @@ export async function PATCH(request: Request) {
   if (!syncResult.ok) {
     return NextResponse.json({ error: syncResult.error }, { status: 500 });
   }
+
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: "student.update",
+    entityType: "student",
+    entityId: data.id,
+    summary: `${data.name} 학생 정보를 수정했습니다.${
+      data.schedule_share_consent_confirmed ? " 타 학원 스케줄 공유 동의 확인 포함." : ""
+    }`,
+  });
 
   return NextResponse.json({ student: toStudentResponse(data) });
 }

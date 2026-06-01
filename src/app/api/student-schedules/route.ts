@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { canAccessAssignedClass } from "@/lib/permissions";
+import { writeAuditLog } from "@/lib/server/audit-log";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -140,6 +141,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: "schedule.create",
+    entityType: "student_schedule",
+    entityId: data.id,
+    summary: `${data.title} 스케줄을 등록했습니다.`,
+  });
+
   return NextResponse.json({ schedule: toScheduleResponse(data) });
 }
 
@@ -205,6 +216,20 @@ export async function PATCH(request: Request) {
   if (!data) {
     return NextResponse.json({ error: "수정할 스케줄을 찾을 수 없습니다." }, { status: 404 });
   }
+
+  const isDeleteLikeUpdate = data.is_active === false;
+
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: isDeleteLikeUpdate ? "schedule.delete" : "schedule.update",
+    entityType: "student_schedule",
+    entityId: data.id,
+    summary: isDeleteLikeUpdate
+      ? `${data.title} 스케줄을 삭제했습니다.`
+      : `${data.title} 스케줄을 수정했습니다.`,
+  });
 
   return NextResponse.json({ schedule: toScheduleResponse(data) });
 }

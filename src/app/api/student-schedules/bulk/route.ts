@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { canAccessAssignedClass } from "@/lib/permissions";
+import { writeAuditLog } from "@/lib/server/audit-log";
 import { hasSupabaseAdminEnv, createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createSupabaseServerClient,
@@ -182,6 +183,16 @@ export async function POST(request: Request) {
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 500 });
   }
+
+  await writeAuditLog({
+    admin: workspace.admin,
+    academyId: workspace.profile.academy_id,
+    actorUserId: workspace.userId,
+    action: "schedule.bulk_create",
+    entityType: "class",
+    entityId: classItem.id,
+    summary: `${classItem.name} 반 공통 수업 시간 ${insertTargets.length}건을 등록했습니다.`,
+  });
 
   return NextResponse.json({
     totalStudents: students.length,
