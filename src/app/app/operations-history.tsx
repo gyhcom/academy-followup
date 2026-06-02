@@ -41,7 +41,7 @@ export function StudentFollowupHistory({
             id="student-followup-history-title"
             className="text-sm font-semibold text-stone-950"
           >
-            최근 팔로업
+            최근 연락 기록
           </h2>
           {history.status === "ready" ? (
             <span className="ml-auto rounded-md border border-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">
@@ -72,7 +72,7 @@ export function StudentFollowupHistory({
         {history.status === "ready" && history.items.length === 0 ? (
           <HistoryMessage
             icon={<History size={17} />}
-            message="아직 저장된 팔로업 기록이 없습니다."
+            message="아직 저장된 연락 기록이 없습니다."
           />
         ) : null}
 
@@ -157,8 +157,8 @@ function StatusBadge({ status }: { status: string }) {
 
 function statusLabel(status: string) {
   const labels: Record<string, string> = {
-    draft: "저장",
-    sent: "발송",
+    draft: "기록 저장",
+    sent: "발송 완료",
     failed: "실패",
   };
 

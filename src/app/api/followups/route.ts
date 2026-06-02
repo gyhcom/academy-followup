@@ -69,7 +69,7 @@ export async function GET(request: Request) {
     workspace: workspaceResult.workspace,
     studentId,
     requireActiveStudent: false,
-    permissionError: "이 학생의 팔로업 기록을 볼 권한이 없습니다.",
+    permissionError: "이 학생의 연락 기록을 볼 권한이 없습니다.",
   });
 
   if (!accessResult.ok) {
@@ -127,8 +127,8 @@ export async function POST(request: Request) {
     workspace: workspaceResult.workspace,
     studentId: parsedRequest.studentId,
     requireActiveStudent: true,
-    inactiveError: "비활성 학생은 팔로업 기록을 만들 수 없습니다.",
-    permissionError: "이 학생의 팔로업 기록을 만들 권한이 없습니다.",
+    inactiveError: "비활성 학생은 연락 기록을 만들 수 없습니다.",
+    permissionError: "이 학생의 연락 기록을 만들 권한이 없습니다.",
   });
 
   if (!accessResult.ok) {
@@ -230,7 +230,7 @@ async function parseCreateFollowupRequest(request: Request): Promise<
   }
 
   if (!isFollowupReason(body.reason)) {
-    return { ok: false, error: "지원하지 않는 팔로업 사유입니다." };
+    return { ok: false, error: "지원하지 않는 연락 사유입니다." };
   }
 
   if (typeof body.messageBody !== "string" || body.messageBody.trim().length === 0) {

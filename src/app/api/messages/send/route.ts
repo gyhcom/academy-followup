@@ -68,7 +68,7 @@ export async function POST(request: Request) {
 
   if (!followup || !followup.students) {
     return NextResponse.json(
-      { error: "발송할 팔로업 기록을 찾을 수 없습니다." },
+      { error: "발송할 연락 기록을 찾을 수 없습니다." },
       { status: 404 },
     );
   }
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
     })
   ) {
     return NextResponse.json(
-      { error: "이 팔로업 기록을 발송할 권한이 없습니다." },
+      { error: "이 연락 기록을 발송할 권한이 없습니다." },
       { status: 403 },
     );
   }
@@ -230,7 +230,7 @@ async function parseSendMessageRequest(request: Request): Promise<
   }
 
   if (typeof body.followupId !== "string" || body.followupId.length === 0) {
-    return { ok: false, error: "팔로업 ID가 필요합니다." };
+    return { ok: false, error: "연락 기록 ID가 필요합니다." };
   }
 
   return { ok: true, followupId: body.followupId };

@@ -144,7 +144,7 @@ async function parsePreviewRequest(request: Request): Promise<
   }
 
   if (!isFollowupReason(body.reason)) {
-    return { ok: false, error: "지원하지 않는 팔로업 사유입니다." };
+    return { ok: false, error: "지원하지 않는 연락 사유입니다." };
   }
 
   if (

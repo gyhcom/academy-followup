@@ -556,7 +556,7 @@ export function OperationsBoard({
         const payload = (await response.json()) as FollowupHistoryResponse;
 
         if (!response.ok) {
-          throw new Error(payload.error ?? "팔로업 기록을 불러오지 못했습니다.");
+          throw new Error(payload.error ?? "연락 기록을 불러오지 못했습니다.");
         }
 
         setFollowupHistory({
@@ -577,7 +577,7 @@ export function OperationsBoard({
           error:
             error instanceof Error
               ? error.message
-              : "팔로업 기록을 불러오지 못했습니다.",
+              : "연락 기록을 불러오지 못했습니다.",
         });
       }
     }
@@ -861,7 +861,7 @@ export function OperationsBoard({
       const payload = (await response.json()) as CreateFollowupResponse;
 
       if (!response.ok || !payload.followup) {
-        throw new Error(payload.error ?? "팔로업 기록을 저장하지 못했습니다.");
+        throw new Error(payload.error ?? "연락 기록을 저장하지 못했습니다.");
       }
 
       setFollowupSave({
@@ -888,7 +888,7 @@ export function OperationsBoard({
         error:
           error instanceof Error
             ? error.message
-            : "팔로업 기록을 저장하지 못했습니다.",
+            : "연락 기록을 저장하지 못했습니다.",
         followupId: "",
       });
     }
@@ -929,7 +929,7 @@ export function OperationsBoard({
         dryRun: payload.dryRun ?? true,
         message:
           payload.message ??
-          (payload.dryRun ? "dry-run 발송을 기록했습니다." : "문자를 발송했습니다."),
+          (payload.dryRun ? "테스트 발송을 완료했습니다." : "문자를 발송했습니다."),
         error: "",
       });
       setHistoryRefreshToken((value) => value + 1);
@@ -1730,7 +1730,7 @@ function MessageComposer({
                 : isPreviewError
                   ? messagePreview.error
                   : isPreviewReady
-                    ? "발송 전에 먼저 팔로업 기록으로 저장합니다. 저장 후 문자 발송 테스트를 진행할 수 있습니다."
+                    ? "발송 전에 먼저 연락 기록으로 저장합니다. 저장 후 테스트 발송을 진행할 수 있습니다."
                     : "학생과 사유를 선택하면 문자 미리보기를 생성합니다."}
             </p>
           </div>
@@ -1753,7 +1753,7 @@ function MessageComposer({
               )}
               <p>
                 {followupSaveError ||
-                  "팔로업 기록을 저장했습니다. 다음 단계에서 dry-run 발송을 이어갑니다."}
+                  "연락 기록을 저장했습니다. 다음 단계에서 테스트 발송을 이어갑니다."}
               </p>
             </div>
           </div>
@@ -1784,7 +1784,7 @@ function MessageComposer({
             ? "저장 중"
             : isFollowupSaved
               ? "저장 완료"
-              : "팔로업 기록 저장"}
+              : "기록 저장"}
         </button>
 
         {isFollowupSaved ? (
@@ -1805,9 +1805,9 @@ function MessageComposer({
                 ? "발송 처리 중"
                 : isMessageSent
                   ? messageSend.dryRun
-                    ? "dry-run 기록 완료"
+                    ? "테스트 발송 완료"
                     : "문자 발송 완료"
-                  : "문자 발송 테스트"}
+                  : "테스트 발송"}
             </button>
 
             {messageSendError || isMessageSent ? (
@@ -1848,7 +1848,7 @@ function MessageComposer({
                 makeupScheduleSave.status !== "saving" &&
                 makeupScheduleSave.status !== "saved" ? (
                   <p className="mt-2 rounded-md bg-white px-2 py-2 text-xs font-semibold text-[#244B67]">
-                    보강 스케줄은 문자 발송 테스트가 완료된 뒤 등록할 수 있습니다.
+                    보강 스케줄은 테스트 발송이 완료된 뒤 등록할 수 있습니다.
                   </p>
                 ) : null}
                 <button

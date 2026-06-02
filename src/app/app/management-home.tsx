@@ -944,8 +944,8 @@ export function ManagementHome({
       id: "settings",
       label: "정책",
       group: "운영 정책",
-      detail: "발신 정보, dry-run, 보조 선생님 발송 권한",
-      count: settings.smsDryRun ? "테스트" : "실발송",
+      detail: "발신 정보, 테스트 모드, 보조 선생님 발송 권한",
+      count: settings.smsDryRun ? "테스트 모드" : "실발송",
       status: settings.allowAssistantSend ? "보조 발송 허용" : "보조 발송 제한",
     },
     {
@@ -1599,12 +1599,12 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
         {
           title: "출석 처리",
           value: `${summary.attendance.total}건`,
-          detail: `출석 ${summary.attendance.present} · 지각 ${summary.attendance.late} · 결석 ${summary.attendance.absent} · 미체크 ${summary.attendance.pending}`,
+          detail: `출석 ${summary.attendance.present} · 지각 ${summary.attendance.late} · 결석 ${summary.attendance.absent} · 체크 필요 ${summary.attendance.pending}`,
         },
         {
           title: "문자 기록",
           value: `${summary.messages.logs}건`,
-          detail: `dry-run ${summary.messages.dryRun} · 실발송 ${summary.messages.sent} · 실패 ${summary.messages.failed} · LMS ${summary.messages.lms}`,
+          detail: `테스트 발송 ${summary.messages.dryRun} · 실발송 ${summary.messages.sent} · 실패 ${summary.messages.failed} · LMS ${summary.messages.lms}`,
         },
         {
           title: "학생 운영",

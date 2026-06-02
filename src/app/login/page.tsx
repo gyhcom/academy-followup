@@ -33,7 +33,7 @@ export default async function LoginPage() {
         </div>
 
         <p className="mt-5 text-sm leading-6 text-stone-600">
-          원장과 선생님이 수업 후 팔로업 문자를 관리하는 내부 화면입니다.
+          원장과 선생님이 출석, 문자, 연락 기록을 관리하는 내부 화면입니다.
         </p>
 
         {hasSupabaseServerEnv() ? (

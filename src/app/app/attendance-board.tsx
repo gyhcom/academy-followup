@@ -179,7 +179,7 @@ const editableStatuses: AttendanceStatus[] = [
 const exceptionStatuses: AttendanceStatus[] = ["absent", "needs_check", "makeup"];
 const attendanceFilterLabels: Record<AttendanceFilter, string> = {
   all: "전체",
-  unchecked: "미체크만",
+  unchecked: "체크 필요만",
   attention: "연락 필요만",
 };
 
@@ -585,7 +585,7 @@ export function AttendanceBoard({
       const payload = (await response.json()) as CreateFollowupResponse;
 
       if (!response.ok || !payload.followup) {
-        throw new Error(payload.error ?? "팔로업 기록을 저장하지 못했습니다.");
+        throw new Error(payload.error ?? "연락 기록을 저장하지 못했습니다.");
       }
 
       setFollowupSave({
@@ -622,7 +622,7 @@ export function AttendanceBoard({
         error:
           error instanceof Error
             ? error.message
-            : "팔로업 기록을 저장하지 못했습니다.",
+            : "연락 기록을 저장하지 못했습니다.",
         followupId: "",
       });
     }
@@ -663,7 +663,7 @@ export function AttendanceBoard({
         dryRun: payload.dryRun ?? true,
         message:
           payload.message ??
-          (payload.dryRun ? "dry-run 발송을 기록했습니다." : "문자를 발송했습니다."),
+          (payload.dryRun ? "테스트 발송을 완료했습니다." : "문자를 발송했습니다."),
         error: "",
       });
       applyAttendanceRecords(
@@ -824,7 +824,7 @@ export function AttendanceBoard({
 
               {summary ? (
                 <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-stone-200 bg-white/95 px-4 py-2 text-sm shadow-[0_-8px_20px_rgba(28,25,23,0.06)] backdrop-blur sm:px-5">
-                  <span className="font-medium text-stone-600">이 수업 미체크</span>
+                  <span className="font-medium text-stone-600">이 수업 체크 필요</span>
                   <span className="rounded-full bg-stone-950 px-2.5 py-1 text-xs font-semibold text-white">
                     {summary.pending}명
                   </span>
@@ -990,7 +990,7 @@ function AttendanceOverviewStrip({ overview }: { overview: AttendanceOverview })
     <section className="grid grid-cols-4 overflow-hidden rounded-lg border border-stone-200 bg-white text-center shadow-sm">
       <CompactOverviewItem label="수업" value={`${overview.totalSessions}개`} />
       <CompactOverviewItem label="학생" value={`${overview.totalStudents}명`} />
-      <CompactOverviewItem label="미체크" value={`${uncheckedCount}명`} />
+      <CompactOverviewItem label="체크 필요" value={`${uncheckedCount}명`} />
       <CompactOverviewItem
         label="연락 필요"
         value={`${needsAttentionCount}명`}
@@ -1093,7 +1093,7 @@ function SessionList({
                         : "bg-stone-100 text-stone-500",
                     ].join(" ")}
                   >
-                    {progress.pending} 미체크
+                    {progress.pending} 체크 필요
                   </span>
                   {progress.attention > 0 ? (
                     <span
@@ -1365,7 +1365,7 @@ function AttendanceArrivalToggle({
         isSaving ? "cursor-wait opacity-60" : "",
       ].join(" ")}
     >
-      <span className="sr-only">{isPresent ? "도착을 미체크로 변경" : "도착으로 변경"}</span>
+      <span className="sr-only">{isPresent ? "도착을 체크 필요로 변경" : "도착으로 변경"}</span>
       <span
         className={[
           "flex size-6 items-center justify-center rounded-full bg-white shadow-sm transition",
@@ -1642,7 +1642,7 @@ function AttendanceFollowupPanel({
                   ? "학원별 문자 템플릿을 불러오는 중입니다."
                   : isPreviewError
                     ? messagePreview.error
-                    : "저장하면 출석 기록과 팔로업 기록이 연결됩니다."}
+                    : "저장하면 출석 기록과 연락 기록이 연결됩니다."}
               </p>
             </div>
           </div>
@@ -1664,7 +1664,7 @@ function AttendanceFollowupPanel({
                 )}
                 <p>
                   {followupSaveError ||
-                    "팔로업 기록을 저장했고 출석 기록과 연결했습니다."}
+                    "연락 기록을 저장했고 출석 기록과 연결했습니다."}
                 </p>
               </div>
             </div>
@@ -1686,7 +1686,7 @@ function AttendanceFollowupPanel({
               ? "저장 중"
               : isFollowupSaved
                 ? "저장 완료"
-                : "팔로업 기록 저장"}
+                : "기록 저장"}
           </button>
 
           {isFollowupSaved ? (
@@ -1707,9 +1707,9 @@ function AttendanceFollowupPanel({
                   ? "발송 처리 중"
                   : isMessageSent
                     ? messageSend.dryRun
-                      ? "dry-run 기록 완료"
+                      ? "테스트 발송 완료"
                       : "문자 발송 완료"
-                    : "문자 발송 테스트"}
+                    : "테스트 발송"}
               </button>
 
               {messageSendError || isMessageSent ? (

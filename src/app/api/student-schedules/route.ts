@@ -443,7 +443,7 @@ async function validateScheduleRelations({
   }
 
   if (payload.sourceFollowupId && !followupResult.data) {
-    return { ok: false, error: "연결할 팔로업 기록을 찾을 수 없습니다." };
+    return { ok: false, error: "연결할 연락 기록을 찾을 수 없습니다." };
   }
 
   if (
@@ -451,7 +451,7 @@ async function validateScheduleRelations({
     followupResult.data &&
     followupResult.data.student_id !== payload.studentId
   ) {
-    return { ok: false, error: "팔로업 기록과 학생 정보가 일치하지 않습니다." };
+    return { ok: false, error: "연락 기록과 학생 정보가 일치하지 않습니다." };
   }
 
   return { ok: true, classTeacherId: classResult.data?.teacher_id ?? null };
