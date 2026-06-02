@@ -245,7 +245,7 @@ export function WorkspaceHome({
             {formatHomeDate(selectedDate)} 기준 운영 현황
           </h3>
           <p className="mt-1 text-sm leading-6 text-stone-600">
-            결석/지각 학생은 문자 저장 후 연락 완료로 표시됩니다.
+            결석/지각 학생은 기록 저장과 테스트 발송 후 연락 완료로 표시됩니다.
           </p>
           <p className="mt-1 text-sm leading-6 text-stone-600">
             숫자를 누르면 해당 학생 목록만 아래에 펼쳐집니다.
@@ -269,7 +269,7 @@ export function WorkspaceHome({
                 onClick={() => toggleFilter("all")}
               />
               <SummaryButton
-                label="연락 전"
+                label="연락 필요"
                 value={`${unsentCount}명`}
                 tone="danger"
                 isActive={expandedFilter === "unsent"}
@@ -397,7 +397,7 @@ function MobileHomeExperience({
 
           <div className="mt-5 grid grid-cols-2 gap-2">
             <MobileHeroMetric label="확인할 학생" value={`${followupItems.length}명`} />
-            <MobileHeroMetric label="연락 전" value={`${unsentCount}명`} tone="warm" />
+            <MobileHeroMetric label="연락 필요" value={`${unsentCount}명`} tone="warm" />
           </div>
           <p className="mt-3 text-xs font-bold text-white/80">
             오늘 {isStaffHome ? "담당 수업" : "학원 일정"}{" "}
@@ -516,13 +516,13 @@ function MobileHomeExperience({
         ) : (
           <div className="grid grid-cols-3 gap-2 p-3">
             <MobileSummaryButton
-              label="확인"
+              label="확인할 학생"
               value={`${followupItems.length}`}
               isActive={expandedFilter === "all"}
               onClick={() => onToggleFilter("all")}
             />
             <MobileSummaryButton
-              label="연락 전"
+              label="연락 필요"
               value={`${unsentCount}`}
               tone="danger"
               isActive={expandedFilter === "unsent"}
@@ -1206,7 +1206,7 @@ function MobileFollowupRow({
           {item.className} · {item.startTime}-{item.endTime}
         </span>
         <span className="mt-1 block text-xs font-medium text-stone-500">
-          {isSent ? "연락 완료" : item.followupStatus === "draft" ? "초안 저장" : "문자 작성 필요"}
+          {isSent ? "연락 완료" : item.followupStatus === "draft" ? "기록 저장" : "연락 필요"}
         </span>
       </span>
       <span className="mt-1 flex size-9 items-center justify-center rounded-full bg-[#F2F7F0] text-[#087A61]">
@@ -1364,7 +1364,7 @@ function HomeFollowupRow({
               isSent ? "bg-[#EAF1F8] text-[#244B67]" : "bg-amber-50 text-amber-800",
             ].join(" ")}
           >
-            {isSent ? "연락 완료" : item.followupStatus === "draft" ? "초안 저장" : "연락 전"}
+            {isSent ? "연락 완료" : item.followupStatus === "draft" ? "기록 저장" : "연락 필요"}
           </span>
         </div>
         <p className="mt-1 text-sm text-stone-600">
@@ -1595,7 +1595,7 @@ function getFilteredItems(items: HomeFollowupItem[], filter: FollowupFilter | nu
 function filterLabel(filter: FollowupFilter) {
   const labels: Record<FollowupFilter, string> = {
     all: "확인할 학생",
-    unsent: "연락 전",
+    unsent: "연락 필요",
     sent: "연락 완료",
   };
 
