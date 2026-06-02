@@ -8,6 +8,11 @@ import {
   normalizeMessageForSending,
 } from "@/lib/message-length";
 import { canManageAcademy } from "@/lib/permissions";
+import {
+  resolveBulkMessageRecipients,
+  type BulkMessageTargetType,
+  type BulkRecipient,
+} from "@/lib/server/bulk-message-recipients";
 import { getRouteWorkspace } from "@/lib/server/route-workspace";
 import { sendSms } from "@/lib/sms/solapi";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -21,31 +26,8 @@ type BulkMessageRequest = {
   excludeDuplicateRecipients?: unknown;
 };
 
-type ClassRecord = {
-  id: string;
-  name: string;
-  grade_label: string | null;
-};
-
-type StudentRecord = {
-  id: string;
-  class_id: string | null;
-  name: string;
-  grade_label: string | null;
-  parent_phone: string;
-  student_phone: string | null;
-  status: string;
-};
-
 type AcademySettingsRecord = {
   sms_dry_run: boolean;
-};
-
-type BulkRecipient = {
-  studentId: string;
-  classId: string | null;
-  recipientType: MessageRecipientType;
-  phone: string;
 };
 
 type CreatedFollowupRecord = {
@@ -78,18 +60,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsedRequest.error }, { status: 400 });
   }
 
-  const [classesResult, studentsResult, settingsResult] = await Promise.all([
-    admin
-      .from("classes")
-      .select("id, name, grade_label")
-      .eq("academy_id", profile.academy_id)
-      .returns<ClassRecord[]>(),
-    admin
-      .from("students")
-      .select("id, class_id, name, grade_label, parent_phone, student_phone, status")
-      .eq("academy_id", profile.academy_id)
-      .eq("status", "active")
-      .returns<StudentRecord[]>(),
+  const [recipientsResult, settingsResult] = await Promise.all([
+    resolveBulkMessageRecipients({
+      admin,
+      academyId: profile.academy_id,
+      targetType: parsedRequest.targetType,
+      classId: parsedRequest.classId,
+      gradeLabel: parsedRequest.gradeLabel,
+      recipientType: parsedRequest.recipientType,
+      excludeDuplicateRecipients: parsedRequest.excludeDuplicateRecipients,
+    }),
     admin
       .from("academy_settings")
       .select("sms_dry_run")
@@ -97,53 +77,15 @@ export async function POST(request: Request) {
       .maybeSingle<AcademySettingsRecord>(),
   ]);
 
-  if (classesResult.error) {
-    return NextResponse.json({ error: classesResult.error.message }, { status: 500 });
-  }
-
-  if (studentsResult.error) {
-    return NextResponse.json({ error: studentsResult.error.message }, { status: 500 });
+  if (!recipientsResult.ok) {
+    return NextResponse.json(
+      { error: recipientsResult.error },
+      { status: recipientsResult.status },
+    );
   }
 
   if (settingsResult.error) {
     return NextResponse.json({ error: settingsResult.error.message }, { status: 500 });
-  }
-
-  const classes = classesResult.data ?? [];
-  const classMap = new Map(classes.map((classItem) => [classItem.id, classItem]));
-  const targetStudents = filterTargetStudents({
-    students: studentsResult.data ?? [],
-    classMap,
-    targetType: parsedRequest.targetType,
-    classId: parsedRequest.classId,
-    gradeLabel: parsedRequest.gradeLabel,
-  });
-
-  if (targetStudents.length === 0) {
-    return NextResponse.json(
-      { error: "전체문자 대상 학생이 없습니다." },
-      { status: 400 },
-    );
-  }
-
-  const candidateRecipients = targetStudents.flatMap((student) =>
-    getMessageRecipients({
-      studentId: student.id,
-      classId: student.class_id,
-      recipientType: parsedRequest.recipientType,
-      parentPhone: student.parent_phone,
-      studentPhone: student.student_phone,
-    }),
-  );
-  const recipients = parsedRequest.excludeDuplicateRecipients
-    ? dedupeRecipientsByPhone(candidateRecipients)
-    : candidateRecipients;
-
-  if (recipients.length === 0) {
-    return NextResponse.json(
-      { error: "발송 가능한 수신자 연락처가 없습니다." },
-      { status: 400 },
-    );
   }
 
   const dryRun = settingsResult.data?.sms_dry_run ?? process.env.SMS_DRY_RUN !== "false";
@@ -152,7 +94,7 @@ export async function POST(request: Request) {
     academyId: profile.academy_id,
     teacherId: userId,
     messageBody: parsedRequest.messageBody,
-    recipients,
+    recipients: recipientsResult.recipients,
   });
 
   if (!followups.ok) {
@@ -164,23 +106,20 @@ export async function POST(request: Request) {
       admin,
       academyId: profile.academy_id,
       followups: followups.records,
-      recipients,
+      recipients: recipientsResult.recipients,
       status: "dry_run",
     });
 
     return NextResponse.json({
       dryRun: true,
-      message: "SMS_DRY_RUN이 활성화되어 실제 문자를 발송하지 않았습니다.",
-      targetStudentCount: targetStudents.length,
-      candidateRecipientCount: candidateRecipients.length,
-      recipientCount: recipients.length,
-      duplicateExcludedCount: candidateRecipients.length - recipients.length,
+      message: "전체문자 테스트 발송 기록을 저장했습니다.",
+      ...recipientsResult.preview,
     });
   }
 
   const sentResults = [];
 
-  for (const recipient of recipients) {
+  for (const recipient of recipientsResult.recipients) {
     const result = await sendSms({
       to: recipient.phone,
       text: parsedRequest.messageBody,
@@ -199,17 +138,14 @@ export async function POST(request: Request) {
   return NextResponse.json({
     dryRun: false,
     message: "전체문자를 발송했습니다.",
-    targetStudentCount: targetStudents.length,
-    candidateRecipientCount: candidateRecipients.length,
-    recipientCount: recipients.length,
-    duplicateExcludedCount: candidateRecipients.length - recipients.length,
+    ...recipientsResult.preview,
   });
 }
 
 async function parseBulkMessageRequest(request: Request): Promise<
   | {
       ok: true;
-      targetType: "all" | "class" | "grade";
+      targetType: BulkMessageTargetType;
       classId: string | null;
       gradeLabel: string | null;
       recipientType: MessageRecipientType;
@@ -267,77 +203,6 @@ async function parseBulkMessageRequest(request: Request): Promise<
     messageBody,
     excludeDuplicateRecipients: body.excludeDuplicateRecipients !== false,
   };
-}
-
-function filterTargetStudents({
-  students,
-  classMap,
-  targetType,
-  classId,
-  gradeLabel,
-}: {
-  students: StudentRecord[];
-  classMap: Map<string, ClassRecord>;
-  targetType: "all" | "class" | "grade";
-  classId: string | null;
-  gradeLabel: string | null;
-}) {
-  if (targetType === "class") {
-    return students.filter((student) => student.class_id === classId);
-  }
-
-  if (targetType === "grade") {
-    return students.filter((student) => {
-      const classGrade = student.class_id
-        ? classMap.get(student.class_id)?.grade_label
-        : null;
-
-      return student.grade_label === gradeLabel || classGrade === gradeLabel;
-    });
-  }
-
-  return students;
-}
-
-function getMessageRecipients({
-  studentId,
-  classId,
-  recipientType,
-  parentPhone,
-  studentPhone,
-}: {
-  studentId: string;
-  classId: string | null;
-  recipientType: MessageRecipientType;
-  parentPhone: string;
-  studentPhone: string | null;
-}) {
-  const recipients: BulkRecipient[] = [];
-  const normalizedParentPhone = normalizePhone(parentPhone);
-  const normalizedStudentPhone = normalizePhone(studentPhone ?? "");
-
-  if ((recipientType === "parent" || recipientType === "both") && normalizedParentPhone) {
-    recipients.push({ studentId, classId, recipientType: "parent", phone: normalizedParentPhone });
-  }
-
-  if ((recipientType === "student" || recipientType === "both") && normalizedStudentPhone) {
-    recipients.push({ studentId, classId, recipientType: "student", phone: normalizedStudentPhone });
-  }
-
-  return recipients;
-}
-
-function dedupeRecipientsByPhone(recipients: BulkRecipient[]) {
-  const seen = new Set<string>();
-
-  return recipients.filter((recipient) => {
-    if (seen.has(recipient.phone)) {
-      return false;
-    }
-
-    seen.add(recipient.phone);
-    return true;
-  });
 }
 
 async function createBulkFollowups({
@@ -422,16 +287,6 @@ async function saveBulkMessageLogs({
   if (followupResult.error) {
     throw new Error(followupResult.error.message);
   }
-}
-
-function normalizePhone(phone: string) {
-  const digits = phone.replace(/\D/g, "");
-
-  if (digits.length < 10 || digits.length > 11) {
-    return "";
-  }
-
-  return digits;
 }
 
 function getProviderMessageId(result: unknown) {

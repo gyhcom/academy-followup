@@ -123,9 +123,26 @@ type BulkMessageState = {
   duplicateExcludedCount: number;
 };
 
+type BulkMessagePreviewState = {
+  status: "idle" | "loading" | "ready" | "error";
+  error: string;
+  targetStudentCount: number;
+  candidateRecipientCount: number;
+  recipientCount: number;
+  duplicateExcludedCount: number;
+};
+
 type BulkMessageResponse = {
   dryRun?: boolean;
   message?: string;
+  targetStudentCount?: number;
+  candidateRecipientCount?: number;
+  recipientCount?: number;
+  duplicateExcludedCount?: number;
+  error?: string;
+};
+
+type BulkMessagePreviewResponse = {
   targetStudentCount?: number;
   candidateRecipientCount?: number;
   recipientCount?: number;
@@ -265,6 +282,14 @@ export function OperationsBoard({
     recipientCount: 0,
     duplicateExcludedCount: 0,
   });
+  const [bulkPreviewState, setBulkPreviewState] = useState<BulkMessagePreviewState>({
+    status: "idle",
+    error: "",
+    targetStudentCount: 0,
+    candidateRecipientCount: 0,
+    recipientCount: 0,
+    duplicateExcludedCount: 0,
+  });
 
   const messageBody =
     messageDraft.key === messageKey
@@ -364,6 +389,87 @@ export function OperationsBoard({
 
     return Array.from(grades).sort((left, right) => left.localeCompare(right, "ko"));
   }, [visibleClasses]);
+
+  useEffect(() => {
+    if (!canManage) {
+      return;
+    }
+
+    if (
+      (bulkTargetType === "class" && !bulkClassId) ||
+      (bulkTargetType === "grade" && !bulkGradeLabel)
+    ) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function loadBulkPreview() {
+      setBulkPreviewState((previousState) => ({
+        ...previousState,
+        status: "loading",
+        error: "",
+      }));
+
+      try {
+        const response = await fetch("/api/bulk-messages/preview", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            targetType: bulkTargetType,
+            classId: bulkTargetType === "class" ? bulkClassId : undefined,
+            gradeLabel: bulkTargetType === "grade" ? bulkGradeLabel : undefined,
+            recipientType: bulkRecipientType,
+            excludeDuplicateRecipients: bulkExcludeDuplicates,
+          }),
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as BulkMessagePreviewResponse;
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "전체문자 대상을 확인하지 못했습니다.");
+        }
+
+        setBulkPreviewState({
+          status: "ready",
+          error: "",
+          targetStudentCount: payload.targetStudentCount ?? 0,
+          candidateRecipientCount: payload.candidateRecipientCount ?? 0,
+          recipientCount: payload.recipientCount ?? 0,
+          duplicateExcludedCount: payload.duplicateExcludedCount ?? 0,
+        });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setBulkPreviewState({
+          status: "error",
+          error:
+            error instanceof Error ? error.message : "전체문자 대상을 확인하지 못했습니다.",
+          targetStudentCount: 0,
+          candidateRecipientCount: 0,
+          recipientCount: 0,
+          duplicateExcludedCount: 0,
+        });
+      }
+    }
+
+    void loadBulkPreview();
+
+    return () => {
+      controller.abort();
+    };
+  }, [
+    canManage,
+    bulkTargetType,
+    bulkClassId,
+    bulkGradeLabel,
+    bulkRecipientType,
+    bulkExcludeDuplicates,
+  ]);
 
   useEffect(() => {
     if (!selectedStudentIdForPreview) {
@@ -537,6 +643,70 @@ export function OperationsBoard({
     setMakeupScheduleSave({ followupId: "", status: "idle", message: "", scheduleId: "" });
   }
 
+  function resetBulkMessageResult() {
+    setBulkMessageState({
+      status: "idle",
+      message: "",
+      error: "",
+      dryRun: true,
+      targetStudentCount: 0,
+      candidateRecipientCount: 0,
+      recipientCount: 0,
+      duplicateExcludedCount: 0,
+    });
+  }
+
+  function resetBulkPreview() {
+    setBulkPreviewState({
+      status: "idle",
+      error: "",
+      targetStudentCount: 0,
+      candidateRecipientCount: 0,
+      recipientCount: 0,
+      duplicateExcludedCount: 0,
+    });
+  }
+
+  function handleBulkTargetTypeChange(nextTargetType: "all" | "class" | "grade") {
+    setBulkTargetType(nextTargetType);
+    resetBulkMessageResult();
+
+    if (
+      (nextTargetType === "class" && !bulkClassId) ||
+      (nextTargetType === "grade" && !bulkGradeLabel)
+    ) {
+      resetBulkPreview();
+    }
+  }
+
+  function handleBulkClassIdChange(nextClassId: string) {
+    setBulkClassId(nextClassId);
+    resetBulkMessageResult();
+
+    if (!nextClassId) {
+      resetBulkPreview();
+    }
+  }
+
+  function handleBulkGradeLabelChange(nextGradeLabel: string) {
+    setBulkGradeLabel(nextGradeLabel);
+    resetBulkMessageResult();
+
+    if (!nextGradeLabel) {
+      resetBulkPreview();
+    }
+  }
+
+  function handleBulkRecipientTypeChange(nextRecipientType: MessageRecipientType) {
+    setBulkRecipientType(nextRecipientType);
+    resetBulkMessageResult();
+  }
+
+  function handleBulkExcludeDuplicatesChange(enabled: boolean) {
+    setBulkExcludeDuplicates(enabled);
+    resetBulkMessageResult();
+  }
+
   async function handleSendBulkMessage() {
     const normalizedBody = bulkMessageBody.trim();
 
@@ -580,7 +750,7 @@ export function OperationsBoard({
         status: "sent",
         message:
           payload.message ??
-          (payload.dryRun ? "dry-run 전체문자를 기록했습니다." : "전체문자를 발송했습니다."),
+          (payload.dryRun ? "전체문자 테스트 발송 기록을 저장했습니다." : "전체문자를 발송했습니다."),
         error: "",
         dryRun: payload.dryRun ?? true,
         targetStudentCount: payload.targetStudentCount ?? 0,
@@ -922,12 +1092,13 @@ export function OperationsBoard({
           recipientType={bulkRecipientType}
           excludeDuplicates={bulkExcludeDuplicates}
           messageBody={bulkMessageBody}
+          previewState={bulkPreviewState}
           state={bulkMessageState}
-          onTargetTypeChange={setBulkTargetType}
-          onClassIdChange={setBulkClassId}
-          onGradeLabelChange={setBulkGradeLabel}
-          onRecipientTypeChange={setBulkRecipientType}
-          onExcludeDuplicatesChange={setBulkExcludeDuplicates}
+          onTargetTypeChange={handleBulkTargetTypeChange}
+          onClassIdChange={handleBulkClassIdChange}
+          onGradeLabelChange={handleBulkGradeLabelChange}
+          onRecipientTypeChange={handleBulkRecipientTypeChange}
+          onExcludeDuplicatesChange={handleBulkExcludeDuplicatesChange}
           onMessageBodyChange={setBulkMessageBody}
           onSend={handleSendBulkMessage}
         />
@@ -1051,6 +1222,7 @@ function BulkMessagePanel({
   recipientType,
   excludeDuplicates,
   messageBody,
+  previewState,
   state,
   onTargetTypeChange,
   onClassIdChange,
@@ -1068,6 +1240,7 @@ function BulkMessagePanel({
   recipientType: MessageRecipientType;
   excludeDuplicates: boolean;
   messageBody: string;
+  previewState: BulkMessagePreviewState;
   state: BulkMessageState;
   onTargetTypeChange: (targetType: "all" | "class" | "grade") => void;
   onClassIdChange: (classId: string) => void;
@@ -1081,6 +1254,8 @@ function BulkMessagePanel({
   const canSend =
     messageBody.trim().length > 0 &&
     !metrics.isOverLimit &&
+    previewState.status === "ready" &&
+    previewState.recipientCount > 0 &&
     state.status !== "sending" &&
     (targetType !== "class" || Boolean(classId)) &&
     (targetType !== "grade" || Boolean(gradeLabel));
@@ -1226,11 +1401,33 @@ function BulkMessagePanel({
                 : "SMS 예상"}
           </p>
 
+          <div className="rounded-lg border border-[#C9D6E2] bg-[#F8FBFD] p-3 text-sm text-[#244B67]">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-semibold text-[#1F3F58]">발송 전 확인</p>
+              {previewState.status === "loading" ? (
+                <span className="text-xs font-medium text-[#557A96]">확인 중</span>
+              ) : null}
+            </div>
+            {previewState.status === "error" ? (
+              <p className="mt-2 leading-6 text-red-700">{previewState.error}</p>
+            ) : (
+              <p className="mt-2 leading-6">
+                대상 {previewState.targetStudentCount}명 · 발송 후보{" "}
+                {previewState.candidateRecipientCount}건 · 실제 발송{" "}
+                {previewState.recipientCount}건 · 중복 제외{" "}
+                {previewState.duplicateExcludedCount}건
+              </p>
+            )}
+            <p className="mt-1 text-xs leading-5 text-[#557A96]">
+              실제 발송 건수는 중복 수신자 제외 설정과 연락처 등록 상태를 반영합니다.
+            </p>
+          </div>
+
           {state.status === "sent" ? (
             <div className="rounded-md border border-[#C9D6E2] bg-[#EAF1F8] p-3 text-sm leading-6 text-[#244B67]">
               <p className="font-semibold">{state.message}</p>
               <p className="mt-1">
-                대상 {state.targetStudentCount}명 · 후보 {state.candidateRecipientCount}건 · 실제 {state.recipientCount}건 · 중복 제외 {state.duplicateExcludedCount}건
+                대상 {state.targetStudentCount}명 · 발송 후보 {state.candidateRecipientCount}건 · 실제 발송 {state.recipientCount}건 · 중복 제외 {state.duplicateExcludedCount}건
               </p>
             </div>
           ) : null}
@@ -1253,7 +1450,7 @@ function BulkMessagePanel({
             ].join(" ")}
           >
             <Send size={17} />
-            {state.status === "sending" ? "전체문자 처리 중" : "전체문자 dry-run 발송"}
+            {state.status === "sending" ? "전체문자 처리 중" : "전체문자 테스트 발송"}
           </button>
         </div>
       </div>
