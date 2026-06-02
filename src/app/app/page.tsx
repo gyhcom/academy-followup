@@ -400,32 +400,35 @@ export default async function AppPage() {
     profileId: user.id,
     role: profile.role,
   });
+  const scopedHomeStudents = canViewAllClasses(profile.role)
+    ? students
+    : students.filter((student) =>
+        classes.some(
+          (classItem) =>
+            classItem.id === student.class_id && classItem.teacher_id === user.id,
+        ),
+      );
   const sharedScheduleItems = await buildSharedHomeScheduleItems({
     admin,
     academyId: profile.academy_id,
     students,
   });
-  const homeScheduleSummaryItems = buildHomeScheduleItems({
-    classes,
-    students,
-    schedules,
-    manualExternalSchedules,
-    sharedScheduleItems,
-  });
   const homeScheduleItems = buildHomeScheduleItems({
     classes,
-    students: canViewAllClasses(profile.role)
-      ? students
-      : students.filter((student) =>
-          classes.some(
-            (classItem) =>
-              classItem.id === student.class_id && classItem.teacher_id === user.id,
-          ),
-        ),
+    students: scopedHomeStudents,
     schedules,
     manualExternalSchedules,
     sharedScheduleItems,
   });
+  const homeScheduleSummaryItems = canViewAllClasses(profile.role)
+    ? buildHomeScheduleItems({
+        classes,
+        students,
+        schedules,
+        manualExternalSchedules,
+        sharedScheduleItems,
+      })
+    : homeScheduleItems;
   const managementClasses = canManage
     ? buildManagementClasses({ classes, students, members })
     : [];

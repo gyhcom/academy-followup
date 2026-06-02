@@ -143,6 +143,7 @@ export function WorkspaceHome({
   const unsentCount = followupItems.length - sentCount;
   const filteredItems = getFilteredItems(followupItems, expandedFilter);
   const copy = getRoleHomeCopy({ academyName, teacherName, role, roleLabel });
+  const isStaffHome = role === "teacher" || role === "assistant";
   const isToday = selectedDate === getTodayDate();
 
   function toggleFilter(filter: FollowupFilter) {
@@ -161,6 +162,7 @@ export function WorkspaceHome({
         followupItems={followupItems}
         scheduleItems={selectedScheduleItems}
         scheduleSummary={selectedScheduleSummary}
+        isStaffHome={isStaffHome}
         unsentCount={unsentCount}
         sentCount={sentCount}
         expandedFilter={expandedFilter}
@@ -222,6 +224,7 @@ export function WorkspaceHome({
         items={selectedScheduleItems}
         summary={selectedScheduleSummary}
         selectedDate={selectedDate}
+        isStaffHome={isStaffHome}
         onNavigate={onNavigate}
       />
 
@@ -329,6 +332,7 @@ function MobileHomeExperience({
   followupItems,
   scheduleItems,
   scheduleSummary,
+  isStaffHome,
   unsentCount,
   sentCount,
   expandedFilter,
@@ -351,6 +355,7 @@ function MobileHomeExperience({
   followupItems: HomeFollowupItem[];
   scheduleItems: HomeScheduleItem[];
   scheduleSummary: HomeScheduleSummary;
+  isStaffHome: boolean;
   unsentCount: number;
   sentCount: number;
   expandedFilter: FollowupFilter | null;
@@ -395,7 +400,8 @@ function MobileHomeExperience({
             <MobileHeroMetric label="연락 전" value={`${unsentCount}명`} tone="warm" />
           </div>
           <p className="mt-3 text-xs font-bold text-white/80">
-            오늘 학원 일정 {scheduleSummary.academyScheduleCount}개 · 보강 불가{" "}
+            오늘 {isStaffHome ? "담당 수업" : "학원 일정"}{" "}
+            {scheduleSummary.academyScheduleCount}개 · 보강 불가{" "}
             {scheduleSummary.blockedScheduleCount}건
           </p>
 
@@ -428,6 +434,7 @@ function MobileHomeExperience({
         items={scheduleItems}
         summary={scheduleSummary}
         selectedDate={selectedDate}
+        isStaffHome={isStaffHome}
         onNavigate={onNavigate}
       />
 
@@ -703,12 +710,14 @@ function TodayScheduleSection({
   items,
   summary,
   selectedDate,
+  isStaffHome = false,
   className = "",
   onNavigate,
 }: {
   items: HomeScheduleItem[];
   summary: HomeScheduleSummary;
   selectedDate: string;
+  isStaffHome?: boolean;
   className?: string;
   onNavigate: (view: WorkspaceView) => void;
 }) {
@@ -724,6 +733,8 @@ function TodayScheduleSection({
   const hiddenBlockedCount = Math.max(0, blockedItems.length - visibleBlockedItems.length);
   const hasAnySchedule = academyItems.length > 0 || blockedItems.length > 0;
   const hasBlockedSchedules = blockedItems.length > 0;
+  const academyScheduleLabel = isStaffHome ? "담당 수업" : "학원 일정";
+  const academyScheduleDescription = isStaffHome ? "내 수업 출석 체크" : "출석 체크";
 
   return (
     <section
@@ -744,7 +755,7 @@ function TodayScheduleSection({
             </h3>
           </div>
           <span className="shrink-0 rounded-full bg-[#EAF1F8] px-2.5 py-1 text-xs font-bold text-[#315C7C]">
-            수업 {summary.academyScheduleCount} · 공유일정{" "}
+            {isStaffHome ? "담당 " : ""}수업 {summary.academyScheduleCount} · 공유일정{" "}
             {summary.blockedScheduleCount}
           </span>
         </div>
@@ -752,15 +763,17 @@ function TodayScheduleSection({
 
       {!hasAnySchedule ? (
         <div className="px-4 py-5 text-sm leading-6 text-stone-600 sm:px-5">
-          이 날짜에는 표시할 일정이 없습니다.
+          이 날짜에는 표시할 {isStaffHome ? "담당 일정" : "일정"}이 없습니다.
         </div>
       ) : (
         <div className="divide-y divide-stone-100">
           <div className="px-4 py-2.5 sm:px-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-black text-stone-950">학원 일정</p>
-                <p className="mt-0.5 text-xs font-medium text-stone-500">출석 체크</p>
+                <p className="text-sm font-black text-stone-950">{academyScheduleLabel}</p>
+                <p className="mt-0.5 text-xs font-medium text-stone-500">
+                  {academyScheduleDescription}
+                </p>
               </div>
               <span className="rounded-full bg-stone-100 px-2 py-1 text-[11px] font-black text-stone-600">
                 {academyItems.length}개
@@ -769,7 +782,7 @@ function TodayScheduleSection({
           </div>
           {visibleAcademyItems.length === 0 ? (
             <div className="px-4 pb-4 text-sm leading-6 text-stone-500 sm:px-5">
-              이 날짜에는 학원 일정이 없습니다.
+              이 날짜에는 {academyScheduleLabel}이 없습니다.
             </div>
           ) : (
             <div className="divide-y divide-stone-100">
