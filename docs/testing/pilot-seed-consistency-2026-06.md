@@ -556,129 +556,68 @@ select
 
 ## 7. 권장 조치
 
-### 검토 후 수정
+### 바로 수정: 완료
 
-현재는 바로 DB를 보정하지 않고, 먼저 Production SQL Editor에서 확인용 SQL을 실행해야 합니다.
+2026-06-03 기준으로 사용자가 Supabase SQL Editor에서 아래 순서의 SQL을 직접 실행했습니다.
 
-권장 순서:
+1. `supabase/seed-pilot-200-students.sql` 전체 실행
+2. 기존 테스트/데모 학생과 반을 정리하고 pilot 200 학생/반만 남기는 cleanup SQL 실행
+3. verify SQL 실행
 
-1. `3.13`, `3.16`으로 200명 seed 적용 여부를 확정합니다.
-2. `3.17`로 다른 seed 혼재 여부를 확인합니다.
-3. 실제 파일럿 기준을 아래 둘 중 하나로 선택합니다.
-   - 200명 seed를 기준으로 고정
-   - 현재 Production 172명 상태를 기준으로 문서/시연 기준 정정
-4. 200명 기준으로 고정한다면 `supabase/seed-pilot-200-students.sql` 전체 재실행 또는 별도 보정 script 작성 이슈로 분리합니다.
+실행은 앱 코드나 seed 파일 변경이 아니라 Production/파일럿 DB 데이터 정리 작업입니다. 이 문서 PR에서는 DB를 직접 수정하지 않고, 사용자가 확인한 결과값만 기록합니다.
+
+### 현재 기준 데이터
+
+아래 값이 Supabase SQL Editor verify 결과와 앱 관리 화면에서 확인되었습니다.
+
+| 항목 | 기대값 | 최종 확인값 | 판단 |
+| --- | ---: | ---: | --- |
+| 전체 학생 | 200 | 200 | 정상 |
+| active 학생 | 200 | 200 | 정상 |
+| pilot 200 학생 ID count | 200 | 200 | 정상 |
+| 전체 반 | 20 | 20 | 정상 |
+| pilot 200 반 ID count | 20 | 20 | 정상 |
+| active 스케줄 | 580 | 580 | 정상 |
+| pilot 정규 스케줄 | 580 | 580 | 정상 |
+| 스케줄 없는 active 학생 | 0 | 0 | 정상 |
+
+따라서 파일럿 기준 데이터는 `학생 200명 / 반 20개 / 정규 스케줄 580개 / 스케줄 미등록 0명`으로 고정합니다.
 
 ### 보류
 
-실제 친구 학원 파일럿을 곧바로 시작해야 하고 200명 정확도가 필수가 아니라면, DB 보정은 보류할 수 있습니다. 다만 이 경우 UAT 문서와 원장 전달 자료에서 “200명” 표현을 쓰지 말고 “운영형 테스트 데이터”로 바꾸는 것이 맞습니다.
+추가 DB 보정 SQL은 현재 필요하지 않습니다.
 
-### 바로 수정
+### 주의
 
-현재 단계에서는 권장하지 않습니다. 원인 확인 전 Production DB에 seed 재실행 또는 delete 포함 SQL을 실행하면 기존 테스트 계정/권한/시연 데이터가 바뀔 수 있습니다.
+- demo seed, volume seed, 이전 operations demo 데이터는 더 이상 파일럿 기준으로 사용하지 않습니다.
+- 실제 학원 개인정보를 넣기 전까지는 200명 fake seed를 기준으로 모바일 UAT와 원장/선생님 시연을 진행합니다.
+- 실제 학원 데이터로 전환할 때는 별도 체크리스트와 백업 기준을 두고 진행합니다.
 
 ## 8. 최종 결론
 
-선택: **1. DB 보정 필요**
-
-단, 즉시 보정이 아니라 확인 SQL 실행 후 보정 방향을 확정해야 합니다.
+선택: **추가 조치 불필요**
 
 이유:
 
-- 기대값 `학생 200명 / 반 20개`와 현재값 `학생 172명 / 반 19개 / 스케줄 미등록 74명`이 명확히 다릅니다.
-- 200명 seed가 정상 적용되었다면 고정 ID 기준 학생 200명과 반 20개가 존재해야 합니다.
-- 스케줄 미등록 74명은 파일럿 운영 UX를 왜곡하므로 실제 파일럿 전 기준 데이터 정리가 필요합니다.
+- 초기 불일치였던 `학생 172명 / 반 19개 / 스케줄 미등록 74명` 상태는 더 이상 현재 기준이 아닙니다.
+- 2026-06-03 후속 cleanup/verify 결과, 200명 seed 기준값이 정상화되었습니다.
+- 앱 관리 화면에서도 학생 200명 count가 확인되었습니다.
+- DB schema, API, 화면 집계 코드 수정 없이 데이터 정리로 문제가 해소되었습니다.
 
 보조 결론:
 
-- seed 파일 자체가 잘못됐다고 단정할 수는 없습니다.
-- API/화면 집계 코드 오류라고 단정할 수도 없습니다.
-- 먼저 Production DB에서 `pilot_200_student_id_count`, `pilot_200_class_id_count`, 다른 seed 혼재 여부를 확인해야 합니다.
+- seed 파일 수정은 필요하지 않습니다.
+- API/화면 집계 코드 수정도 필요하지 않습니다.
+- Issue #22는 이 문서 업데이트와 PR merge 후 닫을 수 있습니다.
 
 ## 9. 후속 GitHub Issue 후보
 
-### 이슈 제목
+현재 T-617 범위에서는 추가 이슈가 필요하지 않습니다.
 
-T-625 파일럿 200명 seed Production 적용 여부 확인 및 기준 데이터 확정
+다만 실제 파일럿 진행 전에는 별도 우선순위로 아래 검수만 이어가면 됩니다.
 
-- 우선순위: P0
-- 목표: Production SQL Editor에서 확인용 SQL을 실행해 200명 seed 적용 여부와 seed 혼재 여부를 확정한다.
-- 실제 수정 범위:
-  - SQL Editor에서 이 문서의 확인용 SQL 실행
-  - 결과값을 `docs/testing/pilot-seed-consistency-2026-06.md` 또는 별도 결과 문서에 기록
-  - 200명 기준 유지 또는 현재값 기준 전환 결정
-- 실행 SQL 또는 수정 파일 후보:
-  - 이 문서의 `3.13`, `3.16`, `3.17`
-  - 결과 문서: `docs/testing/pilot-seed-consistency-result-2026-06.md`
-- 제외 범위:
-  - Production 데이터 수정
-  - seed 파일 수정
-  - 앱 코드 수정
-- 완료 기준:
-  - pilot 200 학생/반 ID count 확인
-  - 다른 seed 혼재 여부 확인
-  - 파일럿 기준 데이터 규모 확정
-- 테스트 기준:
-  - SQL 실행 결과 row 캡처 또는 결과값 기록
-  - owner 관리 탭 count와 SQL count 비교
-- 추천 브랜치명: `codex/t-625-pilot-seed-result-record`
-- Codex 작업 지시문:
-  - `docs/testing/pilot-seed-consistency-2026-06.md`의 확인용 SQL 실행 결과를 받아 파일럿 기준 데이터를 확정하는 결과 문서를 작성해줘. DB 수정은 하지 말고, SQL 결과와 화면 count 차이만 기록해줘.
+- 200명 기준 모바일 홈/출석/문자/관리 smoke 재확인
+- owner/teacher/assistant 계정별 권한 smoke 재확인
+- 실제 학원 데이터 전환 전 백업/정리 체크리스트 확인
 
-### 이슈 제목
-
-T-626 파일럿 200명 seed 재적용 또는 보정 SQL 작성
-
-- 우선순위: P0
-- 목표: T-625 확인 결과에 따라 파일럿 DB를 200명/20개 반 기준으로 맞춘다.
-- 실제 수정 범위:
-  - 선택 A: `supabase/seed-pilot-200-students.sql` 전체 재실행 절차 확정
-  - 선택 B: 누락 학생/반/스케줄만 보정하는 별도 SQL 작성
-  - 실행 전/후 확인 SQL 문서화
-- 실행 SQL 또는 수정 파일 후보:
-  - `supabase/seed-pilot-200-students.sql`
-  - 필요 시 새 문서: `docs/testing/pilot-seed-reapply-guide-2026-06.md`
-  - 필요 시 새 SQL: `supabase/manual-fixes/pilot-200-consistency-fix.sql` 같은 별도 파일
-- 제외 범위:
-  - 앱 UI 변경
-  - API 변경
-  - 실제 SMS 발송
-- 완료 기준:
-  - 학생 200명, 반 20개 기준 확인
-  - 스케줄 미등록 active 학생 0명 또는 의도된 예외만 남음
-  - owner 관리 탭과 리포트 count가 문서 기준과 일치
-- 테스트 기준:
-  - SQL count
-  - owner 관리 탭 count
-  - 모바일 390px 홈/출석/문자/관리 smoke
-- 추천 브랜치명: `codex/t-626-pilot-200-data-fix`
-- Codex 작업 지시문:
-  - T-625 결과를 기준으로 파일럿 200명 데이터를 보정하는 실행 절차 또는 SQL 파일을 작성해줘. Production 실행은 사용자가 SQL Editor에서 검토 후 하도록 하고, destructive SQL은 명확히 분리해줘.
-
-### 이슈 제목
-
-T-627 파일럿 seed 문서와 UAT 기준값 정리
-
-- 우선순위: P1
-- 목표: 200명 seed, 운영형 demo seed, volume seed, 실제 파일럿 데이터의 용도와 실행 순서를 혼동 없이 정리한다.
-- 실제 수정 범위:
-  - `docs/engineering/supabase-setup.md`에 200명 seed 실행/확인/정리 기준 추가
-  - UAT 문서에서 기준 데이터가 200명인지 현재 Production 값인지 명확히 표시
-  - 원장 시연 전 사용할 seed와 실제 학원 데이터 전환 기준 정리
-- 실행 SQL 또는 수정 파일 후보:
-  - `docs/engineering/supabase-setup.md`
-  - `docs/testing/pilot-mobile-uat-200-students-2026-06.md`
-  - `docs/testing/pilot-seed-consistency-2026-06.md`
-- 제외 범위:
-  - DB 수정
-  - seed SQL 수정
-  - 앱 코드 수정
-- 완료 기준:
-  - 어떤 seed를 언제 실행해야 하는지 문서만 보고 판단 가능
-  - “200명”이라는 표현과 실제 DB 기준이 충돌하지 않음
-- 테스트 기준:
-  - 문서 리뷰
-  - `git diff --check`
-- 추천 브랜치명: `codex/t-627-pilot-seed-doc-cleanup`
-- Codex 작업 지시문:
-  - 파일럿 seed 관련 문서를 정리해서 MVP seed, volume seed, operations demo seed, 200명 seed의 용도와 실행 순서를 명확히 해줘. 코드와 DB는 수정하지 마.
+이 항목들은 새 데이터 보정 이슈가 아니라 파일럿 릴리즈 체크리스트 또는 UAT 작업에서 다루는 것이 적절합니다.

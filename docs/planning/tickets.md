@@ -1388,6 +1388,7 @@
 - 원장용 1주 파일럿 체크리스트 추가: 완료
 - 선생님용 10분 파일럿 체크리스트 추가: 완료
 - 원장 피드백 양식 추가: 완료
+- 2026-06-03 기준 Production/파일럿 DB의 200명 seed 정합성 확인: 완료
 - 원장, 선생님, 보조 선생님 계정별 모바일 390px UAT: 실행 예정
 - 200명 기준 홈/출석/문자/관리 성능과 사용성 확인: 실행 예정
 
@@ -1398,6 +1399,7 @@
 
 구현 메모:
 - 200명 운영형 seed는 `supabase/seed-pilot-200-students.sql`입니다.
+- 2026-06-03 verify 기준값은 학생 200명, 반 20개, active 스케줄 580개, pilot 정규 스케줄 580개, 스케줄 미등록 active 학생 0명입니다.
 - 실행/확인 기준은 `docs/testing/pilot-200-students-data-plan-2026-05-31.md`입니다.
 - 원장 체크리스트는 `docs/testing/director-pilot-checklist-2026-05-31.md`입니다.
 - 선생님 체크리스트는 `docs/testing/teacher-pilot-checklist-2026-05-31.md`입니다.
