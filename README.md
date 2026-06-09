@@ -22,8 +22,22 @@
 - Vercel Project: `academy-followup`
 - 현재 배포 방식: GitHub repo 연결을 통한 Vercel 자동 배포
 - Connected Repository: `gyhcom/academy-followup`
+- Vercel Root Directory: `apps/frontend`
 
 `main` 브랜치에 push하면 Vercel Production Deployment가 생성됩니다.
+
+## 로컬 개발
+
+Next.js 앱은 `apps/frontend` workspace에 있습니다.
+
+```bash
+npm install
+npm run dev --workspace apps/frontend
+npm run lint --workspace apps/frontend
+npm run build --workspace apps/frontend
+```
+
+로컬 환경변수는 `apps/frontend/.env.example`을 기준으로 `apps/frontend/.env.local`에 설정합니다.
 
 ## 주요 사용자
 

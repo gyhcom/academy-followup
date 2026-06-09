@@ -10,16 +10,16 @@
 
 ## 2. 단기 목표
 
-- 현재 MVP 안정화
+- 6월 중순까지 Spring Boot 전환을 시작할 수 있는 유지보수 구조 확보
+- Next.js 앱을 `apps/frontend`로 이동해 프론트/백엔드 경계 정리
 - 파일럿 기준 데이터와 Production 상태 확인
 - 기존 PR/이슈 정리
 - 문서 기준 정리
-- `frontend/backend/supabase/docs` 구조 전환 준비
 
 ## 3. 중기 목표
 
-- Next.js 앱을 `frontend/academy-followup-web`로 이동
-- Spring Boot API를 `backend/academy-followup-api`로 추가
+- Next.js 앱을 `apps/frontend`에서 안정화
+- Spring Boot API를 `apps/backend`에 추가
 - IntelliJ에서 루트 프로젝트 기준으로 관리 가능하게 정리
 - report, audit, message preview 같은 read 또는 low-risk API부터 Spring Boot로 분리 검토
 
