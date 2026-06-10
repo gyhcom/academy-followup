@@ -20,6 +20,8 @@
 | T-632 report summary API 첫 이관 | 진행 중 | P1 | `GET /api/reports/summary`를 Spring Boot로 우선 이전 | T-631 완료 | 로컬 Spring API와 기존 Next API 숫자 비교 |
 | T-633 Railway 배포 준비 | 보류 | P1 | `apps/backend`를 Railway 서비스로 배포 가능하게 설정 | T-632 로컬 검증 | Railway 결제 전까지 보류 |
 | T-634 Frontend-Spring 로컬 연동 | 진행 중 | P1 | 로컬 frontend에서 Spring report API 우선 호출 및 fallback 구성 | T-632 | `NEXT_PUBLIC_BACKEND_API_URL`은 로컬에서만 사용 |
+| T-635 로컬 Spring 검증 루틴 | 완료 | P1 | AI 도움 없이 로컬 Spring 검증을 반복할 수 있게 문서/스크립트 제공 | T-632 | 검증 루틴 유지 |
+| T-636 로컬 Spring 전환 소스 정리 | 진행 중 | P1 | 다음 API 이관 전 Supabase REST/fallback 패턴 정리 | T-635 | 공통 client/helper 기반 유지 |
 
 ## 현재 원칙
 
@@ -29,4 +31,5 @@
 - Frontend는 Vercel, Spring Boot backend는 Railway를 기준으로 배포합니다.
 - Railway 결제와 배포는 보류하고, 우선 로컬 Spring Boot로 API 이전과 fallback을 검증합니다.
 - Spring API는 기존 Next.js API fallback을 유지한 상태에서만 production에 연결합니다.
+- 로컬 Spring 소스는 다음 API 이관 전 공통 Supabase REST client와 frontend fallback helper를 기준으로 정리합니다.
 - 7월 13일 전까지는 파일럿 운영 개선과 안정화를 우선합니다.

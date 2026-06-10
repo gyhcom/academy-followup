@@ -1,29 +1,24 @@
 package com.academyfollowup.api.report;
 
-import com.academyfollowup.api.global.config.SupabaseProperties;
+import com.academyfollowup.api.global.supabase.SupabaseRestClient;
+import com.academyfollowup.api.global.supabase.SupabaseRestException;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class SupabaseReportClient {
 
-    private final SupabaseProperties supabaseProperties;
-    private final RestClient restClient;
+    private static final String CONFIG_ERROR_MESSAGE = "백엔드 리포트 환경변수가 설정되지 않았습니다.";
 
-    public SupabaseReportClient(SupabaseProperties supabaseProperties, RestClient.Builder restClientBuilder) {
-        this.supabaseProperties = supabaseProperties;
-        this.restClient = restClientBuilder.build();
+    private final SupabaseRestClient supabaseRestClient;
+
+    public SupabaseReportClient(SupabaseRestClient supabaseRestClient) {
+        this.supabaseRestClient = supabaseRestClient;
     }
 
     public List<AttendanceRecord> findAttendance(String academyId, ReportRangeBounds range) {
@@ -90,43 +85,16 @@ public class SupabaseReportClient {
     }
 
     private <T> List<T> getArray(String path, Class<T[]> responseType) {
-        assertConfigured();
-
         try {
-            T[] response = restClient.get()
-                    .uri(supabaseUri(path))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + supabaseProperties.serviceRoleKey())
-                    .header("apikey", supabaseProperties.serviceRoleKey())
-                    .header("Accept", "application/json")
-                    .retrieve()
-                    .body(responseType);
-
-            if (response == null) {
-                return List.of();
-            }
-
-            return Arrays.asList(response);
-        } catch (HttpClientErrorException exception) {
+            return supabaseRestClient.getServiceArray(path, responseType, CONFIG_ERROR_MESSAGE);
+        } catch (SupabaseRestException exception) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
-                    "운영 리포트 조회 중 오류가 발생했습니다."
+                    exception.getMessage().equals(CONFIG_ERROR_MESSAGE)
+                            ? CONFIG_ERROR_MESSAGE
+                            : "운영 리포트 조회 중 오류가 발생했습니다."
             );
         }
-    }
-
-    private void assertConfigured() {
-        if (!StringUtils.hasText(supabaseProperties.url())
-                || !StringUtils.hasText(supabaseProperties.serviceRoleKey())) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "백엔드 리포트 환경변수가 설정되지 않았습니다."
-            );
-        }
-    }
-
-    private URI supabaseUri(String path) {
-        String baseUrl = supabaseProperties.url().replaceAll("/+$", "");
-        return URI.create(baseUrl + path);
     }
 
     private String encode(String value) {
