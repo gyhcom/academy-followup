@@ -10,10 +10,9 @@
 
 ```text
 academy-followup/
-├─ frontend/
-│  └─ academy-followup-web/
-├─ backend/
-│  └─ academy-followup-api/
+├─ apps/
+│  ├─ frontend/
+│  └─ backend/
 ├─ supabase/
 ├─ docs/
 └─ README.md
@@ -60,3 +59,12 @@ academy-followup/
 - 현재 앱 구조 이동 전 준비 완료
 - 다음 이슈로 Next.js 이동 작업 가능
 - Vercel 배포 기준과 롤백 기준이 문서화됨
+
+## 8. T-629 실행 기준
+
+`T-629`에서는 Next.js 앱만 `apps/frontend`로 이동합니다.
+
+- 루트 `package.json`은 npm workspaces 기준으로 관리합니다.
+- 프론트 개발 명령은 `npm run dev --workspace apps/frontend`를 사용합니다.
+- Vercel Root Directory는 `apps/frontend`로 설정해야 합니다.
+- Spring Boot skeleton은 `T-630`에서 `apps/backend`에 별도로 추가합니다.
