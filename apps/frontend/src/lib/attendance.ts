@@ -13,7 +13,7 @@ export const attendanceStatuses = [
 export type AttendanceStatus = (typeof attendanceStatuses)[number];
 
 export const attendanceStatusLabels: Record<AttendanceStatus, string> = {
-  pending: "미체크",
+  pending: "체크 필요",
   present: "출석",
   late: "지각",
   absent: "결석",

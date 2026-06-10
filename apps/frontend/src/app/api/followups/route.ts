@@ -307,7 +307,7 @@ async function getAttendanceRecordForFollowup({
     return {
       ok: false,
       status: 400,
-      error: "결석 또는 지각 출석 기록만 문자 팔로업과 연결할 수 있습니다.",
+      error: "결석 또는 지각 출석 기록만 문자 연락 기록과 연결할 수 있습니다.",
     };
   }
 
