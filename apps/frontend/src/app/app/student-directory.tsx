@@ -833,6 +833,14 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
   }
 
   async function deactivateEnrollment(enrollmentId: string) {
+    const confirmed = window.confirm(
+      "이 학생의 타 학원 수업 연결을 해제하시겠습니까?\n해제하면 해당 시간은 보강 제외 일정에서 빠집니다.",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     setStatus({ state: "saving", message: "" });
 
     try {
@@ -918,7 +926,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                 type="button"
                 disabled={isSaving}
                 onClick={() => deactivateEnrollment(enrollment.id)}
-                className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-500 disabled:opacity-50"
+                className="flex size-8 shrink-0 items-center justify-center rounded-md border border-red-200 bg-white text-red-600 transition hover:bg-red-50 disabled:opacity-50"
                 aria-label={`${enrollment.title} 연결 해제`}
               >
                 <Trash2 size={13} />
@@ -1140,7 +1148,7 @@ function SharedSchedulePanel({
                     type="button"
                     disabled={isSaving}
                     onClick={() => onRevoke(link.id)}
-                    className="shrink-0 rounded-md border border-stone-200 bg-white px-2 py-1 text-[11px] font-semibold text-stone-600 disabled:opacity-50"
+                    className="shrink-0 rounded-md border border-red-200 bg-white px-2 py-1 text-[11px] font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50"
                   >
                     공유 해제
                   </button>
@@ -1461,6 +1469,14 @@ function useSharedSchedules(studentId: string | null) {
       await runAction({ action: "connect", code });
     },
     revoke: async (linkId: string) => {
+      const confirmed = window.confirm(
+        "스케줄 공유를 해제하시겠습니까?\n해제하면 양쪽 학원 모두 상대 스케줄을 볼 수 없습니다.",
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
       await runAction({ action: "revoke", linkId });
     },
   };
