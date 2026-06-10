@@ -9,7 +9,7 @@ logging:
     root: INFO
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${PORT:${SERVER_PORT:8080}}
 
 management:
   endpoints:
@@ -20,3 +20,10 @@ management:
     health:
       probes:
         enabled: true
+
+academy-followup:
+  supabase:
+    url: ${SUPABASE_URL:}
+    service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:}
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3010,http://localhost:3011}
