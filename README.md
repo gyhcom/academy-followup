@@ -39,6 +39,16 @@ npm run build --workspace apps/frontend
 
 로컬 환경변수는 `apps/frontend/.env.example`을 기준으로 `apps/frontend/.env.local`에 설정합니다.
 
+Spring Boot 백엔드 skeleton은 `apps/backend`에 있습니다.
+
+```bash
+cd apps/backend
+./gradlew bootRun
+curl http://localhost:8080/health
+```
+
+현재 Spring Boot 앱은 병렬 skeleton이며, 기존 Next.js `/api/*`를 대체하지 않습니다.
+
 ## 주요 사용자
 
 - 원장: 전체 발송 현황, 반별/선생님별 팔로업 누락 확인
