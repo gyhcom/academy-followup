@@ -763,7 +763,9 @@ function TodayScheduleSection({
 
       {!hasAnySchedule ? (
         <div className="px-4 py-5 text-sm leading-6 text-stone-600 sm:px-5">
-          이 날짜에는 표시할 {isStaffHome ? "담당 일정" : "일정"}이 없습니다.
+          {isStaffHome
+            ? "이 날짜에는 담당 수업이 없습니다. 담당 반 배정이나 수업 시간이 맞는지 원장에게 확인해 주세요."
+            : "이 날짜에는 학원 일정이 없습니다. 관리 탭에서 수업 시간이나 타 학원 일정을 등록하면 여기에 표시됩니다."}
         </div>
       ) : (
         <div className="divide-y divide-stone-100">
@@ -782,7 +784,9 @@ function TodayScheduleSection({
           </div>
           {visibleAcademyItems.length === 0 ? (
             <div className="px-4 pb-4 text-sm leading-6 text-stone-500 sm:px-5">
-              이 날짜에는 {academyScheduleLabel}이 없습니다.
+              {isStaffHome
+                ? "담당 수업이 없습니다. 다른 날짜를 보거나 담당 반 배정을 확인해 주세요."
+                : `${academyScheduleLabel}이 없습니다. 수업 시간 등록 후 출석 체크를 시작할 수 있습니다.`}
             </div>
           ) : (
             <div className="divide-y divide-stone-100">
@@ -983,7 +987,7 @@ function BlockedScheduleSheet({
             </div>
           ) : (
             <div className="px-4 py-8 text-center text-sm font-semibold text-stone-500">
-              조건에 맞는 공유 일정이 없습니다.
+              조건에 맞는 공유 일정이 없습니다. 학생명이나 필터를 바꿔 다시 확인해 주세요.
             </div>
           )}
         </div>
@@ -1232,7 +1236,7 @@ function HomeEmptyState({
           이 날짜에는 출석/연락 기록이 없습니다.
         </p>
         <p className="mt-1 text-sm leading-6 text-stone-600">
-          {formatHomeDate(selectedDate)} 기준 기록이 아직 없어 학생 목록을 표시하지 않습니다.
+          {formatHomeDate(selectedDate)} 기준으로 처리할 기록이 없습니다. 날짜를 이동하거나 출석 탭에서 수업을 먼저 체크해 주세요.
         </p>
         <div className="mt-4 flex flex-col justify-center gap-2 sm:flex-row">
           {isToday ? (

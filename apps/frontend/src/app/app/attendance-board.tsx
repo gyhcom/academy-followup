@@ -739,7 +739,7 @@ export function AttendanceBoard({
                   </p>
                 ) : (
                   <p className="mt-0.5 text-xs text-stone-500 sm:mt-1 sm:text-sm">
-                    선택한 날짜에 표시할 수업이 없습니다.
+                    선택한 날짜에 수업이 없습니다. 다른 날짜를 보거나 관리 탭에서 수업 시간을 등록해 주세요.
                   </p>
                 )}
               </div>
@@ -817,7 +817,7 @@ export function AttendanceBoard({
                   })
                 ) : (
                   <div className="px-4 py-8 text-center text-sm leading-6 text-stone-500 sm:px-5">
-                    현재 필터에 해당하는 학생이 없습니다.
+                    현재 필터에 해당하는 학생이 없습니다. 필터를 `전체`로 바꾸거나 학생의 출석 상태를 확인해 주세요.
                   </div>
                 )}
               </div>
@@ -833,7 +833,7 @@ export function AttendanceBoard({
             </div>
           ) : (
             <div className="p-5 text-sm leading-6 text-stone-600">
-              선택한 날짜에 수업 기록이나 주간 스케줄이 없습니다.
+              선택한 날짜에 수업 기록이나 주간 스케줄이 없습니다. 관리 탭에서 반 공통 수업 시간을 등록하면 출석부에 표시됩니다.
             </div>
           )}
         </section>
@@ -1110,7 +1110,7 @@ function SessionList({
           })
         ) : (
           <p className="px-1 py-2 text-sm leading-6 text-stone-500">
-            이 날짜에 표시할 수업이 없습니다.
+            이 날짜에 표시할 수업이 없습니다. 다른 날짜를 선택하거나 수업 시간 등록 상태를 확인해 주세요.
           </p>
         )}
       </div>
