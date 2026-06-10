@@ -38,6 +38,7 @@ cp .env.example .env
 ```
 
 T-631 uses Supabase Auth and `profiles` to build the backend workspace context.
+T-632 adds the first read-only migrated API, `GET /api/reports/summary`.
 
 Required values:
 
@@ -54,8 +55,28 @@ curl http://localhost:8080/api/auth/context \
   -H "Authorization: Bearer <supabase-access-token>"
 ```
 
+## Report Summary Check
+
+```bash
+curl "http://localhost:8080/api/reports/summary?range=today" \
+  -H "Authorization: Bearer <supabase-access-token>"
+```
+
+Supported ranges are `today`, `7d`, and `month`. The response shape matches the
+existing Next.js `/api/reports/summary` response so the frontend can fallback
+without UI changes.
+
+For local frontend integration, set this only in local env:
+
+```bash
+NEXT_PUBLIC_BACKEND_API_URL=http://localhost:8080
+```
+
+Do not set `NEXT_PUBLIC_BACKEND_API_URL` in Production until Railway deployment
+is ready.
+
 ## Scope
 
 - Existing Next.js API routes remain active.
 - This app is not part of the Vercel frontend deployment yet.
-- First API migration should start with read-only report or audit endpoints.
+- Railway deployment is deferred until payment/deployment timing is decided.

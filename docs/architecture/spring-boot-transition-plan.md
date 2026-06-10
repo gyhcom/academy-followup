@@ -27,7 +27,7 @@ Supabase
 ```
 
 - Frontend: Vercel + Next.js 유지
-- Backend: Railway + Spring Boot
+- Backend: 로컬 Spring Boot 우선, Railway + Spring Boot 배포는 결제 후 진행
 - DB/Auth: Supabase 유지
 - API 전환 방식: Spring API 우선 호출 + Next.js fallback 유지
 - 첫 이관 API: `GET /api/reports/summary`
@@ -112,13 +112,13 @@ Local:
 Preview:
 
 - Frontend: Vercel Preview
-- Backend: Railway 서비스 또는 별도 preview service
+- Backend: Railway 서비스 또는 로컬 Spring Boot 검증
 - API fallback이 가능해야 합니다.
 
 Production:
 
 - Frontend: Vercel Production
-- Backend: Railway Production service
+- Backend: Railway 결제 전까지 연결하지 않습니다.
 - Spring API 이관 전에는 `NEXT_PUBLIC_BACKEND_API_URL`을 비워도 앱이 동작해야 합니다.
 
 ## 9. 모니터링/로그
@@ -159,18 +159,21 @@ Production:
 - 기존 Next.js 응답 shape와 동일합니다.
 - owner/manager는 성공, teacher/assistant는 `403`입니다.
 - 200명 파일럿 데이터 기준 숫자가 기존 Next.js API와 일치합니다.
+- Railway 배포 전에는 로컬 `http://localhost:8080`에서 먼저 검증합니다.
 
 ### T-633 Railway 배포 준비
 
 - Railway에서 `apps/backend` root directory 기준으로 빌드/실행됩니다.
 - Railway public URL에서 `/health`와 `/actuator/health`가 응답합니다.
 - backend 환경변수 목록과 설정 절차가 README에 있습니다.
+- Railway 결제 전까지는 보류합니다.
 
 ### T-634 Frontend-Spring 연동
 
-- Vercel frontend가 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring report API를 호출합니다.
+- 로컬 또는 Vercel frontend가 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring report API를 호출합니다.
 - 실패 시 기존 Next.js report API로 fallback합니다.
 - Vercel env 제거만으로 rollback 가능합니다.
+- Railway 배포 전에는 로컬 frontend에서만 `NEXT_PUBLIC_BACKEND_API_URL=http://localhost:8080`으로 검증합니다.
 
 ## 12. 하지 않을 것
 
