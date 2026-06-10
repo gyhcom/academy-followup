@@ -52,6 +52,7 @@ import {
   type ReportRange,
   type ReportSummary,
 } from "@/lib/client/report-summary";
+import { fetchAuditLogsFromBackend } from "@/lib/client/audit-logs";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
 
 type ManagementSection =
@@ -120,11 +121,33 @@ export function ManagementHome({
     status: "idle",
     message: "",
   });
+  const [backendAuditLogs, setBackendAuditLogs] = useState<ManagementAuditLog[] | null>(
+    null,
+  );
   const [settingsForm, setSettingsForm] = useState<SettingsFormState>(settings);
   const [settingsFormStatus, setSettingsFormStatus] = useState<FormStatus>({
     status: "idle",
     message: "",
   });
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadAuditLogs() {
+      const backendLogs = await fetchAuditLogsFromBackend(controller.signal);
+
+      if (backendLogs) {
+        setBackendAuditLogs(backendLogs);
+      }
+    }
+
+    void loadAuditLogs();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+  const auditLogItems = backendAuditLogs ?? auditLogs;
   const [templateForm, setTemplateForm] = useState<MessageTemplateFormState | null>(
     null,
   );
@@ -941,8 +964,8 @@ export function ManagementHome({
       label: "이력",
       group: "운영 로그",
       detail: "학생, 반, 스케줄, 설정 최근 변경",
-      count: `${auditLogs.length}건`,
-      status: auditLogs.length > 0 ? "최근 변경 확인" : "기록 대기",
+      count: `${auditLogItems.length}건`,
+      status: auditLogItems.length > 0 ? "최근 변경 확인" : "기록 대기",
     },
   ];
 
@@ -1136,7 +1159,7 @@ export function ManagementHome({
           title="운영 리포트"
           description="출석, 문자, 학생 명단, 최근 변경 이력을 요약하고 CSV로 내려받습니다."
         >
-          <OperationalReportPanel auditLogs={auditLogs} />
+          <OperationalReportPanel auditLogs={auditLogItems} />
         </ManagementPanel>
       ) : null}
 
@@ -1145,7 +1168,7 @@ export function ManagementHome({
           title="최근 변경 이력"
           description="학생, 반, 스케줄, 문자 템플릿, 학원 설정처럼 운영 데이터가 바뀐 기록을 확인합니다."
         >
-          <AuditLogList auditLogs={auditLogs} />
+          <AuditLogList auditLogs={auditLogItems} />
         </ManagementPanel>
       ) : null}
 

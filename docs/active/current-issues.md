@@ -22,6 +22,7 @@
 | T-634 Frontend-Spring 로컬 연동 | 완료 | P1 | 로컬 frontend에서 Spring report API 우선 호출 및 fallback 구성 | T-632 | `NEXT_PUBLIC_BACKEND_API_URL`은 로컬에서만 사용 |
 | T-635 로컬 Spring 검증 루틴 | 완료 | P1 | AI 도움 없이 로컬 Spring 검증을 반복할 수 있게 문서/스크립트 제공 | T-632 | 검증 루틴 유지 |
 | T-636 로컬 Spring 전환 소스 정리 | 완료 | P1 | 다음 API 이관 전 Supabase REST/fallback 패턴 정리 | T-635 | 공통 client/helper 기반 유지 |
+| T-637 Spring audit logs 조회 API 이관 | 완료 | P1 | 최근 변경 이력 조회를 Spring Boot read-only API로 이전 | T-636 | 로컬 Spring 우선 호출과 SSR fallback 유지 |
 
 ## 현재 원칙
 
