@@ -31,17 +31,31 @@ Expected `/health` response:
 
 ## Local Environment
 
-Copy `.env.example` if you want a local env file for future API migration work.
+Copy `.env.example` if you want a local env file for backend API work.
 
 ```bash
 cp .env.example .env
 ```
 
-T-630 does not connect to Supabase yet. The Supabase variables are placeholders for T-631/T-632.
+T-631 uses Supabase Auth and `profiles` to build the backend workspace context.
+
+Required values:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `ALLOWED_ORIGINS`
+
+Do not expose `SUPABASE_SERVICE_ROLE_KEY` to the browser.
+
+## Auth Context Check
+
+```bash
+curl http://localhost:8080/api/auth/context \
+  -H "Authorization: Bearer <supabase-access-token>"
+```
 
 ## Scope
 
 - Existing Next.js API routes remain active.
 - This app is not part of the Vercel frontend deployment yet.
 - First API migration should start with read-only report or audit endpoints.
-

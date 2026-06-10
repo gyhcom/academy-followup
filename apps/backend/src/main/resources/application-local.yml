@@ -4,9 +4,5 @@ spring:
       on-profile: local
 
 academy-followup:
-  supabase:
-    url: ${SUPABASE_URL:}
-    service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:}
   cors:
     allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3010,http://localhost:3011}
-
