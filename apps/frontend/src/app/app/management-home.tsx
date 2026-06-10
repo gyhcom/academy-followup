@@ -611,6 +611,14 @@ export function ManagementHome({
       return;
     }
 
+    const confirmed = window.confirm(
+      "이 학생 스케줄을 삭제하시겠습니까?\n삭제하면 해당 일정은 출석부와 보강 후보에서 제외됩니다.",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     setScheduleFormStatus({ status: "saving", message: "" });
 
     try {
@@ -1510,6 +1518,16 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
   }, [range]);
 
   async function downloadReport(type: ReportExportType) {
+    if (includePrivate) {
+      const confirmed = window.confirm(
+        "전화번호 원문이 포함된 CSV를 다운로드하시겠습니까?\n파일 보관과 전달 시 개인정보 관리에 주의해 주세요.",
+      );
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
     setDownloadType(type);
     setStatus({ status: "saving", message: "" });
 
@@ -1646,7 +1664,13 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
               기본은 전화번호 마스킹입니다. 원장 보관용이 필요할 때만 원문 포함을 켭니다.
             </p>
           </div>
-          <label className="flex shrink-0 items-center gap-2 rounded-md border border-[#E6E0D5] px-2.5 py-2 text-xs font-semibold text-stone-700">
+          <label
+            className={`flex shrink-0 items-center gap-2 rounded-md border px-2.5 py-2 text-xs font-semibold ${
+              includePrivate
+                ? "border-amber-300 bg-amber-50 text-amber-800"
+                : "border-[#E6E0D5] text-stone-700"
+            }`}
+          >
             <input
               type="checkbox"
               checked={includePrivate}
@@ -1669,7 +1693,11 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
               type="button"
               disabled={downloadType === type}
               onClick={() => void downloadReport(type as ReportExportType)}
-              className="flex min-h-14 items-center justify-between gap-3 rounded-md border border-[#E6E0D5] bg-[#FBFAF7] px-3 text-left transition hover:border-[#C9D6E2] hover:bg-[#F8FBFD] disabled:cursor-wait disabled:opacity-70"
+              className={`flex min-h-14 items-center justify-between gap-3 rounded-md border px-3 text-left transition disabled:cursor-wait disabled:opacity-70 ${
+                includePrivate
+                  ? "border-amber-200 bg-amber-50 hover:border-amber-300 hover:bg-amber-100/70"
+                  : "border-[#E6E0D5] bg-[#FBFAF7] hover:border-[#C9D6E2] hover:bg-[#F8FBFD]"
+              }`}
             >
               <span className="flex min-w-0 items-center gap-3">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-white text-[#315C7C]">
