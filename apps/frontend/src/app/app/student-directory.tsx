@@ -199,10 +199,12 @@ export function StudentDirectory({
       />
 
       {students.length === 0 ? (
-        <div className="border-t border-[#E6E0D5] px-4 py-12 text-center">
-          <p className="text-sm font-semibold text-stone-900">아직 등록된 학생이 없습니다.</p>
-          <p className="mt-1 text-sm text-stone-500">CSV 일괄 등록 또는 학생 등록으로 시작합니다.</p>
-        </div>
+      <div className="border-t border-[#E6E0D5] px-4 py-12 text-center">
+        <p className="text-sm font-semibold text-stone-900">아직 등록된 학생이 없습니다.</p>
+        <p className="mt-1 text-sm text-stone-500">
+          CSV 일괄 등록 또는 학생 등록으로 시작하면 출석부와 문자 대상 목록을 바로 만들 수 있습니다.
+        </p>
+      </div>
       ) : (
         <div className="grid min-h-[620px] lg:grid-cols-[minmax(0,1fr)_420px]">
           <div className="min-w-0 border-t border-[#E6E0D5] lg:border-r lg:border-[#E6E0D5]">
@@ -403,7 +405,9 @@ function StudentResourceTable({
     return (
       <div className="px-4 py-12 text-center">
         <p className="text-sm font-semibold text-stone-900">조건에 맞는 학생이 없습니다.</p>
-        <p className="mt-1 text-sm text-stone-500">검색어와 필터를 조정해 주세요.</p>
+        <p className="mt-1 text-sm text-stone-500">
+          검색어를 지우거나 반/상태/스케줄 필터를 `전체`로 바꿔 다시 확인해 주세요.
+        </p>
       </div>
     );
   }
@@ -632,7 +636,9 @@ function StudentDetailPanel({
     return (
       <aside className="p-5 text-center">
         <p className="text-sm font-semibold text-stone-900">선택된 학생이 없습니다.</p>
-        <p className="mt-1 text-sm text-stone-500">왼쪽 테이블에서 학생을 선택해 주세요.</p>
+        <p className="mt-1 text-sm text-stone-500">
+          학생을 선택하면 스케줄, 연락 기록, 타 학원 공유 상태를 한 번에 확인할 수 있습니다.
+        </p>
       </aside>
     );
   }
@@ -687,7 +693,7 @@ function StudentDetailPanel({
           <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-4 text-sm text-stone-500">
             <p className="font-semibold text-stone-900">등록된 스케줄이 없습니다.</p>
             <p className="mt-1 leading-5">
-              이 학생은 출석부와 보강 후보에서 빠질 수 있습니다.
+              이 학생은 출석부와 보강 후보에서 빠질 수 있습니다. 정규 수업 시간을 먼저 추가해 주세요.
             </p>
             <button
               type="button"

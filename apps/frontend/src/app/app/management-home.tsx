@@ -1674,8 +1674,10 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
           ))}
         </div>
       ) : (
-        <div className="rounded-lg border border-[#E6E0D5] bg-white px-3 py-4 text-sm text-stone-600">
-          {status.status === "saving" ? "운영 리포트를 불러오는 중입니다." : "조회할 리포트가 없습니다."}
+        <div className="rounded-lg border border-[#E6E0D5] bg-white px-3 py-4 text-sm leading-6 text-stone-600">
+          {status.status === "saving"
+            ? "운영 리포트를 불러오는 중입니다."
+            : "조회할 리포트가 없습니다. 출석 체크나 문자 기록이 쌓이면 이곳에 요약이 표시됩니다."}
         </div>
       )}
 
@@ -2139,7 +2141,7 @@ function AuditLogList({ auditLogs }: { auditLogs: ManagementAuditLog[] }) {
           아직 기록된 변경 이력이 없습니다.
         </p>
         <p className="mt-2 text-sm leading-6 text-stone-600">
-          학생, 반, 스케줄, 템플릿, 설정을 수정하면 이곳에 최근 20건이 표시됩니다.
+          학생, 반, 스케줄, 템플릿, 설정을 수정하면 이곳에 최근 20건이 표시됩니다. 파일럿 중 변경 이력을 확인하는 기준으로 사용하세요.
         </p>
       </div>
     );
