@@ -9,4 +9,5 @@ export const env = {
   solapiApiSecret: process.env.SOLAPI_API_SECRET ?? "",
   solapiSenderPhone: process.env.SOLAPI_SENDER_PHONE ?? "",
   appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  backendApiUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL ?? "",
 };
