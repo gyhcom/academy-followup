@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: academy-followup-api
+
+debug: false
+
+logging:
+  level:
+    root: INFO
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

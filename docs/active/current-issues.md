@@ -15,7 +15,7 @@
 | T-624 빈 상태 문구 개선 | 후속 후보 | P2 | 빈 화면에서 다음 행동 안내 | role별 빈 상태 확인 | 파일럿 피드백 후 진행 |
 | T-628 docs 정리 및 monorepo 전환 준비 | 완료 | P1 | 문서 기준 정리와 구조 전환 준비 | 현재 docs 목록 점검 | 기준 문서 유지 |
 | T-629 Next.js 앱 frontend 디렉터리 이동 | 진행 중 | P1 | monorepo 목표 구조로 프론트 이동 | T-628 완료 | Issue #43 / PR 진행 |
-| T-630 Spring Boot backend skeleton 추가 | 후속 후보 | P1 | 백엔드 전환을 위한 최소 Spring Boot 앱 추가 | T-629 완료 | skeleton 범위 확정 |
+| T-630 Spring Boot backend skeleton 추가 | 진행 중 | P1 | 백엔드 전환을 위한 최소 Spring Boot 앱 추가 | T-629 브랜치 | Issue #45 / PR 진행 |
 
 ## 현재 원칙
 
