@@ -7,6 +7,9 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace apps/frontend",
+    "dev:frontend:spring-local": "NEXT_PUBLIC_BACKEND_API_URL=http://localhost:8080 npm run dev --workspace apps/frontend -- --port 3011",
+    "dev:backend": "cd apps/backend && ./gradlew bootRun",
+    "test:backend": "cd apps/backend && ./gradlew test",
     "build": "npm run build --workspace apps/frontend",
     "start": "npm run start --workspace apps/frontend",
     "lint": "npm run lint --workspace apps/frontend"
