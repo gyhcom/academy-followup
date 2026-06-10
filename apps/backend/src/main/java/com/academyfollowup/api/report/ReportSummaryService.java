@@ -30,35 +30,41 @@ public class ReportSummaryService {
         }
 
         ReportRangeBounds bounds = rangeCalculator.calculate(range);
-        var attendance = reportClient.findAttendance(workspaceContext.academyId(), bounds);
-        var followups = reportClient.findFollowups(workspaceContext.academyId(), bounds);
-        var messageLogs = reportClient.findMessageLogs(workspaceContext.academyId(), bounds);
-        var students = reportClient.findStudents(workspaceContext.academyId());
-        var classes = reportClient.findClasses(workspaceContext.academyId());
-        var schedules = reportClient.findActiveSchedules(workspaceContext.academyId());
-        var auditLogs = reportClient.findAuditLogs(workspaceContext.academyId(), bounds);
+        ReportData reportData = fetchReportData(workspaceContext.academyId(), bounds);
 
-        var activeStudents = students.stream()
+        var activeStudents = reportData.students().stream()
                 .filter(student -> "active".equals(student.status()))
                 .toList();
-        Set<String> scheduleStudentIds = schedules.stream()
+        Set<String> scheduleStudentIds = reportData.schedules().stream()
                 .map(SupabaseReportClient.ScheduleRecord::studentId)
                 .collect(Collectors.toSet());
 
         return new ReportSummaryResponse(new ReportSummaryResponse.ReportSummary(
                 range.value(),
                 bounds.label(),
-                countAttendance(attendance),
-                countMessages(followups, messageLogs),
+                countAttendance(reportData.attendance()),
+                countMessages(reportData.followups(), reportData.messageLogs()),
                 new ReportSummaryResponse.Students(
                         activeStudents.size(),
-                        classes.size(),
+                        reportData.classes().size(),
                         (int) activeStudents.stream()
                                 .filter(student -> !scheduleStudentIds.contains(student.id()))
                                 .count()
                 ),
-                new ReportSummaryResponse.Audit(auditLogs.size())
+                new ReportSummaryResponse.Audit(reportData.auditLogs().size())
         ));
+    }
+
+    private ReportData fetchReportData(String academyId, ReportRangeBounds bounds) {
+        return new ReportData(
+                reportClient.findAttendance(academyId, bounds),
+                reportClient.findFollowups(academyId, bounds),
+                reportClient.findMessageLogs(academyId, bounds),
+                reportClient.findStudents(academyId),
+                reportClient.findClasses(academyId),
+                reportClient.findActiveSchedules(academyId),
+                reportClient.findAuditLogs(academyId, bounds)
+        );
     }
 
     private ReportSummaryResponse.Attendance countAttendance(
@@ -127,5 +133,16 @@ public class ReportSummaryService {
                 lms,
                 overLimit
         );
+    }
+
+    private record ReportData(
+            java.util.List<SupabaseReportClient.AttendanceRecord> attendance,
+            java.util.List<SupabaseReportClient.FollowupRecord> followups,
+            java.util.List<SupabaseReportClient.MessageLogRecord> messageLogs,
+            java.util.List<SupabaseReportClient.StudentRecord> students,
+            java.util.List<SupabaseReportClient.ClassRecord> classes,
+            java.util.List<SupabaseReportClient.ScheduleRecord> schedules,
+            java.util.List<SupabaseReportClient.AuditRecord> auditLogs
+    ) {
     }
 }

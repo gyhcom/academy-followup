@@ -1,5 +1,6 @@
 package com.academyfollowup.api.report;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.springframework.stereotype.Component;
@@ -9,8 +10,14 @@ public class ReportRangeCalculator {
 
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
+    private final Clock clock;
+
+    public ReportRangeCalculator(Clock clock) {
+        this.clock = clock;
+    }
+
     public ReportRangeBounds calculate(ReportRange range) {
-        LocalDate today = LocalDate.now(KOREA_ZONE);
+        LocalDate today = LocalDate.now(clock.withZone(KOREA_ZONE));
         LocalDate startDate = switch (range) {
             case TODAY -> today;
             case SEVEN_DAYS -> today.minusDays(6);

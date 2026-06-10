@@ -7,6 +7,7 @@
 - Spring Boot backend가 Supabase 로그인 사용자와 권한을 올바르게 판단하는지 확인합니다.
 - 첫 이관 API인 `GET /api/reports/summary`가 기존 Next.js API와 같은 운영 리포트 값을 보여주는지 확인합니다.
 - backend가 꺼져도 frontend가 기존 Next.js API로 fallback 되는지 확인합니다.
+- Spring API 이관 코드는 공통 Supabase REST client와 frontend fallback helper를 사용해 다음 API 이전 시 반복 구현을 줄입니다.
 
 ## 2. 사전 조건
 
