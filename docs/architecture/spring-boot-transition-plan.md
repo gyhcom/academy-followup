@@ -1,93 +1,184 @@
-# Spring Boot 전환 계획
+# Spring Boot 전환 운영 기준
+
+이 문서는 Academy Follow-up의 Spring Boot 전환 기준입니다. 목적은 전체 재작성이나 즉시 API 교체가 아니라, 2026년 6월 중순까지 사용자가 직접 유지보수할 수 있는 Java/Spring 기반 백엔드 경계를 만들고, 7월 13일 전 파일럿 운영을 흔들지 않는 방식으로 API를 점진 이전하는 것입니다.
 
 ## 1. 전환 목적
 
-Spring Boot 전환은 파일럿 MVP를 빠르게 다시 만드는 작업이 아니라, 장기 유지보수와 B2B SaaS 확장을 위한 백엔드 경계 분리입니다.
+- Next.js는 화면, 모바일 UX, 로그인 UI, 라우팅, 빠른 문구/버튼 수정을 담당합니다.
+- Spring Boot는 장기적으로 권한, 리포트, 감사 로그, 문자, 출석/보강 도메인 로직을 담당할 백엔드 경계를 만듭니다.
+- 전환 목표는 “파일럿 MVP를 다시 만드는 것”이 아니라 “AI 의존도가 낮아져도 Java/Spring 코드로 직접 유지보수 가능한 구조”를 확보하는 것입니다.
+- 파일럿 안정성이 Spring 전환보다 우선입니다. 운영 중인 기능을 깨뜨릴 가능성이 있으면 Next.js 구현을 유지합니다.
 
-목표는 Next.js를 화면/UX 중심으로 유지하고, 복잡한 권한, 감사 로그, 리포트, 문자 발송, 출석/보강 도메인 로직을 점진적으로 백엔드 서비스로 옮기는 것입니다.
-
-## 2. Spring Boot로 옮기기 좋은 영역
-
-- report
-- audit log
-- message preview
-- message send
-- permission check
-- attendance/makeup domain logic
-
-우선순위는 read-only 또는 low-risk API부터 시작합니다. 실제 문자 발송과 출석/보강 핵심 로직은 충분한 테스트와 운영 피드백 이후 검토합니다.
-
-## 3. 당분간 Next.js에 남길 영역
-
-- 화면
-- 모바일 UX
-- 라우팅
-- 로그인 UI
-- 관리 화면 UI
-- 파일럿 중 빠르게 바뀌는 문구/버튼/흐름
-
-## 4. 초기 Spring Boot 범위
-
-- health check
-- actuator
-- Supabase 연결 설정 skeleton
-- report read-only API skeleton
-- local setup document
-
-초기 skeleton은 기존 Next.js API를 대체하지 않습니다. 병렬로 띄우고, 안전한 조회 API부터 검증합니다.
-
-## 5. 하지 않을 것
-
-- 기존 API 즉시 제거
-- Supabase Auth 제거
-- 출석/문자/보강 전체 재작성
-- Next.js를 Spring Boot static으로 서빙
-- 파일럿 안정화 전 대규모 백엔드 전환
-
-## 6. 추천 패키지 구조
+## 2. 목표 아키텍처
 
 ```text
-com.academyfollowup.api
-├─ global
-│  ├─ config
-│  ├─ error
-│  ├─ response
-│  └─ security
-├─ academy
-├─ member
-├─ attendance
-├─ message
-├─ report
-└─ audit
+사용자 브라우저
+  └─ Vercel / Next.js frontend
+      ├─ 화면, Supabase 로그인, 빠른 UX 변경
+      ├─ 기존 Next.js /api fallback
+      └─ Railway / Spring Boot backend 호출
+             ├─ 인증/권한 컨텍스트
+             ├─ read-only report API
+             └─ 이후 audit/message/attendance API 점진 이전
+
+Supabase
+  ├─ Auth
+  └─ PostgreSQL
 ```
 
-## 7. 첫 번째 Spring Boot 이슈 후보
+- Frontend: Vercel + Next.js 유지
+- Backend: Railway + Spring Boot
+- DB/Auth: Supabase 유지
+- API 전환 방식: Spring API 우선 호출 + Next.js fallback 유지
+- 첫 이관 API: `GET /api/reports/summary`
+
+## 3. frontend/backend 책임 경계
+
+Frontend가 계속 담당합니다.
+
+- 화면 구성과 모바일 UX
+- 로그인 화면과 Supabase browser session 관리
+- 하단 탭, 홈, 출석, 문자, 관리 화면
+- 파일럿 중 빠르게 바뀌는 문구와 CTA
+- Spring API 장애 시 Next.js API fallback
+
+Backend가 점진적으로 담당합니다.
+
+- 공통 인증/권한 컨텍스트
+- 원장/관리자/선생님/보조 선생님 권한 검증
+- 리포트, 감사 로그, 문자, 출석/보강 도메인 로직
+- 서버 전용 secret을 사용하는 API
+- 운영 로그와 에러 응답 표준화
+
+## 4. API 이관 원칙
+
+- read-only 또는 low-risk API부터 이관합니다.
+- 첫 이관은 `GET /api/reports/summary?range=today|7d|month`로 고정합니다.
+- 쓰기 API, 문자 발송 API, 출석/보강 핵심 API는 충분한 테스트 전까지 Next.js에 둡니다.
+- Spring API 응답 shape는 기존 Next.js API와 동일하게 유지합니다.
+- 기존 Next.js API는 바로 삭제하지 않고 fallback으로 남깁니다.
+- API 하나당 이슈 1개, 브랜치 1개, PR 1개로 진행합니다.
+
+## 5. 인증/권한 정책
+
+- Supabase Auth는 유지합니다.
+- Frontend는 Supabase access token을 `Authorization: Bearer ...`로 Spring API에 전달합니다.
+- Spring Boot는 토큰에서 user를 확인하고, `profiles`에서 `academy_id`, `role`, `status`를 조회해 권한 컨텍스트를 만듭니다.
+- 서비스 role key는 서버 전용이며 browser에 노출하지 않습니다.
+- `owner`, `manager`만 운영 리포트 API를 볼 수 있습니다.
+- `teacher`, `assistant`는 담당 반/학생 중심 API만 후속으로 허용합니다.
+- 권한 실패는 `403`, 로그인 누락은 `401`, 환경 설정 누락은 `500`으로 명확히 응답합니다.
+
+## 6. fallback/rollback 정책
+
+- Frontend는 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 우선 호출합니다.
+- Spring API 호출 실패 또는 backend URL 미설정 시 기존 Next.js API로 fallback합니다.
+- 운영 중 문제가 생기면 Vercel에서 `NEXT_PUBLIC_BACKEND_API_URL`을 제거해 즉시 Next.js API로 되돌립니다.
+- Spring API 이관 PR은 기존 Next.js API 삭제를 포함하지 않습니다.
+- rollback은 DB migration 없이 가능해야 합니다.
+
+## 7. 환경변수/secret 관리
+
+Vercel frontend:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` 서버 전용
+- `NEXT_PUBLIC_BACKEND_API_URL` public 값이며 backend base URL만 포함
+
+Railway backend:
+
+- `SPRING_PROFILES_ACTIVE=railway`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `FRONTEND_ORIGIN`
+- 필요 시 후속으로 `SUPABASE_DB_URL`, `SUPABASE_DB_USERNAME`, `SUPABASE_DB_PASSWORD`
+
+원칙:
+
+- `SUPABASE_SERVICE_ROLE_KEY`는 Vercel server-side와 Railway backend에만 둡니다.
+- browser 노출 금지입니다.
+- `.env.example`에는 값이 아니라 이름과 용도만 남깁니다.
+- Railway와 Vercel 환경변수는 환경별로 분리합니다.
+
+## 8. 배포 환경 구분
+
+Local:
+
+- Frontend: `npm run dev --workspace apps/frontend`
+- Backend: `cd apps/backend && ./gradlew bootRun`
+- Backend URL: `http://localhost:8080`
+
+Preview:
+
+- Frontend: Vercel Preview
+- Backend: Railway 서비스 또는 별도 preview service
+- API fallback이 가능해야 합니다.
+
+Production:
+
+- Frontend: Vercel Production
+- Backend: Railway Production service
+- Spring API 이관 전에는 `NEXT_PUBLIC_BACKEND_API_URL`을 비워도 앱이 동작해야 합니다.
+
+## 9. 모니터링/로그
+
+- Spring Boot는 `/health`와 `/actuator/health`를 제공합니다.
+- Railway 로그에서 요청 실패, 권한 실패, Supabase 연결 실패를 확인할 수 있어야 합니다.
+- 로그에는 학생/학부모 전화번호 원문, message body 전문, service role key를 남기지 않습니다.
+- API 실패 응답은 사용자에게 필요한 한국어 메시지를 내려주되, 내부 detail은 서버 로그에만 남깁니다.
+- 첫 단계에서는 별도 APM을 붙이지 않고 Railway logs + Vercel logs로 운영합니다.
+
+## 10. 비용/리소스 기준
+
+- Railway backend는 최소 리소스로 시작합니다.
+- 파일럿 기간에는 1개 backend service만 운영합니다.
+- DB는 Supabase 기존 프로젝트를 사용합니다.
+- 비용이 증가하는 작업은 실제 SMS 발송, 별도 queue, 별도 cache, APM 도입 순으로 후속 검토합니다.
+- 200명 파일럿 기준에서 read-only report API가 안정적으로 동작하는 것을 1차 기준으로 봅니다.
+
+## 11. 이슈별 완료 기준
 
 ### T-630 Spring Boot backend skeleton 추가
 
-목표:
-
-- `apps/backend`에 최소 Spring Boot 프로젝트를 추가합니다.
-- health check, actuator, Supabase 설정 skeleton, local setup 문서를 구성합니다.
-- 기존 Next.js 앱과 배포 흐름을 깨지 않습니다.
-
-제외:
-
-- 기존 API 이전
-- Supabase Auth 교체
-- 실제 문자 발송 전환
-- 출석/보강 도메인 재작성
-
-완료 기준:
-
-- `GET /health`와 actuator health가 로컬에서 응답합니다.
+- `apps/backend`에 Spring Boot 프로젝트가 있습니다.
+- `GET /health`와 `/actuator/health`가 로컬에서 응답합니다.
 - 기존 Next.js `/api/*`는 계속 frontend 앱이 담당합니다.
 - Spring Boot는 아직 Vercel 배포 대상에 포함하지 않습니다.
 
-### T-631 Supabase JWT/권한 컨텍스트 설계
+### T-631 Supabase 인증/권한 컨텍스트
 
-T-630 다음 단계에서는 Spring Boot에서 Supabase JWT를 검증하고 `academy_id`, `role`, `user_id`를 조회하는 권한 컨텍스트를 설계합니다.
+- Spring Boot가 Supabase access token으로 로그인 사용자를 식별합니다.
+- `profiles` 기반 `academy_id`, `role`, `status` 컨텍스트를 구성합니다.
+- owner/manager 전용 권한 helper가 있습니다.
+- teacher/assistant 권한 실패가 `403`으로 검증됩니다.
 
-### T-632 read-only API 첫 이관
+### T-632 report summary API 첫 이관
 
-첫 API 이관은 리포트/감사 로그 같은 조회 중심 API에서 시작합니다. 출석/문자/보강 핵심 쓰기 로직은 마지막에 검토합니다.
+- Spring Boot에 `GET /api/reports/summary`가 추가됩니다.
+- 기존 Next.js 응답 shape와 동일합니다.
+- owner/manager는 성공, teacher/assistant는 `403`입니다.
+- 200명 파일럿 데이터 기준 숫자가 기존 Next.js API와 일치합니다.
+
+### T-633 Railway 배포 준비
+
+- Railway에서 `apps/backend` root directory 기준으로 빌드/실행됩니다.
+- Railway public URL에서 `/health`와 `/actuator/health`가 응답합니다.
+- backend 환경변수 목록과 설정 절차가 README에 있습니다.
+
+### T-634 Frontend-Spring 연동
+
+- Vercel frontend가 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring report API를 호출합니다.
+- 실패 시 기존 Next.js report API로 fallback합니다.
+- Vercel env 제거만으로 rollback 가능합니다.
+
+## 12. 하지 않을 것
+
+- 기존 Next.js API 즉시 제거
+- 전체 API 일괄 이전
+- Supabase Auth 제거
+- Supabase DB를 다른 DB로 이전
+- Next.js를 Spring Boot static resource로 서빙
+- 실제 문자 발송 로직을 첫 단계에서 이전
+- 출석/보강 쓰기 로직을 첫 단계에서 이전
+- 파일럿 안정화 전 대규모 도메인 재작성

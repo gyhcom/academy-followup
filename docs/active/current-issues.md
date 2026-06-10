@@ -16,10 +16,16 @@
 | T-628 docs 정리 및 monorepo 전환 준비 | 완료 | P1 | 문서 기준 정리와 구조 전환 준비 | 현재 docs 목록 점검 | 기준 문서 유지 |
 | T-629 Next.js 앱 frontend 디렉터리 이동 | 진행 중 | P1 | monorepo 목표 구조로 프론트 이동 | T-628 완료 | Issue #43 / PR 진행 |
 | T-630 Spring Boot backend skeleton 추가 | 진행 중 | P1 | 백엔드 전환을 위한 최소 Spring Boot 앱 추가 | T-629 브랜치 | Issue #45 / PR 진행 |
+| T-631 Spring Boot 인증/권한 컨텍스트 | 후속 후보 | P1 | Supabase token 기반 사용자/학원/역할 컨텍스트 구성 | T-630 완료 | Railway 배포 전 backend 권한 기반 구현 |
+| T-632 report summary API 첫 이관 | 후속 후보 | P1 | `GET /api/reports/summary`를 Spring Boot로 우선 이전 | T-631 완료 | 기존 Next API와 숫자 일치 검증 |
+| T-633 Railway 배포 준비 | 후속 후보 | P1 | `apps/backend`를 Railway 서비스로 배포 가능하게 설정 | T-630 완료 | Root Directory/env/health 확인 |
+| T-634 Frontend-Spring 연동 | 후속 후보 | P1 | Vercel frontend에서 Spring report API 우선 호출 및 fallback 구성 | T-632, T-633 완료 | `NEXT_PUBLIC_BACKEND_API_URL` 기반 전환 |
 
 ## 현재 원칙
 
 - GitHub Issue는 실제 실행 카드입니다.
 - 문서만으로 끝나는 판단은 `docs/active`에 남기고, 구현이 필요할 때만 GitHub Issue를 만듭니다.
-- 6월 중순까지 Spring Boot 전환을 시작할 수 있도록 구조 변경은 작게, API 이전은 순차적으로 진행합니다.
+- 6월 중순까지 Spring Boot 전환을 시작할 수 있도록 구조 변경은 작게, API 이전은 `report summary`부터 순차적으로 진행합니다.
+- Frontend는 Vercel, Spring Boot backend는 Railway를 기준으로 배포합니다.
+- Spring API는 기존 Next.js API fallback을 유지한 상태에서만 production에 연결합니다.
 - 7월 13일 전까지는 파일럿 운영 개선과 안정화를 우선합니다.
