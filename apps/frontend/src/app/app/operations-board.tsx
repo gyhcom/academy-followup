@@ -54,7 +54,9 @@ export type OperationsClass = {
 type OperationsBoardProps = {
   academyName: string;
   teacherName: string;
+  role: string;
   roleLabel: string;
+  allowAssistantSend: boolean;
   canManage: boolean;
   classes: OperationsClass[];
   initialSelection?: {
@@ -175,7 +177,9 @@ type FollowupHistoryResponse = {
 export function OperationsBoard({
   academyName,
   teacherName,
+  role,
   roleLabel,
+  allowAssistantSend,
   canManage,
   classes,
   initialSelection,
@@ -920,7 +924,11 @@ export function OperationsBoard({
       const payload = (await response.json()) as SendMessageResponse;
 
       if (!response.ok) {
-        throw new Error(payload.error ?? "문자를 발송하지 못했습니다.");
+        throw new Error(
+          response.status === 403
+            ? "발송 권한이 없습니다. 담당 반 또는 발송 권한을 확인해 주세요."
+            : payload.error ?? "문자를 발송하지 못했습니다.",
+        );
       }
 
       setMessageSend({
@@ -1037,6 +1045,10 @@ export function OperationsBoard({
     Boolean(selectedMakeupCandidate) &&
     Boolean(savedFollowupId) &&
     isMessageSent;
+  const assistantSendBlockedMessage =
+    role === "assistant" && !allowAssistantSend
+      ? "보조 선생님은 현재 테스트 발송 권한이 없습니다. 연락 기록 저장은 가능하며, 발송은 원장/관리자에게 요청하세요."
+      : "";
   const commonComposerProps = {
     isDraftEdited,
     isMessageBlank,
@@ -1059,6 +1071,7 @@ export function OperationsBoard({
     selectedReason,
     selectedStudent,
     selectedRecipientType: effectiveRecipientType,
+    sendBlockedMessage: assistantSendBlockedMessage,
     canRegisterMakeupSchedule,
     onReasonChange: handleComposerReasonChange,
     onRecipientTypeChange: setSelectedRecipientType,
@@ -1483,6 +1496,7 @@ function MessageComposer({
   selectedStudent,
   selectedRecipientType,
   canRegisterMakeupSchedule,
+  sendBlockedMessage,
   onClose,
   onReasonChange,
   onRecipientTypeChange,
@@ -1516,6 +1530,7 @@ function MessageComposer({
   selectedStudent: OperationsStudent | undefined;
   selectedRecipientType: MessageRecipientType;
   canRegisterMakeupSchedule: boolean;
+  sendBlockedMessage: string;
   onClose?: () => void;
   onReasonChange: (reason: FollowupReason) => void;
   onRecipientTypeChange: (recipientType: MessageRecipientType) => void;
@@ -1532,7 +1547,7 @@ function MessageComposer({
     !messageMetrics.isOverLimit &&
     !isFollowupSaving &&
     !duplicateDraftWarning;
-  const canSendMessage = isFollowupSaved && !isMessageSending;
+  const canSendMessage = isFollowupSaved && !isMessageSending && !sendBlockedMessage;
 
   return (
     <section
@@ -1789,6 +1804,15 @@ function MessageComposer({
 
         {isFollowupSaved ? (
           <div className="space-y-2">
+            {sendBlockedMessage ? (
+              <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-950">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="mt-0.5 shrink-0" size={17} />
+                  <p>{sendBlockedMessage}</p>
+                </div>
+              </div>
+            ) : null}
+
             <button
               type="button"
               disabled={!canSendMessage}

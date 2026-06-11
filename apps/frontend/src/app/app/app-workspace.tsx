@@ -260,7 +260,9 @@ export function AppWorkspace({
         <OperationsBoard
           academyName={academyName}
           teacherName={teacherName}
+          role={role}
           roleLabel={roleLabel}
+          allowAssistantSend={managementSettings.allowAssistantSend}
           canManage={canManage}
           classes={classes}
           initialSelection={operationsSelection}
@@ -269,6 +271,8 @@ export function AppWorkspace({
         <AttendanceBoard
           academyName={academyName}
           teacherName={teacherName}
+          role={role}
+          allowAssistantSend={managementSettings.allowAssistantSend}
           classes={classes}
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
