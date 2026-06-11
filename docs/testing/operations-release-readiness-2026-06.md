@@ -3,6 +3,8 @@
 이 문서는 Academy Follow-up을 데모가 아니라 친구 학원 1주 운영 파일럿에 올리기 전 확인할 기준입니다.
 200명 seed는 부하/UX 검증용이고, 실제 운영은 실제 구조 데이터와 테스트 번호 제한 발송을 거쳐 시작합니다.
 
+운영 데이터 정리 전에는 [운영 데이터 정리 전 선행 점검](./operations-pre-reset-checklist-2026-06.md)을 먼저 실행합니다. 이 문서의 Preview/Cleanup/Verify 순서를 통과하기 전에는 seed/demo 데이터를 삭제하지 않습니다.
+
 ## 1. 운영 전환 원칙
 
 - Production 앱은 Vercel + 기존 Next.js API 기준으로 안정 운영합니다.
@@ -41,6 +43,13 @@
 
 첫 운영 투입은 전체 학생이 아니라 실제 구조 일부로 시작합니다.
 
+실제 데이터 전환 전에 먼저 할 일:
+
+- 200명 seed 기준 스냅샷과 CSV export를 남깁니다.
+- `auth.users`, `profiles`, `academies`, `academy_settings`, `message_templates`, `platform_admins`는 보존 대상으로 확정합니다.
+- 운영 데이터 cleanup은 `Preview -> Cleanup -> Verify` 순서로만 진행합니다.
+- Cleanup SQL은 자동 실행하지 않고 Supabase SQL Editor에서 사람이 직접 실행합니다.
+
 권장 범위:
 
 - 반 1~2개
@@ -59,6 +68,7 @@ CSV 필수 필드:
 - 학생 연락처
 - 수업 요일
 - 수업 시작/종료 시간
+- 담당 선생님
 - 타 학원 스케줄 공유 동의 여부
 
 실행 전 결정:
