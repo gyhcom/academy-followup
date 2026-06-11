@@ -12,7 +12,8 @@
 
 - 6월 중순까지 Spring Boot 전환을 시작할 수 있는 유지보수 구조 확보
 - Next.js 앱을 `apps/frontend`로 이동해 프론트/백엔드 경계 정리
-- 파일럿 기준 데이터와 Production 상태 확인
+- 200명 seed 검증에서 실제 구조 데이터 20~30명 운영 전환 검증으로 이동
+- SOLAPI 테스트 번호 1건 제한 발송 준비
 - 기존 PR/이슈 정리
 - 문서 기준 정리
 
@@ -37,3 +38,5 @@
 - Supabase Auth 즉시 제거
 - 운영 화면을 Spring Boot에 직접 종속
 - 고객 피드백 없이 대규모 기능 추가
+- Railway 결제 전 Production에 Spring backend URL 연결
+- 테스트 번호 검증 전 실제 학부모 번호 문자 발송
