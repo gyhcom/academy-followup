@@ -53,6 +53,8 @@ import {
   type ReportSummary,
 } from "@/lib/client/report-summary";
 import { fetchAuditLogsFromBackend } from "@/lib/client/audit-logs";
+import { saveAcademySettings } from "@/lib/client/management-settings";
+import { saveMessageTemplate } from "@/lib/client/message-template-save";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
 
 type ManagementSection =
@@ -812,19 +814,7 @@ export function ManagementHome({
     setSettingsFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/academy-settings", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(settingsForm),
-      });
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "학원 설정을 저장하지 못했습니다.");
-      }
-
+      await saveAcademySettings(settingsForm);
       setSettingsFormStatus({ status: "saved", message: "학원 설정을 저장했습니다." });
       router.refresh();
     } catch (error) {
@@ -855,24 +845,12 @@ export function ManagementHome({
     setTemplateFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/message-templates", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          reason: templateForm.reason,
-          title: templateForm.title,
-          body: templateForm.body,
-          isActive: templateForm.isActive,
-        }),
+      await saveMessageTemplate({
+        reason: templateForm.reason,
+        title: templateForm.title,
+        body: templateForm.body,
+        isActive: templateForm.isActive,
       });
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "문자 템플릿을 저장하지 못했습니다.");
-      }
-
       setTemplateFormStatus({
         status: "saved",
         message: `${templateForm.reasonLabel} 템플릿을 저장했습니다.`,
