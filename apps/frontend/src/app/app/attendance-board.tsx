@@ -70,6 +70,8 @@ export type AttendanceRecordItem = {
 type AttendanceBoardProps = {
   academyName: string;
   teacherName: string;
+  role: string;
+  allowAssistantSend: boolean;
   classes: AttendanceClass[];
   selectedDate: string;
   onDateChange: (date: string) => void;
@@ -186,6 +188,8 @@ const attendanceFilterLabels: Record<AttendanceFilter, string> = {
 export function AttendanceBoard({
   academyName,
   teacherName,
+  role,
+  allowAssistantSend,
   classes,
   selectedDate,
   onDateChange,
@@ -654,7 +658,11 @@ export function AttendanceBoard({
       const payload = (await response.json()) as SendMessageResponse;
 
       if (!response.ok) {
-        throw new Error(payload.error ?? "문자를 발송하지 못했습니다.");
+        throw new Error(
+          response.status === 403
+            ? "발송 권한이 없습니다. 담당 반 또는 발송 권한을 확인해 주세요."
+            : payload.error ?? "문자를 발송하지 못했습니다.",
+        );
       }
 
       setMessageSend({
@@ -688,6 +696,11 @@ export function AttendanceBoard({
       });
     }
   }
+
+  const assistantSendBlockedMessage =
+    role === "assistant" && !allowAssistantSend
+      ? "보조 선생님은 현재 테스트 발송 권한이 없습니다. 연락 기록 저장은 가능하며, 발송은 원장/관리자에게 요청하세요."
+      : "";
 
   return (
     <div className="mx-auto max-w-6xl space-y-3 sm:space-y-5">
@@ -858,6 +871,7 @@ export function AttendanceBoard({
           messageSend={messageSend}
           messageSendError={messageSendError}
           needsCheckStudents={needsCheckStudents}
+          sendBlockedMessage={assistantSendBlockedMessage}
           onDismiss={() => {
             setDuplicateWarning("");
             setFollowupTarget(null);
@@ -1421,6 +1435,7 @@ function AttendanceFollowupPanel({
   messageSend,
   messageSendError,
   needsCheckStudents,
+  sendBlockedMessage,
   selectedRecipientType,
   onDismiss,
   onMessageChange,
@@ -1447,6 +1462,7 @@ function AttendanceFollowupPanel({
   messageSend: MessageSendState;
   messageSendError: string;
   needsCheckStudents: AttendanceStudent[];
+  sendBlockedMessage: string;
   selectedRecipientType: MessageRecipientType;
   onDismiss: () => void;
   onMessageChange: (body: string) => void;
@@ -1458,7 +1474,7 @@ function AttendanceFollowupPanel({
   const messageMetrics = getMessageLengthMetrics(messageBody);
   const canSaveFollowup =
     isPreviewReady && !isMessageBlank && !messageMetrics.isOverLimit && !isFollowupSaving;
-  const canSendMessage = isFollowupSaved && !isMessageSending;
+  const canSendMessage = isFollowupSaved && !isMessageSending && !sendBlockedMessage;
 
   return (
     <section className={["rounded-lg border border-stone-200 bg-white shadow-sm xl:sticky xl:top-5", className].join(" ")}>
@@ -1691,6 +1707,15 @@ function AttendanceFollowupPanel({
 
           {isFollowupSaved ? (
             <div className="space-y-2">
+              {sendBlockedMessage ? (
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-950">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="mt-0.5 shrink-0" size={17} />
+                    <p>{sendBlockedMessage}</p>
+                  </div>
+                </div>
+              ) : null}
+
               <button
                 type="button"
                 disabled={!canSendMessage}
