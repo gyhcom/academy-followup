@@ -13,7 +13,9 @@ import static org.mockito.Mockito.when;
 class BulkMessagePreviewServiceTest {
 
     private final SupabaseBulkMessageClient bulkMessageClient = mock(SupabaseBulkMessageClient.class);
-    private final BulkMessagePreviewService service = new BulkMessagePreviewService(bulkMessageClient);
+    private final BulkMessagePreviewService service = new BulkMessagePreviewService(
+            new BulkMessageRecipientResolver(bulkMessageClient)
+    );
 
     @Test
     void countsRecipientsAndDuplicatePhonesLikeNextApi() {

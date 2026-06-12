@@ -79,7 +79,7 @@ Backend가 점진적으로 담당합니다.
 | `POST/PATCH /api/students`, `/api/classes`, `/api/student-schedules` | Next.js + Spring | Spring 추가 + frontend fallback | High | 실제 운영 데이터 수정 API입니다. 단건 저장을 Spring에 추가하고, bulk CSV/일괄 스케줄은 Next.js 유지입니다. |
 | `GET/POST/PATCH /api/members` | Next.js + Spring | Spring 추가 + frontend fallback | High | Auth/profile 생성·수정 API입니다. Spring에 추가하고 기존 Next.js fallback을 유지합니다. |
 | `POST /api/messages/send` | Next.js + Spring | Spring 추가 + frontend fallback | High | 개별 문자 발송/로그 API입니다. dry-run, 중복 차단, SOLAPI 실발송 경로를 Spring에 추가하고 fallback을 유지합니다. |
-| `POST /api/bulk-messages/send` | Next.js | 마지막 단계 | High | 대량 발송 API입니다. 단건 발송 이전과 운영 제한 장치 검증 후 진행합니다. |
+| `POST /api/bulk-messages/send` | Next.js + Spring | Spring 추가 + frontend fallback | High | 전체문자 발송 API입니다. 대상 산정, 중복 수신자 제외, dry-run/실발송 로그 저장을 Spring에 추가하고 fallback을 유지합니다. |
 | `/api/platform/academies` | Next.js | 마지막 단계 | High | 플랫폼 관리자/학원 생성 API입니다. 학원 운영 API 이전 후 진행합니다. |
 
 오늘 기준 “Spring 전환 완료”는 전체 API 일괄 삭제가 아니라, 운영 가능한 Spring 인증 기반 위에 API를 단계별로 옮기고, 남은 API의 이전 순서와 완료 기준을 고정하는 것을 의미합니다.
@@ -316,6 +316,26 @@ Production:
   - `assistant`: 담당 반이면서 `allow_assistant_send=true`일 때만 가능
 - 실제 발송 경로는 SOLAPI 환경변수(`SOLAPI_API_KEY`, `SOLAPI_API_SECRET`, `SOLAPI_SENDER_PHONE`)가 필요합니다.
 - frontend 문자/출석 화면은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고, Spring 5xx/네트워크 실패 또는 URL 미설정 시 기존 Next.js API로 fallback합니다.
+- Production에는 backend URL을 설정하지 않아 기존 Next.js API 기준을 유지합니다.
+
+### T-647 전체문자 발송 API 이관
+
+- Spring Boot에 `POST /api/bulk-messages/send`를 추가했습니다.
+- 기존 Next.js API는 삭제하지 않고 fallback으로 유지합니다.
+- 요청/응답 shape는 기존과 동일합니다.
+  - 요청: `{ targetType, classId, gradeLabel, recipientType, messageBody, excludeDuplicateRecipients }`
+  - 응답: `{ dryRun, message, targetStudentCount, candidateRecipientCount, recipientCount, duplicateExcludedCount }`
+- 대상 산정은 Spring preview API와 같은 규칙을 사용합니다.
+  - 전체/반/학년 필터
+  - 학부모/학생/둘 다 수신자 선택
+  - 전화번호 정규화
+  - 중복 수신자 제외 옵션
+- 기존 운영 안전장치를 유지합니다.
+  - `academy_settings.sms_dry_run=true`이면 실제 SOLAPI 발송 없이 `message_logs.status=dry_run`을 저장합니다.
+  - 발송 전 전체문자 followup을 생성하고, 발송/dry-run 후 `followups.status=sent`와 `sent_at`을 저장합니다.
+  - 2000byte 초과 본문은 발송 전에 차단합니다.
+- 권한은 기존 Next.js 정책과 동일하게 `owner/manager`만 허용합니다.
+- frontend 전체문자 화면은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고, Spring 5xx/네트워크 실패 또는 URL 미설정 시 기존 Next.js API로 fallback합니다.
 - Production에는 backend URL을 설정하지 않아 기존 Next.js API 기준을 유지합니다.
 
 ## 12. 하지 않을 것

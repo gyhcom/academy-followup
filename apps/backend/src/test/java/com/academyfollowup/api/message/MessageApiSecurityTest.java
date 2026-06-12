@@ -42,6 +42,9 @@ class MessageApiSecurityTest {
     @MockBean
     private SendMessageService sendMessageService;
 
+    @MockBean
+    private BulkMessageSendService bulkMessageSendService;
+
     @Test
     void messageTemplatesRequireBearerToken() throws Exception {
         mockMvc.perform(get("/api/message-templates"))
@@ -141,6 +144,22 @@ class MessageApiSecurityTest {
                         .content("{\"targetType\":\"all\",\"recipientType\":\"parent\",\"excludeDuplicateRecipients\":true}"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("전체문자는 원장 또는 관리자만 확인할 수 있습니다."));
+    }
+
+    @Test
+    void sendsBulkMessageForOwner() throws Exception {
+        WorkspaceContext workspaceContext = new WorkspaceContext("owner-1", "academy-1", "owner", "active");
+        when(supabaseAuthService.resolveWorkspace("owner-token")).thenReturn(workspaceContext);
+        when(bulkMessageSendService.send(eq(workspaceContext), any(BulkMessageSendRequest.class)))
+                .thenReturn(new BulkMessageSendResponse(true, "전체문자 테스트 발송 기록을 저장했습니다.", 10, 10, 10, 0));
+
+        mockMvc.perform(post("/api/bulk-messages/send")
+                        .header("Authorization", "Bearer owner-token")
+                        .contentType("application/json")
+                        .content("{\"targetType\":\"all\",\"recipientType\":\"parent\",\"messageBody\":\"공지\",\"excludeDuplicateRecipients\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dryRun").value(true))
+                .andExpect(jsonPath("$.recipientCount").value(10));
     }
 
     @Test
