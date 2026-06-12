@@ -219,7 +219,7 @@ export function AppWorkspace({
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 pb-20 sm:space-y-5 sm:pb-0">
+    <div className="mx-auto max-w-6xl space-y-4 pb-20 sm:space-y-5 sm:pb-0 xl:max-w-[82rem] 2xl:max-w-[88rem]">
       <WorkspaceNavigation
         activeView={visibleView}
         canManage={canManage}

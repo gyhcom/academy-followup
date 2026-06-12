@@ -57,7 +57,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
         onClassSelect={props.onClassSelect}
       />
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(260px,0.95fr)_minmax(360px,1.05fr)] lg:items-start xl:grid-cols-[320px_minmax(380px,1fr)_400px]">
+      <section className="grid gap-4 lg:grid-cols-[minmax(300px,0.95fr)_minmax(380px,1.05fr)] lg:items-start xl:grid-cols-[360px_minmax(420px,1fr)_420px]">
         <StudentSelectionList
           selectedClass={props.selectedClass}
           selectedStudent={props.selectedStudent}
@@ -243,10 +243,10 @@ function StudentSelectionList({
       <div className="flex items-end justify-between gap-3 px-1">
         <div>
           <h2 id="student-flow-title" className="text-base font-semibold text-stone-950">
-            연락 대상
+            학생 확인 목록
           </h2>
           <p className="mt-1 text-xs text-stone-500">
-            학생을 고른 뒤 사유를 선택합니다.
+            학생을 확인하고 필요한 연락 사유를 바로 선택합니다.
           </p>
         </div>
         <span className="shrink-0 text-xs font-medium text-stone-500">
@@ -254,7 +254,7 @@ function StudentSelectionList({
         </span>
       </div>
 
-      <div className="max-h-[min(34rem,calc(100vh-16rem))] overflow-y-auto rounded-lg border border-[#DED8CE] bg-white shadow-sm">
+      <div className="max-h-[min(40rem,calc(100vh-14rem))] overflow-y-auto rounded-lg border border-[#DED8CE] bg-white shadow-sm">
         {selectedClass?.students.length ? (
           selectedClass.students.map((student) => {
             const isSelected = student.id === selectedStudent?.id;
