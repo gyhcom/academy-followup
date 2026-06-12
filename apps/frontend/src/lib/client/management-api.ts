@@ -46,6 +46,48 @@ export type SaveStudentScheduleResponse = {
   error?: string;
 };
 
+export type BulkStudentImportPayload = {
+  rows: Array<{
+    rowNumber: number;
+    name: string;
+    className: string;
+    schoolName: string;
+    gradeLabel: string;
+    parentName: string;
+    parentPhone: string;
+    studentPhone: string;
+    status: string;
+  }>;
+};
+
+export type BulkStudentImportResponse = {
+  error?: string;
+  message?: string;
+  insertedCount?: number;
+  duplicateCount?: number;
+  invalidCount?: number;
+};
+
+export type BulkSchedulePayload = {
+  classId: string;
+  teacherId: string;
+  scheduleType: string;
+  dayOfWeeks: number[];
+  startTime: string;
+  endTime: string;
+  subject: string;
+  title: string;
+  memo: string;
+};
+
+export type BulkScheduleResponse = {
+  error?: string;
+  insertedCount?: number;
+  skippedCount?: number;
+  totalStudents?: number;
+  message?: string;
+};
+
 export async function saveClass(payload: SaveClassPayload, mode: "create" | "edit") {
   await saveWithFallback({
     path: "/api/classes",
@@ -73,6 +115,24 @@ export async function saveStudentSchedule(
     method: mode === "create" ? "POST" : "PATCH",
     payload,
     fallbackError: payload.isActive ? "스케줄을 저장하지 못했습니다." : "스케줄을 삭제하지 못했습니다.",
+  });
+}
+
+export async function saveBulkStudents(payload: BulkStudentImportPayload) {
+  return saveWithFallback<BulkStudentImportResponse>({
+    path: "/api/students/bulk",
+    method: "POST",
+    payload,
+    fallbackError: "학생 정보를 저장하지 못했습니다.",
+  });
+}
+
+export async function saveBulkStudentSchedules(payload: BulkSchedulePayload) {
+  return saveWithFallback<BulkScheduleResponse>({
+    path: "/api/student-schedules/bulk",
+    method: "POST",
+    payload,
+    fallbackError: "반 스케줄을 일괄 등록하지 못했습니다.",
   });
 }
 

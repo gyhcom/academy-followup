@@ -34,6 +34,11 @@ import {
   weekDayLabel,
   weekDayShortLabel,
 } from "@/app/app/management-utils";
+import {
+  fetchStudentScheduleSharing,
+  postStudentScheduleSharing,
+} from "@/lib/client/student-schedule-sharing";
+import { saveExternalAcademyClass } from "@/lib/client/external-academy-classes";
 
 type SharedSchedule = {
   id: string;
@@ -64,15 +69,6 @@ type SharedScheduleState = {
   expiresAt: string;
   actionStatus: "idle" | "saving" | "error";
   actionMessage: string;
-};
-
-type SharedScheduleResponse = {
-  canManage?: boolean;
-  links?: SharedScheduleLink[];
-  code?: string;
-  expiresAt?: string;
-  message?: string;
-  error?: string;
 };
 
 const staleStudentContextMessage =
@@ -787,28 +783,17 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
     setStatus({ state: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/external-academy-classes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "create_class_and_enroll",
-          studentId: student.id,
-          academyName: form.academyName,
-          classTitle: form.classTitle,
-          subject: form.subject,
-          dayOfWeek: form.dayOfWeek,
-          startTime: form.startTime,
-          endTime: form.endTime,
-          memo: form.memo,
-        }),
+      const payload = await saveExternalAcademyClass({
+        action: "create_class_and_enroll",
+        studentId: student.id,
+        academyName: form.academyName,
+        classTitle: form.classTitle,
+        subject: form.subject,
+        dayOfWeek: form.dayOfWeek,
+        startTime: form.startTime,
+        endTime: form.endTime,
+        memo: form.memo,
       });
-      const payload = (await response.json()) as { error?: string; message?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "타 학원 수업을 저장하지 못했습니다.");
-      }
 
       setStatus({
         state: "saved",
@@ -845,21 +830,10 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
     setStatus({ state: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/external-academy-classes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "deactivate_enrollment",
-          enrollmentId,
-        }),
+      const payload = await saveExternalAcademyClass({
+        action: "deactivate_enrollment",
+        enrollmentId,
       });
-      const payload = (await response.json()) as { error?: string; message?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "타 학원 수업 연결을 해제하지 못했습니다.");
-      }
 
       setStatus({
         state: "saved",
@@ -1368,15 +1342,7 @@ function useSharedSchedules(studentId: string | null) {
       }));
 
       try {
-        const response = await fetch(
-          `/api/student-schedule-sharing?studentId=${activeStudentId}`,
-          { signal: controller.signal },
-        );
-        const payload = (await response.json()) as SharedScheduleResponse;
-
-        if (!response.ok) {
-          throw new Error(payload.error ?? "공유 스케줄을 불러오지 못했습니다.");
-        }
+        const payload = await fetchStudentScheduleSharing(activeStudentId, controller.signal);
 
         setState((current) => ({
           ...current,
@@ -1422,18 +1388,7 @@ function useSharedSchedules(studentId: string | null) {
     }));
 
     try {
-      const response = await fetch("/api/student-schedule-sharing", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ studentId, ...body }),
-      });
-      const payload = (await response.json()) as SharedScheduleResponse;
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "스케줄 공유 요청을 처리하지 못했습니다.");
-      }
+      const payload = await postStudentScheduleSharing({ studentId, ...body });
 
       setState((current) => ({
         ...current,

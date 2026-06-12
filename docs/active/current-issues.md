@@ -38,6 +38,7 @@
 | T-646 개별 문자 발송 API 이관 | 완료 | P1 | 개별 문자 발송/dry-run/로그 저장을 Spring에 추가 | T-645 | 문자/출석 패널 Spring 우선 호출과 Next.js fallback 회귀 확인 |
 | T-647 전체문자 발송 API 이관 | 완료 | P1 | 전체문자 발송/dry-run/로그 저장을 Spring에 추가 | T-646 | 전체문자 화면 Spring 우선 호출과 Next.js fallback 회귀 확인 |
 | T-648 플랫폼 학원 관리 API 이관 | 완료 | P1 | 플랫폼 학원 생성/상태 관리를 Spring에 추가 | T-647 | 플랫폼 콘솔 Spring 우선 호출과 Next.js fallback 회귀 확인 |
+| T-649 남은 운영 API 이관 | 완료 | P1 | bulk 학생/스케줄, 타 학원 수업, 스케줄 공유 API를 Spring에 추가 | T-648 | 관리/학생 상세/보강 화면 Spring 우선 호출과 Next.js fallback 회귀 확인 |
 
 ## 현재 원칙
 
@@ -48,6 +49,6 @@
 - Railway 결제와 배포는 보류하고, 우선 로컬 Spring Boot로 API 이전과 fallback을 검증합니다.
 - Spring API는 기존 Next.js API fallback을 유지한 상태에서만 production에 연결합니다.
 - 로컬 Spring 소스는 다음 API 이관 전 공통 Supabase REST client와 frontend fallback helper를 기준으로 정리합니다.
-- 현재 Spring 전환 완료 기준은 전체 API를 한 번에 삭제하는 것이 아니라 인증/리포트/이력/조회·미리보기/운영 설정 저장/CSV 내보내기/연락 기록 API를 단계별로 Spring에 붙이고 fallback을 유지하는 것입니다.
-- 주요 운영 API는 Spring Boot에 추가됐고 Next.js fallback을 유지합니다. bulk 학생/스케줄 등록과 타 학원 수업/공유 API는 운영 리스크가 있어 별도 보강 후 이전합니다.
+- 현재 Spring 전환 완료 기준은 기존 Next.js API를 즉시 제거하는 것이 아니라, 운영 API를 Spring Boot에 추가하고 frontend에서 Spring 우선 호출 + Next.js fallback을 유지하는 것입니다.
+- 주요 운영 API는 Spring Boot에 추가됐고 Next.js fallback을 유지합니다. 남은 Next 전용 라우트인 `/api/auth/redirect-target`는 로그인 화면용 Next server helper라 Spring 전환 대상 운영 API에서 제외합니다.
 - 7월 13일 전까지는 파일럿 운영 개선과 안정화를 우선합니다.

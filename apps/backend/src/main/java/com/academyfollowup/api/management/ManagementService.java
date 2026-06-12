@@ -336,7 +336,7 @@ public class ManagementService {
         return new ScheduleRelation(student, classRecord == null ? null : classRecord.teacherId());
     }
 
-    private void syncAutomaticScheduleLinks(WorkspaceContext workspaceContext, SupabaseManagementClient.StudentRecord student) {
+    void syncAutomaticScheduleLinks(WorkspaceContext workspaceContext, SupabaseManagementClient.StudentRecord student) {
         List<SupabaseManagementClient.ScheduleLinkRecord> links = new java.util.ArrayList<>();
         links.addAll(managementClient.findActiveScheduleLinks(student.academyId(), student.id(), true));
         links.addAll(managementClient.findActiveScheduleLinks(student.academyId(), student.id(), false));
