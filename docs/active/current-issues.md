@@ -30,6 +30,7 @@
 | T-638 Spring 전환 완료 기준 문서화 | 완료 | P1 | API 위험도와 오늘의 Spring 완료 기준 고정 | T-637 | high-risk API는 파일럿 안정화 전 Next.js 유지 |
 | T-639 저위험 Spring API 추가 이관 | 완료 | P1 | health/templates/message preview/bulk preview를 Spring에 추가 | T-638 | 로컬 Spring API와 Next.js fallback 회귀 확인 |
 | T-640 운영 설정/문자 템플릿 저장 API 이관 | 완료 | P1 | 설정/템플릿 저장을 Spring에 추가하고 audit log 유지 | T-639 | 로컬 Spring API와 Next.js fallback 회귀 확인 |
+| T-641 리포트 CSV 내보내기 API 이관 | 완료 | P1 | 학생/출석/문자/이력 CSV 다운로드를 Spring에 추가 | T-640 | 개인정보 마스킹과 Next.js fallback 회귀 확인 |
 
 ## 현재 원칙
 
@@ -40,6 +41,6 @@
 - Railway 결제와 배포는 보류하고, 우선 로컬 Spring Boot로 API 이전과 fallback을 검증합니다.
 - Spring API는 기존 Next.js API fallback을 유지한 상태에서만 production에 연결합니다.
 - 로컬 Spring 소스는 다음 API 이관 전 공통 Supabase REST client와 frontend fallback helper를 기준으로 정리합니다.
-- 현재 Spring 전환 완료 기준은 전체 API를 한 번에 삭제하는 것이 아니라 인증/리포트/이력/조회·미리보기/운영 설정 저장 API를 단계별로 Spring에 붙이고 fallback을 유지하는 것입니다.
-- 남은 API도 최종 이전 대상입니다. 순서는 `reports/export -> followups -> attendance -> students/classes/schedules -> members -> messages/send -> bulk-messages/send -> platform`입니다.
+- 현재 Spring 전환 완료 기준은 전체 API를 한 번에 삭제하는 것이 아니라 인증/리포트/이력/조회·미리보기/운영 설정 저장/CSV 내보내기 API를 단계별로 Spring에 붙이고 fallback을 유지하는 것입니다.
+- 남은 API도 최종 이전 대상입니다. 순서는 `followups -> attendance -> students/classes/schedules -> members -> messages/send -> bulk-messages/send -> platform`입니다.
 - 7월 13일 전까지는 파일럿 운영 개선과 안정화를 우선합니다.
