@@ -76,7 +76,7 @@ Backend가 점진적으로 담당합니다.
 | `GET /api/reports/export` | Next.js + Spring | Spring 추가 + frontend fallback | Medium | CSV/개인정보 포함 옵션은 Spring 우선 다운로드 후 기존 Next API fallback으로 유지합니다. |
 | `GET/POST /api/followups` | Next.js + Spring | Spring 추가 + frontend fallback | High | 연락 기록 조회/저장 API입니다. 문자 발송 전 단계로 Spring에 이전하고 fallback을 유지합니다. |
 | `GET/POST/PATCH /api/attendance` | Next.js + Spring | Spring 추가 + frontend fallback | High | 수업 중 출석 조회/저장 핵심 API입니다. 담당 반 권한과 상태 저장 규칙을 유지합니다. |
-| `POST/PATCH /api/students`, `/api/classes`, `/api/student-schedules` | Next.js | 다음 단계 | High | 실제 운영 데이터 수정 API입니다. 대량 데이터 백업 기준과 함께 진행합니다. |
+| `POST/PATCH /api/students`, `/api/classes`, `/api/student-schedules` | Next.js + Spring | Spring 추가 + frontend fallback | High | 실제 운영 데이터 수정 API입니다. 단건 저장을 Spring에 추가하고, bulk CSV/일괄 스케줄은 Next.js 유지입니다. |
 | `POST/PATCH /api/members` | Next.js | 다음 단계 | High | Auth/profile 생성·권한 API입니다. 운영 계정 생성 절차 검증 후 진행합니다. |
 | `POST /api/messages/send` | Next.js | 마지막 단계 | High | 실제 문자 발송/로그 API입니다. 테스트 번호 제한 발송 검증 후 이전합니다. |
 | `POST /api/bulk-messages/send` | Next.js | 마지막 단계 | High | 대량 발송 API입니다. 단건 발송 이전과 운영 제한 장치 검증 후 진행합니다. |
@@ -99,6 +99,26 @@ Backend가 점진적으로 담당합니다.
   - `present/late/makeup`은 `arrived_at` 기록
 - Frontend는 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고, 실패하거나 env가 없으면 기존 Next.js API로 fallback합니다.
 - Production Vercel에는 계속 `NEXT_PUBLIC_BACKEND_API_URL`을 설정하지 않습니다.
+
+### T-644 학생/반/스케줄 API 이관 결과
+
+- Spring Boot에 단건 관리 API를 추가했습니다.
+  - `POST/PATCH /api/classes`
+  - `POST/PATCH /api/students`
+  - `POST/PATCH /api/student-schedules`
+- 기존 Next.js API는 삭제하지 않고 fallback으로 유지합니다.
+- Frontend 관리 화면과 보강 등록 흐름은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 우선 호출합니다.
+- 학생 저장 시 기존 자동 공유 동기화 기준을 유지합니다.
+  - 양쪽 동의 확인
+  - 이름/학교/학년/전화번호 일치
+  - 기존 active 링크 중 불일치 링크 revoke
+  - 신규 일치 학생 active 링크 생성
+- 스케줄 저장 권한은 기존과 동일합니다.
+  - `owner/manager`: 전체 학생 스케줄 관리 가능
+  - `teacher/assistant`: 담당 반 학생 스케줄만 관리 가능
+- bulk API는 이번 범위에서 제외했습니다.
+  - `POST /api/students/bulk`
+  - `POST /api/student-schedules/bulk`
 
 ## 5. 인증/권한 정책
 

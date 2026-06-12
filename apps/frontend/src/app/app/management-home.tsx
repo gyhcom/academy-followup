@@ -58,6 +58,11 @@ import {
 } from "@/lib/client/report-export";
 import { fetchAuditLogsFromBackend } from "@/lib/client/audit-logs";
 import { saveAcademySettings } from "@/lib/client/management-settings";
+import {
+  saveClass,
+  saveStudent,
+  saveStudentSchedule,
+} from "@/lib/client/management-api";
 import { saveMessageTemplate } from "@/lib/client/message-template-save";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
 
@@ -234,25 +239,13 @@ export function ManagementHome({
     setClassFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/classes", {
-        method: classForm.mode === "create" ? "POST" : "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          classId: classForm.classId,
-          name: classForm.name,
-          subject: classForm.subject,
-          gradeLabel: classForm.gradeLabel,
-          teacherId: classForm.teacherId,
-        }),
-      });
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "반 정보를 저장하지 못했습니다.");
-      }
-
+      await saveClass({
+        classId: classForm.classId,
+        name: classForm.name,
+        subject: classForm.subject,
+        gradeLabel: classForm.gradeLabel,
+        teacherId: classForm.teacherId,
+      }, classForm.mode);
       setClassFormStatus({
         status: "saved",
         message: classForm.mode === "create" ? "반을 등록했습니다." : "반 정보를 수정했습니다.",
@@ -409,30 +402,18 @@ export function ManagementHome({
     setStudentFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/students", {
-        method: studentForm.mode === "create" ? "POST" : "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          studentId: studentForm.studentId,
-          classId: studentForm.classId,
-          name: studentForm.name,
-          schoolName: studentForm.schoolName,
-          gradeLabel: studentForm.gradeLabel,
-          parentName: studentForm.parentName,
-          parentPhone: studentForm.parentPhone,
-          studentPhone: studentForm.studentPhone,
-          scheduleShareConsentConfirmed: studentForm.scheduleShareConsentConfirmed,
-          status: studentForm.status,
-        }),
-      });
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "학생 정보를 저장하지 못했습니다.");
-      }
-
+      await saveStudent({
+        studentId: studentForm.studentId,
+        classId: studentForm.classId,
+        name: studentForm.name,
+        schoolName: studentForm.schoolName,
+        gradeLabel: studentForm.gradeLabel,
+        parentName: studentForm.parentName,
+        parentPhone: studentForm.parentPhone,
+        studentPhone: studentForm.studentPhone,
+        scheduleShareConsentConfirmed: studentForm.scheduleShareConsentConfirmed,
+        status: studentForm.status,
+      }, studentForm.mode);
       setStudentFormStatus({
         status: "saved",
         message:
@@ -588,34 +569,22 @@ export function ManagementHome({
     setScheduleFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/student-schedules", {
-        method: scheduleForm.mode === "create" ? "POST" : "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          scheduleId: scheduleForm.scheduleId,
-          studentId: scheduleForm.studentId,
-          classId: scheduleForm.classId,
-          teacherId: scheduleForm.teacherId,
-          scheduleType: scheduleForm.scheduleType,
-          scheduleDate: scheduleForm.scheduleDate,
-          dayOfWeek: scheduleForm.dayOfWeek,
-          startTime: scheduleForm.startTime,
-          endTime: scheduleForm.endTime,
-          subject: scheduleForm.subject,
-          title: scheduleForm.title,
-          memo: scheduleForm.memo,
-          isActive: scheduleForm.isActive,
-          sourceFollowupId: scheduleForm.sourceFollowupId,
-        }),
-      });
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "스케줄을 저장하지 못했습니다.");
-      }
-
+      await saveStudentSchedule({
+        scheduleId: scheduleForm.scheduleId,
+        studentId: scheduleForm.studentId,
+        classId: scheduleForm.classId,
+        teacherId: scheduleForm.teacherId,
+        scheduleType: scheduleForm.scheduleType,
+        scheduleDate: scheduleForm.scheduleDate,
+        dayOfWeek: scheduleForm.dayOfWeek,
+        startTime: scheduleForm.startTime,
+        endTime: scheduleForm.endTime,
+        subject: scheduleForm.subject,
+        title: scheduleForm.title,
+        memo: scheduleForm.memo,
+        isActive: scheduleForm.isActive,
+        sourceFollowupId: scheduleForm.sourceFollowupId,
+      }, scheduleForm.mode);
       setScheduleFormStatus({
         status: "saved",
         message:
@@ -649,34 +618,22 @@ export function ManagementHome({
     setScheduleFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/student-schedules", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          scheduleId: scheduleForm.scheduleId,
-          studentId: scheduleForm.studentId,
-          classId: scheduleForm.classId,
-          teacherId: scheduleForm.teacherId,
-          scheduleType: scheduleForm.scheduleType,
-          scheduleDate: scheduleForm.scheduleDate,
-          dayOfWeek: scheduleForm.dayOfWeek,
-          startTime: scheduleForm.startTime,
-          endTime: scheduleForm.endTime,
-          subject: scheduleForm.subject,
-          title: scheduleForm.title,
-          memo: scheduleForm.memo,
-          isActive: false,
-          sourceFollowupId: scheduleForm.sourceFollowupId,
-        }),
-      });
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "스케줄을 삭제하지 못했습니다.");
-      }
-
+      await saveStudentSchedule({
+        scheduleId: scheduleForm.scheduleId,
+        studentId: scheduleForm.studentId,
+        classId: scheduleForm.classId,
+        teacherId: scheduleForm.teacherId,
+        scheduleType: scheduleForm.scheduleType,
+        scheduleDate: scheduleForm.scheduleDate,
+        dayOfWeek: scheduleForm.dayOfWeek,
+        startTime: scheduleForm.startTime,
+        endTime: scheduleForm.endTime,
+        subject: scheduleForm.subject,
+        title: scheduleForm.title,
+        memo: scheduleForm.memo,
+        isActive: false,
+        sourceFollowupId: scheduleForm.sourceFollowupId,
+      }, "edit");
       setScheduleFormStatus({
         status: "saved",
         message: "학생 스케줄을 삭제했습니다.",

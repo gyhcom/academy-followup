@@ -13,6 +13,7 @@ import {
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 import { fetchBulkMessagePreview } from "@/lib/client/bulk-message-preview";
 import { createFollowup, fetchFollowupHistory } from "@/lib/client/followups";
+import { saveStudentSchedule } from "@/lib/client/management-api";
 import { fetchMessagePreview } from "@/lib/client/message-preview";
 import { getMessageLengthMetrics } from "@/lib/message-length";
 import {
@@ -127,16 +128,6 @@ type BulkMessageResponse = {
   candidateRecipientCount?: number;
   recipientCount?: number;
   duplicateExcludedCount?: number;
-  error?: string;
-};
-
-type ScheduleCreateResponse = {
-  schedule?: {
-    id: string;
-    scheduleDate: string | null;
-    startTime: string;
-    endTime: string;
-  };
   error?: string;
 };
 
@@ -909,30 +900,23 @@ export function OperationsBoard({
     });
 
     try {
-      const response = await fetch("/api/student-schedules", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          studentId: selectedStudent.id,
-          classId: selectedClass.id,
-          teacherId: "",
-          scheduleType: "makeup",
-          scheduleDate: selectedMakeupCandidate.date,
-          dayOfWeek: selectedMakeupCandidate.dayOfWeek,
-          startTime: selectedMakeupCandidate.startTime,
-          endTime: selectedMakeupCandidate.endTime,
-          subject: selectedClass.subject ?? "",
-          title: `${selectedStudent.name} 보강`,
-          memo: `${selectedMakeupCandidate.label} 문자 발송 후 자동 등록`,
-          isActive: true,
-          sourceFollowupId: savedFollowupId,
-        }),
-      });
-      const payload = (await response.json()) as ScheduleCreateResponse;
+      const payload = await saveStudentSchedule({
+        studentId: selectedStudent.id,
+        classId: selectedClass.id,
+        teacherId: "",
+        scheduleType: "makeup",
+        scheduleDate: selectedMakeupCandidate.date,
+        dayOfWeek: selectedMakeupCandidate.dayOfWeek,
+        startTime: selectedMakeupCandidate.startTime,
+        endTime: selectedMakeupCandidate.endTime,
+        subject: selectedClass.subject ?? "",
+        title: `${selectedStudent.name} 보강`,
+        memo: `${selectedMakeupCandidate.label} 문자 발송 후 자동 등록`,
+        isActive: true,
+        sourceFollowupId: savedFollowupId,
+      }, "create");
 
-      if (!response.ok || !payload.schedule) {
+      if (!payload.schedule) {
         throw new Error(payload.error ?? "보강 스케줄을 등록하지 못했습니다.");
       }
 
