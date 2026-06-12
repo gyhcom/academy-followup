@@ -80,7 +80,7 @@ Backend가 점진적으로 담당합니다.
 | `GET/POST/PATCH /api/members` | Next.js + Spring | Spring 추가 + frontend fallback | High | Auth/profile 생성·수정 API입니다. Spring에 추가하고 기존 Next.js fallback을 유지합니다. |
 | `POST /api/messages/send` | Next.js + Spring | Spring 추가 + frontend fallback | High | 개별 문자 발송/로그 API입니다. dry-run, 중복 차단, SOLAPI 실발송 경로를 Spring에 추가하고 fallback을 유지합니다. |
 | `POST /api/bulk-messages/send` | Next.js + Spring | Spring 추가 + frontend fallback | High | 전체문자 발송 API입니다. 대상 산정, 중복 수신자 제외, dry-run/실발송 로그 저장을 Spring에 추가하고 fallback을 유지합니다. |
-| `/api/platform/academies` | Next.js | 마지막 단계 | High | 플랫폼 관리자/학원 생성 API입니다. 학원 운영 API 이전 후 진행합니다. |
+| `/api/platform/academies` | Next.js + Spring | Spring 추가 + frontend fallback | High | 플랫폼 관리자/학원 생성·상태 관리 API입니다. 플랫폼 전용 인증을 분리하고 fallback을 유지합니다. |
 
 오늘 기준 “Spring 전환 완료”는 전체 API 일괄 삭제가 아니라, 운영 가능한 Spring 인증 기반 위에 API를 단계별로 옮기고, 남은 API의 이전 순서와 완료 기준을 고정하는 것을 의미합니다.
 
@@ -336,6 +336,24 @@ Production:
   - 2000byte 초과 본문은 발송 전에 차단합니다.
 - 권한은 기존 Next.js 정책과 동일하게 `owner/manager`만 허용합니다.
 - frontend 전체문자 화면은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고, Spring 5xx/네트워크 실패 또는 URL 미설정 시 기존 Next.js API로 fallback합니다.
+- Production에는 backend URL을 설정하지 않아 기존 Next.js API 기준을 유지합니다.
+
+### T-648 플랫폼 학원 관리 API 이관
+
+- Spring Boot에 `GET /api/platform/academies`와 `POST /api/platform/academies`를 추가했습니다.
+- 기존 Next.js API는 삭제하지 않고 fallback으로 유지합니다.
+- 플랫폼 API는 일반 학원 workspace 인증과 분리합니다.
+  - `/api/platform/**`는 `profiles`가 없어도 접근 가능한 플랫폼 전용 인증을 사용합니다.
+  - Supabase access token으로 user id를 확인한 뒤 `platform_admins.user_id` 존재 여부를 검증합니다.
+- 학원 생성 흐름은 기존 Next.js 정책과 동일합니다.
+  - slug 중복 검사
+  - Supabase Auth owner 계정 생성
+  - `academies` 생성
+  - `academy_settings.sms_dry_run=true` 기본 생성
+  - owner `profiles` 생성
+  - 초기 설정 실패 시 Auth user와 academy를 rollback합니다.
+- 학원 상태/플랜 수정은 기존과 동일하게 `action=update_status`로 처리합니다.
+- frontend 플랫폼 콘솔은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고, Spring 5xx/네트워크 실패 또는 URL 미설정 시 기존 Next.js API로 fallback합니다.
 - Production에는 backend URL을 설정하지 않아 기존 Next.js API 기준을 유지합니다.
 
 ## 12. 하지 않을 것

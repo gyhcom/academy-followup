@@ -104,6 +104,29 @@ public class SupabaseRestClient {
         }
     }
 
+    public void deleteServiceNoContent(
+            String path,
+            String configErrorMessage,
+            String preferHeader
+    ) {
+        assertConfigured(configErrorMessage);
+
+        try {
+            var request = restClient.delete()
+                    .uri(supabaseUri(path))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + supabaseProperties.serviceRoleKey())
+                    .header("apikey", supabaseProperties.serviceRoleKey());
+
+            if (StringUtils.hasText(preferHeader)) {
+                request.header("Prefer", preferHeader);
+            }
+
+            request.retrieve().toBodilessEntity();
+        } catch (HttpClientErrorException exception) {
+            throw new SupabaseRestException("Supabase REST 삭제 중 오류가 발생했습니다.");
+        }
+    }
+
     private <T> List<T> writeServiceArray(
             HttpMethod method,
             String path,
