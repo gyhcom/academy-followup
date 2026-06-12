@@ -20,6 +20,7 @@ import {
   getFollowupReasonForAttendanceStatus,
   type AttendanceStatus,
 } from "@/lib/attendance";
+import { createFollowup, fetchFollowupHistory } from "@/lib/client/followups";
 import { fetchMessagePreview } from "@/lib/client/message-preview";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 import { getMessageLengthMetrics } from "@/lib/message-length";
@@ -137,32 +138,11 @@ type MessageSendState = {
   error: string;
 };
 
-type CreateFollowupResponse = {
-  followup?: {
-    id: string;
-    status: string;
-    createdAt: string;
-    attendanceRecordId?: string | null;
-  };
-  error?: string;
-};
-
 type SendMessageResponse = {
   dryRun?: boolean;
   message?: string;
   recipientPhone?: string;
   followupId?: string;
-  error?: string;
-};
-
-type FollowupHistoryResponse = {
-  followups?: Array<{
-    id: string;
-    reason: string;
-    status: string;
-    sentAt: string | null;
-    createdAt: string;
-  }>;
   error?: string;
 };
 
@@ -425,14 +405,7 @@ export function AttendanceBoard({
 
     async function loadDuplicateWarning() {
       try {
-        const response = await fetch(`/api/followups?studentId=${target.student.id}`, {
-          signal: controller.signal,
-        });
-        const payload = (await response.json()) as FollowupHistoryResponse;
-
-        if (!response.ok) {
-          return;
-        }
+        const payload = await fetchFollowupHistory(target.student.id, controller.signal);
 
         const warning = getRecentDuplicateWarning({
           followups: payload.followups ?? [],
@@ -559,24 +532,13 @@ export function AttendanceBoard({
     });
 
     try {
-      const response = await fetch("/api/followups", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          studentId: followupTarget.student.id,
-          reason: followupTarget.reason,
-          messageBody: bodyToSave,
-          attendanceRecordId: followupTarget.record.id,
-          recipientType: effectiveRecipientType,
-        }),
+      const payload = await createFollowup({
+        studentId: followupTarget.student.id,
+        reason: followupTarget.reason,
+        messageBody: bodyToSave,
+        attendanceRecordId: followupTarget.record.id,
+        recipientType: effectiveRecipientType,
       });
-      const payload = (await response.json()) as CreateFollowupResponse;
-
-      if (!response.ok || !payload.followup) {
-        throw new Error(payload.error ?? "연락 기록을 저장하지 못했습니다.");
-      }
 
       setFollowupSave({
         key: followupTargetKey,
@@ -2185,7 +2147,7 @@ function getRecentDuplicateWarning({
   followups,
   reason,
 }: {
-  followups: NonNullable<FollowupHistoryResponse["followups"]>;
+  followups: Array<{ reason: string; createdAt: string }>;
   reason: FollowupReason;
 }) {
   const now = Date.now();

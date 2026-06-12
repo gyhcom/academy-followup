@@ -12,10 +12,10 @@ import {
   X,
 } from "lucide-react";
 import {
-  type FollowupHistoryItem,
   type FollowupHistoryState,
   StudentFollowupHistory,
 } from "@/app/app/operations-history";
+import { fetchFollowupHistory } from "@/lib/client/followups";
 import type {
   ManagementClass,
   ManagementStudent,
@@ -34,11 +34,6 @@ import {
   weekDayLabel,
   weekDayShortLabel,
 } from "@/app/app/management-utils";
-
-type FollowupHistoryResponse = {
-  followups?: FollowupHistoryItem[];
-  error?: string;
-};
 
 type SharedSchedule = {
   id: string;
@@ -1307,14 +1302,7 @@ function useStudentHistory(studentId: string | null): FollowupHistoryState {
       }));
 
       try {
-        const response = await fetch(`/api/followups?studentId=${activeStudentId}`, {
-          signal: controller.signal,
-        });
-        const payload = (await response.json()) as FollowupHistoryResponse;
-
-        if (!response.ok) {
-          throw new Error(payload.error ?? "연락 기록을 불러오지 못했습니다.");
-        }
+        const payload = await fetchFollowupHistory(activeStudentId, controller.signal);
 
         setHistory({
           studentId: activeStudentId,
