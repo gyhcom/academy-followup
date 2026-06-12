@@ -75,7 +75,7 @@ Backend가 점진적으로 담당합니다.
 | `POST /api/bulk-messages/preview` | Next.js + Spring | Spring 추가 + frontend fallback | Low | 전체문자 대상/중복 제외 count 미리보기. owner/manager만 허용합니다. |
 | `GET /api/reports/export` | Next.js + Spring | Spring 추가 + frontend fallback | Medium | CSV/개인정보 포함 옵션은 Spring 우선 다운로드 후 기존 Next API fallback으로 유지합니다. |
 | `GET/POST /api/followups` | Next.js + Spring | Spring 추가 + frontend fallback | High | 연락 기록 조회/저장 API입니다. 문자 발송 전 단계로 Spring에 이전하고 fallback을 유지합니다. |
-| `GET/POST/PATCH /api/attendance` | Next.js | 다음 단계 | High | 수업 중 출석 저장 핵심 API입니다. followup 이전 후 진행합니다. |
+| `GET/POST/PATCH /api/attendance` | Next.js + Spring | Spring 추가 + frontend fallback | High | 수업 중 출석 조회/저장 핵심 API입니다. 담당 반 권한과 상태 저장 규칙을 유지합니다. |
 | `POST/PATCH /api/students`, `/api/classes`, `/api/student-schedules` | Next.js | 다음 단계 | High | 실제 운영 데이터 수정 API입니다. 대량 데이터 백업 기준과 함께 진행합니다. |
 | `POST/PATCH /api/members` | Next.js | 다음 단계 | High | Auth/profile 생성·권한 API입니다. 운영 계정 생성 절차 검증 후 진행합니다. |
 | `POST /api/messages/send` | Next.js | 마지막 단계 | High | 실제 문자 발송/로그 API입니다. 테스트 번호 제한 발송 검증 후 이전합니다. |
@@ -83,6 +83,22 @@ Backend가 점진적으로 담당합니다.
 | `/api/platform/academies` | Next.js | 마지막 단계 | High | 플랫폼 관리자/학원 생성 API입니다. 학원 운영 API 이전 후 진행합니다. |
 
 오늘 기준 “Spring 전환 완료”는 전체 API 일괄 삭제가 아니라, 운영 가능한 Spring 인증 기반 위에 API를 단계별로 옮기고, 남은 API의 이전 순서와 완료 기준을 고정하는 것을 의미합니다.
+
+### T-643 Attendance API 이관 결과
+
+- Spring Boot에 `GET /api/attendance?date=YYYY-MM-DD`와 `PATCH/POST /api/attendance`를 추가했습니다.
+- 기존 Next.js 출석 API는 삭제하지 않고 fallback으로 유지합니다.
+- 권한은 기존 정책과 동일합니다.
+  - `owner/manager`: 학원 전체 출석 기록 조회/수정 가능
+  - `teacher/assistant`: 본인이 담당한 반의 출석 기록만 조회/수정 가능
+- 저장 규칙은 기존 Next.js API와 동일하게 유지합니다.
+  - 학생/반/날짜/수업 시간/상태/메모 검증
+  - 비활성 학생 수정 차단
+  - 학생이 선택한 반에 속하지 않으면 차단
+  - `pending`은 `checked_at/arrived_at` 초기화
+  - `present/late/makeup`은 `arrived_at` 기록
+- Frontend는 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고, 실패하거나 env가 없으면 기존 Next.js API로 fallback합니다.
+- Production Vercel에는 계속 `NEXT_PUBLIC_BACKEND_API_URL`을 설정하지 않습니다.
 
 ## 5. 인증/권한 정책
 

@@ -20,6 +20,11 @@ import {
   getFollowupReasonForAttendanceStatus,
   type AttendanceStatus,
 } from "@/lib/attendance";
+import {
+  fetchAttendanceRecords,
+  saveAttendanceRecord,
+  type AttendanceRecordItem as AttendanceClientRecordItem,
+} from "@/lib/client/attendance";
 import { createFollowup, fetchFollowupHistory } from "@/lib/client/followups";
 import { fetchMessagePreview } from "@/lib/client/message-preview";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
@@ -52,22 +57,7 @@ export type AttendanceClass = {
   students: AttendanceStudent[];
 };
 
-export type AttendanceRecordItem = {
-  id: string;
-  studentId: string;
-  classId: string;
-  teacherId: string | null;
-  attendanceDate: string;
-  scheduledStartTime: string;
-  scheduledEndTime: string;
-  status: string;
-  checkedAt: string | null;
-  arrivedAt: string | null;
-  note: string | null;
-  followupId: string | null;
-  followupStatus: string | null;
-  followupSentAt: string | null;
-};
+export type AttendanceRecordItem = AttendanceClientRecordItem;
 
 type AttendanceBoardProps = {
   academyName: string;
@@ -79,12 +69,6 @@ type AttendanceBoardProps = {
   onDateChange: (date: string) => void;
   initialRecords: AttendanceRecordItem[];
   onRecordsChange?: (records: AttendanceRecordItem[]) => void;
-};
-
-type AttendanceApiResponse = {
-  records?: AttendanceRecordItem[];
-  record?: AttendanceRecordItem;
-  error?: string;
 };
 
 type AttendanceSession = {
@@ -326,15 +310,7 @@ export function AttendanceBoard({
       setLoadState({ status: "loading", error: "" });
 
       try {
-        const response = await fetch(`/api/attendance?date=${selectedDate}`, {
-          signal: controller.signal,
-        });
-        const payload = (await response.json()) as AttendanceApiResponse;
-
-        if (!response.ok) {
-          throw new Error(payload.error ?? "출석 기록을 불러오지 못했습니다.");
-        }
-
+        const payload = await fetchAttendanceRecords(selectedDate, controller.signal);
         const nextRecords = payload.records ?? [];
         applyAttendanceRecords(nextRecords);
         setLoadState({ status: "idle", error: "" });
@@ -456,26 +432,15 @@ export function AttendanceBoard({
     applyAttendanceRecords(mergeAttendanceRecord(previousRecords, optimisticRecord));
 
     try {
-      const response = await fetch("/api/attendance", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          studentId: student.id,
-          classId: selectedSession.classId,
-          attendanceDate: selectedDate,
-          scheduledStartTime: selectedSession.startTime,
-          scheduledEndTime: selectedSession.endTime,
-          status,
-          note: createDefaultNote(status),
-        }),
+      const payload = await saveAttendanceRecord({
+        studentId: student.id,
+        classId: selectedSession.classId,
+        attendanceDate: selectedDate,
+        scheduledStartTime: selectedSession.startTime,
+        scheduledEndTime: selectedSession.endTime,
+        status,
+        note: createDefaultNote(status),
       });
-      const payload = (await response.json()) as AttendanceApiResponse;
-
-      if (!response.ok || !payload.record) {
-        throw new Error(payload.error ?? "출석 상태를 저장하지 못했습니다.");
-      }
 
       const savedRecord = payload.record;
       const followupReason = getFollowupReasonForAttendanceStatus(status);

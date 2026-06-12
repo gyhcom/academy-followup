@@ -27,6 +27,7 @@ import {
   OperationsBoard,
   type OperationsClass,
 } from "@/app/app/operations-board";
+import { fetchAttendanceRecords } from "@/lib/client/attendance";
 import type { FollowupReason } from "@/lib/followup-templates";
 import { canManageAcademy } from "@/lib/permissions";
 
@@ -89,11 +90,6 @@ type OperationsSelection = {
   classId: string;
   studentId: string;
   reason: FollowupReason;
-};
-
-type AttendanceApiResponse = {
-  records?: AttendanceRecordItem[];
-  error?: string;
 };
 
 export function AppWorkspace({
@@ -173,15 +169,7 @@ export function AppWorkspace({
       setAttendanceLoadState({ status: "loading", error: "" });
 
       try {
-        const response = await fetch(`/api/attendance?date=${selectedDate}`, {
-          signal: controller.signal,
-        });
-        const payload = (await response.json()) as AttendanceApiResponse;
-
-        if (!response.ok) {
-          throw new Error(payload.error ?? "출석 기록을 불러오지 못했습니다.");
-        }
-
+        const payload = await fetchAttendanceRecords(selectedDate, controller.signal);
         setWorkspaceAttendanceRecords(payload.records ?? []);
         setAttendanceLoadState({ status: "idle", error: "" });
       } catch (error) {
