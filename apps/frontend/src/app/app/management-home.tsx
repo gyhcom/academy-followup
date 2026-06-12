@@ -60,6 +60,8 @@ import { fetchAuditLogsFromBackend } from "@/lib/client/audit-logs";
 import { saveAcademySettings } from "@/lib/client/management-settings";
 import {
   saveClass,
+  saveBulkStudents,
+  saveBulkStudentSchedules,
   saveStudent,
   saveStudentSchedule,
 } from "@/lib/client/management-api";
@@ -293,34 +295,17 @@ export function ManagementHome({
     setBulkScheduleFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/student-schedules/bulk", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          classId: bulkScheduleForm.classId,
-          teacherId: bulkScheduleForm.teacherId,
-          scheduleType: bulkScheduleForm.scheduleType,
-          dayOfWeeks: bulkScheduleForm.dayOfWeeks,
-          startTime: bulkScheduleForm.startTime,
-          endTime: bulkScheduleForm.endTime,
-          subject: bulkScheduleForm.subject,
-          title: bulkScheduleForm.title,
-          memo: bulkScheduleForm.memo,
-        }),
+      const payload = await saveBulkStudentSchedules({
+        classId: bulkScheduleForm.classId,
+        teacherId: bulkScheduleForm.teacherId,
+        scheduleType: bulkScheduleForm.scheduleType,
+        dayOfWeeks: bulkScheduleForm.dayOfWeeks,
+        startTime: bulkScheduleForm.startTime,
+        endTime: bulkScheduleForm.endTime,
+        subject: bulkScheduleForm.subject,
+        title: bulkScheduleForm.title,
+        memo: bulkScheduleForm.memo,
       });
-      const payload = (await response.json()) as {
-        error?: string;
-        insertedCount?: number;
-        skippedCount?: number;
-        totalStudents?: number;
-        message?: string;
-      };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "반 스케줄을 일괄 등록하지 못했습니다.");
-      }
 
       setBulkScheduleFormStatus({
         status: "saved",
@@ -451,36 +436,19 @@ export function ManagementHome({
     setBulkStudentImportStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/students/bulk", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          rows: rows.map((row) => ({
-            rowNumber: row.rowNumber,
-            name: row.name,
-            className: row.className,
-            schoolName: row.schoolName,
-            gradeLabel: row.gradeLabel,
-            parentName: row.parentName,
-            parentPhone: row.normalizedParentPhone,
-            studentPhone: row.normalizedStudentPhone ?? "",
-            status: row.status,
-          })),
-        }),
+      const payload = await saveBulkStudents({
+        rows: rows.map((row) => ({
+          rowNumber: row.rowNumber,
+          name: row.name,
+          className: row.className,
+          schoolName: row.schoolName,
+          gradeLabel: row.gradeLabel,
+          parentName: row.parentName,
+          parentPhone: row.normalizedParentPhone,
+          studentPhone: row.normalizedStudentPhone ?? "",
+          status: row.status,
+        })),
       });
-      const payload = (await response.json()) as {
-        error?: string;
-        message?: string;
-        insertedCount?: number;
-        duplicateCount?: number;
-        invalidCount?: number;
-      };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "학생 일괄 등록에 실패했습니다.");
-      }
 
       setBulkStudentImportStatus({
         status: "saved",

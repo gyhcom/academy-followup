@@ -76,7 +76,10 @@ Backend가 점진적으로 담당합니다.
 | `GET /api/reports/export` | Next.js + Spring | Spring 추가 + frontend fallback | Medium | CSV/개인정보 포함 옵션은 Spring 우선 다운로드 후 기존 Next API fallback으로 유지합니다. |
 | `GET/POST /api/followups` | Next.js + Spring | Spring 추가 + frontend fallback | High | 연락 기록 조회/저장 API입니다. 문자 발송 전 단계로 Spring에 이전하고 fallback을 유지합니다. |
 | `GET/POST/PATCH /api/attendance` | Next.js + Spring | Spring 추가 + frontend fallback | High | 수업 중 출석 조회/저장 핵심 API입니다. 담당 반 권한과 상태 저장 규칙을 유지합니다. |
-| `POST/PATCH /api/students`, `/api/classes`, `/api/student-schedules` | Next.js + Spring | Spring 추가 + frontend fallback | High | 실제 운영 데이터 수정 API입니다. 단건 저장을 Spring에 추가하고, bulk CSV/일괄 스케줄은 Next.js 유지입니다. |
+| `POST/PATCH /api/students`, `/api/classes`, `/api/student-schedules` | Next.js + Spring | Spring 추가 + frontend fallback | High | 실제 운영 데이터 수정 API입니다. 단건 저장을 Spring에 추가하고 fallback을 유지합니다. |
+| `POST /api/students/bulk`, `POST /api/student-schedules/bulk` | Next.js + Spring | Spring 추가 + frontend fallback | High | CSV 학생 일괄 등록과 반 공통 스케줄 등록 API입니다. 운영 데이터 대량 변경이므로 Spring 우선 호출 후 Next.js fallback을 유지합니다. |
+| `POST /api/external-academy-classes` | Next.js + Spring | Spring 추가 + frontend fallback | High | 수동 타 학원 수업 연결/해제 API입니다. owner/manager만 허용하고 audit log를 유지합니다. |
+| `GET/POST /api/student-schedule-sharing` | Next.js + Spring | Spring 추가 + frontend fallback | High | 학원 간 수동 공유 코드/연결/해제와 공유 일정 조회 API입니다. 실제 학원명 비공개 정책을 유지합니다. |
 | `GET/POST/PATCH /api/members` | Next.js + Spring | Spring 추가 + frontend fallback | High | Auth/profile 생성·수정 API입니다. Spring에 추가하고 기존 Next.js fallback을 유지합니다. |
 | `POST /api/messages/send` | Next.js + Spring | Spring 추가 + frontend fallback | High | 개별 문자 발송/로그 API입니다. dry-run, 중복 차단, SOLAPI 실발송 경로를 Spring에 추가하고 fallback을 유지합니다. |
 | `POST /api/bulk-messages/send` | Next.js + Spring | Spring 추가 + frontend fallback | High | 전체문자 발송 API입니다. 대상 산정, 중복 수신자 제외, dry-run/실발송 로그 저장을 Spring에 추가하고 fallback을 유지합니다. |
@@ -116,7 +119,7 @@ Backend가 점진적으로 담당합니다.
 - 스케줄 저장 권한은 기존과 동일합니다.
   - `owner/manager`: 전체 학생 스케줄 관리 가능
   - `teacher/assistant`: 담당 반 학생 스케줄만 관리 가능
-- bulk API는 이번 범위에서 제외했습니다.
+- bulk API는 T-649에서 별도로 Spring에 추가했습니다.
   - `POST /api/students/bulk`
   - `POST /api/student-schedules/bulk`
 
@@ -354,6 +357,22 @@ Production:
   - 초기 설정 실패 시 Auth user와 academy를 rollback합니다.
 - 학원 상태/플랜 수정은 기존과 동일하게 `action=update_status`로 처리합니다.
 - frontend 플랫폼 콘솔은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고, Spring 5xx/네트워크 실패 또는 URL 미설정 시 기존 Next.js API로 fallback합니다.
+- Production에는 backend URL을 설정하지 않아 기존 Next.js API 기준을 유지합니다.
+
+### T-649 남은 운영 API 이관
+
+- Spring Boot에 남은 운영 API를 추가했습니다.
+  - `POST /api/students/bulk`
+  - `POST /api/student-schedules/bulk`
+  - `POST /api/external-academy-classes`
+  - `GET/POST /api/student-schedule-sharing`
+- 기존 Next.js API는 삭제하지 않고 fallback으로 유지합니다.
+- 학생 CSV 일괄 등록은 반명 매칭, 전화번호 정규화, 파일 내 중복/기존 학생 중복 제외, 공유 동의 자동 링크 동기화를 유지합니다.
+- 반 공통 스케줄 일괄 등록은 담당 반 권한, 담당 선생님 검증, 동일 시간 중복 skip, audit log 기록을 유지합니다.
+- 수동 타 학원 수업 연결/해제는 owner/manager만 허용하고 audit log를 유지합니다.
+- 학원 간 스케줄 공유는 수동 공유 코드 생성/연결/해제와 연결 일정 조회를 Spring에 추가했습니다. 상대 학원명은 기존 정책대로 `연결 학원 N`처럼 익명으로 반환합니다.
+- Frontend 관리/학생 상세/보강 화면은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고, Spring 5xx/네트워크 실패 또는 URL 미설정 시 기존 Next.js API로 fallback합니다.
+- `/api/auth/redirect-target`는 로그인 화면의 Next.js server helper라 Spring 전환 대상 운영 API에서 제외합니다.
 - Production에는 backend URL을 설정하지 않아 기존 Next.js API 기준을 유지합니다.
 
 ## 12. 하지 않을 것

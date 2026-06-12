@@ -41,6 +41,14 @@ public class SupabaseManagementClient {
         ).stream().findFirst();
     }
 
+    public List<ClassRecord> findClasses(String academyId) {
+        return getArray(
+                "/rest/v1/classes?select=id,academy_id,name,subject,grade_label,teacher_id"
+                        + "&academy_id=eq." + encode(academyId),
+                ClassRecord[].class
+        );
+    }
+
     public Optional<ProfileRecord> findProfile(String academyId, String userId) {
         return getArray(
                 "/rest/v1/profiles?select=id,academy_id,role,status"
@@ -59,6 +67,24 @@ public class SupabaseManagementClient {
                         + "&limit=1",
                 StudentRecord[].class
         ).stream().findFirst();
+    }
+
+    public List<StudentRecord> findStudents(String academyId) {
+        return getArray(
+                "/rest/v1/students?select=" + STUDENT_SELECT
+                        + "&academy_id=eq." + encode(academyId),
+                StudentRecord[].class
+        );
+    }
+
+    public List<StudentRecord> findActiveStudentsByClass(String academyId, String classId) {
+        return getArray(
+                "/rest/v1/students?select=" + STUDENT_SELECT
+                        + "&academy_id=eq." + encode(academyId)
+                        + "&class_id=eq." + encode(classId)
+                        + "&status=eq.active",
+                StudentRecord[].class
+        );
     }
 
     public Optional<FollowupRecord> findFollowup(String academyId, String followupId) {
@@ -138,6 +164,22 @@ public class SupabaseManagementClient {
         ).stream().findFirst().orElseThrow(() -> saveError("학생 정보를 저장하지 못했습니다."));
     }
 
+    public List<StudentRecord> insertStudents(
+            String academyId,
+            String userId,
+            List<StudentPayload> payloads
+    ) {
+        List<Map<String, Object>> body = payloads.stream()
+                .map((payload) -> studentBody(academyId, userId, payload))
+                .toList();
+        return postArray(
+                "/rest/v1/students?select=" + STUDENT_SELECT,
+                body,
+                StudentRecord[].class,
+                "return=representation"
+        );
+    }
+
     public Optional<StudentRecord> updateStudent(String academyId, String userId, StudentPayload payload) {
         Map<String, Object> body = studentBody(academyId, userId, payload);
         body.remove("academy_id");
@@ -160,6 +202,48 @@ public class SupabaseManagementClient {
                 ScheduleRecord[].class,
                 "return=representation"
         ).stream().findFirst().orElseThrow(() -> saveError("스케줄을 저장하지 못했습니다."));
+    }
+
+    public List<ScheduleRecord> findDuplicateClassSchedules(
+            String academyId,
+            String classId,
+            String scheduleType,
+            List<Integer> dayOfWeeks,
+            String startTime,
+            String endTime,
+            List<String> studentIds
+    ) {
+        if (dayOfWeeks.isEmpty() || studentIds.isEmpty()) {
+            return List.of();
+        }
+
+        String dayFilter = String.join(",", dayOfWeeks.stream().map(String::valueOf).toList());
+        String studentFilter = String.join(",", studentIds.stream().map(this::encode).toList());
+        return getArray(
+                "/rest/v1/student_schedules?select=" + SCHEDULE_SELECT
+                        + "&academy_id=eq." + encode(academyId)
+                        + "&class_id=eq." + encode(classId)
+                        + "&schedule_type=eq." + encode(scheduleType)
+                        + "&day_of_week=in.(" + dayFilter + ")"
+                        + "&start_time=eq." + encode(startTime)
+                        + "&end_time=eq." + encode(endTime)
+                        + "&is_active=eq.true"
+                        + "&schedule_date=is.null"
+                        + "&student_id=in.(" + studentFilter + ")",
+                ScheduleRecord[].class
+        );
+    }
+
+    public void insertSchedules(String academyId, List<StudentSchedulePayload> payloads) {
+        List<Map<String, Object>> body = payloads.stream()
+                .map((payload) -> scheduleBody(academyId, payload))
+                .toList();
+        postArray(
+                "/rest/v1/student_schedules?select=id",
+                body,
+                IdRecord[].class,
+                "return=representation"
+        );
     }
 
     public Optional<ScheduleRecord> updateSchedule(String academyId, StudentSchedulePayload payload) {

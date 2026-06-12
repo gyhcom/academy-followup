@@ -20,6 +20,9 @@ import {
   MakeupSchedulePlanner,
   type ScheduleConflict,
 } from "@/app/app/makeup-scheduling";
+import {
+  fetchStudentScheduleSharing,
+} from "@/lib/client/student-schedule-sharing";
 
 type MakeupCalendarPanelProps = {
   selectedStudent:
@@ -31,24 +34,6 @@ type MakeupCalendarPanelProps = {
     | undefined;
   selectedCandidate: MakeupCandidate | null;
   onCandidateSelect: (candidate: MakeupCandidate) => void;
-};
-
-type SharedScheduleResponse = {
-  links?: Array<{
-    academyName: string;
-    schedules: Array<{
-      id: string;
-      academyName: string;
-      scheduleType: string;
-      scheduleDate: string | null;
-      dayOfWeek: number;
-      startTime: string;
-      endTime: string;
-      subject: string | null;
-      title: string;
-    }>;
-  }>;
-  error?: string;
 };
 
 const weekDayHeaders = [1, 2, 3, 4, 5, 6, 0];
@@ -421,6 +406,7 @@ function useSharedSchedules(studentId: string | null) {
     }
 
     const controller = new AbortController();
+    const activeStudentId = studentId;
 
     async function loadSharedSchedules() {
       setState((current) => ({
@@ -430,14 +416,7 @@ function useSharedSchedules(studentId: string | null) {
       }));
 
       try {
-        const response = await fetch(`/api/student-schedule-sharing?studentId=${studentId}`, {
-          signal: controller.signal,
-        });
-        const payload = (await response.json()) as SharedScheduleResponse;
-
-        if (!response.ok) {
-          throw new Error(payload.error ?? "연결 학원 일정을 불러오지 못했습니다.");
-        }
+        const payload = await fetchStudentScheduleSharing(activeStudentId, controller.signal);
 
         setState({
           status: "ready",
