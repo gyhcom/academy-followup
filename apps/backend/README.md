@@ -1,6 +1,7 @@
 # Academy Follow-up Backend
 
-Spring Boot backend skeleton for the gradual Java migration.
+Spring Boot backend for the gradual Java migration. Operational APIs are now
+implemented here while existing Next.js API routes remain as frontend fallback.
 
 ## Requirements
 
@@ -37,8 +38,7 @@ Copy `.env.example` if you want a local env file for backend API work.
 cp .env.example .env
 ```
 
-T-631 uses Supabase Auth and `profiles` to build the backend workspace context.
-T-632 adds the first read-only migrated API, `GET /api/reports/summary`.
+Supabase Auth and `profiles` are used to build the backend workspace context.
 
 Required values:
 
@@ -55,16 +55,18 @@ curl http://localhost:8080/api/auth/context \
   -H "Authorization: Bearer <supabase-access-token>"
 ```
 
-## Report Summary Check
+## API Checks
 
 ```bash
 curl "http://localhost:8080/api/reports/summary?range=today" \
   -H "Authorization: Bearer <supabase-access-token>"
+
+curl "http://localhost:8080/api/audit/logs?limit=20" \
+  -H "Authorization: Bearer <supabase-access-token>"
 ```
 
-Supported ranges are `today`, `7d`, and `month`. The response shape matches the
-existing Next.js `/api/reports/summary` response so the frontend can fallback
-without UI changes.
+The response shapes match the existing Next.js API responses so the frontend can
+fallback without UI changes.
 
 For local frontend integration, set this only in local env:
 
@@ -78,5 +80,6 @@ is ready.
 ## Scope
 
 - Existing Next.js API routes remain active.
-- This app is not part of the Vercel frontend deployment yet.
-- Railway deployment is deferred until payment/deployment timing is decided.
+- This app is deployed separately from the Vercel frontend.
+- Railway deployment is prepared but deferred until payment/deployment timing is decided.
+- See `docs/architecture/railway-backend-deployment-readiness.md` before connecting Production.
