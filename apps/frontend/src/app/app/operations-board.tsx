@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 import { fetchBulkMessagePreview } from "@/lib/client/bulk-message-preview";
+import { createFollowup, fetchFollowupHistory } from "@/lib/client/followups";
 import { fetchMessagePreview } from "@/lib/client/message-preview";
 import { getMessageLengthMetrics } from "@/lib/message-length";
 import {
@@ -20,7 +21,6 @@ import {
   type MessageRecipientType,
 } from "@/lib/message-recipients";
 import {
-  type FollowupHistoryItem,
   type FollowupHistoryState,
 } from "@/app/app/operations-history";
 import {
@@ -84,15 +84,6 @@ type FollowupSaveState = {
   followupId: string;
 };
 
-type CreateFollowupResponse = {
-  followup?: {
-    id: string;
-    status: string;
-    createdAt: string;
-  };
-  error?: string;
-};
-
 type MessageSendState = {
   followupId: string;
   status: "idle" | "sending" | "sent" | "error";
@@ -154,11 +145,6 @@ type MakeupScheduleSaveState = {
   status: "idle" | "saving" | "saved" | "error";
   message: string;
   scheduleId: string;
-};
-
-type FollowupHistoryResponse = {
-  followups?: FollowupHistoryItem[];
-  error?: string;
 };
 
 export function OperationsBoard({
@@ -523,14 +509,7 @@ export function OperationsBoard({
       }));
 
       try {
-        const response = await fetch(`/api/followups?studentId=${studentId}`, {
-          signal: controller.signal,
-        });
-        const payload = (await response.json()) as FollowupHistoryResponse;
-
-        if (!response.ok) {
-          throw new Error(payload.error ?? "연락 기록을 불러오지 못했습니다.");
-        }
+        const payload = await fetchFollowupHistory(studentId, controller.signal);
 
         setFollowupHistory({
           studentId,
@@ -819,23 +798,12 @@ export function OperationsBoard({
     });
 
     try {
-      const response = await fetch("/api/followups", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          studentId: selectedStudent.id,
-          reason: selectedReason,
-          messageBody: bodyToSave,
-          recipientType: effectiveRecipientType,
-        }),
+      const payload = await createFollowup({
+        studentId: selectedStudent.id,
+        reason: selectedReason,
+        messageBody: bodyToSave,
+        recipientType: effectiveRecipientType,
       });
-      const payload = (await response.json()) as CreateFollowupResponse;
-
-      if (!response.ok || !payload.followup) {
-        throw new Error(payload.error ?? "연락 기록을 저장하지 못했습니다.");
-      }
 
       setFollowupSave({
         key: messageKey,

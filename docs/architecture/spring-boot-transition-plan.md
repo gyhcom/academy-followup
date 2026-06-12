@@ -74,7 +74,7 @@ Backend가 점진적으로 담당합니다.
 | `POST /api/messages/preview` | Next.js + Spring | Spring 추가 + frontend fallback | Low | 문자 초안 미리보기. 담당 반 권한 검증을 유지합니다. |
 | `POST /api/bulk-messages/preview` | Next.js + Spring | Spring 추가 + frontend fallback | Low | 전체문자 대상/중복 제외 count 미리보기. owner/manager만 허용합니다. |
 | `GET /api/reports/export` | Next.js + Spring | Spring 추가 + frontend fallback | Medium | CSV/개인정보 포함 옵션은 Spring 우선 다운로드 후 기존 Next API fallback으로 유지합니다. |
-| `POST /api/followups` | Next.js | 다음 단계 | High | 운영 기록 쓰기 API입니다. 메시지 발송 전 단계로 먼저 이전합니다. |
+| `GET/POST /api/followups` | Next.js + Spring | Spring 추가 + frontend fallback | High | 연락 기록 조회/저장 API입니다. 문자 발송 전 단계로 Spring에 이전하고 fallback을 유지합니다. |
 | `GET/POST/PATCH /api/attendance` | Next.js | 다음 단계 | High | 수업 중 출석 저장 핵심 API입니다. followup 이전 후 진행합니다. |
 | `POST/PATCH /api/students`, `/api/classes`, `/api/student-schedules` | Next.js | 다음 단계 | High | 실제 운영 데이터 수정 API입니다. 대량 데이터 백업 기준과 함께 진행합니다. |
 | `POST/PATCH /api/members` | Next.js | 다음 단계 | High | Auth/profile 생성·권한 API입니다. 운영 계정 생성 절차 검증 후 진행합니다. |
@@ -238,6 +238,16 @@ Production:
 - owner/manager만 허용하고 teacher/assistant는 `403`입니다.
 - frontend 관리 > 리포트의 CSV 다운로드는 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고 실패 시 기존 Next.js API로 fallback합니다.
 - Production에는 backend URL을 설정하지 않아 기존 Next.js API 기준을 유지합니다.
+
+### T-642 연락 기록 followups API 이관
+
+- Spring Boot에 `GET /api/followups?studentId=...`를 추가했습니다.
+- Spring Boot에 `POST /api/followups`를 추가했습니다.
+- 기존 Next.js API와 같은 응답 shape를 유지합니다.
+- owner/manager는 학원 전체 학생, teacher/assistant는 담당 반 학생만 접근할 수 있습니다.
+- 연락 기록 저장 시 비활성 학생, 잘못된 사유/수신자, 2000byte 초과 본문, 결석/지각이 아닌 출석 기록 연결을 차단합니다.
+- 출석 기록 ID가 있으면 연락 기록 저장 후 `attendance_records.followup_id`를 연결합니다.
+- frontend 문자/출석/학생 상세 화면은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고 실패 시 기존 Next.js API로 fallback합니다.
 
 ## 12. 하지 않을 것
 
