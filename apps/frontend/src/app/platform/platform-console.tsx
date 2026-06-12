@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, CheckCircle2, ClipboardList, Loader2, Plus } from "lucide-react";
+import { savePlatformAcademy } from "@/lib/client/platform-academies";
 
 export type PlatformAcademySummary = {
   id: string;
@@ -100,21 +101,10 @@ export function PlatformConsole({ academies }: PlatformConsoleProps) {
     setCreatedAcademy(null);
 
     try {
-      const response = await fetch("/api/platform/academies", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "create",
-          ...form,
-        }),
+      const payload = await savePlatformAcademy({
+        action: "create",
+        ...form,
       });
-      const payload = (await response.json()) as { error?: string; message?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "학원을 생성하지 못했습니다.");
-      }
 
       setStatus({
         state: "saved",
@@ -151,23 +141,12 @@ export function PlatformConsole({ academies }: PlatformConsoleProps) {
     setStatus({ state: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/platform/academies", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "update_status",
-          academyId,
-          status: statusValue,
-          plan: planValue,
-        }),
+      const payload = await savePlatformAcademy({
+        action: "update_status",
+        academyId,
+        status: statusValue,
+        plan: planValue,
       });
-      const payload = (await response.json()) as { error?: string; message?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "학원 상태를 수정하지 못했습니다.");
-      }
 
       setStatus({
         state: "saved",
