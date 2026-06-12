@@ -39,6 +39,9 @@ class MessageApiSecurityTest {
     @MockBean
     private BulkMessagePreviewService bulkMessagePreviewService;
 
+    @MockBean
+    private SendMessageService sendMessageService;
+
     @Test
     void messageTemplatesRequireBearerToken() throws Exception {
         mockMvc.perform(get("/api/message-templates"))
@@ -138,5 +141,45 @@ class MessageApiSecurityTest {
                         .content("{\"targetType\":\"all\",\"recipientType\":\"parent\",\"excludeDuplicateRecipients\":true}"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("전체문자는 원장 또는 관리자만 확인할 수 있습니다."));
+    }
+
+    @Test
+    void sendsFollowupMessageForOwner() throws Exception {
+        WorkspaceContext workspaceContext = new WorkspaceContext("owner-1", "academy-1", "owner", "active");
+        when(supabaseAuthService.resolveWorkspace("owner-token")).thenReturn(workspaceContext);
+        when(sendMessageService.send(eq(workspaceContext), any(SendMessageRequest.class))).thenReturn(
+                SendMessageResponse.sent(
+                        true,
+                        "SMS_DRY_RUN이 활성화되어 실제 문자를 발송하지 않았습니다.",
+                        "010-****-5678",
+                        1,
+                        "followup-1"
+                )
+        );
+
+        mockMvc.perform(post("/api/messages/send")
+                        .header("Authorization", "Bearer owner-token")
+                        .contentType("application/json")
+                        .content("{\"followupId\":\"followup-1\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dryRun").value(true))
+                .andExpect(jsonPath("$.followupId").value("followup-1"));
+    }
+
+    @Test
+    void returnsDuplicateSendConflict() throws Exception {
+        WorkspaceContext workspaceContext = new WorkspaceContext("owner-1", "academy-1", "owner", "active");
+        when(supabaseAuthService.resolveWorkspace("owner-token")).thenReturn(workspaceContext);
+        when(sendMessageService.send(eq(workspaceContext), any(SendMessageRequest.class))).thenThrow(
+                new DuplicateMessageException("최근 발송 기록이 있어 중복 발송을 차단했습니다.", 1440)
+        );
+
+        mockMvc.perform(post("/api/messages/send")
+                        .header("Authorization", "Bearer owner-token")
+                        .contentType("application/json")
+                        .content("{\"followupId\":\"followup-1\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.duplicate").value(true))
+                .andExpect(jsonPath("$.duplicateGuardMinutes").value(1440));
     }
 }

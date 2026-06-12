@@ -35,6 +35,7 @@
 | T-643 출석 attendance API 이관 | 완료 | P1 | 출석 조회/저장을 Spring에 추가 | T-642 | 출석 탭 Spring 우선 호출과 Next.js fallback 회귀 확인 |
 | T-644 학생/반/스케줄 API 이관 | 완료 | P1 | 단건 학생/반/스케줄 저장을 Spring에 추가 | T-643 | 관리 탭과 보강 등록 fallback 회귀 확인 |
 | T-645 구성원 members API 이관 | 완료 | P1 | 구성원 조회/생성/수정을 Spring에 추가 | T-644 | Auth/profile rollback과 Next.js fallback 회귀 확인 |
+| T-646 개별 문자 발송 API 이관 | 완료 | P1 | 개별 문자 발송/dry-run/로그 저장을 Spring에 추가 | T-645 | 문자/출석 패널 Spring 우선 호출과 Next.js fallback 회귀 확인 |
 
 ## 현재 원칙
 
@@ -46,5 +47,5 @@
 - Spring API는 기존 Next.js API fallback을 유지한 상태에서만 production에 연결합니다.
 - 로컬 Spring 소스는 다음 API 이관 전 공통 Supabase REST client와 frontend fallback helper를 기준으로 정리합니다.
 - 현재 Spring 전환 완료 기준은 전체 API를 한 번에 삭제하는 것이 아니라 인증/리포트/이력/조회·미리보기/운영 설정 저장/CSV 내보내기/연락 기록 API를 단계별로 Spring에 붙이고 fallback을 유지하는 것입니다.
-- 남은 API도 최종 이전 대상입니다. 순서는 `messages/send -> bulk-messages/send -> platform`입니다. bulk 학생/스케줄 등록은 운영 리스크가 있어 별도 보강 후 이전합니다.
+- 남은 API도 최종 이전 대상입니다. 순서는 `bulk-messages/send -> platform`입니다. bulk 학생/스케줄 등록은 운영 리스크가 있어 별도 보강 후 이전합니다.
 - 7월 13일 전까지는 파일럿 운영 개선과 안정화를 우선합니다.
