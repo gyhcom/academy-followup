@@ -5,9 +5,9 @@
 ## 1. 목적
 
 - Spring Boot backend가 Supabase 로그인 사용자와 권한을 올바르게 판단하는지 확인합니다.
-- 첫 이관 API인 `GET /api/reports/summary`가 기존 Next.js API와 같은 운영 리포트 값을 보여주는지 확인합니다.
+- Spring으로 이관된 운영 API가 기존 Next.js API와 같은 응답/권한 기준으로 동작하는지 확인합니다.
 - backend가 꺼져도 frontend가 기존 Next.js API로 fallback 되는지 확인합니다.
-- Spring API 이관 코드는 공통 Supabase REST client와 frontend fallback helper를 사용해 다음 API 이전 시 반복 구현을 줄입니다.
+- Spring API 이관 코드는 공통 Supabase REST client와 frontend fallback helper를 사용합니다.
 
 ## 2. 사전 조건
 
@@ -75,12 +75,15 @@ curl http://localhost:8080/api/auth/context \
 
 curl "http://localhost:8080/api/reports/summary?range=today" \
   -H "Authorization: Bearer $OWNER_TOKEN"
+
+curl "http://localhost:8080/api/audit/logs?limit=20" \
+  -H "Authorization: Bearer $OWNER_TOKEN"
 ```
 
 기대값:
 
-- owner/manager: report summary `200`
-- teacher/assistant: report summary `403`
+- owner/manager: report summary/audit logs `200`
+- teacher/assistant: report summary/audit logs `403`
 - token 없음: `401`
 - 200명 seed 기준: 학생 200명, 반 20개, 스케줄 미등록 0명
 
@@ -98,10 +101,14 @@ npm run dev:frontend:spring-local
 - `owner@test.com / 1234`
 - `/app` 진입
 - 관리 탭 > 리포트
+- 관리 탭 > 이력
+- 출석 탭
+- 문자 탭
+- 학생 상세 > 타 학원 수업/공유 일정
 
 기대값:
 
-- 브라우저 network에서 `http://localhost:8080/api/reports/summary?range=today` 호출
+- 브라우저 network에서 `http://localhost:8080/api/*` 호출
 - 화면에 학생 200명, 반 20개, 스케줄 미등록 0명 표시
 - 콘솔 에러 없음
 

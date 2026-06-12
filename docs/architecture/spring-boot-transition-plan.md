@@ -5,7 +5,7 @@
 ## 1. 전환 목적
 
 - Next.js는 화면, 모바일 UX, 로그인 UI, 라우팅, 빠른 문구/버튼 수정을 담당합니다.
-- Spring Boot는 장기적으로 권한, 리포트, 감사 로그, 문자, 출석/보강 도메인 로직을 담당할 백엔드 경계를 만듭니다.
+- Spring Boot는 권한, 리포트, 감사 로그, 문자, 출석/보강, 관리 도메인 API를 담당할 백엔드 경계를 만듭니다.
 - 전환 목표는 “파일럿 MVP를 다시 만드는 것”이 아니라 “AI 의존도가 낮아져도 Java/Spring 코드로 직접 유지보수 가능한 구조”를 확보하는 것입니다.
 - 파일럿 안정성이 Spring 전환보다 우선입니다. 운영 중인 기능을 깨뜨릴 가능성이 있으면 Next.js 구현을 유지합니다.
 
@@ -30,8 +30,9 @@ Supabase
 - Backend: 로컬 Spring Boot 우선, Railway + Spring Boot 배포는 결제 후 진행
 - DB/Auth: Supabase 유지
 - API 전환 방식: Spring API 우선 호출 + Next.js fallback 유지
-- 첫 이관 API: `GET /api/reports/summary`
-- 현재 Spring 이관 완료 범위: 인증 컨텍스트, 리포트 요약, 감사 로그 조회, Supabase health, 문자 템플릿 조회/저장, 학원 설정 저장, 문자 미리보기, 전체문자 대상 미리보기
+- Spring 이관 완료 범위: 운영 API 전체를 Spring Boot에 추가했고 기존 Next.js API fallback을 유지합니다.
+- Next.js 전용으로 남은 `/api/auth/redirect-target`는 로그인 UI helper이며 Spring 운영 API 전환 대상에서 제외합니다.
+- 배포 상태: Railway 결제 전까지 Production에는 `NEXT_PUBLIC_BACKEND_API_URL`을 설정하지 않습니다.
 
 ## 3. frontend/backend 책임 경계
 
@@ -54,8 +55,8 @@ Backend가 점진적으로 담당합니다.
 ## 4. API 이관 원칙
 
 - read-only 또는 low-risk API부터 이관합니다.
-- 첫 이관은 `GET /api/reports/summary?range=today|7d|month`로 고정합니다.
-- 쓰기 API, 문자 발송 API, 출석/보강 핵심 API도 최종 이전 대상입니다. 다만 운영 리스크에 따라 단계별로 이관하고, 각 단계에서 Next.js fallback을 유지합니다.
+- 운영 API는 Spring Boot에 추가 완료했습니다.
+- 쓰기 API, 문자 발송 API, 출석/보강 핵심 API도 Spring에 추가했지만, 운영 리스크를 줄이기 위해 각 단계에서 Next.js fallback을 유지합니다.
 - Spring API 응답 shape는 기존 Next.js API와 동일하게 유지합니다.
 - 기존 Next.js API는 바로 삭제하지 않고 fallback으로 남깁니다.
 - API 하나당 이슈 1개, 브랜치 1개, PR 1개로 진행합니다.
@@ -85,7 +86,7 @@ Backend가 점진적으로 담당합니다.
 | `POST /api/bulk-messages/send` | Next.js + Spring | Spring 추가 + frontend fallback | High | 전체문자 발송 API입니다. 대상 산정, 중복 수신자 제외, dry-run/실발송 로그 저장을 Spring에 추가하고 fallback을 유지합니다. |
 | `/api/platform/academies` | Next.js + Spring | Spring 추가 + frontend fallback | High | 플랫폼 관리자/학원 생성·상태 관리 API입니다. 플랫폼 전용 인증을 분리하고 fallback을 유지합니다. |
 
-오늘 기준 “Spring 전환 완료”는 전체 API 일괄 삭제가 아니라, 운영 가능한 Spring 인증 기반 위에 API를 단계별로 옮기고, 남은 API의 이전 순서와 완료 기준을 고정하는 것을 의미합니다.
+오늘 기준 “Spring 전환 완료”는 기존 Next.js API 삭제가 아니라, 운영 API를 Spring Boot에 추가하고 frontend에서 Spring 우선 호출 + Next.js fallback을 유지하는 상태를 의미합니다. Railway 실제 배포와 Production backend URL 연결은 결제 및 smoke test 이후 별도 승인으로 진행합니다.
 
 ### T-643 Attendance API 이관 결과
 
@@ -243,7 +244,8 @@ Production:
 - Railway에서 `apps/backend` root directory 기준으로 빌드/실행됩니다.
 - Railway public URL에서 `/health`와 `/actuator/health`가 응답합니다.
 - backend 환경변수 목록과 설정 절차가 README에 있습니다.
-- Railway 결제 전까지는 보류합니다.
+- Railway 결제 전까지 실제 배포는 보류합니다.
+- 배포 준비 기준은 [Railway Spring Backend 배포 준비 체크리스트](./railway-backend-deployment-readiness.md)를 따릅니다.
 
 ### T-634 Frontend-Spring 연동
 
@@ -374,6 +376,13 @@ Production:
 - Frontend 관리/학생 상세/보강 화면은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고, Spring 5xx/네트워크 실패 또는 URL 미설정 시 기존 Next.js API로 fallback합니다.
 - `/api/auth/redirect-target`는 로그인 화면의 Next.js server helper라 Spring 전환 대상 운영 API에서 제외합니다.
 - Production에는 backend URL을 설정하지 않아 기존 Next.js API 기준을 유지합니다.
+
+### T-650 Spring 전환 배포 준비 완료
+
+- Spring 전환 상태를 “코드/API 이관 완료 + 로컬 검증 가능 + Railway 배포 준비 완료 + Production 미연결”로 고정합니다.
+- Railway Root Directory, 필수 환경변수, health/auth/report/message smoke test, Vercel 연결/rollback 절차를 문서화했습니다.
+- Production에는 아직 `NEXT_PUBLIC_BACKEND_API_URL`을 설정하지 않습니다.
+- 실제 Railway 결제/배포와 Vercel Production 연결은 별도 승인 후 진행합니다.
 
 ## 12. 하지 않을 것
 
