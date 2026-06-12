@@ -64,6 +64,7 @@ import {
   saveStudentSchedule,
 } from "@/lib/client/management-api";
 import { saveMessageTemplate } from "@/lib/client/message-template-save";
+import { saveMember } from "@/lib/client/members";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
 
 type ManagementSection =
@@ -730,27 +731,15 @@ export function ManagementHome({
     setMemberFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/members", {
-        method: memberForm.mode === "create" ? "POST" : "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          memberId: memberForm.memberId,
-          name: memberForm.name,
-          email: memberForm.email,
-          phone: memberForm.phone,
-          role: memberForm.role,
-          status: memberForm.status,
-          password: memberForm.password,
-        }),
-      });
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "구성원 정보를 저장하지 못했습니다.");
-      }
-
+      await saveMember({
+        memberId: memberForm.memberId,
+        name: memberForm.name,
+        email: memberForm.email,
+        phone: memberForm.phone,
+        role: memberForm.role,
+        status: memberForm.status,
+        password: memberForm.password,
+      }, memberForm.mode);
       setMemberFormStatus({
         status: "saved",
         message:

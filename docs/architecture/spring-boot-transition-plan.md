@@ -77,7 +77,7 @@ Backend가 점진적으로 담당합니다.
 | `GET/POST /api/followups` | Next.js + Spring | Spring 추가 + frontend fallback | High | 연락 기록 조회/저장 API입니다. 문자 발송 전 단계로 Spring에 이전하고 fallback을 유지합니다. |
 | `GET/POST/PATCH /api/attendance` | Next.js + Spring | Spring 추가 + frontend fallback | High | 수업 중 출석 조회/저장 핵심 API입니다. 담당 반 권한과 상태 저장 규칙을 유지합니다. |
 | `POST/PATCH /api/students`, `/api/classes`, `/api/student-schedules` | Next.js + Spring | Spring 추가 + frontend fallback | High | 실제 운영 데이터 수정 API입니다. 단건 저장을 Spring에 추가하고, bulk CSV/일괄 스케줄은 Next.js 유지입니다. |
-| `POST/PATCH /api/members` | Next.js | 다음 단계 | High | Auth/profile 생성·권한 API입니다. 운영 계정 생성 절차 검증 후 진행합니다. |
+| `GET/POST/PATCH /api/members` | Next.js + Spring | Spring 추가 + frontend fallback | High | Auth/profile 생성·수정 API입니다. Spring에 추가하고 기존 Next.js fallback을 유지합니다. |
 | `POST /api/messages/send` | Next.js | 마지막 단계 | High | 실제 문자 발송/로그 API입니다. 테스트 번호 제한 발송 검증 후 이전합니다. |
 | `POST /api/bulk-messages/send` | Next.js | 마지막 단계 | High | 대량 발송 API입니다. 단건 발송 이전과 운영 제한 장치 검증 후 진행합니다. |
 | `/api/platform/academies` | Next.js | 마지막 단계 | High | 플랫폼 관리자/학원 생성 API입니다. 학원 운영 API 이전 후 진행합니다. |
@@ -119,6 +119,19 @@ Backend가 점진적으로 담당합니다.
 - bulk API는 이번 범위에서 제외했습니다.
   - `POST /api/students/bulk`
   - `POST /api/student-schedules/bulk`
+
+### T-645 Members API 이관 결과
+
+- Spring Boot에 `GET/POST/PATCH /api/members`를 추가했습니다.
+- 기존 Next.js API는 삭제하지 않고 fallback으로 유지합니다.
+- Supabase Auth Admin REST를 Spring에서 호출합니다.
+  - 생성: Auth user 생성 후 `profiles` insert
+  - profile 저장 실패 시 Auth user 삭제 rollback
+  - 수정: Auth user metadata/email 수정 후 `profiles` update
+- 권한과 보호 규칙은 기존과 동일합니다.
+  - `owner/manager`만 구성원 조회/생성/수정 가능
+  - 현재 로그인한 관리자 본인은 비활성화하거나 `teacher/assistant`로 낮출 수 없음
+- Frontend 관리 화면은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 우선 호출하고, 실패하거나 env가 없으면 기존 Next.js API로 fallback합니다.
 
 ## 5. 인증/권한 정책
 
