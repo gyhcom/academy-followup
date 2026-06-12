@@ -474,7 +474,7 @@ function PcOperationsDashboard({
         </div>
       </section>
 
-      <section className="mt-5 grid gap-4 xl:grid-cols-[18rem_minmax(0,1fr)_24rem] xl:items-start">
+      <section className="mt-5 grid gap-4 xl:grid-cols-[17rem_minmax(0,1fr)_24rem] 2xl:grid-cols-[18rem_minmax(0,1fr)_26rem] xl:items-start">
         <aside className="space-y-4">
           <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
             <div className="border-b border-stone-200 px-4 py-3">
@@ -530,7 +530,7 @@ function PcOperationsDashboard({
           </section>
         </aside>
 
-        <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
+        <section className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
           <div className="border-b border-stone-200 px-4 py-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -561,14 +561,7 @@ function PcOperationsDashboard({
             ) : null}
           </div>
 
-          <div className="grid grid-cols-[minmax(8rem,1fr)_7rem_8rem_7rem_7rem] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500">
-            <span>학생</span>
-            <span>수업 시간</span>
-            <span>반</span>
-            <span>출석</span>
-            <span>연락</span>
-          </div>
-          <div className="max-h-[38rem] divide-y divide-stone-100 overflow-y-auto">
+          <div className="max-h-[38rem] space-y-2 overflow-y-auto bg-stone-50/70 px-3 py-3" role="listbox" aria-label="오늘 학생 상태 목록">
             {filteredStudentRows.length > 0 ? (
               filteredStudentRows.map((row) => (
                 <PcStudentBoardRowItem
@@ -587,7 +580,6 @@ function PcOperationsDashboard({
         </section>
 
         <PcStudentDetailPanel
-          selectedDate={selectedDate}
           row={selectedStudentRow}
           blockedItems={blockedItems}
           recentAttentionItems={recentAttentionItems}
@@ -683,15 +675,20 @@ function PcStudentFilterBar({
   totalCount: number;
   onChange: (filter: PcStudentBoardFilter) => void;
 }) {
-  const options: Array<{ value: PcStudentBoardFilter; label: string; count: number }> = [
-    { value: "all", label: "전체", count: totalCount },
-    { value: "unchecked", label: "체크 필요", count: summary.unchecked },
-    { value: "present", label: "도착", count: summary.present },
-    { value: "late", label: "지각", count: summary.late },
-    { value: "absent", label: "결석", count: summary.absent },
-    { value: "needs_check", label: "확인 필요", count: summary.needsCheck },
-    { value: "attention", label: "연락 필요", count: summary.attention },
-    { value: "makeup", label: "보강 예정", count: summary.makeup },
+  const options: Array<{
+    value: PcStudentBoardFilter;
+    label: string;
+    count: number;
+    tone: "default" | "blue" | "green" | "amber" | "red" | "violet";
+  }> = [
+    { value: "all", label: "전체", count: totalCount, tone: "default" },
+    { value: "unchecked", label: "체크 필요", count: summary.unchecked, tone: "blue" },
+    { value: "present", label: "도착", count: summary.present, tone: "green" },
+    { value: "late", label: "지각", count: summary.late, tone: "amber" },
+    { value: "absent", label: "결석", count: summary.absent, tone: "red" },
+    { value: "needs_check", label: "확인 필요", count: summary.needsCheck, tone: "red" },
+    { value: "attention", label: "연락 필요", count: summary.attention, tone: "amber" },
+    { value: "makeup", label: "보강 예정", count: summary.makeup, tone: "violet" },
   ];
 
   return (
@@ -708,7 +705,7 @@ function PcStudentFilterBar({
             className={[
               "inline-flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
               isSelected
-                ? "border-stone-950 bg-stone-950 text-white"
+                ? selectedChipTone(option.tone)
                 : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50",
             ].join(" ")}
           >
@@ -716,7 +713,7 @@ function PcStudentFilterBar({
             <span
               className={[
                 "rounded-full px-1.5 py-0.5 tabular-nums",
-                isSelected ? "bg-white/15 text-white" : "bg-stone-100 text-stone-500",
+                isSelected ? "bg-white/20 text-white" : "bg-stone-100 text-stone-500",
               ].join(" ")}
             >
               {option.count}
@@ -739,24 +736,29 @@ function PcStudentBoardRowItem({
 }) {
   const isSent = row.followupStatus === "sent";
   const needsContact = isAttentionStatus(row.status) && !isSent;
+  const contactLabel = isSent ? "연락 완료" : needsContact ? "연락 필요" : "대기";
 
   return (
     <button
       type="button"
-      aria-pressed={isSelected}
+      role="option"
+      aria-selected={isSelected}
+      aria-label={`${row.student.name} 학생 상세 보기, ${row.className}, ${row.startTime}-${row.endTime}, 출석 ${attendanceDisplayLabel(row.status)}, 연락 ${contactLabel}`}
       onClick={onClick}
       className={[
-        "grid min-h-[3.8rem] w-full grid-cols-[minmax(8rem,1fr)_7rem_8rem_7rem_7rem] items-center gap-3 px-4 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]",
-        isSelected ? "bg-[#F3F8FC]" : "bg-white hover:bg-stone-50",
+        "flex min-h-[4.35rem] w-full items-center gap-3 rounded-lg border px-3.5 py-2.5 text-left shadow-sm transition focus:outline-none focus:ring-2 focus:ring-[#7EA7C4] focus:ring-offset-2 focus:ring-offset-stone-50",
+        isSelected
+          ? "border-[#7EA7C4] bg-[#F3F8FC] shadow-[0_6px_18px_rgba(49,92,124,0.10)]"
+          : "border-stone-200 bg-white hover:border-stone-300 hover:bg-white",
       ].join(" ")}
     >
-      <span className="min-w-0">
+      <span className="min-w-0 flex-[1.25]">
         <span className="flex min-w-0 items-center gap-2">
           <span className="truncate text-sm font-semibold text-stone-950">
             {row.student.name}
           </span>
           {row.hasBlockedSchedule ? (
-            <span className="shrink-0 rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-semibold text-violet-800">
+            <span className="shrink-0 rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-semibold text-violet-800">
               보강 제외
             </span>
           ) : null}
@@ -766,36 +768,41 @@ function PcStudentBoardRowItem({
             "학년 정보 없음"}
         </span>
       </span>
-      <span className="text-xs font-semibold tabular-nums text-stone-700">
-        {row.startTime}-{row.endTime}
+      <span className="min-w-0 flex flex-[1.15] items-center gap-2">
+        <span className="shrink-0 rounded-md bg-stone-50 px-2 py-1 text-xs font-semibold tabular-nums text-stone-700">
+          {row.startTime}-{row.endTime}
+        </span>
+        <span className="min-w-0 truncate text-xs font-medium text-stone-600">
+          {row.className}
+        </span>
       </span>
-      <span className="truncate text-xs text-stone-600">{row.className}</span>
-      <span
-        className={[
-          "w-fit rounded-full px-2 py-1 text-[11px] font-semibold",
-          statusTone(row.status),
-        ].join(" ")}
-      >
-        {attendanceDisplayLabel(row.status)}
-      </span>
-      <span
-        className={[
-          "w-fit rounded-full px-2 py-1 text-[11px] font-semibold",
-          isSent
-            ? "bg-emerald-50 text-emerald-800"
-            : needsContact
-            ? "bg-amber-50 text-amber-800"
-            : "bg-stone-100 text-stone-600",
-        ].join(" ")}
-      >
-        {isSent ? "연락 완료" : needsContact ? "연락 필요" : "대기"}
+      <span className="flex shrink-0 items-center gap-1.5">
+        <span
+          className={[
+            "rounded-full px-2 py-1 text-[11px] font-semibold",
+            statusTone(row.status),
+          ].join(" ")}
+        >
+          {attendanceDisplayLabel(row.status)}
+        </span>
+        <span
+          className={[
+            "rounded-full px-2 py-1 text-[11px] font-semibold",
+            isSent
+              ? "bg-emerald-50 text-emerald-800"
+              : needsContact
+              ? "bg-amber-50 text-amber-800"
+              : "bg-stone-100 text-stone-600",
+          ].join(" ")}
+        >
+          {contactLabel}
+        </span>
       </span>
     </button>
   );
 }
 
 function PcStudentDetailPanel({
-  selectedDate,
   row,
   blockedItems,
   recentAttentionItems,
@@ -804,7 +811,6 @@ function PcStudentDetailPanel({
   onNavigate,
   onStudentSelect,
 }: {
-  selectedDate: string;
   row: PcStudentBoardRow | undefined;
   blockedItems: HomeScheduleItem[];
   recentAttentionItems: HomeFollowupItem[];
@@ -824,17 +830,17 @@ function PcStudentDetailPanel({
 
   return (
     <aside className="sticky top-4 space-y-4">
-      <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
-        <div className="border-b border-stone-200 px-4 py-3">
-          <h3 className="text-sm font-semibold text-stone-950">선택 학생 상세</h3>
+      <section className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
+        <div className="border-b border-stone-200 bg-stone-50/70 px-4 py-3">
+          <h3 className="text-sm font-semibold text-stone-950">학생 미니 프로필</h3>
           <p className="mt-0.5 text-xs text-stone-500">
-            수업, 연락 상태, 보강 제외 시간을 함께 확인합니다.
+            오늘 처리할 출석, 연락, 보강 제외 시간을 확인합니다.
           </p>
         </div>
 
         {row ? (
           <div className="space-y-4 px-4 py-4">
-            <div>
+            <div className="rounded-lg border border-stone-200 bg-white p-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-lg font-semibold text-stone-950">
@@ -854,17 +860,25 @@ function PcStudentDetailPanel({
                   {attendanceDisplayLabel(row.status)}
                 </span>
               </div>
-              <p className="mt-3 rounded-md bg-stone-50 px-3 py-2 text-sm leading-6 text-stone-700">
-                {formatHomeDate(selectedDate)} · {row.startTime}-{row.endTime} ·{" "}
-                {row.className}
-              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-md bg-stone-50 px-3 py-2">
+                  <p className="font-semibold text-stone-500">오늘 수업</p>
+                  <p className="mt-1 truncate font-semibold text-stone-900">{row.className}</p>
+                </div>
+                <div className="rounded-md bg-stone-50 px-3 py-2">
+                  <p className="font-semibold text-stone-500">수업 시간</p>
+                  <p className="mt-1 font-semibold tabular-nums text-stone-900">
+                    {row.startTime}-{row.endTime}
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => onNavigate("attendance")}
-                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
+                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
               >
                 출석부로 이동
               </button>
@@ -879,7 +893,7 @@ function PcStudentDetailPanel({
                       })
                     : undefined
                 }
-                className="min-h-10 rounded-md bg-[#315C7C] px-3 text-sm font-semibold text-white transition hover:bg-[#244B67]"
+                className="min-h-11 rounded-md bg-[#315C7C] px-3 text-sm font-semibold text-white transition hover:bg-[#244B67] focus:outline-none focus:ring-2 focus:ring-[#7EA7C4] focus:ring-offset-2"
               >
                 문자 화면
               </button>
@@ -954,7 +968,7 @@ function PcStudentDetailPanel({
                     reason: followupReasonForStatus(item.status),
                   })
                 }
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-stone-50"
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-semibold text-stone-950">
@@ -2420,11 +2434,28 @@ function statusTone(status: AttendanceStatus) {
     return "bg-amber-50 text-amber-800";
   }
 
+  if (status === "present") {
+    return "bg-emerald-50 text-emerald-800";
+  }
+
   if (status === "pending") {
     return "bg-stone-100 text-stone-700";
   }
 
   return "bg-violet-50 text-violet-800";
+}
+
+function selectedChipTone(tone: "default" | "blue" | "green" | "amber" | "red" | "violet") {
+  const tones = {
+    default: "border-stone-900 bg-stone-900 text-white",
+    blue: "border-[#315C7C] bg-[#315C7C] text-white",
+    green: "border-emerald-700 bg-emerald-700 text-white",
+    amber: "border-amber-700 bg-amber-700 text-white",
+    red: "border-red-700 bg-red-700 text-white",
+    violet: "border-violet-700 bg-violet-700 text-white",
+  };
+
+  return tones[tone];
 }
 
 function attendanceDisplayLabel(status: AttendanceStatus) {
