@@ -4,6 +4,7 @@ import com.academyfollowup.api.global.config.SupabaseProperties;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -55,6 +56,85 @@ public class SupabaseRestClient {
             return Arrays.asList(response);
         } catch (HttpClientErrorException exception) {
             throw new SupabaseRestException("Supabase REST 조회 중 오류가 발생했습니다.");
+        }
+    }
+
+    public <T> List<T> postServiceArray(
+            String path,
+            Object body,
+            Class<T[]> responseType,
+            String configErrorMessage,
+            String preferHeader
+    ) {
+        return writeServiceArray(HttpMethod.POST, path, body, responseType, configErrorMessage, preferHeader);
+    }
+
+    public <T> List<T> patchServiceArray(
+            String path,
+            Object body,
+            Class<T[]> responseType,
+            String configErrorMessage,
+            String preferHeader
+    ) {
+        return writeServiceArray(HttpMethod.PATCH, path, body, responseType, configErrorMessage, preferHeader);
+    }
+
+    public void postServiceNoContent(
+            String path,
+            Object body,
+            String configErrorMessage,
+            String preferHeader
+    ) {
+        assertConfigured(configErrorMessage);
+
+        try {
+            var request = restClient.post()
+                    .uri(supabaseUri(path))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + supabaseProperties.serviceRoleKey())
+                    .header("apikey", supabaseProperties.serviceRoleKey())
+                    .header("Content-Type", "application/json");
+
+            if (StringUtils.hasText(preferHeader)) {
+                request.header("Prefer", preferHeader);
+            }
+
+            request.body(body).retrieve().toBodilessEntity();
+        } catch (HttpClientErrorException exception) {
+            throw new SupabaseRestException("Supabase REST 저장 중 오류가 발생했습니다.");
+        }
+    }
+
+    private <T> List<T> writeServiceArray(
+            HttpMethod method,
+            String path,
+            Object body,
+            Class<T[]> responseType,
+            String configErrorMessage,
+            String preferHeader
+    ) {
+        assertConfigured(configErrorMessage);
+
+        try {
+            var request = restClient.method(method)
+                    .uri(supabaseUri(path))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + supabaseProperties.serviceRoleKey())
+                    .header("apikey", supabaseProperties.serviceRoleKey())
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "application/json");
+
+            if (StringUtils.hasText(preferHeader)) {
+                request.header("Prefer", preferHeader);
+            }
+
+            T[] response = request.body(body).retrieve().body(responseType);
+
+            if (response == null) {
+                return List.of();
+            }
+
+            return Arrays.asList(response);
+        } catch (HttpClientErrorException exception) {
+            throw new SupabaseRestException("Supabase REST 저장 중 오류가 발생했습니다.");
         }
     }
 

@@ -39,7 +39,7 @@ public class SupabaseAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String path = request.getRequestURI();
 
-        if (!path.startsWith("/api/")) {
+        if (!path.startsWith("/api/") || "/api/health/supabase".equals(path)) {
             filterChain.doFilter(request, response);
             return;
         }

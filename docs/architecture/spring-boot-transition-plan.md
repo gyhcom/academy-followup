@@ -31,6 +31,7 @@ Supabase
 - DB/Auth: Supabase 유지
 - API 전환 방식: Spring API 우선 호출 + Next.js fallback 유지
 - 첫 이관 API: `GET /api/reports/summary`
+- 현재 Spring 이관 완료 범위: 인증 컨텍스트, 리포트 요약, 감사 로그 조회, Supabase health, 문자 템플릿 조회/저장, 학원 설정 저장, 문자 미리보기, 전체문자 대상 미리보기
 
 ## 3. frontend/backend 책임 경계
 
@@ -54,10 +55,34 @@ Backend가 점진적으로 담당합니다.
 
 - read-only 또는 low-risk API부터 이관합니다.
 - 첫 이관은 `GET /api/reports/summary?range=today|7d|month`로 고정합니다.
-- 쓰기 API, 문자 발송 API, 출석/보강 핵심 API는 충분한 테스트 전까지 Next.js에 둡니다.
+- 쓰기 API, 문자 발송 API, 출석/보강 핵심 API도 최종 이전 대상입니다. 다만 운영 리스크에 따라 단계별로 이관하고, 각 단계에서 Next.js fallback을 유지합니다.
 - Spring API 응답 shape는 기존 Next.js API와 동일하게 유지합니다.
 - 기존 Next.js API는 바로 삭제하지 않고 fallback으로 남깁니다.
 - API 하나당 이슈 1개, 브랜치 1개, PR 1개로 진행합니다.
+
+### 4.1 API 위험도 분류
+
+| API | 현재 위치 | Spring 상태 | 위험도 | 운영 기준 |
+| --- | --- | --- | --- | --- |
+| `GET /api/health/supabase` | Next.js + Spring | Spring 추가 | Low | 공개 health check. 운영 연결 전 Supabase 접근 상태 확인용입니다. |
+| `GET /api/auth/context` | Spring | Spring 완료 | Low | Supabase token 기반 workspace context 검증용입니다. |
+| `GET /api/reports/summary` | Next.js + Spring | Spring 완료 + frontend fallback | Low | 관리 리포트 요약. owner/manager만 허용합니다. |
+| `GET /api/audit/logs` | Next.js + Spring | Spring 완료 + frontend fallback | Low | 최근 변경 이력 조회. owner/manager만 허용합니다. |
+| `GET /api/message-templates` | Next.js + Spring | Spring 추가 | Low | 템플릿 조회. owner/manager만 허용합니다. 현재 화면 목록은 SSR Supabase 조회를 유지합니다. |
+| `PATCH /api/message-templates` | Next.js + Spring | Spring 추가 + frontend fallback | Medium | 템플릿 저장. owner/manager만 허용하고 audit log를 남깁니다. |
+| `PATCH /api/academy-settings` | Next.js + Spring | Spring 추가 + frontend fallback | Medium | 운영 설정 저장. owner/manager만 허용하고 audit log를 남깁니다. |
+| `POST /api/messages/preview` | Next.js + Spring | Spring 추가 + frontend fallback | Low | 문자 초안 미리보기. 담당 반 권한 검증을 유지합니다. |
+| `POST /api/bulk-messages/preview` | Next.js + Spring | Spring 추가 + frontend fallback | Low | 전체문자 대상/중복 제외 count 미리보기. owner/manager만 허용합니다. |
+| `GET /api/reports/export` | Next.js + Spring | Spring 추가 + frontend fallback | Medium | CSV/개인정보 포함 옵션은 Spring 우선 다운로드 후 기존 Next API fallback으로 유지합니다. |
+| `POST /api/followups` | Next.js | 다음 단계 | High | 운영 기록 쓰기 API입니다. 메시지 발송 전 단계로 먼저 이전합니다. |
+| `GET/POST/PATCH /api/attendance` | Next.js | 다음 단계 | High | 수업 중 출석 저장 핵심 API입니다. followup 이전 후 진행합니다. |
+| `POST/PATCH /api/students`, `/api/classes`, `/api/student-schedules` | Next.js | 다음 단계 | High | 실제 운영 데이터 수정 API입니다. 대량 데이터 백업 기준과 함께 진행합니다. |
+| `POST/PATCH /api/members` | Next.js | 다음 단계 | High | Auth/profile 생성·권한 API입니다. 운영 계정 생성 절차 검증 후 진행합니다. |
+| `POST /api/messages/send` | Next.js | 마지막 단계 | High | 실제 문자 발송/로그 API입니다. 테스트 번호 제한 발송 검증 후 이전합니다. |
+| `POST /api/bulk-messages/send` | Next.js | 마지막 단계 | High | 대량 발송 API입니다. 단건 발송 이전과 운영 제한 장치 검증 후 진행합니다. |
+| `/api/platform/academies` | Next.js | 마지막 단계 | High | 플랫폼 관리자/학원 생성 API입니다. 학원 운영 API 이전 후 진행합니다. |
+
+오늘 기준 “Spring 전환 완료”는 전체 API 일괄 삭제가 아니라, 운영 가능한 Spring 인증 기반 위에 API를 단계별로 옮기고, 남은 API의 이전 순서와 완료 기준을 고정하는 것을 의미합니다.
 
 ## 5. 인증/권한 정책
 
@@ -175,6 +200,45 @@ Production:
 - Vercel env 제거만으로 rollback 가능합니다.
 - Railway 배포 전에는 로컬 frontend에서만 `NEXT_PUBLIC_BACKEND_API_URL=http://localhost:8080`으로 검증합니다.
 
+### T-637 Spring audit logs 조회 API 이관
+
+- 최근 변경 이력 `GET /api/audit/logs`가 Spring Boot에서 제공됩니다.
+- owner/manager만 조회할 수 있고 teacher/assistant는 `403`입니다.
+- frontend는 Spring 우선 호출 후 기존 Next.js SSR/상태로 fallback합니다.
+- Production에는 backend URL을 설정하지 않아 기존 Next.js 기준을 유지합니다.
+
+### T-638 Spring 전환 완료 기준 문서화
+
+- 현재 Next.js API를 위험도별로 분류했습니다.
+- 오늘 완료 기준을 전체 이전이 아니라 `Spring 기반/인증/리포트/이력/저위험 API 이관 + fallback 유지`로 고정했습니다.
+- 문자 발송, 출석 저장, 학생/반/구성원 수정 API는 high-risk로 분류해 파일럿 안정화 전까지 Next.js에 유지합니다.
+
+### T-639 저위험 Spring API 추가 이관
+
+- Spring Boot에 `GET /api/health/supabase`를 추가했습니다.
+- Spring Boot에 `GET /api/message-templates`를 추가했습니다.
+- Spring Boot에 `POST /api/messages/preview`를 추가했습니다.
+- Spring Boot에 `POST /api/bulk-messages/preview`를 추가했습니다.
+- frontend 문자/출석 미리보기와 전체문자 대상 미리보기는 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고 실패 시 기존 Next.js API로 fallback합니다.
+- 관리 화면 템플릿 목록은 현재 SSR Supabase 조회 구조를 유지하며, Spring `GET /api/message-templates`는 운영 가능한 backend endpoint로 먼저 준비했습니다.
+
+### T-640 운영 설정/문자 템플릿 저장 API 이관
+
+- Spring Boot에 `PATCH /api/message-templates`를 추가했습니다.
+- Spring Boot에 `PATCH /api/academy-settings`를 추가했습니다.
+- 두 API 모두 owner/manager만 허용합니다.
+- 두 API 모두 저장 성공 후 `audit_logs`에 최근 변경 이력을 남깁니다.
+- frontend 관리 화면은 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고 실패 시 기존 Next.js API로 fallback합니다.
+
+### T-641 reports/export CSV API 이관
+
+- Spring Boot에 `GET /api/reports/export`를 추가했습니다.
+- 학생 목록, 출석 기록, 문자 기록, 변경 이력 CSV 컬럼은 기존 Next.js API와 동일하게 유지합니다.
+- 기본 다운로드는 전화번호 마스킹이며, `includePrivate=true`일 때만 원문을 포함합니다.
+- owner/manager만 허용하고 teacher/assistant는 `403`입니다.
+- frontend 관리 > 리포트의 CSV 다운로드는 `NEXT_PUBLIC_BACKEND_API_URL`이 있을 때 Spring API를 먼저 호출하고 실패 시 기존 Next.js API로 fallback합니다.
+- Production에는 backend URL을 설정하지 않아 기존 Next.js API 기준을 유지합니다.
+
 ## 12. 하지 않을 것
 
 - 기존 Next.js API 즉시 제거
@@ -182,6 +246,6 @@ Production:
 - Supabase Auth 제거
 - Supabase DB를 다른 DB로 이전
 - Next.js를 Spring Boot static resource로 서빙
-- 실제 문자 발송 로직을 첫 단계에서 이전
-- 출석/보강 쓰기 로직을 첫 단계에서 이전
+- 실제 문자 발송 로직을 fallback 없이 전환
+- 출석/보강 쓰기 로직을 검증 없이 전환
 - 파일럿 안정화 전 대규모 도메인 재작성

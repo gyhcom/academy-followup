@@ -52,7 +52,13 @@ import {
   type ReportRange,
   type ReportSummary,
 } from "@/lib/client/report-summary";
+import {
+  downloadReportExport,
+  type ReportExportType,
+} from "@/lib/client/report-export";
 import { fetchAuditLogsFromBackend } from "@/lib/client/audit-logs";
+import { saveAcademySettings } from "@/lib/client/management-settings";
+import { saveMessageTemplate } from "@/lib/client/message-template-save";
 import type { StudentImportValidatedRow } from "@/lib/student-import";
 
 type ManagementSection =
@@ -64,8 +70,6 @@ type ManagementSection =
   | "settings"
   | "reports"
   | "history";
-
-type ReportExportType = "students" | "attendance" | "messages" | "audit";
 
 export function ManagementHome({
   academyName,
@@ -812,19 +816,7 @@ export function ManagementHome({
     setSettingsFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/academy-settings", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(settingsForm),
-      });
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "학원 설정을 저장하지 못했습니다.");
-      }
-
+      await saveAcademySettings(settingsForm);
       setSettingsFormStatus({ status: "saved", message: "학원 설정을 저장했습니다." });
       router.refresh();
     } catch (error) {
@@ -855,24 +847,12 @@ export function ManagementHome({
     setTemplateFormStatus({ status: "saving", message: "" });
 
     try {
-      const response = await fetch("/api/message-templates", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          reason: templateForm.reason,
-          title: templateForm.title,
-          body: templateForm.body,
-          isActive: templateForm.isActive,
-        }),
+      await saveMessageTemplate({
+        reason: templateForm.reason,
+        title: templateForm.title,
+        body: templateForm.body,
+        isActive: templateForm.isActive,
       });
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "문자 템플릿을 저장하지 못했습니다.");
-      }
-
       setTemplateFormStatus({
         status: "saved",
         message: `${templateForm.reasonLabel} 템플릿을 저장했습니다.`,
@@ -1555,34 +1535,11 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
     setStatus({ status: "saving", message: "" });
 
     try {
-      const params = new URLSearchParams({
+      await downloadReportExport({
         type,
         range,
-        includePrivate: String(includePrivate),
+        includePrivate,
       });
-      const response = await fetch(`/api/reports/export?${params.toString()}`, {
-        cache: "no-store",
-      });
-
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as {
-          error?: string;
-        } | null;
-        throw new Error(payload?.error ?? "CSV를 내려받지 못했습니다.");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const disposition = response.headers.get("Content-Disposition") ?? "";
-      const filename =
-        disposition.match(/filename="([^"]+)"/)?.[1] ?? `academy-${type}.csv`;
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
       setStatus({ status: "saved", message: "CSV 다운로드를 시작했습니다." });
     } catch (error) {
       setStatus({

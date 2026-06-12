@@ -11,6 +11,8 @@ import {
   X,
 } from "lucide-react";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
+import { fetchBulkMessagePreview } from "@/lib/client/bulk-message-preview";
+import { fetchMessagePreview } from "@/lib/client/message-preview";
 import { getMessageLengthMetrics } from "@/lib/message-length";
 import {
   messageRecipientLabels,
@@ -74,13 +76,6 @@ type MessagePreviewState = {
   error: string;
 };
 
-type MessagePreviewResponse = {
-  title?: string;
-  body?: string;
-  metrics?: ReturnType<typeof getMessageLengthMetrics>;
-  error?: string;
-};
-
 type FollowupSaveState = {
   key: string;
   body: string;
@@ -137,14 +132,6 @@ type BulkMessagePreviewState = {
 type BulkMessageResponse = {
   dryRun?: boolean;
   message?: string;
-  targetStudentCount?: number;
-  candidateRecipientCount?: number;
-  recipientCount?: number;
-  duplicateExcludedCount?: number;
-  error?: string;
-};
-
-type BulkMessagePreviewResponse = {
   targetStudentCount?: number;
   candidateRecipientCount?: number;
   recipientCount?: number;
@@ -416,25 +403,16 @@ export function OperationsBoard({
       }));
 
       try {
-        const response = await fetch("/api/bulk-messages/preview", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        const payload = await fetchBulkMessagePreview(
+          {
             targetType: bulkTargetType,
             classId: bulkTargetType === "class" ? bulkClassId : undefined,
             gradeLabel: bulkTargetType === "grade" ? bulkGradeLabel : undefined,
             recipientType: bulkRecipientType,
             excludeDuplicateRecipients: bulkExcludeDuplicates,
-          }),
-          signal: controller.signal,
-        });
-        const payload = (await response.json()) as BulkMessagePreviewResponse;
-
-        if (!response.ok) {
-          throw new Error(payload.error ?? "전체문자 대상을 확인하지 못했습니다.");
-        }
+          },
+          controller.signal,
+        );
 
         setBulkPreviewState({
           status: "ready",
@@ -485,23 +463,14 @@ export function OperationsBoard({
 
     async function loadPreview() {
       try {
-        const response = await fetch("/api/messages/preview", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        const payload = await fetchMessagePreview(
+          {
             studentId: selectedStudentIdForPreview,
             reason: selectedReason,
             makeupCandidateTime,
-          }),
-          signal: controller.signal,
-        });
-        const payload = (await response.json()) as MessagePreviewResponse;
-
-        if (!response.ok || !payload.body) {
-          throw new Error(payload.error ?? "문자 미리보기를 만들지 못했습니다.");
-        }
+          },
+          controller.signal,
+        );
 
         setMessagePreview({
           key: nextMessageKey,

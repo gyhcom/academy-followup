@@ -20,6 +20,7 @@ import {
   getFollowupReasonForAttendanceStatus,
   type AttendanceStatus,
 } from "@/lib/attendance";
+import { fetchMessagePreview } from "@/lib/client/message-preview";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 import { getMessageLengthMetrics } from "@/lib/message-length";
 import {
@@ -134,12 +135,6 @@ type MessageSendState = {
   dryRun: boolean;
   message: string;
   error: string;
-};
-
-type MessagePreviewResponse = {
-  title?: string;
-  body?: string;
-  error?: string;
 };
 
 type CreateFollowupResponse = {
@@ -396,22 +391,13 @@ export function AttendanceBoard({
 
     async function loadPreview() {
       try {
-        const response = await fetch("/api/messages/preview", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        const payload = await fetchMessagePreview(
+          {
             studentId: target.student.id,
             reason: target.reason,
-          }),
-          signal: controller.signal,
-        });
-        const payload = (await response.json()) as MessagePreviewResponse;
-
-        if (!response.ok || !payload.body) {
-          throw new Error(payload.error ?? "문자 초안을 만들지 못했습니다.");
-        }
+          },
+          controller.signal,
+        );
 
         setMessagePreview({
           key: nextKey,
