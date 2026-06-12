@@ -611,7 +611,7 @@ export function AttendanceBoard({
 
       <AttendanceOverviewStrip overview={overview} />
 
-      <section className="grid gap-3 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start lg:gap-4 xl:grid-cols-[18rem_minmax(0,1fr)_22rem]">
+      <section className="grid gap-3 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start lg:gap-4 xl:grid-cols-[18rem_minmax(0,1.15fr)_24rem] 2xl:grid-cols-[20rem_minmax(0,1.25fr)_26rem]">
         <SessionList
           sessions={sessions}
           selectedSessionKey={selectedSession?.key ?? ""}
@@ -667,7 +667,7 @@ export function AttendanceBoard({
 
           {selectedSession ? (
             <div>
-              <div className="hidden grid-cols-[minmax(16rem,1fr)_5.5rem_7rem] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5">
+              <div className="hidden grid-cols-[minmax(18rem,1fr)_6.25rem_8rem] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5 xl:grid-cols-[minmax(20rem,1fr)_7rem_8.5rem]">
                 <span>학생</span>
                 <span>도착</span>
                 <span>상태</span>
@@ -1129,8 +1129,8 @@ function AttendanceStudentRow({
   const isExceptionStatus = !isPresent && !isPending;
 
   return (
-    <article className="px-3 py-2.5 sm:px-5 sm:py-3">
-      <div className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 sm:grid-cols-[2.25rem_minmax(0,1fr)_auto] sm:gap-3">
+    <article className="px-3 py-2.5 sm:px-5 sm:py-3 xl:py-2.5">
+      <div className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 sm:grid-cols-[2.25rem_minmax(0,1fr)_auto] sm:gap-3 xl:grid-cols-[2.25rem_minmax(0,1fr)_auto]">
         <span className="flex size-8 items-center justify-center rounded-full bg-stone-100 text-xs font-semibold text-stone-600 sm:size-9 sm:text-sm">
           {getStudentInitial(student.name)}
         </span>
@@ -1163,7 +1163,7 @@ function AttendanceStudentRow({
           />
         </div>
 
-        <div className="flex items-center justify-end gap-1">
+        <div className="flex items-center justify-end gap-1 xl:gap-1.5">
           <AttendanceArrivalToggle
             isPresent={isPresent}
             isSaving={isSaving}

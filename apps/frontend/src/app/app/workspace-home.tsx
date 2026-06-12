@@ -25,6 +25,8 @@ import {
 } from "@/lib/attendance";
 import type { AttendanceRecordItem } from "@/app/app/attendance-board";
 import type { OperationsClass, OperationsStudent } from "@/app/app/operations-board";
+import { getSortedActiveSchedules } from "@/app/app/operations-schedule";
+import { weekDayShortLabel } from "@/app/app/management-utils";
 import type { FollowupReason } from "@/lib/followup-templates";
 
 type WorkspaceView = "home" | "operations" | "attendance" | "management";
@@ -55,6 +57,15 @@ type WorkspaceHomeProps = {
 
 type FollowupFilter = "all" | "unsent" | "sent";
 type BlockedScheduleFilter = "all" | "shared" | "manual" | "personal";
+type PcStudentBoardFilter =
+  | "all"
+  | "unchecked"
+  | "present"
+  | "late"
+  | "absent"
+  | "needs_check"
+  | "attention"
+  | "makeup";
 
 type HomeFollowupItem = {
   key: string;
@@ -102,6 +113,21 @@ type HomeScheduleSummary = {
   totalCount: number;
 };
 
+type PcStudentBoardRow = {
+  key: string;
+  classId: string;
+  className: string;
+  subject: string | null;
+  gradeLabel: string | null;
+  student: OperationsStudent;
+  status: AttendanceStatus;
+  startTime: string;
+  endTime: string;
+  followupStatus: string | null;
+  followupSentAt: string | null;
+  hasBlockedSchedule: boolean;
+};
+
 const actionableStatuses: AttendanceStatus[] = [
   "needs_check",
   "late",
@@ -127,6 +153,8 @@ export function WorkspaceHome({
   onStudentSelect,
 }: WorkspaceHomeProps) {
   const [expandedFilter, setExpandedFilter] = useState<FollowupFilter | null>(null);
+  const [pcStudentFilter, setPcStudentFilter] = useState<PcStudentBoardFilter>("all");
+  const [selectedPcStudentKey, setSelectedPcStudentKey] = useState("");
   const followupItems = useMemo(
     () => buildHomeFollowupItems(classes, records),
     [classes, records],
@@ -142,6 +170,25 @@ export function WorkspaceHome({
   const sentCount = followupItems.filter((item) => item.followupStatus === "sent").length;
   const unsentCount = followupItems.length - sentCount;
   const filteredItems = getFilteredItems(followupItems, expandedFilter);
+  const pcStudentRows = useMemo(
+    () =>
+      buildPcStudentBoardRows({
+        classes,
+        records,
+        scheduleItems: selectedScheduleItems,
+        selectedDate,
+      }),
+    [classes, records, selectedScheduleItems, selectedDate],
+  );
+  const filteredPcStudentRows = useMemo(
+    () => filterPcStudentBoardRows(pcStudentRows, pcStudentFilter),
+    [pcStudentRows, pcStudentFilter],
+  );
+  const selectedPcStudent =
+    pcStudentRows.find((item) => item.key === selectedPcStudentKey) ??
+    filteredPcStudentRows[0] ??
+    pcStudentRows[0];
+  const pcBoardSummary = summarizePcStudentBoardRows(pcStudentRows);
   const copy = getRoleHomeCopy({ academyName, teacherName, role, roleLabel });
   const isStaffHome = role === "teacher" || role === "assistant";
   const isToday = selectedDate === getTodayDate();
@@ -151,7 +198,7 @@ export function WorkspaceHome({
   }
 
   return (
-    <section className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+    <section className="mx-auto max-w-6xl space-y-4 sm:space-y-5 xl:max-w-[82rem] 2xl:max-w-[88rem]">
       <MobileHomeExperience
         academyName={academyName}
         copy={copy}
@@ -174,7 +221,31 @@ export function WorkspaceHome({
         onStudentSelect={onStudentSelect}
       />
 
-      <section className="hidden border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:block sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-5 sm:shadow-sm">
+      <PcOperationsDashboard
+        academyName={academyName}
+        copy={copy}
+        canManage={canManage}
+        selectedDate={selectedDate}
+        loadState={loadState}
+        scheduleItems={selectedScheduleItems}
+        scheduleSummary={selectedScheduleSummary}
+        isStaffHome={isStaffHome}
+        followupItems={followupItems}
+        unsentCount={unsentCount}
+        sentCount={sentCount}
+        studentRows={pcStudentRows}
+        filteredStudentRows={filteredPcStudentRows}
+        selectedStudentRow={selectedPcStudent}
+        studentFilter={pcStudentFilter}
+        boardSummary={pcBoardSummary}
+        onDateChange={onDateChange}
+        onNavigate={onNavigate}
+        onStudentSelect={onStudentSelect}
+        onStudentFilterChange={setPcStudentFilter}
+        onPcStudentSelect={setSelectedPcStudentKey}
+      />
+
+      <section className="hidden border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:block sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-5 sm:shadow-sm xl:hidden">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-[#315C7C]">{academyName}</p>
@@ -195,7 +266,7 @@ export function WorkspaceHome({
 
       <section
         aria-label="주요 바로가기"
-        className="hidden overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm sm:block"
+        className="hidden overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm sm:block xl:hidden"
       >
         <HomeActionButton
           icon={<MessageSquareText size={18} />}
@@ -220,7 +291,7 @@ export function WorkspaceHome({
       </section>
 
       <TodayScheduleSection
-        className="hidden sm:block"
+        className="hidden sm:block xl:hidden"
         items={selectedScheduleItems}
         summary={selectedScheduleSummary}
         selectedDate={selectedDate}
@@ -228,7 +299,7 @@ export function WorkspaceHome({
         onNavigate={onNavigate}
       />
 
-      <section className="hidden overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm sm:block">
+      <section className="hidden overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm sm:block xl:hidden">
         <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-semibold text-[#315C7C]">
@@ -319,6 +390,608 @@ export function WorkspaceHome({
         ) : null}
       </section>
     </section>
+  );
+}
+
+function PcOperationsDashboard({
+  academyName,
+  copy,
+  canManage,
+  selectedDate,
+  loadState,
+  scheduleItems,
+  scheduleSummary,
+  isStaffHome,
+  followupItems,
+  unsentCount,
+  sentCount,
+  studentRows,
+  filteredStudentRows,
+  selectedStudentRow,
+  studentFilter,
+  boardSummary,
+  onDateChange,
+  onNavigate,
+  onStudentSelect,
+  onStudentFilterChange,
+  onPcStudentSelect,
+}: {
+  academyName: string;
+  copy: { title: string; description: string };
+  canManage: boolean;
+  selectedDate: string;
+  loadState: {
+    status: "idle" | "loading" | "error";
+    error: string;
+  };
+  scheduleItems: HomeScheduleItem[];
+  scheduleSummary: HomeScheduleSummary;
+  isStaffHome: boolean;
+  followupItems: HomeFollowupItem[];
+  unsentCount: number;
+  sentCount: number;
+  studentRows: PcStudentBoardRow[];
+  filteredStudentRows: PcStudentBoardRow[];
+  selectedStudentRow: PcStudentBoardRow | undefined;
+  studentFilter: PcStudentBoardFilter;
+  boardSummary: ReturnType<typeof summarizePcStudentBoardRows>;
+  onDateChange: (date: string) => void;
+  onNavigate: (view: WorkspaceView) => void;
+  onStudentSelect: (selection: {
+    classId: string;
+    studentId: string;
+    reason: FollowupReason;
+  }) => void;
+  onStudentFilterChange: (filter: PcStudentBoardFilter) => void;
+  onPcStudentSelect: (key: string) => void;
+}) {
+  const academyItems = scheduleItems.filter(isAcademyScheduleItem);
+  const blockedItems = scheduleItems.filter(isBlockedScheduleItem);
+  const recentAttentionItems = followupItems.slice(0, 4);
+
+  return (
+    <div className="hidden xl:block">
+      <section className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-end">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[#315C7C]">{academyName}</p>
+            <h2 className="mt-2 text-3xl font-semibold leading-tight text-stone-950">
+              {copy.title}
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-600">
+              {copy.description}
+            </p>
+          </div>
+          <HomeDateControl value={selectedDate} onChange={onDateChange} />
+        </div>
+
+        <div className="mt-5 grid grid-cols-5 overflow-hidden rounded-lg border border-stone-200 bg-stone-50">
+          <PcKpi label="오늘 수업" value={`${scheduleSummary.academyScheduleCount}개`} />
+          <PcKpi label="학생 체크" value={`${studentRows.length}명`} />
+          <PcKpi label="체크 필요" value={`${boardSummary.unchecked}명`} tone="warning" />
+          <PcKpi label="연락 필요" value={`${boardSummary.attention}명`} tone="danger" />
+          <PcKpi label="보강 제외" value={`${scheduleSummary.blockedScheduleCount}건`} tone="muted" />
+        </div>
+      </section>
+
+      <section className="mt-5 grid gap-4 xl:grid-cols-[18rem_minmax(0,1fr)_24rem] xl:items-start">
+        <aside className="space-y-4">
+          <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
+            <div className="border-b border-stone-200 px-4 py-3">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-sm font-semibold text-stone-950">
+                    {isStaffHome ? "오늘 담당 수업" : "오늘 학원 수업"}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-stone-500">수업을 누르면 출석부로 이동합니다.</p>
+                </div>
+                <span className="rounded-full bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-600">
+                  {academyItems.length}개
+                </span>
+              </div>
+            </div>
+            <div className="max-h-[28rem] divide-y divide-stone-100 overflow-y-auto">
+              {academyItems.length > 0 ? (
+                academyItems.map((item) => (
+                  <PcScheduleButton key={item.id} item={item} onNavigate={onNavigate} />
+                ))
+              ) : (
+                <p className="px-4 py-5 text-sm leading-6 text-stone-500">
+                  이 날짜에는 표시할 수업이 없습니다.
+                </p>
+              )}
+            </div>
+          </section>
+
+          <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
+            <div className="border-b border-stone-200 px-4 py-3">
+              <h3 className="text-sm font-semibold text-stone-950">업무 바로가기</h3>
+            </div>
+            <HomeActionButton
+              icon={<ClipboardCheck size={18} />}
+              title="출석부 열기"
+              description="도착·지각·예외를 바로 처리합니다."
+              onClick={() => onNavigate("attendance")}
+            />
+            <HomeActionButton
+              icon={<MessageSquareText size={18} />}
+              title="문자 화면 열기"
+              description="학생 확인과 연락 기록을 처리합니다."
+              onClick={() => onNavigate("operations")}
+            />
+            {canManage ? (
+              <HomeActionButton
+                icon={<Settings size={18} />}
+                title="관리 화면"
+                description="학생, 반, 직원 설정을 확인합니다."
+                onClick={() => onNavigate("management")}
+              />
+            ) : null}
+          </section>
+        </aside>
+
+        <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
+          <div className="border-b border-stone-200 px-4 py-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-base font-semibold text-stone-950">
+                  {isStaffHome ? "담당 학생 현황" : "오늘 학생 체크 보드"}
+                </h3>
+                <p className="mt-1 text-xs text-stone-500">
+                  학생을 누르면 오른쪽에서 수업, 연락, 보강 제외 일정을 확인합니다.
+                </p>
+              </div>
+              {loadState.status === "loading" ? (
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-500">
+                  <Loader2 size={13} className="animate-spin" />
+                  불러오는 중
+                </span>
+              ) : null}
+            </div>
+            <PcStudentFilterBar
+              value={studentFilter}
+              summary={boardSummary}
+              totalCount={studentRows.length}
+              onChange={onStudentFilterChange}
+            />
+            {loadState.status === "error" ? (
+              <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-900">
+                {loadState.error}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="grid grid-cols-[minmax(8rem,1fr)_7rem_8rem_7rem_7rem] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500">
+            <span>학생</span>
+            <span>수업 시간</span>
+            <span>반</span>
+            <span>출석</span>
+            <span>연락</span>
+          </div>
+          <div className="max-h-[38rem] divide-y divide-stone-100 overflow-y-auto">
+            {filteredStudentRows.length > 0 ? (
+              filteredStudentRows.map((row) => (
+                <PcStudentBoardRowItem
+                  key={row.key}
+                  row={row}
+                  isSelected={row.key === selectedStudentRow?.key}
+                  onClick={() => onPcStudentSelect(row.key)}
+                />
+              ))
+            ) : (
+              <div className="px-4 py-10 text-center text-sm leading-6 text-stone-500">
+                선택한 조건에 해당하는 학생이 없습니다. 필터를 바꿔 확인해 주세요.
+              </div>
+            )}
+          </div>
+        </section>
+
+        <PcStudentDetailPanel
+          selectedDate={selectedDate}
+          row={selectedStudentRow}
+          blockedItems={blockedItems}
+          recentAttentionItems={recentAttentionItems}
+          sentCount={sentCount}
+          unsentCount={unsentCount}
+          onNavigate={onNavigate}
+          onStudentSelect={onStudentSelect}
+        />
+      </section>
+    </div>
+  );
+}
+
+function PcKpi({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: string;
+  tone?: "default" | "warning" | "danger" | "muted";
+}) {
+  const toneClass = {
+    default: "text-stone-950",
+    warning: "text-amber-800",
+    danger: "text-red-700",
+    muted: "text-[#315C7C]",
+  }[tone];
+
+  return (
+    <div className="border-r border-stone-200 px-4 py-3 last:border-r-0">
+      <p className="text-xs font-medium text-stone-500">{label}</p>
+      <p className={`mt-1 text-xl font-semibold tabular-nums ${toneClass}`}>{value}</p>
+    </div>
+  );
+}
+
+function PcScheduleButton({
+  item,
+  onNavigate,
+}: {
+  item: HomeScheduleItem;
+  onNavigate: (view: WorkspaceView) => void;
+}) {
+  const content = (
+    <>
+      <span className="w-[4.4rem] shrink-0">
+        <span className="block text-sm font-black tabular-nums text-stone-950">
+          {item.startTime}
+        </span>
+        <span className="block text-xs font-semibold tabular-nums text-stone-400">
+          {item.endTime}
+        </span>
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-semibold text-stone-950">
+          {item.title}
+        </span>
+        <span className="mt-0.5 block truncate text-xs text-stone-500">
+          {item.subtitle}
+          {item.studentCount ? ` · ${item.studentCount}명` : ""}
+        </span>
+      </span>
+      <span className="rounded-full bg-stone-950 px-2.5 py-1 text-[11px] font-semibold text-white">
+        출석
+      </span>
+    </>
+  );
+
+  if (!item.canOpenAttendance) {
+    return <div className="flex min-h-[4.25rem] items-center gap-3 px-4 py-3">{content}</div>;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onNavigate("attendance")}
+      className="flex min-h-[4.25rem] w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]"
+    >
+      {content}
+    </button>
+  );
+}
+
+function PcStudentFilterBar({
+  value,
+  summary,
+  totalCount,
+  onChange,
+}: {
+  value: PcStudentBoardFilter;
+  summary: ReturnType<typeof summarizePcStudentBoardRows>;
+  totalCount: number;
+  onChange: (filter: PcStudentBoardFilter) => void;
+}) {
+  const options: Array<{ value: PcStudentBoardFilter; label: string; count: number }> = [
+    { value: "all", label: "전체", count: totalCount },
+    { value: "unchecked", label: "체크 필요", count: summary.unchecked },
+    { value: "present", label: "도착", count: summary.present },
+    { value: "late", label: "지각", count: summary.late },
+    { value: "absent", label: "결석", count: summary.absent },
+    { value: "needs_check", label: "확인 필요", count: summary.needsCheck },
+    { value: "attention", label: "연락 필요", count: summary.attention },
+    { value: "makeup", label: "보강 예정", count: summary.makeup },
+  ];
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-1.5" aria-label="학생 상태 필터">
+      {options.map((option) => {
+        const isSelected = value === option.value;
+
+        return (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={isSelected}
+            onClick={() => onChange(option.value)}
+            className={[
+              "inline-flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+              isSelected
+                ? "border-stone-950 bg-stone-950 text-white"
+                : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50",
+            ].join(" ")}
+          >
+            {option.label}
+            <span
+              className={[
+                "rounded-full px-1.5 py-0.5 tabular-nums",
+                isSelected ? "bg-white/15 text-white" : "bg-stone-100 text-stone-500",
+              ].join(" ")}
+            >
+              {option.count}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function PcStudentBoardRowItem({
+  row,
+  isSelected,
+  onClick,
+}: {
+  row: PcStudentBoardRow;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  const isSent = row.followupStatus === "sent";
+  const needsContact = isAttentionStatus(row.status) && !isSent;
+
+  return (
+    <button
+      type="button"
+      aria-pressed={isSelected}
+      onClick={onClick}
+      className={[
+        "grid min-h-[3.8rem] w-full grid-cols-[minmax(8rem,1fr)_7rem_8rem_7rem_7rem] items-center gap-3 px-4 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]",
+        isSelected ? "bg-[#F3F8FC]" : "bg-white hover:bg-stone-50",
+      ].join(" ")}
+    >
+      <span className="min-w-0">
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="truncate text-sm font-semibold text-stone-950">
+            {row.student.name}
+          </span>
+          {row.hasBlockedSchedule ? (
+            <span className="shrink-0 rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-semibold text-violet-800">
+              보강 제외
+            </span>
+          ) : null}
+        </span>
+        <span className="mt-0.5 block truncate text-xs text-stone-500">
+          {[row.student.schoolName, row.student.gradeLabel].filter(Boolean).join(" · ") ||
+            "학년 정보 없음"}
+        </span>
+      </span>
+      <span className="text-xs font-semibold tabular-nums text-stone-700">
+        {row.startTime}-{row.endTime}
+      </span>
+      <span className="truncate text-xs text-stone-600">{row.className}</span>
+      <span
+        className={[
+          "w-fit rounded-full px-2 py-1 text-[11px] font-semibold",
+          statusTone(row.status),
+        ].join(" ")}
+      >
+        {attendanceDisplayLabel(row.status)}
+      </span>
+      <span
+        className={[
+          "w-fit rounded-full px-2 py-1 text-[11px] font-semibold",
+          isSent
+            ? "bg-emerald-50 text-emerald-800"
+            : needsContact
+            ? "bg-amber-50 text-amber-800"
+            : "bg-stone-100 text-stone-600",
+        ].join(" ")}
+      >
+        {isSent ? "연락 완료" : needsContact ? "연락 필요" : "대기"}
+      </span>
+    </button>
+  );
+}
+
+function PcStudentDetailPanel({
+  selectedDate,
+  row,
+  blockedItems,
+  recentAttentionItems,
+  sentCount,
+  unsentCount,
+  onNavigate,
+  onStudentSelect,
+}: {
+  selectedDate: string;
+  row: PcStudentBoardRow | undefined;
+  blockedItems: HomeScheduleItem[];
+  recentAttentionItems: HomeFollowupItem[];
+  sentCount: number;
+  unsentCount: number;
+  onNavigate: (view: WorkspaceView) => void;
+  onStudentSelect: (selection: {
+    classId: string;
+    studentId: string;
+    reason: FollowupReason;
+  }) => void;
+}) {
+  const studentBlockedItems = row
+    ? blockedItems.filter((item) => item.studentId === row.student.id)
+    : [];
+  const studentSchedules = row ? getSortedActiveSchedules(row.student.schedules).slice(0, 5) : [];
+
+  return (
+    <aside className="sticky top-4 space-y-4">
+      <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
+        <div className="border-b border-stone-200 px-4 py-3">
+          <h3 className="text-sm font-semibold text-stone-950">선택 학생 상세</h3>
+          <p className="mt-0.5 text-xs text-stone-500">
+            수업, 연락 상태, 보강 제외 시간을 함께 확인합니다.
+          </p>
+        </div>
+
+        {row ? (
+          <div className="space-y-4 px-4 py-4">
+            <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-lg font-semibold text-stone-950">
+                    {row.student.name}
+                  </p>
+                  <p className="mt-1 truncate text-sm text-stone-500">
+                    {[row.student.schoolName, row.student.gradeLabel].filter(Boolean).join(" · ") ||
+                      "학년 정보 없음"}
+                  </p>
+                </div>
+                <span
+                  className={[
+                    "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
+                    statusTone(row.status),
+                  ].join(" ")}
+                >
+                  {attendanceDisplayLabel(row.status)}
+                </span>
+              </div>
+              <p className="mt-3 rounded-md bg-stone-50 px-3 py-2 text-sm leading-6 text-stone-700">
+                {formatHomeDate(selectedDate)} · {row.startTime}-{row.endTime} ·{" "}
+                {row.className}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => onNavigate("attendance")}
+                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
+              >
+                출석부로 이동
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  row
+                    ? onStudentSelect({
+                        classId: row.classId,
+                        studentId: row.student.id,
+                        reason: followupReasonForStatus(row.status),
+                      })
+                    : undefined
+                }
+                className="min-h-10 rounded-md bg-[#315C7C] px-3 text-sm font-semibold text-white transition hover:bg-[#244B67]"
+              >
+                문자 화면
+              </button>
+            </div>
+
+            <DetailBlock title="주간 스케줄">
+              {studentSchedules.length > 0 ? (
+                <div className="space-y-2">
+                  {studentSchedules.map((schedule) => (
+                    <div
+                      key={schedule.id}
+                      className="rounded-md border border-stone-200 bg-stone-50 px-3 py-2"
+                    >
+                      <p className="text-xs font-semibold text-stone-500">
+                        {weekDayShortLabel(schedule.dayOfWeek)} · {schedule.startTime}-
+                        {schedule.endTime}
+                      </p>
+                      <p className="mt-0.5 truncate text-sm font-semibold text-stone-900">
+                        {schedule.title}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-stone-500">등록된 주간 스케줄이 없습니다.</p>
+              )}
+            </DetailBlock>
+
+            <DetailBlock title="보강 제외 일정">
+              {studentBlockedItems.length > 0 ? (
+                <div className="space-y-2">
+                  {studentBlockedItems.map((item) => (
+                    <div key={item.id} className="rounded-md border border-violet-100 bg-violet-50 px-3 py-2">
+                      <p className="text-xs font-semibold text-violet-800">
+                        {item.startTime}-{item.endTime} · {getBlockedScheduleBadgeLabel(item)}
+                      </p>
+                      <p className="mt-0.5 truncate text-sm font-semibold text-stone-900">
+                        {getBlockedScheduleDetail(item)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-stone-500">오늘 보강 제외 일정이 없습니다.</p>
+              )}
+            </DetailBlock>
+          </div>
+        ) : (
+          <div className="px-4 py-8 text-center text-sm text-stone-500">
+            왼쪽 학생 보드에서 학생을 선택해 주세요.
+          </div>
+        )}
+      </section>
+
+      <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
+        <div className="border-b border-stone-200 px-4 py-3">
+          <h3 className="text-sm font-semibold text-stone-950">오늘 연락 큐</h3>
+          <p className="mt-0.5 text-xs text-stone-500">
+            미발송 {unsentCount}명 · 발송 완료 {sentCount}명
+          </p>
+        </div>
+        <div className="divide-y divide-stone-100">
+          {recentAttentionItems.length > 0 ? (
+            recentAttentionItems.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() =>
+                  onStudentSelect({
+                    classId: item.classId,
+                    studentId: item.student.id,
+                    reason: followupReasonForStatus(item.status),
+                  })
+                }
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-stone-50"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-stone-950">
+                    {item.student.name}
+                  </span>
+                  <span className="mt-0.5 block truncate text-xs text-stone-500">
+                    {item.className} · {attendanceStatusLabels[item.status]}
+                  </span>
+                </span>
+                <ArrowRight size={14} className="shrink-0 text-stone-400" />
+              </button>
+            ))
+          ) : (
+            <p className="px-4 py-5 text-sm leading-6 text-stone-500">
+              아직 연락 큐에 표시할 학생이 없습니다.
+            </p>
+          )}
+        </div>
+      </section>
+    </aside>
+  );
+}
+
+function DetailBlock({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <div>
+      <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+        {title}
+      </h4>
+      {children}
+    </div>
   );
 }
 
@@ -1475,6 +2148,138 @@ function buildHomeFollowupItems(
     });
 }
 
+function buildPcStudentBoardRows({
+  classes,
+  records,
+  scheduleItems,
+  selectedDate,
+}: {
+  classes: OperationsClass[];
+  records: AttendanceRecordItem[];
+  scheduleItems: HomeScheduleItem[];
+  selectedDate: string;
+}): PcStudentBoardRow[] {
+  const classMap = new Map(classes.map((classItem) => [classItem.id, classItem]));
+  const blockedStudentIds = new Set(
+    scheduleItems
+      .filter(isBlockedScheduleItem)
+      .map((item) => item.studentId)
+      .filter((studentId): studentId is string => Boolean(studentId)),
+  );
+
+  return scheduleItems
+    .filter((item) => item.canOpenAttendance && item.classId)
+    .flatMap((item) => {
+      const classItem = classMap.get(item.classId ?? "");
+
+      if (!classItem) {
+        return [];
+      }
+
+      return classItem.students.map((student) => {
+        const record = records.find(
+          (candidate) =>
+            candidate.attendanceDate === selectedDate &&
+            candidate.classId === classItem.id &&
+            candidate.studentId === student.id &&
+            candidate.scheduledStartTime === item.startTime &&
+            candidate.scheduledEndTime === item.endTime,
+        );
+        const status = isAttendanceStatus(record?.status)
+          ? (record?.status as AttendanceStatus)
+          : "pending";
+
+        return {
+          key: `${item.id}:${student.id}`,
+          classId: classItem.id,
+          className: classItem.name,
+          subject: classItem.subject,
+          gradeLabel: classItem.gradeLabel,
+          student,
+          status,
+          startTime: item.startTime,
+          endTime: item.endTime,
+          followupStatus: record?.followupStatus ?? null,
+          followupSentAt: record?.followupSentAt ?? null,
+          hasBlockedSchedule: blockedStudentIds.has(student.id),
+        };
+      });
+    })
+    .sort(
+      (first, second) =>
+        first.startTime.localeCompare(second.startTime) ||
+        first.className.localeCompare(second.className, "ko") ||
+        first.student.name.localeCompare(second.student.name, "ko"),
+    );
+}
+
+function summarizePcStudentBoardRows(rows: PcStudentBoardRow[]) {
+  const summary = {
+    unchecked: 0,
+    present: 0,
+    late: 0,
+    absent: 0,
+    needsCheck: 0,
+    makeup: 0,
+    attention: 0,
+  };
+
+  rows.forEach((row) => {
+    if (row.status === "pending") {
+      summary.unchecked += 1;
+    }
+
+    if (row.status === "present") {
+      summary.present += 1;
+    }
+
+    if (row.status === "late") {
+      summary.late += 1;
+    }
+
+    if (row.status === "absent") {
+      summary.absent += 1;
+    }
+
+    if (row.status === "needs_check") {
+      summary.needsCheck += 1;
+    }
+
+    if (row.status === "makeup") {
+      summary.makeup += 1;
+    }
+
+    if (isAttentionStatus(row.status) && row.followupStatus !== "sent") {
+      summary.attention += 1;
+    }
+  });
+
+  return summary;
+}
+
+function filterPcStudentBoardRows(
+  rows: PcStudentBoardRow[],
+  filter: PcStudentBoardFilter,
+) {
+  if (filter === "all") {
+    return rows;
+  }
+
+  if (filter === "unchecked") {
+    return rows.filter((row) => row.status === "pending");
+  }
+
+  if (filter === "attention") {
+    return rows.filter((row) => isAttentionStatus(row.status) && row.followupStatus !== "sent");
+  }
+
+  if (filter === "needs_check") {
+    return rows.filter((row) => row.status === "needs_check");
+  }
+
+  return rows.filter((row) => row.status === filter);
+}
+
 function filterScheduleItemsForDate(items: HomeScheduleItem[], dateValue: string) {
   const dayOfWeek = getDayOfWeek(dateValue);
 
@@ -1620,6 +2425,18 @@ function statusTone(status: AttendanceStatus) {
   }
 
   return "bg-violet-50 text-violet-800";
+}
+
+function attendanceDisplayLabel(status: AttendanceStatus) {
+  if (status === "pending") {
+    return "체크 필요";
+  }
+
+  return attendanceStatusLabels[status];
+}
+
+function isAttentionStatus(status: AttendanceStatus) {
+  return status === "late" || status === "absent" || status === "needs_check";
 }
 
 function scheduleTypeLabel(scheduleType: string) {
