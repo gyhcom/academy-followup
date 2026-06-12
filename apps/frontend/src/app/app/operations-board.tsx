@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
+import { sendBulkMessage } from "@/lib/client/bulk-message-send";
 import { fetchBulkMessagePreview } from "@/lib/client/bulk-message-preview";
 import { createFollowup, fetchFollowupHistory } from "@/lib/client/followups";
 import { saveStudentSchedule } from "@/lib/client/management-api";
@@ -112,16 +113,6 @@ type BulkMessagePreviewState = {
   candidateRecipientCount: number;
   recipientCount: number;
   duplicateExcludedCount: number;
-};
-
-type BulkMessageResponse = {
-  dryRun?: boolean;
-  message?: string;
-  targetStudentCount?: number;
-  candidateRecipientCount?: number;
-  recipientCount?: number;
-  duplicateExcludedCount?: number;
-  error?: string;
 };
 
 type MakeupScheduleSaveState = {
@@ -662,25 +653,14 @@ export function OperationsBoard({
     });
 
     try {
-      const response = await fetch("/api/bulk-messages/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          targetType: bulkTargetType,
-          classId: bulkTargetType === "class" ? bulkClassId : undefined,
-          gradeLabel: bulkTargetType === "grade" ? bulkGradeLabel : undefined,
-          recipientType: bulkRecipientType,
-          messageBody: normalizedBody,
-          excludeDuplicateRecipients: bulkExcludeDuplicates,
-        }),
+      const payload = await sendBulkMessage({
+        targetType: bulkTargetType,
+        classId: bulkTargetType === "class" ? bulkClassId : undefined,
+        gradeLabel: bulkTargetType === "grade" ? bulkGradeLabel : undefined,
+        recipientType: bulkRecipientType,
+        messageBody: normalizedBody,
+        excludeDuplicateRecipients: bulkExcludeDuplicates,
       });
-      const payload = (await response.json()) as BulkMessageResponse;
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "전체문자를 처리하지 못했습니다.");
-      }
 
       setBulkMessageState({
         status: "sent",
