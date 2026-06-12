@@ -26,6 +26,7 @@ import {
   type AttendanceRecordItem as AttendanceClientRecordItem,
 } from "@/lib/client/attendance";
 import { createFollowup, fetchFollowupHistory } from "@/lib/client/followups";
+import { sendFollowupMessage } from "@/lib/client/message-send";
 import { fetchMessagePreview } from "@/lib/client/message-preview";
 import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
 import { getMessageLengthMetrics } from "@/lib/message-length";
@@ -120,14 +121,6 @@ type MessageSendState = {
   dryRun: boolean;
   message: string;
   error: string;
-};
-
-type SendMessageResponse = {
-  dryRun?: boolean;
-  message?: string;
-  recipientPhone?: string;
-  followupId?: string;
-  error?: string;
 };
 
 const editableStatuses: AttendanceStatus[] = [
@@ -559,24 +552,7 @@ export function AttendanceBoard({
     });
 
     try {
-      const response = await fetch("/api/messages/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          followupId: savedFollowupId,
-        }),
-      });
-      const payload = (await response.json()) as SendMessageResponse;
-
-      if (!response.ok) {
-        throw new Error(
-          response.status === 403
-            ? "발송 권한이 없습니다. 담당 반 또는 발송 권한을 확인해 주세요."
-            : payload.error ?? "문자를 발송하지 못했습니다.",
-        );
-      }
+      const payload = await sendFollowupMessage(savedFollowupId);
 
       setMessageSend({
         followupId: savedFollowupId,
