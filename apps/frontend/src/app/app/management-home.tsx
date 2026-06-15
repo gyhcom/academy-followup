@@ -79,6 +79,14 @@ type ManagementSection =
   | "reports"
   | "history";
 
+type ManagementNavigateView =
+  | "home"
+  | "operations"
+  | "attendance"
+  | "students"
+  | "reports"
+  | "management";
+
 export function ManagementHome({
   academyName,
   classes,
@@ -88,6 +96,7 @@ export function ManagementHome({
   templates,
   auditLogs,
   attendanceSessionCount,
+  initialSection = "setup",
   onNavigate,
 }: {
   academyName: string;
@@ -98,7 +107,8 @@ export function ManagementHome({
   templates: ManagementMessageTemplate[];
   auditLogs: ManagementAuditLog[];
   attendanceSessionCount: number;
-  onNavigate: (view: "home" | "operations" | "attendance" | "management") => void;
+  initialSection?: ManagementSection;
+  onNavigate: (view: ManagementNavigateView) => void;
 }) {
   const router = useRouter();
   const [classForm, setClassForm] = useState<ClassFormState | null>(null);
@@ -176,7 +186,9 @@ export function ManagementHome({
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     students[0]?.id ?? null,
   );
-  const [activeSection, setActiveSection] = useState<ManagementSection>("setup");
+  const [activeSection, setActiveSection] =
+    useState<ManagementSection>(initialSection);
+
   const activeStudents = useMemo(
     () => students.filter((student) => student.status === "active"),
     [students],

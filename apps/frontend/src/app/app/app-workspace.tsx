@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
+  BarChart3,
   ClipboardCheck,
   Home,
   MessageSquareText,
   Settings,
+  UsersRound,
 } from "lucide-react";
 import {
   AttendanceBoard,
@@ -84,7 +86,13 @@ type AppWorkspaceProps = {
   managementAuditLogs: ManagementAuditLog[];
 };
 
-type WorkspaceView = "home" | "operations" | "attendance" | "management";
+type WorkspaceView =
+  | "home"
+  | "operations"
+  | "attendance"
+  | "students"
+  | "reports"
+  | "management";
 
 type OperationsSelection = {
   classId: string;
@@ -143,7 +151,7 @@ export function AppWorkspace({
   }>({ status: "idle", error: "" });
   const [operationsSelection, setOperationsSelection] =
     useState<OperationsSelection | null>(null);
-  const visibleView = !canManage && activeView === "management" ? "home" : activeView;
+  const visibleView = normalizeWorkspaceView(activeView, canManage);
 
   useEffect(() => {
     function syncVisualViewportHeight() {
@@ -269,6 +277,7 @@ export function AppWorkspace({
         />
       ) : (
         <ManagementHome
+          key={visibleView}
           academyName={academyName}
           classes={managementClasses}
           members={managementMembers}
@@ -277,6 +286,7 @@ export function AppWorkspace({
           templates={managementTemplates}
           auditLogs={managementAuditLogs}
           attendanceSessionCount={attendanceSessionCount}
+          initialSection={getManagementInitialSection(visibleView)}
           onNavigate={handleViewChange}
         />
       )}
@@ -285,11 +295,23 @@ export function AppWorkspace({
 }
 
 function normalizeWorkspaceView(view: WorkspaceView, canManage: boolean): WorkspaceView {
-  if (!canManage && view === "management") {
+  if (!canManage && ["students", "reports", "management"].includes(view)) {
     return "home";
   }
 
   return view;
+}
+
+function getManagementInitialSection(view: WorkspaceView) {
+  if (view === "students") {
+    return "students";
+  }
+
+  if (view === "reports") {
+    return "reports";
+  }
+
+  return "setup";
 }
 
 function getDayOfWeek(dateValue: string) {
@@ -312,46 +334,155 @@ function WorkspaceNavigation({
   canManage: boolean;
   onChange: (view: WorkspaceView) => void;
 }) {
+  const navItems = getWorkspaceNavItems(canManage);
+  const mobileItems = navItems.filter((item) => item.showOnMobile);
+  const shellLabel = canManage ? "학원 운영 콘솔" : "수업 처리 도구";
+  const shellDescription = canManage
+    ? "PC에서는 학생 명단과 리포트까지 바로 접근합니다."
+    : "담당 수업 출석과 연락 처리만 빠르게 사용합니다.";
+
   return (
-    <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[#DED8CE] bg-white/95 px-3 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:static sm:w-auto sm:max-w-none sm:rounded-lg sm:border sm:bg-white sm:p-2 sm:shadow-sm">
-      <div className={["grid gap-1.5", canManage ? "grid-cols-4" : "grid-cols-3"].join(" ")}>
-        <WorkspaceNavButton
-          icon={<Home size={17} />}
-          label="홈"
-          shortLabel="홈"
-          description="오늘 요약"
-          isActive={activeView === "home"}
-          onClick={() => onChange("home")}
-        />
-        <WorkspaceNavButton
-          icon={<ClipboardCheck size={17} />}
-          label="출석부"
-          shortLabel="출석"
-          description="도착·지각 체크"
-          isActive={activeView === "attendance"}
-          onClick={() => onChange("attendance")}
-        />
-        <WorkspaceNavButton
-          icon={<MessageSquareText size={17} />}
-          label="문자 보내기"
-          shortLabel="문자"
-          description="수업 후 연락"
-          isActive={activeView === "operations"}
-          onClick={() => onChange("operations")}
-        />
-        {canManage ? (
-          <WorkspaceNavButton
-            icon={<Settings size={17} />}
-            label="관리"
-            shortLabel="관리"
-            description="학생·반·구성원"
-            isActive={activeView === "management"}
-            onClick={() => onChange("management")}
-          />
-        ) : null}
-      </div>
-    </section>
+    <>
+      <section className="hidden overflow-hidden rounded-xl border border-[#DED8CE] bg-white shadow-sm sm:block">
+        <div className="flex flex-col gap-2 px-3 py-2 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-[#315C7C]">{shellLabel}</p>
+            <p className="mt-0.5 hidden text-xs text-stone-500 lg:block">
+              {shellDescription}
+            </p>
+          </div>
+
+          <nav
+            aria-label={shellLabel}
+            className="grid gap-1.5 md:grid-cols-3 lg:flex lg:items-center"
+          >
+            {navItems.map((item) => (
+              <WorkspaceNavButton
+                key={item.view}
+                icon={item.icon}
+                label={item.label}
+                shortLabel={item.shortLabel}
+                description={item.description}
+                isActive={activeView === item.view}
+                variant="desktop"
+                onClick={() => onChange(item.view)}
+              />
+            ))}
+          </nav>
+        </div>
+      </section>
+
+      <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[#DED8CE] bg-white/95 px-3 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:hidden">
+        <nav
+          aria-label={shellLabel}
+          className={["grid gap-1.5", getMobileGridClass(mobileItems.length)].join(" ")}
+        >
+          {mobileItems.map((item) => (
+            <WorkspaceNavButton
+              key={item.view}
+              icon={item.icon}
+              label={item.label}
+              shortLabel={item.shortLabel}
+              description={item.description}
+              isActive={activeView === item.view}
+              variant="mobile"
+              onClick={() => onChange(item.view)}
+            />
+          ))}
+        </nav>
+      </section>
+    </>
   );
+}
+
+function getWorkspaceNavItems(canManage: boolean) {
+  const baseItems: Array<{
+    view: WorkspaceView;
+    icon: ReactNode;
+    label: string;
+    shortLabel: string;
+    description: string;
+    showOnMobile: boolean;
+  }> = [
+    {
+      view: "home",
+      icon: <Home size={17} />,
+      label: canManage ? "운영 홈" : "홈",
+      shortLabel: "홈",
+      description: canManage ? "오늘 운영 현황" : "담당 수업 요약",
+      showOnMobile: true,
+    },
+    {
+      view: "attendance",
+      icon: <ClipboardCheck size={17} />,
+      label: "출석부",
+      shortLabel: "출석",
+      description: "도착·지각 체크",
+      showOnMobile: true,
+    },
+  ];
+
+  if (canManage) {
+    return [
+      ...baseItems,
+      {
+        view: "students" as const,
+        icon: <UsersRound size={17} />,
+        label: "학생 명단",
+        shortLabel: "학생",
+        description: "학생·반·스케줄",
+        showOnMobile: true,
+      },
+      {
+        view: "operations" as const,
+        icon: <MessageSquareText size={17} />,
+        label: "문자",
+        shortLabel: "문자",
+        description: "연락 기록·발송",
+        showOnMobile: true,
+      },
+      {
+        view: "reports" as const,
+        icon: <BarChart3 size={17} />,
+        label: "리포트",
+        shortLabel: "리포트",
+        description: "운영 기록·CSV",
+        showOnMobile: false,
+      },
+      {
+        view: "management" as const,
+        icon: <Settings size={17} />,
+        label: "관리",
+        shortLabel: "관리",
+        description: "직원·정책·설정",
+        showOnMobile: true,
+      },
+    ];
+  }
+
+  return [
+    ...baseItems,
+    {
+      view: "operations" as const,
+      icon: <MessageSquareText size={17} />,
+      label: "문자",
+      shortLabel: "문자",
+      description: "수업 후 연락",
+      showOnMobile: true,
+    },
+  ];
+}
+
+function getMobileGridClass(itemCount: number) {
+  if (itemCount >= 5) {
+    return "grid-cols-5";
+  }
+
+  if (itemCount === 4) {
+    return "grid-cols-4";
+  }
+
+  return "grid-cols-3";
 }
 
 function WorkspaceNavButton({
@@ -361,6 +492,7 @@ function WorkspaceNavButton({
   description,
   isActive,
   disabled = false,
+  variant,
   onClick,
 }: {
   icon: ReactNode;
@@ -369,8 +501,49 @@ function WorkspaceNavButton({
   description: string;
   isActive: boolean;
   disabled?: boolean;
+  variant: "desktop" | "mobile";
   onClick: () => void;
 }) {
+  if (variant === "desktop") {
+    return (
+      <button
+        type="button"
+        disabled={disabled}
+        aria-label={label}
+        aria-pressed={isActive}
+        onClick={onClick}
+        className={[
+          "flex min-h-11 min-w-[8.25rem] items-center gap-2 rounded-lg border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+          isActive
+            ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm"
+            : "border-transparent bg-white text-stone-700 hover:border-[#D9E2EA] hover:bg-[#F8FBFD]",
+          disabled ? "cursor-not-allowed opacity-55" : "",
+        ].join(" ")}
+      >
+        <span
+          aria-hidden="true"
+          className={[
+            "flex size-8 shrink-0 items-center justify-center rounded-md",
+            isActive ? "bg-white/15 text-white" : "bg-[#F2F5F8] text-[#315C7C]",
+          ].join(" ")}
+        >
+          {icon}
+        </span>
+        <span className="min-w-0">
+          <span className="block truncate text-sm font-semibold">{label}</span>
+          <span
+            className={[
+              "mt-0.5 block truncate text-xs",
+              isActive ? "text-white/75" : "text-stone-500",
+            ].join(" ")}
+          >
+            {description}
+          </span>
+        </span>
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -379,35 +552,31 @@ function WorkspaceNavButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "flex min-h-12 flex-col items-center justify-center gap-1 rounded-md border px-2 text-center transition sm:min-h-12 sm:flex-row sm:justify-start sm:text-left sm:px-3",
+        "flex min-h-12 flex-col items-center justify-center gap-1 rounded-md border px-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
         isActive
-          ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67] sm:bg-[#315C7C] sm:text-white"
-          : "border-transparent bg-transparent text-stone-700 hover:bg-[#F2F5F8] sm:bg-white",
-        disabled ? "cursor-not-allowed opacity-55 hover:border-[#E6E0D5] hover:bg-[#F7F5F0]" : "",
+          ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67]"
+          : "border-transparent bg-transparent text-stone-700 hover:bg-[#F2F5F8]",
+        disabled ? "cursor-not-allowed opacity-55" : "",
       ].join(" ")}
     >
       <span
+        aria-hidden="true"
         className={[
-          "flex size-6 shrink-0 items-center justify-center rounded-md sm:size-8",
-          isActive ? "text-[#244B67] sm:bg-white/15 sm:text-white" : "text-stone-500 sm:bg-[#F2F5F8] sm:text-[#315C7C]",
+          "flex size-6 shrink-0 items-center justify-center rounded-md",
+          isActive ? "text-[#244B67]" : "text-stone-500",
         ].join(" ")}
       >
         {icon}
       </span>
-      <span className="min-w-0">
-        <span className="block truncate text-xs font-semibold sm:text-sm">
-          <span className="sm:hidden">{shortLabel}</span>
-          <span className="hidden sm:inline">{label}</span>
-        </span>
-        <span
-          className={[
-            "mt-0.5 hidden truncate text-xs sm:block",
-            isActive ? "text-white/70" : "text-stone-500",
-          ].join(" ")}
-        >
-          {description}
-        </span>
+      <span className="block max-w-full truncate text-xs font-semibold">
+        {shortLabel}
       </span>
     </button>
   );
 }
+
+/*
+ * WorkspaceNavButton intentionally has separate desktop/mobile variants.
+ * Owner PC navigation needs an operating-console command bar, while mobile
+ * remains a compact five-item tab bar.
+ */
