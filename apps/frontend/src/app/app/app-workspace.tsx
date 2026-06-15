@@ -229,8 +229,8 @@ export function AppWorkspace({
   }
 
   return (
-    <div className="mx-auto max-w-6xl pb-20 sm:pb-0 xl:max-w-[88rem] 2xl:max-w-[94rem]">
-      <div className="sm:grid sm:grid-cols-[15.5rem_minmax(0,1fr)] sm:gap-4 lg:grid-cols-[16.5rem_minmax(0,1fr)]">
+    <div className="mx-auto w-full max-w-6xl pb-20 sm:max-w-none sm:px-4 sm:pb-0 xl:px-5">
+      <div className="sm:grid sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-4 lg:grid-cols-[16rem_minmax(0,1fr)]">
         <WorkspaceNavigation
           activeView={visibleView}
           canManage={canManage}

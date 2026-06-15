@@ -51,20 +51,22 @@ export function OperationsDesktopView(props: OperationsViewProps) {
         classCount={props.classes.length}
         totalStudents={props.totalStudents}
       />
-      <ClassPicker
-        classes={props.classes}
-        selectedClass={props.selectedClass}
-        onClassSelect={props.onClassSelect}
-      />
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(300px,0.95fr)_minmax(380px,1.05fr)] lg:items-start xl:grid-cols-[360px_minmax(420px,1fr)_420px]">
-        <StudentSelectionList
-          selectedClass={props.selectedClass}
-          selectedStudent={props.selectedStudent}
-          selectedReason={props.selectedReason}
-          onStudentSelect={props.onStudentSelect}
-          onStudentReasonSelect={props.onStudentReasonSelect}
-        />
+      <section className="grid min-w-0 gap-3 lg:grid-cols-[14rem_minmax(0,1fr)] lg:items-start xl:grid-cols-[15.5rem_minmax(0,1fr)_21rem] 2xl:grid-cols-[16rem_minmax(0,1fr)_22rem]">
+        <aside className="min-w-0 space-y-3">
+          <ClassPicker
+            classes={props.classes}
+            selectedClass={props.selectedClass}
+            onClassSelect={props.onClassSelect}
+          />
+          <StudentSelectionList
+            selectedClass={props.selectedClass}
+            selectedStudent={props.selectedStudent}
+            selectedReason={props.selectedReason}
+            onStudentSelect={props.onStudentSelect}
+            onStudentReasonSelect={props.onStudentReasonSelect}
+          />
+        </aside>
 
         <ScheduleAndHistoryPanel
           selectedClassName={props.selectedClass?.name}
@@ -73,7 +75,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
           visibleFollowupHistory={props.visibleFollowupHistory}
           onDateMakeupCandidateSelect={props.onDateMakeupCandidateSelect}
           onMakeupCandidateSelect={props.onMakeupCandidateSelect}
-          className="lg:order-3 lg:col-span-2 xl:order-2 xl:col-span-1"
+          className="min-w-0"
         />
 
         {props.desktopComposer}
@@ -152,14 +154,14 @@ function OperationsHeader({
   totalStudents: number;
 }) {
   return (
-    <section className="mb-3 border-b border-[#DED8CE] bg-transparent px-1 pb-3 sm:mb-4 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
+    <section className="mb-3 border-b border-[#DED8CE] bg-transparent px-1 pb-3 sm:mb-4 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-4 sm:py-3 sm:shadow-sm">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="text-sm font-medium text-[#315C7C]">{academyName}</p>
-          <h2 className="mt-1 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
+          <h2 className="mt-1 text-xl font-semibold leading-tight text-stone-950 sm:text-2xl">
             수업 후 연락
           </h2>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-stone-600">
+          <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600">
             반과 학생을 선택하면 학부모 문자 초안이 준비됩니다.
           </p>
         </div>
@@ -183,7 +185,7 @@ function ClassPicker({
   onClassSelect: (classId: string) => void;
 }) {
   return (
-    <section aria-label="반 선택" className="mb-3 space-y-2 sm:mb-4">
+    <section aria-label="반 선택" className="space-y-2">
       <div className="flex items-center justify-between gap-2 px-1">
         <p className="text-xs font-semibold text-stone-500">반 선택</p>
         {selectedClass ? (
@@ -192,7 +194,7 @@ function ClassPicker({
           </p>
         ) : null}
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="max-h-[12rem] space-y-1.5 overflow-y-auto rounded-lg border border-stone-200 bg-white p-1.5 shadow-sm">
         {classes.map((classItem) => {
           const isSelected = classItem.id === selectedClass?.id;
           return (
@@ -202,7 +204,7 @@ function ClassPicker({
               aria-pressed={isSelected}
               onClick={() => onClassSelect(classItem.id)}
               className={[
-                "min-h-10 shrink-0 rounded-md border px-3 text-left transition",
+                "min-h-10 w-full rounded-md border px-2.5 text-left transition",
                 isSelected
                   ? "border-[#315C7C] bg-[#315C7C] text-white"
                   : "border-stone-200 bg-white text-stone-700 hover:border-stone-300",
@@ -239,10 +241,10 @@ function StudentSelectionList({
   onStudentReasonSelect: (studentId: string, reasonId: FollowupReason) => void;
 }) {
   return (
-    <section aria-labelledby="student-flow-title" className="space-y-3 lg:order-1">
+    <section aria-labelledby="student-flow-title" className="min-w-0 space-y-2 lg:order-1">
       <div className="flex items-end justify-between gap-3 px-1">
         <div>
-          <h2 id="student-flow-title" className="text-base font-semibold text-stone-950">
+          <h2 id="student-flow-title" className="text-sm font-semibold text-stone-950">
             학생 확인 목록
           </h2>
           <p className="mt-1 text-xs text-stone-500">
@@ -254,7 +256,7 @@ function StudentSelectionList({
         </span>
       </div>
 
-      <div className="max-h-[min(40rem,calc(100vh-14rem))] overflow-y-auto rounded-lg border border-[#DED8CE] bg-white shadow-sm">
+      <div className="max-h-[min(42rem,calc(100vh-18rem))] overflow-y-auto rounded-lg border border-[#DED8CE] bg-white shadow-sm">
         {selectedClass?.students.length ? (
           selectedClass.students.map((student) => {
             const isSelected = student.id === selectedStudent?.id;
@@ -263,7 +265,7 @@ function StudentSelectionList({
               <article
                 key={student.id}
                 className={[
-                  "border-b border-stone-100 border-l-4 px-3 py-3 last:border-b-0",
+                  "border-b border-stone-100 border-l-4 px-2.5 py-2.5 last:border-b-0",
                   isSelected ? "border-l-[#315C7C] bg-[#F3F8FC]" : "border-l-transparent bg-white",
                 ].join(" ")}
               >
@@ -271,7 +273,7 @@ function StudentSelectionList({
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <p className="text-base font-semibold text-stone-950">
+                        <p className="text-sm font-semibold text-stone-950">
                           {student.name}
                         </p>
                         {isSelected ? (
@@ -312,12 +314,12 @@ function StudentSelectionList({
                   ) : null}
                 </div>
 
-                <div className="mt-2 flex gap-2 overflow-x-auto pb-0.5">
+                <div className="mt-2 flex gap-1.5 overflow-x-auto pb-0.5">
                   <button
                     type="button"
                     onClick={() => onStudentSelect(student.id)}
                     className={[
-                      "inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+                      "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
                       isSelected
                         ? "border-[#315C7C] bg-white text-[#315C7C]"
                         : "border-[#C9D6E2] bg-white text-[#315C7C] hover:bg-[#EAF1F8]",
@@ -335,7 +337,7 @@ function StudentSelectionList({
                         aria-pressed={isReasonSelected}
                         onClick={() => onStudentReasonSelect(student.id, reasonId)}
                         className={[
-                          "min-h-9 shrink-0 rounded-md border px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+                          "min-h-8 shrink-0 rounded-md border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
                           isReasonSelected
                             ? "border-[#315C7C] bg-[#315C7C] text-white"
                             : "border-stone-200 bg-stone-50 text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
