@@ -1229,13 +1229,14 @@ function AttendanceWorkbench({
   const selectedStatus = normalizeAttendanceStatus(selectedRecord?.status);
 
   return (
-    <section className="space-y-3">
-      <header className="rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm">
-        <div className="flex items-start justify-between gap-4">
+    <section className="space-y-3 rounded-xl bg-[var(--clinic-page)] p-3">
+      <header className="overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)]">
+        <div className="h-1 bg-[linear-gradient(90deg,var(--clinic-primary-dark),var(--clinic-primary),var(--clinic-accent))]" />
+        <div className="flex items-start justify-between gap-4 px-4 py-3">
           <div className="min-w-0">
-            <p className="text-xs font-semibold text-[#315C7C]">{academyName}</p>
-            <h2 className="mt-1 text-xl font-semibold text-stone-950">출석부 장부</h2>
-            <p className="mt-1 text-sm leading-5 text-stone-600">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--clinic-primary)]">{academyName}</p>
+            <h2 className="mt-1 text-xl font-semibold text-[var(--clinic-text)]">출석부 장부</h2>
+            <p className="mt-1 text-sm leading-5 text-[var(--clinic-muted)]">
               {teacherName}님, 수업을 선택하고 학생 row에서 출석·지각·결석을 바로 처리합니다.
             </p>
           </div>
@@ -1245,7 +1246,7 @@ function AttendanceWorkbench({
         </div>
       </header>
 
-      <div className="grid min-h-[42rem] gap-3 lg:grid-cols-[14rem_minmax(0,1fr)_18rem] xl:grid-cols-[17rem_minmax(0,1fr)_22rem] 2xl:grid-cols-[18rem_minmax(0,1fr)_24rem]">
+      <div className="grid min-h-[42rem] gap-3 lg:grid-cols-[13rem_minmax(0,1fr)_17rem] xl:grid-cols-[15rem_minmax(0,1fr)_18rem] 2xl:grid-cols-[17rem_minmax(0,1fr)_22rem]">
         <aside className="space-y-3">
           <AttendanceOverviewStrip overview={overview} />
           <SessionList
@@ -1257,24 +1258,24 @@ function AttendanceWorkbench({
           />
         </aside>
 
-        <section className="min-w-0 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-          <div className="border-b border-stone-200 bg-[#FBFAF7] px-4 py-3">
+        <section className="min-w-0 overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)]">
+          <div className="border-b border-[var(--clinic-border)] bg-[var(--clinic-panel-muted)] px-4 py-3">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <UserCheck size={18} className="text-[#315C7C]" />
-                  <h3 className="truncate text-base font-semibold text-stone-950">
+                  <UserCheck size={18} className="text-[var(--clinic-primary)]" />
+                  <h3 className="truncate text-base font-semibold text-[var(--clinic-text)]">
                     {selectedSession?.className ?? "선택된 수업 없음"}
                   </h3>
                 </div>
                 {selectedSession ? (
-                  <p className="mt-1 text-sm text-stone-500">
+                  <p className="mt-1 text-sm text-[var(--clinic-muted)]">
                     {selectedSession.startTime}-{selectedSession.endTime} ·{" "}
                     {selectedSession.subject ?? "과목 미지정"} ·{" "}
                     {selectedSession.students.length}명
                   </p>
                 ) : (
-                  <p className="mt-1 text-sm text-stone-500">
+                  <p className="mt-1 text-sm text-[var(--clinic-muted)]">
                     이 날짜에 수업이 없습니다. 날짜나 수업 시간 등록 상태를 확인해 주세요.
                   </p>
                 )}
@@ -1420,17 +1421,17 @@ function AttendanceLedgerTable({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-[54rem] w-full border-separate border-spacing-0 text-left">
-        <thead className="bg-white text-xs font-semibold text-stone-500">
+    <div className="overflow-x-auto bg-[var(--clinic-panel)]">
+      <table className="w-full min-w-full table-fixed border-separate border-spacing-0 text-left">
+        <thead className="bg-[#e6eef1] text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--clinic-muted)]">
           <tr>
-            <th className="w-10 border-b border-stone-200 px-3 py-2">선택</th>
-            <th className="border-b border-stone-200 px-3 py-2">학생</th>
-            <th className="border-b border-stone-200 px-3 py-2">수업시간</th>
-            <th className="border-b border-stone-200 px-3 py-2">출석 상태</th>
-            <th className="border-b border-stone-200 px-3 py-2">연락 상태</th>
-            <th className="border-b border-stone-200 px-3 py-2">메모</th>
-            <th className="border-b border-stone-200 px-3 py-2 text-right">처리</th>
+            <th className="w-8 border-b border-[var(--clinic-border)] px-2 py-2">선택</th>
+            <th className="w-[30%] border-b border-[var(--clinic-border)] px-2 py-2">학생 차트</th>
+            <th className="w-[13%] border-b border-[var(--clinic-border)] px-2 py-2">수업</th>
+            <th className="w-[12%] border-b border-[var(--clinic-border)] px-2 py-2">출석</th>
+            <th className="w-[12%] border-b border-[var(--clinic-border)] px-2 py-2">연락</th>
+            <th className="w-[6%] border-b border-[var(--clinic-border)] px-2 py-2">메모</th>
+            <th className="w-[19%] border-b border-[var(--clinic-border)] px-2 py-2 text-right">처리</th>
           </tr>
         </thead>
         <tbody>
@@ -1464,31 +1465,33 @@ function AttendanceLedgerTable({
                   }
                 }}
                 className={[
-                  "group cursor-pointer border-b border-stone-100 transition focus:outline-none",
-                  isSelected ? "bg-[#F8FBFD]" : "bg-white hover:bg-stone-50",
+                  "group cursor-pointer border-b border-[var(--clinic-border)] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
+                  isSelected
+                    ? "bg-[#edf9f7] shadow-[inset_4px_0_0_var(--clinic-primary)]"
+                    : "bg-[var(--clinic-panel)] hover:bg-[#f4f9fa]",
                 ].join(" ")}
               >
-                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                <td className="border-b border-[#dbe6ea] px-2 py-2.5 align-middle">
                   <input
                     type="checkbox"
                     checked={isBulkSelected}
                     disabled={!isBulkSelectable}
                     onClick={(event) => event.stopPropagation()}
                     onChange={() => onToggleBulkStudent(student.id)}
-                    className="size-4 accent-[#315C7C] disabled:opacity-30"
+                    className="size-4 accent-[var(--clinic-primary)] disabled:opacity-30"
                     aria-label={`${student.name} 일괄 문자 대상 선택`}
                   />
                 </td>
-                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                <td className="border-b border-[#dbe6ea] px-2 py-2.5 align-middle">
                   <div className="flex items-center gap-2">
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-stone-100 text-xs font-semibold text-stone-600">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#b9cbd2] bg-[#e7f2f3] text-xs font-semibold text-[var(--clinic-primary-dark)]">
                       {getStudentInitial(student.name)}
                     </span>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-stone-950">
+                      <p className="truncate text-sm font-semibold leading-5 text-[var(--clinic-text)]">
                         {student.name}
                       </p>
-                      <p className="truncate text-xs text-stone-500">
+                      <p className="truncate text-[11px] leading-4 text-[var(--clinic-muted)]">
                         {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
                           "학교/학년 미등록"}{" "}
                         · {student.maskedParentPhone}
@@ -1496,21 +1499,21 @@ function AttendanceLedgerTable({
                     </div>
                   </div>
                 </td>
-                <td className="border-b border-stone-100 px-3 py-2.5 align-middle text-sm tabular-nums text-stone-700">
+                <td className="truncate border-b border-[#dbe6ea] px-2 py-2.5 align-middle text-[11px] tabular-nums text-[var(--clinic-text)]">
                   {session.startTime}-{session.endTime}
                 </td>
-                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                <td className="border-b border-[#dbe6ea] px-2 py-2.5 align-middle">
                   <StatusLozenge status={status} />
                 </td>
-                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                <td className="border-b border-[#dbe6ea] px-2 py-2.5 align-middle">
                   <ContactLozenge record={record} status={status} />
                 </td>
-                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
-                  <span className="rounded-full bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-500">
-                    {record?.note ? "메모 있음" : "메모 없음"}
+                <td className="border-b border-[#dbe6ea] px-2 py-2.5 align-middle">
+                  <span className="rounded-sm border border-[#d5e1e5] bg-[#f5f9fa] px-1.5 py-1 text-[11px] font-semibold text-[var(--clinic-muted)]">
+                    {record?.note ? "있음" : "-"}
                   </span>
                 </td>
-                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                <td className="border-b border-[#dbe6ea] px-2 py-2.5 align-middle">
                   <div className="flex justify-end gap-1">
                     <LedgerStatusButton
                       label="출석"
@@ -1558,10 +1561,10 @@ function LedgerStatusButton({
 }) {
   const activeClass =
     tone === "amber"
-      ? "border-amber-300 bg-amber-50 text-amber-900"
+      ? "border-amber-300 bg-amber-50 text-[var(--clinic-warning)]"
       : tone === "red"
-        ? "border-red-200 bg-red-50 text-red-800"
-        : "border-[#315C7C] bg-[#EAF1F8] text-[#244B67]";
+        ? "border-red-200 bg-red-50 text-[var(--clinic-danger)]"
+        : "border-[var(--clinic-primary)] bg-[#e3f3f1] text-[var(--clinic-primary-dark)]";
 
   return (
     <button
@@ -1573,8 +1576,8 @@ function LedgerStatusButton({
         onClick();
       }}
       className={[
-        "min-h-8 rounded-md border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
-        active ? activeClass : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50",
+        "min-h-7 whitespace-nowrap rounded-sm border px-1.5 text-[11px] font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
+        active ? activeClass : "border-[#c9d8dd] bg-white text-[var(--clinic-muted)] hover:bg-[#f3f9fa]",
         disabled ? "cursor-wait opacity-60" : "",
       ].join(" ")}
     >
@@ -1587,7 +1590,7 @@ function StatusLozenge({ status }: { status: AttendanceStatus }) {
   return (
     <span
       className={[
-        "inline-flex min-h-6 items-center rounded-full px-2.5 text-xs font-semibold",
+        "inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border px-1.5 text-[11px] font-semibold",
         attendanceStatusClass(status),
       ].join(" ")}
     >
@@ -1605,7 +1608,7 @@ function ContactLozenge({
 }) {
   if (record?.followupStatus === "sent") {
     return (
-      <span className="inline-flex min-h-6 items-center rounded-full bg-emerald-50 px-2.5 text-xs font-semibold text-emerald-700">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-emerald-200 bg-emerald-50 px-1.5 text-[11px] font-semibold text-[var(--clinic-success)]">
         문자 완료
       </span>
     );
@@ -1613,7 +1616,7 @@ function ContactLozenge({
 
   if (status === "late" || status === "absent") {
     return (
-      <span className="inline-flex min-h-6 items-center rounded-full bg-amber-50 px-2.5 text-xs font-semibold text-amber-800">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-amber-200 bg-amber-50 px-1.5 text-[11px] font-semibold text-[var(--clinic-warning)]">
         연락 필요
       </span>
     );
@@ -1621,14 +1624,14 @@ function ContactLozenge({
 
   if (status === "needs_check") {
     return (
-      <span className="inline-flex min-h-6 items-center rounded-full bg-orange-50 px-2.5 text-xs font-semibold text-orange-800">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-red-200 bg-red-50 px-1.5 text-[11px] font-semibold text-[var(--clinic-danger)]">
         확인 필요
       </span>
     );
   }
 
   return (
-    <span className="inline-flex min-h-6 items-center rounded-full bg-stone-100 px-2.5 text-xs font-semibold text-stone-500">
+    <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-[#d5e1e5] bg-[#f5f9fa] px-1.5 text-[11px] font-semibold text-[var(--clinic-muted)]">
       대기
     </span>
   );
@@ -1651,30 +1654,30 @@ function WorkbenchStudentPanel({
     Boolean(student && record && getFollowupReasonForAttendanceStatus(status));
 
   return (
-    <section className="sticky top-5 overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <div className="border-b border-stone-200 bg-[#FBFAF7] px-4 py-3">
-        <h3 className="text-sm font-semibold text-stone-950">작업 패널</h3>
-        <p className="mt-1 text-xs leading-5 text-stone-500">
+    <section className="sticky top-5 overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)]">
+      <div className="border-b border-[var(--clinic-border)] bg-[var(--clinic-primary-dark)] px-4 py-3">
+        <h3 className="text-sm font-semibold text-white">학생 차트</h3>
+        <p className="mt-1 text-xs leading-5 text-white/65">
           학생 row를 선택하면 문자, 메모, 연락 상태를 확인합니다.
         </p>
       </div>
 
       {!student ? (
-        <div className="p-4 text-sm leading-6 text-stone-500">
+        <div className="p-4 text-sm leading-6 text-[var(--clinic-muted)]">
           학생을 선택하면 상세 정보가 표시됩니다.
         </div>
       ) : (
         <div>
-          <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
-            <p className="text-xs font-medium text-stone-500">선택 학생</p>
-            <h4 className="mt-1 truncate text-xl font-semibold text-stone-950">{student.name}</h4>
-            <p className="mt-1 truncate text-sm text-stone-500">
+          <div className="border-l-4 border-l-[var(--clinic-accent)] bg-[#edf9f7] px-4 py-3">
+            <p className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--clinic-primary)]">선택 학생</p>
+            <h4 className="mt-1 truncate text-xl font-semibold text-[var(--clinic-text)]">{student.name}</h4>
+            <p className="mt-1 truncate text-sm text-[var(--clinic-muted)]">
               {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
                 "학교/학년 미등록"}
             </p>
           </div>
 
-          <div className="divide-y divide-stone-100">
+          <div className="divide-y divide-[#dbe6ea]">
             <AttendancePanelRow label="출석 상태">
               <StatusLozenge status={status} />
             </AttendancePanelRow>
@@ -1693,7 +1696,7 @@ function WorkbenchStudentPanel({
             <AttendancePanelRow label="연락/메모" value={record?.note ?? "등록된 메모가 없습니다."} />
           </div>
 
-          <div className="border-t border-stone-100 p-3">
+          <div className="border-t border-[var(--clinic-border)] bg-[#f6fafb] p-3">
             <button
               type="button"
               disabled={!canOpenFollowup}
@@ -1705,8 +1708,8 @@ function WorkbenchStudentPanel({
               className={[
                 "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
                 canOpenFollowup
-                  ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
-                  : "bg-stone-200 text-stone-500",
+                  ? "bg-[var(--clinic-primary)] text-white hover:bg-[var(--clinic-primary-dark)]"
+                  : "bg-[#d7e3e7] text-[var(--clinic-muted)]",
               ].join(" ")}
             >
               <MessageSquareText size={17} />
@@ -1732,8 +1735,8 @@ function AttendancePanelRow({
 }) {
   return (
     <div className="grid min-h-10 grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 px-4 py-2.5">
-      <span className="text-xs font-semibold text-stone-500">{label}</span>
-      <span className={`min-w-0 truncate text-sm font-semibold text-stone-900 ${mono ? "tabular-nums" : ""}`}>
+      <span className="text-xs font-semibold text-[var(--clinic-muted)]">{label}</span>
+      <span className={`min-w-0 truncate text-sm font-semibold text-[var(--clinic-text)] ${mono ? "tabular-nums" : ""}`}>
         {children ?? value}
       </span>
     </div>
@@ -1771,13 +1774,13 @@ function AttendanceDateControl({
 
   return (
     <div className="w-full lg:max-w-sm">
-      <span className="mb-1 block text-xs font-semibold text-stone-500">조회 날짜</span>
+      <span className="mb-1 block text-xs font-semibold text-[var(--clinic-muted)]">조회 날짜</span>
       <div className="grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] gap-1.5 sm:grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] sm:gap-2">
         <button
           type="button"
           aria-label="전날 출석부 보기"
           onClick={() => onChange(shiftDate(value, -1))}
-          className="flex min-h-10 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50 sm:min-h-11"
+          className="flex min-h-10 items-center justify-center rounded-sm border border-[#c9d8dd] bg-white text-[var(--clinic-muted)] transition hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa] sm:min-h-11"
         >
           <ChevronLeft size={18} />
         </button>
@@ -1799,7 +1802,7 @@ function AttendanceDateControl({
           <button
             type="button"
             onClick={openCalendar}
-            className="flex min-h-10 w-full items-center gap-2 rounded-md border border-stone-300 bg-white px-2.5 text-left text-sm font-semibold text-stone-900 transition hover:border-[#315C7C] hover:bg-[#EAF1F8] focus:border-[#315C7C] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2] sm:min-h-11 sm:px-3"
+            className="flex min-h-10 w-full items-center gap-2 rounded-sm border border-[#c9d8dd] bg-white px-2.5 text-left text-sm font-semibold text-[var(--clinic-text)] transition hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa] focus:border-[var(--clinic-primary)] focus:outline-none focus:ring-2 focus:ring-[#b7ece6] sm:min-h-11 sm:px-3"
           >
             <CalendarDays size={17} className="shrink-0 text-stone-500" />
             <span className="min-w-0 flex-1 truncate tabular-nums">
@@ -1813,7 +1816,7 @@ function AttendanceDateControl({
           type="button"
           aria-label="다음날 출석부 보기"
           onClick={() => onChange(shiftDate(value, 1))}
-          className="flex min-h-10 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50 sm:min-h-11"
+          className="flex min-h-10 items-center justify-center rounded-sm border border-[#c9d8dd] bg-white text-[var(--clinic-muted)] transition hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa] sm:min-h-11"
         >
           <ChevronRight size={18} />
         </button>
@@ -1841,7 +1844,7 @@ function DateShortcutButton({
     <button
       type="button"
       onClick={() => onChange(date)}
-      className="min-h-8 rounded-md border border-stone-200 bg-stone-50 px-2 text-xs font-semibold text-stone-600 transition hover:border-[#C9D6E2] hover:bg-[#EAF1F8] hover:text-[#315C7C] sm:min-h-9"
+      className="min-h-8 rounded-sm border border-[#c9d8dd] bg-[#f4f9fa] px-2 text-xs font-semibold text-[var(--clinic-muted)] transition hover:border-[var(--clinic-accent)] hover:bg-[#e4f5f3] hover:text-[var(--clinic-primary)] sm:min-h-9"
     >
       {label}
     </button>
@@ -1854,7 +1857,7 @@ function AttendanceOverviewStrip({ overview }: { overview: AttendanceOverview })
     overview.counts.absent + overview.counts.late + overview.counts.needs_check;
 
   return (
-    <section className="grid grid-cols-4 overflow-hidden rounded-lg border border-stone-200 bg-white text-center shadow-sm">
+    <section className="grid grid-cols-4 overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)] text-center">
       <CompactOverviewItem label="수업" value={`${overview.totalSessions}개`} />
       <CompactOverviewItem label="학생" value={`${overview.totalStudents}명`} />
       <CompactOverviewItem label="체크 필요" value={`${uncheckedCount}명`} />
@@ -1876,9 +1879,9 @@ function CompactOverviewItem({
   value: string;
 }) {
   return (
-    <div className={["border-r border-stone-200 px-2 py-2 last:border-r-0 sm:px-3 sm:py-3", className].join(" ")}>
-      <p className="text-[11px] font-medium text-stone-500 sm:text-xs">{label}</p>
-      <p className="mt-0.5 text-sm font-semibold tabular-nums text-stone-950 sm:mt-1 sm:text-base">{value}</p>
+    <div className={["border-r border-[var(--clinic-border)] px-2 py-2 last:border-r-0 sm:px-3 sm:py-3", className].join(" ")}>
+      <p className="text-[11px] font-medium text-[var(--clinic-muted)] sm:text-xs">{label}</p>
+      <p className="mt-0.5 text-sm font-semibold tabular-nums text-[var(--clinic-text)] sm:mt-1 sm:text-base">{value}</p>
     </div>
   );
 }
@@ -1897,19 +1900,19 @@ function SessionList({
   onSelect: (sessionKey: string) => void;
 }) {
   return (
-    <section className="rounded-lg border border-stone-200 bg-white shadow-sm">
-      <div className="border-b border-stone-200 px-3 py-2.5 sm:px-4 sm:py-3">
+    <section className="overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)]">
+      <div className="border-b border-[var(--clinic-border)] bg-[var(--clinic-primary-dark)] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-stone-950">오늘 수업</h3>
+          <h3 className="text-sm font-semibold text-white">오늘 수업</h3>
           {loadState === "loading" ? (
-            <Loader2 size={16} className="animate-spin text-stone-400" />
+            <Loader2 size={16} className="animate-spin text-white/60" />
           ) : (
-            <span className="text-xs font-medium text-stone-500">{sessions.length}개</span>
+            <span className="text-xs font-medium text-white/70">{sessions.length}개</span>
           )}
         </div>
       </div>
 
-      <div className="max-h-40 divide-y divide-stone-100 overflow-y-auto overscroll-contain sm:max-h-none">
+      <div className="max-h-40 divide-y divide-[#dbe6ea] overflow-y-auto overscroll-contain sm:max-h-none">
         {sessions.length > 0 ? (
           sessions.map((session) => {
             const isSelected = session.key === selectedSessionKey;
@@ -1924,14 +1927,14 @@ function SessionList({
                 className={[
                   "grid min-h-[3.55rem] w-full grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2 border-l-4 px-2.5 py-2 text-left transition sm:min-h-[4.25rem] sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:gap-3 sm:px-4 sm:py-3",
                   isSelected
-                    ? "border-l-[#315C7C] bg-[#F8FBFD] text-stone-950"
-                    : "border-l-transparent bg-white text-stone-700 hover:bg-stone-50",
+                    ? "border-l-[var(--clinic-accent)] bg-[#e8f5f4] text-[var(--clinic-text)]"
+                    : "border-l-transparent bg-[var(--clinic-panel)] text-[var(--clinic-text)] hover:bg-[#f3f9fa]",
                 ].join(" ")}
               >
                 <span
                   className={[
-                    "flex size-8 items-center justify-center rounded-full text-xs font-semibold sm:size-9 sm:text-sm",
-                    isSelected ? "bg-[#315C7C] text-white" : "bg-stone-100 text-stone-500",
+                    "flex size-8 items-center justify-center rounded-md text-xs font-semibold sm:size-9 sm:text-sm",
+                    isSelected ? "bg-[var(--clinic-primary)] text-white" : "bg-[#e6eef1] text-[var(--clinic-muted)]",
                   ].join(" ")}
                 >
                   {getClassInitial(session.className)}
@@ -1943,7 +1946,7 @@ function SessionList({
                   <span
                     className={[
                       "mt-0.5 flex items-center gap-1 truncate text-[11px] sm:text-xs",
-                      isSelected ? "text-[#315C7C]" : "text-stone-500",
+                      isSelected ? "text-[var(--clinic-primary)]" : "text-[var(--clinic-muted)]",
                     ].join(" ")}
                   >
                     <Clock3 size={13} className="shrink-0" />
@@ -1956,17 +1959,15 @@ function SessionList({
                     className={[
                       "rounded-full px-1.5 py-0.5 text-[11px] font-semibold sm:px-2 sm:py-1 sm:text-xs",
                       progress.pending > 0
-                        ? "bg-stone-950 text-white"
-                        : "bg-stone-100 text-stone-500",
+                        ? "bg-[var(--clinic-primary-dark)] text-white"
+                        : "bg-[#eef4f6] text-[var(--clinic-muted)]",
                     ].join(" ")}
                   >
                     {progress.pending} 체크 필요
                   </span>
                   {progress.attention > 0 ? (
                     <span
-                      className={[
-                        "rounded-full bg-red-50 px-1.5 py-0.5 text-[11px] font-semibold text-red-800 sm:px-2 sm:py-1 sm:text-xs",
-                      ].join(" ")}
+                      className="rounded-sm border border-red-200 bg-red-50 px-1.5 py-0.5 text-[11px] font-semibold text-[var(--clinic-danger)] sm:px-2 sm:py-1 sm:text-xs"
                     >
                       {progress.attention} 연락
                     </span>
@@ -2017,17 +2018,17 @@ function AttendanceFilterBar({
             aria-pressed={isSelected}
             onClick={() => onChange(filter)}
             className={[
-              "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2] sm:min-h-9 sm:px-3",
+              "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)] sm:min-h-9 sm:px-3",
               isSelected
-                ? "border-stone-950 bg-stone-950 text-white"
-                : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50",
+                ? "border-[var(--clinic-primary-dark)] bg-[var(--clinic-primary-dark)] text-white"
+                : "border-[#c9d8dd] bg-white text-[var(--clinic-muted)] hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa]",
             ].join(" ")}
           >
             {attendanceFilterLabels[filter]}
             <span
               className={[
                 "rounded-full px-1.5 py-0.5 tabular-nums",
-                isSelected ? "bg-white/15 text-white" : "bg-stone-100 text-stone-500",
+                isSelected ? "bg-white/15 text-white" : "bg-[#edf4f6] text-[var(--clinic-muted)]",
               ].join(" ")}
             >
               {counts[filter]}
@@ -2059,9 +2060,9 @@ function AttendanceBulkActionBar({
   }
 
   return (
-    <div className="mt-2 rounded-md border border-stone-200 bg-stone-50 px-2.5 py-2 sm:mt-3 sm:px-3">
+    <div className="mt-2 rounded-md border border-[var(--clinic-border)] bg-[#eef6f7] px-2.5 py-2 sm:mt-3 sm:px-3">
       <div className="flex flex-wrap items-center gap-1.5">
-        <span className="mr-0.5 text-xs font-semibold text-stone-600">
+        <span className="mr-0.5 text-xs font-semibold text-[var(--clinic-primary-dark)]">
           일괄 문자
         </span>
         <button
@@ -2072,8 +2073,8 @@ function AttendanceBulkActionBar({
           className={[
             "min-h-8 rounded-full border px-2.5 text-xs font-semibold transition",
             activeReason === "late"
-              ? "border-amber-300 bg-amber-50 text-amber-900"
-              : "border-stone-200 bg-white text-stone-700 hover:border-amber-200 hover:bg-amber-50",
+              ? "border-amber-300 bg-amber-50 text-[var(--clinic-warning)]"
+              : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-amber-200 hover:bg-amber-50",
             lateCount === 0 ? "cursor-not-allowed opacity-45" : "",
           ].join(" ")}
         >
@@ -2087,8 +2088,8 @@ function AttendanceBulkActionBar({
           className={[
             "min-h-8 rounded-full border px-2.5 text-xs font-semibold transition",
             activeReason === "absence"
-              ? "border-red-200 bg-red-50 text-red-800"
-              : "border-stone-200 bg-white text-stone-700 hover:border-red-200 hover:bg-red-50",
+              ? "border-red-200 bg-red-50 text-[var(--clinic-danger)]"
+              : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-red-200 hover:bg-red-50",
             absentCount === 0 ? "cursor-not-allowed opacity-45" : "",
           ].join(" ")}
         >
@@ -2096,13 +2097,13 @@ function AttendanceBulkActionBar({
         </button>
         {activeReason ? (
           <>
-            <span className="ml-auto rounded-full bg-stone-950 px-2 py-1 text-[11px] font-semibold text-white">
+            <span className="ml-auto rounded-sm bg-[var(--clinic-primary-dark)] px-2 py-1 text-[11px] font-semibold text-white">
               {selectedCount}명 선택됨
             </span>
             <button
               type="button"
               onClick={onClear}
-              className="min-h-8 rounded-full border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-600 hover:bg-stone-100"
+              className="min-h-8 rounded-sm border border-[#c9d8dd] bg-white px-2.5 text-xs font-semibold text-[var(--clinic-muted)] hover:bg-[#f3f9fa]"
             >
               해제
             </button>
@@ -2119,13 +2120,13 @@ function AttendanceSummary({
   summary: Record<AttendanceStatus, number>;
 }) {
   return (
-    <dl className="grid grid-cols-5 divide-x divide-stone-200 rounded-md border border-stone-200 bg-stone-50 text-center text-[11px] sm:text-xs">
+    <dl className="grid grid-cols-5 divide-x divide-[var(--clinic-border)] rounded-sm border border-[var(--clinic-border)] bg-[#edf4f6] text-center text-[11px] sm:text-xs">
       {editableStatuses.map((status) => (
         <div key={status} className="min-w-0 px-1.5 py-1.5 sm:px-2 sm:py-2">
-          <dt className="truncate font-medium text-stone-500">
+          <dt className="truncate font-medium text-[var(--clinic-muted)]">
             {attendanceDisplayLabel(status)}
           </dt>
-          <dd className="mt-0.5 text-sm font-semibold text-stone-950 sm:mt-1 sm:text-base">{summary[status]}</dd>
+          <dd className="mt-0.5 text-sm font-semibold text-[var(--clinic-text)] sm:mt-1 sm:text-base">{summary[status]}</dd>
         </div>
       ))}
     </dl>
@@ -2320,10 +2321,10 @@ function AttendanceArrivalToggle({
       disabled={isSaving}
       onClick={onToggle}
       className={[
-        "inline-flex min-h-8 w-12 items-center rounded-full border p-0.5 transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+        "inline-flex min-h-8 w-12 items-center rounded-full border p-0.5 transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
         isPresent
-          ? "justify-end border-[#315C7C] bg-[#315C7C]"
-          : "justify-start border-stone-300 bg-stone-100 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
+          ? "justify-end border-[var(--clinic-primary)] bg-[var(--clinic-primary)]"
+          : "justify-start border-[#c9d8dd] bg-[#e6eef1] hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa]",
         isSaving ? "cursor-wait opacity-60" : "",
       ].join(" ")}
     >
@@ -2331,7 +2332,7 @@ function AttendanceArrivalToggle({
       <span
         className={[
           "flex size-6 items-center justify-center rounded-full bg-white shadow-sm transition",
-          isPresent ? "text-[#315C7C]" : "text-stone-400",
+          isPresent ? "text-[var(--clinic-primary)]" : "text-[var(--clinic-muted)]",
         ].join(" ")}
       >
         {isPresent ? <Check size={14} /> : null}
@@ -2354,7 +2355,7 @@ function AttendanceSaveStatus({
   }
 
   if (isSaved) {
-    return <p className="text-[11px] font-medium text-[#315C7C]">저장됨</p>;
+    return <p className="text-[11px] font-medium text-[var(--clinic-primary)]">저장됨</p>;
   }
 
   if (checkedAt) {
@@ -2403,44 +2404,44 @@ function BulkAttendanceFollowupPanel({
   );
 
   return (
-    <section className={["rounded-lg border border-stone-200 bg-white xl:sticky xl:top-5", className].join(" ")}>
-      <div className="border-b border-stone-200 px-3 py-2.5 sm:px-4 sm:py-3">
+    <section className={["overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)] xl:sticky xl:top-5", className].join(" ")}>
+      <div className="border-b border-[var(--clinic-border)] bg-[var(--clinic-primary-dark)] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[#315C7C]" size={18} />
-          <h3 className="text-sm font-semibold text-stone-950">
+          <MessageSquareText className="text-[var(--clinic-accent)]" size={18} />
+          <h3 className="text-sm font-semibold text-white">
             {reasonLabel(bulkTarget.reason)} 일괄 문자
           </h3>
           <button
             type="button"
             onClick={onDismiss}
-            className="ml-auto rounded-md border border-stone-200 px-2 py-1 text-xs font-semibold text-stone-600"
+            className="ml-auto rounded-sm border border-white/20 bg-white/10 px-2 py-1 text-xs font-semibold text-white hover:bg-white/15"
           >
             닫기
           </button>
         </div>
-        <p className="mt-1 text-xs leading-5 text-stone-500">
+        <p className="mt-1 text-xs leading-5 text-white/65">
           선택 학생마다 이름 변수를 치환해 개별 연락 기록을 저장합니다.
         </p>
       </div>
 
       <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-        <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-3 py-3">
+        <div className="border-l-4 border-l-[var(--clinic-accent)] bg-[#edf9f7] px-3 py-3">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-stone-950">
+            <p className="text-sm font-semibold text-[var(--clinic-text)]">
               선택 학생 {selectedStudents.length}명
             </p>
             <span
               className={[
-                "rounded-full px-2 py-1 text-xs font-semibold",
+                "rounded-sm px-2 py-1 text-xs font-semibold",
                 bulkTarget.reason === "late"
-                  ? "bg-amber-50 text-amber-900"
-                  : "bg-red-50 text-red-800",
+                  ? "border border-amber-200 bg-amber-50 text-[var(--clinic-warning)]"
+                  : "border border-red-200 bg-red-50 text-[var(--clinic-danger)]",
               ].join(" ")}
             >
               {reasonLabel(bulkTarget.reason)}
             </span>
           </div>
-          <p className="mt-1 text-xs text-stone-500">
+          <p className="mt-1 text-xs text-[var(--clinic-muted)]">
             {bulkTarget.session.className} · {bulkTarget.session.startTime}-
             {bulkTarget.session.endTime}
           </p>
@@ -2449,13 +2450,13 @@ function BulkAttendanceFollowupPanel({
               selectedStudents.map((student) => (
                 <span
                   key={student.id}
-                  className="rounded border border-stone-200 bg-white px-2 py-1 text-xs font-semibold text-stone-700"
+                  className="rounded-sm border border-[#c9d8dd] bg-white px-2 py-1 text-xs font-semibold text-[var(--clinic-text)]"
                 >
                   {student.name}
                 </span>
               ))
             ) : (
-              <span className="text-xs text-red-700">
+              <span className="text-xs text-[var(--clinic-danger)]">
                 왼쪽 학생 목록에서 문자 대상 학생을 선택해 주세요.
               </span>
             )}
@@ -2463,7 +2464,7 @@ function BulkAttendanceFollowupPanel({
         </div>
 
         <fieldset>
-          <legend className="text-sm font-semibold text-stone-800">수신자</legend>
+          <legend className="text-sm font-semibold text-[var(--clinic-text)]">수신자</legend>
           <div className="mt-2 grid grid-cols-3 gap-2">
             {messageRecipientTypes.map((recipientType) => {
               const needsStudentPhone = recipientType !== "parent";
@@ -2478,10 +2479,10 @@ function BulkAttendanceFollowupPanel({
                   aria-pressed={isSelected}
                   onClick={() => onRecipientTypeChange(recipientType)}
                   className={[
-                    "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                    "min-h-10 rounded-sm border px-2 text-xs font-semibold transition",
                     isSelected
-                      ? "border-[#315C7C] bg-[#315C7C] text-white"
-                      : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
+                      ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
+                      : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
                 >
@@ -2491,7 +2492,7 @@ function BulkAttendanceFollowupPanel({
             })}
           </div>
           {selectedStudentPhoneMissing ? (
-            <p className="mt-2 text-xs leading-5 text-stone-500">
+            <p className="mt-2 text-xs leading-5 text-[var(--clinic-muted)]">
               학생 연락처가 없는 대상이 있어 학부모 수신으로 처리합니다.
             </p>
           ) : null}
@@ -2500,7 +2501,7 @@ function BulkAttendanceFollowupPanel({
         <div>
           <label
             htmlFor="bulk-attendance-followup-message"
-            className="text-sm font-semibold text-stone-800"
+            className="text-sm font-semibold text-[var(--clinic-text)]"
           >
             공통 문자 본문
           </label>
@@ -2509,7 +2510,7 @@ function BulkAttendanceFollowupPanel({
             value={messageTemplate}
             onChange={(event) => onMessageTemplateChange(event.target.value)}
             rows={8}
-            className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#c9d8dd] bg-white px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#b7ece6]"
           />
           <p
             className={[
@@ -2518,7 +2519,7 @@ function BulkAttendanceFollowupPanel({
                 ? "text-red-700"
                 : messageMetrics.transportType === "lms"
                   ? "text-amber-700"
-                  : "text-stone-500",
+                  : "text-[var(--clinic-muted)]",
             ].join(" ")}
           >
             공통 본문 {messageMetrics.charCount}자 · {messageMetrics.byteCount}byte ·{" "}
@@ -2532,9 +2533,9 @@ function BulkAttendanceFollowupPanel({
           </p>
         </div>
 
-        <div className="rounded-md border border-stone-200 bg-stone-50 p-3 text-sm leading-6 text-stone-700">
+        <div className="rounded-sm border border-[var(--clinic-border)] bg-[#f4f9fa] p-3 text-sm leading-6 text-[var(--clinic-text)]">
           <div className="flex items-start gap-2">
-            <CheckCircle2 className="mt-0.5 shrink-0 text-[#315C7C]" size={17} />
+            <CheckCircle2 className="mt-0.5 shrink-0 text-[var(--clinic-primary)]" size={17} />
             <p>
               `{"{{studentName}}"}` 변수는 학생별 이름으로 바뀝니다. 예:{" "}
               {selectedStudents[0]?.name ?? "학생명"}
@@ -2559,7 +2560,7 @@ function BulkAttendanceFollowupPanel({
               "rounded-md border p-3 text-sm leading-6",
               submitState.status === "error"
                 ? "border-red-200 bg-red-50 text-red-900"
-                : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
+                : "border-[#b7d8d4] bg-[#e3f3f1] text-[var(--clinic-primary-dark)]",
             ].join(" ")}
           >
             <div className="flex items-start gap-2">
@@ -2586,10 +2587,10 @@ function BulkAttendanceFollowupPanel({
             disabled={!canSave}
             onClick={() => onSubmit(false)}
             className={[
-              "flex min-h-12 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition",
               canSave
-                ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
-                : "bg-stone-300 text-stone-600",
+                ? "bg-[var(--clinic-primary)] text-white hover:bg-[var(--clinic-primary-dark)]"
+                : "bg-[#d7e3e7] text-[var(--clinic-muted)]",
             ].join(" ")}
           >
             <Send size={17} />
@@ -2600,10 +2601,10 @@ function BulkAttendanceFollowupPanel({
             disabled={!canSend}
             onClick={() => onSubmit(true)}
             className={[
-              "flex min-h-12 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition",
               canSend
-                ? "bg-stone-950 text-white hover:bg-stone-800"
-                : "bg-[#C9D6E2] text-[#244B67]",
+                ? "bg-[var(--clinic-primary-dark)] text-white hover:bg-[#052f38]"
+                : "bg-[#c9d8dd] text-[var(--clinic-primary-dark)]",
             ].join(" ")}
           >
             <Send size={17} />
@@ -2682,30 +2683,30 @@ function AttendanceFollowupPanel({
   const canSendMessage = isFollowupSaved && !isMessageSending && !sendBlockedMessage;
 
   return (
-    <section className={["rounded-lg border border-stone-200 bg-white xl:sticky xl:top-5", className].join(" ")}>
-      <div className="border-b border-stone-200 px-3 py-2.5 sm:px-4 sm:py-3">
+    <section className={["overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)] xl:sticky xl:top-5", className].join(" ")}>
+      <div className="border-b border-[var(--clinic-border)] bg-[var(--clinic-primary-dark)] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[#315C7C]" size={18} />
-          <h3 className="text-sm font-semibold text-stone-950">결석/지각 문자</h3>
+          <MessageSquareText className="text-[var(--clinic-accent)]" size={18} />
+          <h3 className="text-sm font-semibold text-white">결석/지각 문자</h3>
           {followupTarget ? (
             <button
               type="button"
               onClick={onDismiss}
-              className="ml-auto rounded-md border border-stone-200 px-2 py-1 text-xs font-semibold text-stone-600"
+              className="ml-auto rounded-sm border border-white/20 bg-white/10 px-2 py-1 text-xs font-semibold text-white hover:bg-white/15"
             >
               닫기
             </button>
           ) : null}
         </div>
-        <p className="mt-1 text-xs leading-5 text-stone-500">
+        <p className="mt-1 text-xs leading-5 text-white/65">
           결석/지각 선택 시 문자 초안이 준비됩니다.
         </p>
       </div>
 
       {!followupTarget ? (
         <div className="space-y-3 p-3 sm:p-4">
-          <div className="rounded-md border border-stone-200 bg-stone-50 p-3 text-sm leading-6 text-stone-600">
-            <p className="font-semibold text-stone-900">대기 상태</p>
+          <div className="rounded-sm border border-[var(--clinic-border)] bg-[#f4f9fa] p-3 text-sm leading-6 text-[var(--clinic-muted)]">
+            <p className="font-semibold text-[var(--clinic-text)]">대기 상태</p>
             <p className="mt-1">
               `확인 필요`는 바로 문자를 만들지 않습니다. 미도착 학생을 잠시 대기시킨
               뒤 결석이나 지각으로 확정하면 문자 초안이 생성됩니다.
@@ -2732,22 +2733,22 @@ function AttendanceFollowupPanel({
         </div>
       ) : (
         <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-          <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-3 py-3">
-            <p className="text-xs font-medium text-stone-500">선택 학생</p>
-            <p className="mt-1 text-base font-semibold text-stone-950">
+          <div className="border-l-4 border-l-[var(--clinic-accent)] bg-[#edf9f7] px-3 py-3">
+            <p className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--clinic-primary)]">선택 학생</p>
+            <p className="mt-1 text-base font-semibold text-[var(--clinic-text)]">
               {followupTarget.student.name}
             </p>
-            <p className="mt-1 text-xs text-stone-500">
+            <p className="mt-1 text-xs text-[var(--clinic-muted)]">
               {followupTarget.session.className} · {followupTarget.session.startTime}-
               {followupTarget.session.endTime}
             </p>
-            <p className="mt-2 inline-flex rounded-md bg-red-50 px-2 py-1 text-xs font-semibold text-red-800">
+            <p className="mt-2 inline-flex rounded-sm border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-[var(--clinic-danger)]">
               {reasonLabel(followupTarget.reason)} 안내
             </p>
           </div>
 
           <fieldset>
-            <legend className="text-sm font-semibold text-stone-800">수신자</legend>
+            <legend className="text-sm font-semibold text-[var(--clinic-text)]">수신자</legend>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {messageRecipientTypes.map((recipientType) => {
                 const needsStudentPhone = recipientType !== "parent";
@@ -2763,10 +2764,10 @@ function AttendanceFollowupPanel({
                     aria-pressed={isSelected}
                     onClick={() => onRecipientTypeChange(recipientType)}
                     className={[
-                      "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                      "min-h-10 rounded-sm border px-2 text-xs font-semibold transition",
                       isSelected
-                        ? "border-[#315C7C] bg-[#315C7C] text-white"
-                        : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
+                        ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
+                        : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa]",
                       isDisabled ? "cursor-not-allowed opacity-45" : "",
                     ].join(" ")}
                   >
@@ -2775,7 +2776,7 @@ function AttendanceFollowupPanel({
                 );
               })}
             </div>
-            <p className="mt-2 text-xs leading-5 text-stone-500">
+            <p className="mt-2 text-xs leading-5 text-[var(--clinic-muted)]">
               학생 연락처: {followupTarget.student.maskedStudentPhone ?? "미등록"}
             </p>
           </fieldset>
@@ -2793,7 +2794,7 @@ function AttendanceFollowupPanel({
             <div className="flex items-center justify-between gap-2">
               <label
                 htmlFor="attendance-followup-message"
-                className="truncate text-sm font-semibold text-stone-800"
+                className="truncate text-sm font-semibold text-[var(--clinic-text)]"
               >
                 {isPreviewReady ? messagePreview.title : "문자 미리보기"}
               </label>
@@ -2803,7 +2804,7 @@ function AttendanceFollowupPanel({
                 title="원문으로 되돌리기"
                 disabled={!isDraftEdited}
                 onClick={onRestorePreview}
-                className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#c9d8dd] bg-white text-[var(--clinic-muted)] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <RotateCcw size={15} />
               </button>
@@ -2820,7 +2821,7 @@ function AttendanceFollowupPanel({
                   : "결석 또는 지각 학생을 선택하면 문자 초안이 표시됩니다."
               }
               rows={8}
-              className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition disabled:bg-stone-50 disabled:text-stone-500 focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#c9d8dd] bg-white px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition disabled:bg-[#eef4f6] disabled:text-[var(--clinic-muted)] focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#b7ece6]"
             />
             <p
               className={[
@@ -2829,7 +2830,7 @@ function AttendanceFollowupPanel({
                   ? "text-red-700"
                   : messageMetrics.transportType === "lms"
                     ? "text-amber-700"
-                    : "text-stone-500",
+                    : "text-[var(--clinic-muted)]",
               ].join(" ")}
             >
               {messageMetrics.charCount}자 · {messageMetrics.byteCount}byte ·{" "}
@@ -2846,15 +2847,15 @@ function AttendanceFollowupPanel({
 
           <div
             className={[
-              "rounded-md border p-3 text-sm leading-6",
+              "rounded-sm border p-3 text-sm leading-6",
               isPreviewError
                 ? "border-red-200 bg-red-50 text-red-900"
-                : "border-stone-200 bg-stone-50 text-stone-700",
+                : "border-[var(--clinic-border)] bg-[#f4f9fa] text-[var(--clinic-text)]",
             ].join(" ")}
           >
             <div className="flex items-start gap-2">
               {isPreviewReady && !isPreviewError ? (
-                <CheckCircle2 className="mt-0.5 shrink-0 text-[#315C7C]" size={17} />
+                <CheckCircle2 className="mt-0.5 shrink-0 text-[var(--clinic-primary)]" size={17} />
               ) : (
                 <AlertCircle className="mt-0.5 shrink-0" size={17} />
               )}
@@ -2871,10 +2872,10 @@ function AttendanceFollowupPanel({
           {followupSaveError || isFollowupSaved ? (
             <div
               className={[
-                "rounded-md border p-3 text-sm leading-6",
+                "rounded-sm border p-3 text-sm leading-6",
                 followupSaveError
                   ? "border-red-200 bg-red-50 text-red-900"
-                  : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
+                  : "border-[#b7d8d4] bg-[#e3f3f1] text-[var(--clinic-primary-dark)]",
               ].join(" ")}
             >
               <div className="flex items-start gap-2">
@@ -2896,10 +2897,10 @@ function AttendanceFollowupPanel({
             disabled={!canSaveFollowup}
             onClick={onSaveFollowup}
             className={[
-              "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+              "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition",
               canSaveFollowup
-                ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
-                : "bg-stone-300 text-stone-600",
+                ? "bg-[var(--clinic-primary)] text-white hover:bg-[var(--clinic-primary-dark)]"
+                : "bg-[#d7e3e7] text-[var(--clinic-muted)]",
             ].join(" ")}
           >
             <Send size={17} />
@@ -2926,10 +2927,10 @@ function AttendanceFollowupPanel({
                 disabled={!canSendMessage}
                 onClick={onSendMessage}
                 className={[
-                  "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+                  "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition",
                   canSendMessage
-                    ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
-                    : "bg-[#C9D6E2] text-[#244B67]",
+                    ? "bg-[var(--clinic-primary-dark)] text-white hover:bg-[#052f38]"
+                    : "bg-[#c9d8dd] text-[var(--clinic-primary-dark)]",
                 ].join(" ")}
               >
                 <Send size={17} />
@@ -2945,10 +2946,10 @@ function AttendanceFollowupPanel({
               {messageSendError || isMessageSent ? (
                 <div
                   className={[
-                    "rounded-md border p-3 text-sm leading-6",
+                    "rounded-sm border p-3 text-sm leading-6",
                     messageSendError
                       ? "border-red-200 bg-red-50 text-red-900"
-                      : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
+                      : "border-[#b7d8d4] bg-[#e3f3f1] text-[var(--clinic-primary-dark)]",
                   ].join(" ")}
                 >
                   <div className="flex items-start gap-2">
@@ -3388,13 +3389,13 @@ function createDefaultNote(status: AttendanceStatus) {
 
 function attendanceStatusClass(status: AttendanceStatus) {
   const classes: Record<AttendanceStatus, string> = {
-    pending: "bg-stone-100 text-stone-600",
-    present: "bg-[#EAF1F8] text-[#315C7C]",
-    late: "bg-amber-50 text-amber-800",
-    absent: "bg-red-50 text-red-800",
-    makeup: "bg-blue-50 text-blue-800",
-    excused: "bg-purple-50 text-purple-800",
-    needs_check: "bg-orange-50 text-orange-800",
+    pending: "border-[#c9d8dd] bg-[#f4f9fa] text-[var(--clinic-muted)]",
+    present: "border-[#b7d8d4] bg-[#e3f3f1] text-[var(--clinic-primary)]",
+    late: "border-amber-200 bg-amber-50 text-[var(--clinic-warning)]",
+    absent: "border-red-200 bg-red-50 text-[var(--clinic-danger)]",
+    makeup: "border-violet-200 bg-violet-50 text-[var(--clinic-violet)]",
+    excused: "border-violet-200 bg-violet-50 text-[var(--clinic-violet)]",
+    needs_check: "border-red-200 bg-red-50 text-[var(--clinic-danger)]",
   };
 
   return classes[status];
