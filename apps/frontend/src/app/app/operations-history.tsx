@@ -32,7 +32,7 @@ export function StudentFollowupHistory({
   return (
     <section
       aria-labelledby="student-followup-history-title"
-      className="rounded-lg border border-stone-200 bg-white shadow-sm"
+      className="rounded-lg border border-stone-200 bg-white"
     >
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
@@ -56,30 +56,36 @@ export function StudentFollowupHistory({
         </p>
       </div>
 
-      <div className="p-4">
+      <div>
         {history.status === "loading" ? (
-          <HistoryMessage icon={<Clock3 size={17} />} message="최근 기록을 불러오는 중입니다." />
+          <div className="p-4">
+            <HistoryMessage icon={<Clock3 size={17} />} message="최근 기록을 불러오는 중입니다." />
+          </div>
         ) : null}
 
         {history.status === "error" ? (
-          <HistoryMessage
-            icon={<AlertCircle size={17} />}
-            message={history.error || "최근 기록을 불러오지 못했습니다."}
-            tone="error"
-          />
+          <div className="p-4">
+            <HistoryMessage
+              icon={<AlertCircle size={17} />}
+              message={history.error || "최근 기록을 불러오지 못했습니다."}
+              tone="error"
+            />
+          </div>
         ) : null}
 
         {history.status === "ready" && history.items.length === 0 ? (
-          <HistoryMessage
-            icon={<History size={17} />}
-            message="아직 저장된 연락 기록이 없습니다."
-          />
+          <div className="p-4">
+            <HistoryMessage
+              icon={<History size={17} />}
+              message="아직 저장된 연락 기록이 없습니다."
+            />
+          </div>
         ) : null}
 
         {history.status === "ready" && history.items.length > 0 ? (
-          <ol className="space-y-3">
+          <ol className="divide-y divide-stone-100">
             {history.items.map((item) => (
-              <li key={item.id} className="rounded-md border border-stone-200 p-3">
+              <li key={item.id} className="border-l-2 border-l-transparent px-4 py-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
