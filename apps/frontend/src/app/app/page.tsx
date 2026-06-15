@@ -943,7 +943,7 @@ function AppShell({
 }) {
   return (
     <main className="min-h-screen bg-[#F7F3EA] pb-[env(safe-area-inset-bottom)]">
-      <section className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-8 sm:py-5">
+      <section className="mx-auto w-full max-w-[96rem] px-3 py-3 sm:px-6 sm:py-5 xl:px-8">
         <header className="flex items-start justify-between gap-2 border-b border-stone-200 pb-4 sm:items-center sm:gap-3 sm:pb-5">
           <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#315C7C] text-white sm:size-11">
