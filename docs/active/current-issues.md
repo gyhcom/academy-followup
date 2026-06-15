@@ -41,6 +41,20 @@
 | T-649 남은 운영 API 이관 | 완료 | P1 | bulk 학생/스케줄, 타 학원 수업, 스케줄 공유 API를 Spring에 추가 | T-648 | 관리/학생 상세/보강 화면 Spring 우선 호출과 Next.js fallback 회귀 확인 |
 | T-650 Spring 전환 배포 준비 완료 | 완료 | P1 | Railway 배포 준비 문서와 최종 전환 기준 고정 | T-649 | Railway 결제 후 배포 smoke test 진행 |
 | T-654 출석부 지각/결석 다중 선택 일괄 문자 | 완료 | P1 | 출석부에서 지각/결석 학생을 여러 명 선택해 학생명 변수 치환 문자 기록/테스트 발송 처리 | 출석부 문자 흐름, SOLAPI dry-run 유지 | 실제 수업 단위 dry-run 검증 |
+| T-635 출석부 중심 제품 방향 재정의 및 후속 이슈 분리 | 완료 | P0 | 원장 미팅 결과를 기준으로 제품 방향을 출석부 중심으로 재정의 | 월요일 원장 미팅 | 후속 이슈 #73~#78 순서대로 검토 |
+
+## 출석부 중심 후속 이슈
+
+주의: 기존 문서에는 Spring 전환 작업으로 T-636~T-641 번호가 이미 사용되어 있습니다. 아래 GitHub Issue는 월요일 원장 미팅 요청 원문 번호를 유지해 생성했으며, 문서에서는 “출석부 중심 후속 이슈”로 별도 구분합니다.
+
+| GitHub Issue | 티켓 | 우선순위 | 목표 | 제외 범위 | 추천 브랜치 |
+| --- | --- | --- | --- | --- | --- |
+| #73 | T-636 출석부 메뉴 우선순위 및 상태 단순화 | P0 | 출석부를 핵심 메뉴로 올리고 출석/지각/결석 상태를 단순화 | 달력형 출석부, 문자 변수, 교재비 | `codex/t-636-attendance-menu-status-simplification` |
+| #74 | T-637 출석부 다중 선택 및 지각/결석 일괄 처리 | P0 | 여러 학생 선택 후 지각/결석 상태 변경 | 실제 문자 발송 | `codex/t-637-attendance-bulk-status-update` |
+| #75 | T-638 선택 학생 일괄 문자 및 이름 변수 치환 | P0 | 선택 학생에게 동일 템플릿을 학생명 변수만 치환해서 발송 | 수강료/교재비 변수 | `codex/t-638-attendance-bulk-message-variables` |
+| #76 | T-639 학생 식별 정보 및 개인 메모 개선 | P1 | 동명이인 구분, 성별 아이콘, 휴대폰 일부 표시, 개인 메모 | 전화번호 원문 노출 확대, 전체 상담 CRM | `codex/t-639-student-identity-notes` |
+| #77 | T-640 달력형 출석부 UX 검토 | P1 | 날짜/수업시간 기준의 달력형 출석부 구조 검토 | 바로 전체 달력 구현, DB schema 변경 | `codex/t-640-calendar-attendance-ux-review` |
+| #78 | T-641 교재비/수강료 변수 및 월말 안내 문자 설계 | P2 | 교재비/수강료 금액 기록과 월말 안내 문자 설계 | 결제/수납/미납/청구서/영수증 | `codex/t-641-fee-material-message-design` |
 
 ## 현재 원칙
 
@@ -56,4 +70,6 @@
 - 실제 Railway 배포와 Vercel `NEXT_PUBLIC_BACKEND_API_URL` 설정은 결제 후 smoke test를 통과한 뒤 별도 승인으로 진행합니다.
 - PC 홈/관리 콘솔 개선은 main에 반영됐고 Vercel frontend 자동 배포 기준입니다.
 - 실제 운영 전환 기준 문서는 `docs/testing/operations-real-data-transition-2026-06.md`, SOLAPI 테스트 번호 기준은 `docs/testing/solapi-test-number-readiness-2026-06.md`를 봅니다.
+- 월요일 원장 미팅 이후 제품 중심이 출석부로 이동할 가능성이 커졌습니다. 기준 문서는 `docs/product/attendance-led-product-direction-2026-06.md`를 봅니다.
+- Spring Boot/Railway 후속 작업보다 출석부 중심 요구사항 P0를 먼저 정리합니다. 고객 미팅 결과에 따라 UI/API 우선순위가 바뀔 수 있습니다.
 - 7월 13일 전까지는 파일럿 운영 개선과 안정화를 우선합니다.
