@@ -451,21 +451,21 @@ function PcOperationsDashboard({
 
   return (
     <div className="hidden xl:block">
-      <section className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+      <section className="rounded-md border border-[#CAD8DE] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-end">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-[#315C7C]">{academyName}</p>
-            <h2 className="mt-2 text-3xl font-semibold leading-tight text-stone-950">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">{academyName}</p>
+            <h2 className="mt-2 text-2xl font-bold leading-tight text-[var(--clinic-text)]">
               {copy.title}
             </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-600">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--clinic-muted)]">
               {copy.description}
             </p>
           </div>
           <HomeDateControl value={selectedDate} onChange={onDateChange} />
         </div>
 
-        <div className="mt-5 grid grid-cols-5 overflow-hidden rounded-lg border border-stone-200 bg-stone-50">
+        <div className="mt-4 grid grid-cols-5 overflow-hidden rounded-md border border-[#D2DDE2] bg-[#F4F8F9]">
           <PcKpi label="오늘 수업" value={`${scheduleSummary.academyScheduleCount}개`} />
           <PcKpi label="학생 체크" value={`${studentRows.length}명`} />
           <PcKpi label="체크 필요" value={`${boardSummary.unchecked}명`} tone="warning" />
@@ -474,23 +474,23 @@ function PcOperationsDashboard({
         </div>
       </section>
 
-      <section className="mt-5 grid gap-4 xl:grid-cols-[17rem_minmax(0,1fr)_24rem] 2xl:grid-cols-[18rem_minmax(0,1fr)_26rem] xl:items-start">
+      <section className="mt-5 grid gap-4 xl:grid-cols-[20rem_minmax(0,1fr)_24rem] 2xl:grid-cols-[21rem_minmax(0,1fr)_26rem] xl:items-start">
         <aside className="space-y-4">
-          <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
-            <div className="border-b border-stone-200 px-4 py-3">
+          <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+            <div className="border-b border-[#D6E0E5] bg-[#F7FAFB] px-4 py-3">
               <div className="flex items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-sm font-semibold text-stone-950">
+                  <h3 className="text-sm font-bold text-[var(--clinic-text)]">
                     {isStaffHome ? "오늘 담당 수업" : "오늘 학원 수업"}
                   </h3>
-                  <p className="mt-0.5 text-xs text-stone-500">수업을 누르면 출석부로 이동합니다.</p>
+                  <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">수업을 누르면 출석부로 이동합니다.</p>
                 </div>
-                <span className="rounded-full bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-600">
+                <span className="rounded-full bg-[#DCECEF] px-2 py-1 text-xs font-bold text-[var(--clinic-primary-dark)]">
                   {academyItems.length}개
                 </span>
               </div>
             </div>
-            <div className="max-h-[28rem] divide-y divide-stone-100 overflow-y-auto">
+            <div className="max-h-[31rem] divide-y divide-[#E1EAEE] overflow-y-auto">
               {academyItems.length > 0 ? (
                 academyItems.map((item) => (
                   <PcScheduleButton key={item.id} item={item} onNavigate={onNavigate} />
@@ -503,9 +503,9 @@ function PcOperationsDashboard({
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
-            <div className="border-b border-stone-200 px-4 py-3">
-              <h3 className="text-sm font-semibold text-stone-950">업무 바로가기</h3>
+          <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+            <div className="border-b border-[#D6E0E5] bg-[#F7FAFB] px-4 py-3">
+              <h3 className="text-sm font-bold text-[var(--clinic-text)]">작업</h3>
             </div>
             <HomeActionButton
               icon={<ClipboardCheck size={18} />}
@@ -530,14 +530,14 @@ function PcOperationsDashboard({
           </section>
         </aside>
 
-        <section className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
-          <div className="border-b border-stone-200 px-4 py-3">
+        <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+          <div className="border-b border-[#D6E0E5] bg-[#F7FAFB] px-4 py-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 className="text-base font-semibold text-stone-950">
+                <h3 className="text-base font-bold text-[var(--clinic-text)]">
                   {isStaffHome ? "담당 학생 현황" : "오늘 학생 체크 보드"}
                 </h3>
-                <p className="mt-1 text-xs text-stone-500">
+                <p className="mt-1 text-xs text-[var(--clinic-muted)]">
                   학생을 누르면 오른쪽에서 수업, 연락, 보강 제외 일정을 확인합니다.
                 </p>
               </div>
@@ -561,7 +561,7 @@ function PcOperationsDashboard({
             ) : null}
           </div>
 
-          <div className="max-h-[38rem] divide-y divide-stone-100 overflow-y-auto bg-white" role="listbox" aria-label="오늘 학생 상태 목록">
+          <div className="max-h-[38rem] divide-y divide-[#E1EAEE] overflow-y-auto bg-white" role="listbox" aria-label="오늘 학생 상태 목록">
             {filteredStudentRows.length > 0 ? (
               filteredStudentRows.map((row) => (
                 <PcStudentBoardRowItem
@@ -603,16 +603,16 @@ function PcKpi({
   tone?: "default" | "warning" | "danger" | "muted";
 }) {
   const toneClass = {
-    default: "text-stone-950",
-    warning: "text-amber-800",
-    danger: "text-red-700",
-    muted: "text-[#315C7C]",
+    default: "text-[var(--clinic-text)]",
+    warning: "text-[var(--clinic-warning)]",
+    danger: "text-[var(--clinic-danger)]",
+    muted: "text-[var(--clinic-primary)]",
   }[tone];
 
   return (
-    <div className="border-r border-stone-200 px-4 py-3 last:border-r-0">
-      <p className="text-xs font-medium text-stone-500">{label}</p>
-      <p className={`mt-1 text-xl font-semibold tabular-nums ${toneClass}`}>{value}</p>
+    <div className="border-r border-[#D2DDE2] px-4 py-3 last:border-r-0">
+      <p className="text-xs font-semibold text-[var(--clinic-muted)]">{label}</p>
+      <p className={`mt-1 text-xl font-bold tabular-nums ${toneClass}`}>{value}</p>
     </div>
   );
 }
@@ -627,23 +627,23 @@ function PcScheduleButton({
   const content = (
     <>
       <span className="w-[4.4rem] shrink-0">
-        <span className="block text-sm font-black tabular-nums text-stone-950">
+        <span className="block text-sm font-black tabular-nums text-[var(--clinic-text)]">
           {item.startTime}
         </span>
-        <span className="block text-xs font-semibold tabular-nums text-stone-400">
+        <span className="block text-xs font-semibold tabular-nums text-[var(--clinic-muted)]">
           {item.endTime}
         </span>
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-semibold text-stone-950">
+        <span className="block truncate text-sm font-bold text-[var(--clinic-text)]">
           {item.title}
         </span>
-        <span className="mt-0.5 block truncate text-xs text-stone-500">
+        <span className="mt-0.5 block truncate text-xs text-[var(--clinic-muted)]">
           {item.subtitle}
           {item.studentCount ? ` · ${item.studentCount}명` : ""}
         </span>
       </span>
-      <span className="rounded-full bg-stone-950 px-2.5 py-1 text-[11px] font-semibold text-white">
+      <span className="rounded-md bg-[var(--clinic-primary-dark)] px-2.5 py-1 text-[11px] font-bold text-white">
         출석
       </span>
     </>
@@ -657,7 +657,7 @@ function PcScheduleButton({
     <button
       type="button"
       onClick={() => onNavigate("attendance")}
-      className="flex min-h-[4.25rem] w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]"
+      className="flex min-h-[4.25rem] w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F2F8F8] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]"
     >
       {content}
     </button>
@@ -703,17 +703,17 @@ function PcStudentFilterBar({
             aria-pressed={isSelected}
             onClick={() => onChange(option.value)}
             className={[
-              "inline-flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+              "inline-flex min-h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
               isSelected
                 ? selectedChipTone(option.tone)
-                : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50",
+                : "border-[#CAD8DE] bg-white text-[var(--clinic-muted)] hover:border-[#9FB7C0] hover:bg-[#F4F8F9]",
             ].join(" ")}
           >
             {option.label}
             <span
               className={[
                 "rounded-full px-1.5 py-0.5 tabular-nums",
-                isSelected ? "bg-white/20 text-white" : "bg-stone-100 text-stone-500",
+                isSelected ? "bg-white/20 text-white" : "bg-[#E8F0F2] text-[var(--clinic-muted)]",
               ].join(" ")}
             >
               {option.count}
@@ -746,33 +746,33 @@ function PcStudentBoardRowItem({
       aria-label={`${row.student.name} 학생 상세 보기, ${row.className}, ${row.startTime}-${row.endTime}, 출석 ${attendanceDisplayLabel(row.status)}, 연락 ${contactLabel}`}
       onClick={onClick}
       className={[
-        "flex min-h-[4.35rem] w-full items-center gap-3 border-l-2 px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#7EA7C4]",
+        "flex min-h-[4.35rem] w-full items-center gap-3 border-l-[3px] px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
         isSelected
-          ? "border-l-[#315C7C] bg-[#F3F8FC]"
-          : "border-l-transparent bg-white hover:border-l-[#C9D6E2] hover:bg-stone-50",
+          ? "border-l-[var(--clinic-primary)] bg-[#EAF6F5]"
+          : "border-l-transparent bg-white hover:border-l-[#B8C9D0] hover:bg-[#F5FAFA]",
       ].join(" ")}
     >
       <span className="min-w-0 flex-[1.25]">
         <span className="flex min-w-0 items-center gap-2">
-          <span className="truncate text-sm font-semibold text-stone-950">
+          <span className="truncate text-sm font-bold text-[var(--clinic-text)]">
             {row.student.name}
           </span>
           {row.hasBlockedSchedule ? (
-            <span className="shrink-0 rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-semibold text-violet-800">
+            <span className="shrink-0 rounded-md border border-violet-200 bg-violet-50 px-2 py-0.5 text-[11px] font-bold text-violet-800">
               보강 제외
             </span>
           ) : null}
         </span>
-        <span className="mt-0.5 block truncate text-xs text-stone-500">
+        <span className="mt-0.5 block truncate text-xs text-[var(--clinic-muted)]">
           {[row.student.schoolName, row.student.gradeLabel].filter(Boolean).join(" · ") ||
             "학년 정보 없음"}
         </span>
       </span>
       <span className="min-w-0 flex flex-[1.15] items-center gap-2">
-        <span className="shrink-0 rounded-md bg-stone-50 px-2 py-1 text-xs font-semibold tabular-nums text-stone-700">
+        <span className="shrink-0 rounded-md bg-[#F0F6F7] px-2 py-1 text-xs font-bold tabular-nums text-[var(--clinic-text)]">
           {row.startTime}-{row.endTime}
         </span>
-        <span className="min-w-0 truncate text-xs font-medium text-stone-600">
+        <span className="min-w-0 truncate text-xs font-semibold text-[var(--clinic-muted)]">
           {row.className}
         </span>
       </span>
@@ -830,23 +830,23 @@ function PcStudentDetailPanel({
 
   return (
     <aside className="sticky top-4 space-y-3">
-      <section className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-        <div className="border-b border-stone-200 bg-stone-50/70 px-4 py-3">
-          <h3 className="text-sm font-semibold text-stone-950">학생 미니 프로필</h3>
-          <p className="mt-0.5 text-xs text-stone-500">
+      <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+        <div className="border-b border-[#0B3E49] bg-[var(--clinic-primary-dark)] px-4 py-3 text-white">
+          <h3 className="text-sm font-bold">학생 차트</h3>
+          <p className="mt-0.5 text-xs text-cyan-50/72">
             오늘 처리할 출석, 연락, 보강 제외 시간을 확인합니다.
           </p>
         </div>
 
         {row ? (
           <div>
-            <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
+            <div className="border-l-[3px] border-l-[var(--clinic-accent)] bg-[#EAF6F5] px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-lg font-semibold text-stone-950">
+                  <p className="truncate text-lg font-bold text-[var(--clinic-text)]">
                     {row.student.name}
                   </p>
-                  <p className="mt-1 truncate text-sm text-stone-500">
+                  <p className="mt-1 truncate text-sm text-[var(--clinic-muted)]">
                     {[row.student.schoolName, row.student.gradeLabel].filter(Boolean).join(" · ") ||
                       "학년 정보 없음"}
                   </p>
@@ -862,7 +862,7 @@ function PcStudentDetailPanel({
               </div>
             </div>
 
-            <div className="divide-y divide-stone-100">
+            <div className="divide-y divide-[#E1EAEE]">
               <ConsoleDetailRow label="오늘 수업" value={row.className} />
               <ConsoleDetailRow label="수업 시간" value={`${row.startTime}-${row.endTime}`} mono />
               <ConsoleDetailRow
@@ -889,11 +889,11 @@ function PcStudentDetailPanel({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 border-t border-stone-100 px-4 py-3">
+            <div className="grid grid-cols-2 gap-2 border-t border-[#E1EAEE] px-4 py-3">
               <button
                 type="button"
                 onClick={() => onNavigate("attendance")}
-                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+                className="min-h-11 rounded-md border border-[#B8C9D0] bg-white px-3 text-sm font-bold text-[var(--clinic-text)] transition hover:bg-[#F4F8F9] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]"
               >
                 출석부로 이동
               </button>
@@ -908,7 +908,7 @@ function PcStudentDetailPanel({
                       })
                     : undefined
                 }
-                className="min-h-11 rounded-md bg-[#315C7C] px-3 text-sm font-semibold text-white transition hover:bg-[#244B67] focus:outline-none focus:ring-2 focus:ring-[#7EA7C4] focus:ring-offset-2"
+                className="min-h-11 rounded-md bg-[var(--clinic-primary)] px-3 text-sm font-bold text-white transition hover:bg-[var(--clinic-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)] focus:ring-offset-2"
               >
                 문자 화면
               </button>
@@ -963,14 +963,14 @@ function PcStudentDetailPanel({
         )}
       </section>
 
-      <section className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-        <div className="border-b border-stone-200 px-4 py-3">
-          <h3 className="text-sm font-semibold text-stone-950">오늘 연락 큐</h3>
-          <p className="mt-0.5 text-xs text-stone-500">
+      <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+        <div className="border-b border-[#D6E0E5] bg-[#F7FAFB] px-4 py-3">
+          <h3 className="text-sm font-bold text-[var(--clinic-text)]">오늘 연락 큐</h3>
+          <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">
             미발송 {unsentCount}명 · 발송 완료 {sentCount}명
           </p>
         </div>
-        <div className="divide-y divide-stone-100">
+        <div className="divide-y divide-[#E1EAEE]">
           {recentAttentionItems.length > 0 ? (
             recentAttentionItems.map((item) => (
               <button
@@ -983,13 +983,13 @@ function PcStudentDetailPanel({
                     reason: followupReasonForStatus(item.status),
                   })
                 }
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]"
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-[#F4F8F9] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]"
               >
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold text-stone-950">
+                  <span className="block truncate text-sm font-bold text-[var(--clinic-text)]">
                     {item.student.name}
                   </span>
-                  <span className="mt-0.5 block truncate text-xs text-stone-500">
+                  <span className="mt-0.5 block truncate text-xs text-[var(--clinic-muted)]">
                     {item.className} · {attendanceStatusLabels[item.status]}
                   </span>
                 </span>
