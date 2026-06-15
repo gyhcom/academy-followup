@@ -2354,21 +2354,21 @@ function ManagementCommandCenter({
   onSelectSection: (section: ManagementSection) => void;
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-[#DED8CE] bg-white shadow-sm xl:sticky xl:top-4">
-      <div className="border-b border-[#EEE7DC] bg-[#FBFAF7] px-4 py-4 sm:px-5 xl:px-4">
+    <section className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm xl:sticky xl:top-4">
+      <div className="border-b border-[#EEE7DC] bg-[#FBFAF7] px-3 py-3 sm:px-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
           Academy Admin
         </p>
         <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between xl:block">
           <div className="min-w-0">
-            <h2 className="text-2xl font-semibold leading-tight text-stone-950 sm:text-2xl xl:text-xl">
+            <h2 className="text-xl font-semibold leading-tight text-stone-950 xl:text-lg">
               {academyName}
             </h2>
             <p className="mt-1 text-sm leading-6 text-stone-600 xl:text-xs xl:leading-5">
               운영 세팅, 명단, 수업, 직원, 문자, 정책을 업무 단위로 관리합니다.
             </p>
           </div>
-          <div className="grid grid-cols-4 gap-2 rounded-xl border border-[#E2DED6] bg-white p-2 text-center xl:mt-3 xl:grid-cols-2">
+          <div className="grid grid-cols-4 gap-1.5 rounded-md border border-[#E2DED6] bg-white p-1.5 text-center xl:mt-3 xl:grid-cols-2">
             <Metric label="학생" value={`${activeStudents}명`} />
             <Metric label="미등록" value={`${missingScheduleCount}명`} />
             <Metric label="반" value={`${classCount}개`} />
@@ -2377,7 +2377,7 @@ function ManagementCommandCenter({
         </div>
       </div>
 
-      <div className="grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1">
+      <div className="divide-y divide-[#EEE7DC] p-1.5">
         {sections.map((section) => {
           const isActive = activeSection === section.id;
 
@@ -2389,38 +2389,35 @@ function ManagementCommandCenter({
               aria-current={isActive ? "page" : undefined}
               onClick={() => onSelectSection(section.id)}
               className={[
-                "group grid min-h-[5.25rem] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border p-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2] xl:min-h-[4.5rem] xl:p-2.5",
+                "group grid min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-l-2 px-2.5 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
                 isActive
-                  ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67] shadow-sm"
-                  : "border-[#ECE6DC] bg-white text-stone-800 hover:border-[#C9D6E2] hover:bg-[#F8FBFD]",
+                  ? "border-l-[#315C7C] bg-[#F8FBFD] text-stone-950"
+                  : "border-l-transparent bg-white text-stone-800 hover:border-l-[#C9D6E2] hover:bg-[#FBFAF7]",
               ].join(" ")}
             >
               <span className="min-w-0">
                 <span className="flex min-w-0 items-center gap-2">
-                  <span className="truncate text-base font-semibold xl:text-sm">{section.label}</span>
+                  <span className="truncate text-sm font-semibold">{section.label}</span>
                   <span
                     className={[
                       "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold",
-                      isActive ? "bg-white text-[#244B67]" : "bg-[#F3EFE7] text-stone-600",
+                      isActive ? "bg-[#EAF1F8] text-[#244B67]" : "bg-[#F3EFE7] text-stone-600",
                     ].join(" ")}
                   >
                     {section.count}
                   </span>
                 </span>
-                <span className="mt-1 block truncate text-xs font-semibold text-[#315C7C]">
-                  {section.group}
-                </span>
-                <span className="mt-1 block truncate text-xs text-stone-500 xl:hidden">
-                  {section.status}
+                <span className="mt-0.5 block truncate text-xs text-stone-500">
+                  {section.group} · {section.status}
                 </span>
                 <span className="sr-only">{section.detail}</span>
               </span>
               <span
                 className={[
-                  "flex size-9 items-center justify-center rounded-full transition",
+                  "flex size-7 items-center justify-center rounded transition",
                   isActive
-                    ? "bg-[#315C7C] text-white"
-                    : "bg-[#F7F5F0] text-stone-500 group-hover:bg-[#EAF1F8] group-hover:text-[#315C7C]",
+                    ? "text-[#315C7C]"
+                    : "text-stone-300 group-hover:text-stone-500",
                 ].join(" ")}
               >
                 <ArrowRight size={16} />

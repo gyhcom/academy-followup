@@ -478,8 +478,8 @@ function WorkspaceNavigation({
   return (
     <>
       <aside className="hidden sm:sticky sm:top-5 sm:block sm:self-start">
-        <section className="overflow-hidden rounded-2xl border border-[#DED8CE] bg-white shadow-sm">
-          <div className="border-b border-[#EEE7DC] bg-[#FBFAF7] px-4 py-4">
+        <section className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm">
+          <div className="border-b border-[#EEE7DC] bg-[#FBFAF7] px-3 py-3">
             <p className="text-xs font-semibold text-[#315C7C]">{shellLabel}</p>
             <p className="mt-1 text-xs leading-5 text-stone-500">{shellDescription}</p>
           </div>
@@ -652,32 +652,41 @@ function WorkspaceNavButton({
         aria-pressed={isActive}
         onClick={onClick}
         className={[
-          "flex min-h-11 w-full items-center gap-2 rounded-lg border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+          "group relative flex min-h-10 w-full items-center gap-2 border-l-2 px-2.5 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
           isActive
-            ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm"
-            : "border-transparent bg-white text-stone-700 hover:border-[#D9E2EA] hover:bg-[#F8FBFD]",
+            ? "border-l-[#315C7C] bg-[#F8FBFD] text-stone-950"
+            : "border-l-transparent bg-white text-stone-700 hover:border-l-[#C9D6E2] hover:bg-[#FBFAF7]",
           disabled ? "cursor-not-allowed opacity-55" : "",
         ].join(" ")}
       >
         <span
           aria-hidden="true"
           className={[
-            "flex size-8 shrink-0 items-center justify-center rounded-md",
-            isActive ? "bg-white/15 text-white" : "bg-[#F2F5F8] text-[#315C7C]",
+            "flex size-7 shrink-0 items-center justify-center rounded",
+            isActive ? "bg-[#EAF1F8] text-[#315C7C]" : "bg-transparent text-stone-500 group-hover:text-[#315C7C]",
           ].join(" ")}
         >
           {icon}
         </span>
-        <span className="min-w-0">
+        <span className="min-w-0 flex-1">
           <span className="block truncate text-sm font-semibold">{label}</span>
           <span
             className={[
               "mt-0.5 block truncate text-xs",
-              isActive ? "text-white/75" : "text-stone-500",
+              isActive ? "text-stone-500" : "text-stone-500",
             ].join(" ")}
           >
             {description}
           </span>
+        </span>
+        <span
+          aria-hidden="true"
+          className={[
+            "text-xs font-semibold",
+            isActive ? "text-[#315C7C]" : "text-stone-300 group-hover:text-stone-500",
+          ].join(" ")}
+        >
+          ›
         </span>
       </button>
     );
