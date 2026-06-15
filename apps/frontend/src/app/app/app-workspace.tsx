@@ -324,20 +324,20 @@ function WorkspaceNavigation({
           onClick={() => onChange("home")}
         />
         <WorkspaceNavButton
-          icon={<MessageSquareText size={17} />}
-          label="문자 보내기"
-          shortLabel="문자"
-          description="수업 후 연락"
-          isActive={activeView === "operations"}
-          onClick={() => onChange("operations")}
-        />
-        <WorkspaceNavButton
           icon={<ClipboardCheck size={17} />}
           label="출석부"
           shortLabel="출석"
           description="도착·지각 체크"
           isActive={activeView === "attendance"}
           onClick={() => onChange("attendance")}
+        />
+        <WorkspaceNavButton
+          icon={<MessageSquareText size={17} />}
+          label="문자 보내기"
+          shortLabel="문자"
+          description="수업 후 연락"
+          isActive={activeView === "operations"}
+          onClick={() => onChange("operations")}
         />
         {canManage ? (
           <WorkspaceNavButton
