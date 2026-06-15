@@ -13,17 +13,17 @@ export function SummaryCard({
   detail: string;
 }) {
   return (
-    <article className="min-w-0 rounded-lg border border-[#E2DED6] bg-white p-3.5 shadow-sm sm:p-4">
+    <article className="min-w-0 rounded-md border border-[#C7D6DD] bg-white p-3.5 shadow-[0_1px_2px_rgba(13,38,48,0.08)] sm:p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium text-stone-500">{label}</p>
-          <p className="mt-2 text-xl font-semibold text-stone-950 sm:text-2xl">{value}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--clinic-muted)]">{label}</p>
+          <p className="mt-2 text-xl font-bold text-[var(--clinic-text)] sm:text-2xl">{value}</p>
         </div>
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#EAF1F8] text-[#315C7C] sm:size-10">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-[#EAF6F5] text-[var(--clinic-primary)] sm:size-10">
           {icon}
         </div>
       </div>
-      <p className="mt-3 text-xs leading-5 text-stone-500">{detail}</p>
+      <p className="mt-3 text-xs leading-5 text-[var(--clinic-muted)]">{detail}</p>
     </article>
   );
 }
@@ -44,11 +44,11 @@ export function ManagementPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="min-w-0 bg-transparent sm:rounded-lg sm:border sm:border-[#E2DED6] sm:bg-white sm:p-5 sm:shadow-sm">
-      <div className="flex items-center justify-between gap-3 pb-3 sm:border-b sm:border-[#E2DED6] sm:pb-4">
+    <section className="min-w-0 bg-transparent sm:rounded-md sm:border sm:border-[#C7D6DD] sm:bg-white sm:p-5 sm:shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+      <div className="flex items-center justify-between gap-3 pb-3 sm:border-b sm:border-[#D6E0E5] sm:pb-4">
         <div className="min-w-0">
-          <h3 className="text-lg font-semibold text-stone-950 sm:text-base">{title}</h3>
-          <p className="mt-1 hidden text-sm leading-6 text-stone-600 sm:block">{description}</p>
+          <h3 className="text-lg font-bold text-[var(--clinic-text)] sm:text-base">{title}</h3>
+          <p className="mt-1 hidden text-sm leading-6 text-[var(--clinic-muted)] sm:block">{description}</p>
         </div>
         {actionLabel ? (
           <button
@@ -58,8 +58,8 @@ export function ManagementPanel({
             className={[
               "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:min-h-10",
               onAction
-                ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm transition hover:border-[#244B67] hover:bg-[#244B67]"
-                : "cursor-not-allowed border-[#E2DED6] bg-[#F7F5F0] text-stone-500",
+                ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white shadow-sm transition hover:border-[var(--clinic-primary-dark)] hover:bg-[var(--clinic-primary-dark)]"
+                : "cursor-not-allowed border-[#D6E0E5] bg-[#F4F8F9] text-[var(--clinic-muted)]",
             ].join(" ")}
           >
             {actionIcon}

@@ -942,26 +942,26 @@ function AppShell({
   children: ReactNode;
 }) {
   return (
-    <main className="min-h-screen bg-[#F7F3EA] pb-[env(safe-area-inset-bottom)]">
-      <section className="mx-auto w-full max-w-[96rem] px-3 py-3 sm:px-6 sm:py-5 xl:px-8">
-        <header className="flex items-start justify-between gap-2 border-b border-stone-200 pb-4 sm:items-center sm:gap-3 sm:pb-5">
+    <main className="min-h-screen bg-[var(--clinic-page)] pb-[env(safe-area-inset-bottom)] text-[var(--clinic-text)]">
+      <section className="mx-auto w-full max-w-[120rem] px-0 sm:px-0">
+        <header className="flex items-start justify-between gap-2 border-b border-[#D7E0E4] bg-white px-4 py-3 shadow-[0_1px_0_rgba(15,43,51,0.04)] sm:hidden">
           <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#315C7C] text-white sm:size-11">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-[var(--clinic-primary-dark)] text-white shadow-sm sm:size-11">
               <School size={21} />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-stone-500 sm:text-sm">{subtitle}</p>
-              <h1 className="truncate text-base font-semibold leading-snug text-stone-950 sm:text-xl">
+              <p className="truncate text-xs font-semibold uppercase tracking-[0.16em] text-[var(--clinic-muted)] sm:text-xs">{subtitle}</p>
+              <h1 className="truncate text-base font-semibold leading-snug text-[var(--clinic-text)] sm:text-xl">
                 {title}
               </h1>
-              <p className="mt-1 break-all text-xs text-stone-500">{email}</p>
+              <p className="mt-1 break-all text-xs text-[var(--clinic-muted)]">{email}</p>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {hasPlatformAdmin ? (
               <Link
                 href="/platform"
-                className="hidden min-h-10 items-center rounded-md border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-700 sm:flex"
+                className="hidden min-h-10 items-center rounded-md border border-[#B8C9D0] bg-white px-3 text-sm font-semibold text-[var(--clinic-text)] transition hover:border-[var(--clinic-primary)] hover:bg-[#F5FAFA] sm:flex"
               >
                 플랫폼 관리
               </Link>
@@ -970,7 +970,7 @@ function AppShell({
           </div>
         </header>
 
-        <div className="py-4 sm:py-6">{children}</div>
+        <div>{children}</div>
       </section>
     </main>
   );

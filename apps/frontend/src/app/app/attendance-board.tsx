@@ -1229,13 +1229,13 @@ function AttendanceWorkbench({
   const selectedStatus = normalizeAttendanceStatus(selectedRecord?.status);
 
   return (
-    <section className="space-y-3 rounded-xl bg-[var(--clinic-page)] p-3">
-      <header className="overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)]">
-        <div className="h-1 bg-[linear-gradient(90deg,var(--clinic-primary-dark),var(--clinic-primary),var(--clinic-accent))]" />
-        <div className="flex items-start justify-between gap-4 px-4 py-3">
+    <section className="space-y-3 rounded-md bg-[var(--clinic-page)]">
+      <header className="overflow-hidden rounded-md border border-[#C2D1D8] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+        <div className="h-1.5 bg-[linear-gradient(90deg,var(--clinic-primary-dark),var(--clinic-primary),var(--clinic-accent))]" />
+        <div className="flex items-start justify-between gap-4 px-4 py-3.5">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--clinic-primary)]">{academyName}</p>
-            <h2 className="mt-1 text-xl font-semibold text-[var(--clinic-text)]">출석부 장부</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">{academyName}</p>
+            <h2 className="mt-1 text-2xl font-bold text-[var(--clinic-text)]">출석부 장부</h2>
             <p className="mt-1 text-sm leading-5 text-[var(--clinic-muted)]">
               {teacherName}님, 수업을 선택하고 학생 row에서 출석·지각·결석을 바로 처리합니다.
             </p>
@@ -1246,7 +1246,7 @@ function AttendanceWorkbench({
         </div>
       </header>
 
-      <div className="grid min-h-[42rem] gap-3 lg:grid-cols-[13rem_minmax(0,1fr)_17rem] xl:grid-cols-[15rem_minmax(0,1fr)_18rem] 2xl:grid-cols-[17rem_minmax(0,1fr)_22rem]">
+      <div className="grid min-h-[42rem] gap-3 lg:grid-cols-[15rem_minmax(0,1fr)_18rem] xl:grid-cols-[17rem_minmax(0,1fr)_20rem] 2xl:grid-cols-[20rem_minmax(0,1fr)_24rem]">
         <aside className="space-y-3">
           <AttendanceOverviewStrip overview={overview} />
           <SessionList
@@ -1258,13 +1258,13 @@ function AttendanceWorkbench({
           />
         </aside>
 
-        <section className="min-w-0 overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)]">
-          <div className="border-b border-[var(--clinic-border)] bg-[var(--clinic-panel-muted)] px-4 py-3">
+        <section className="min-w-0 overflow-hidden rounded-md border border-[#C2D1D8] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+          <div className="border-b border-[#D2DDE2] bg-[#F7FAFB] px-4 py-3">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <UserCheck size={18} className="text-[var(--clinic-primary)]" />
-                  <h3 className="truncate text-base font-semibold text-[var(--clinic-text)]">
+                  <h3 className="truncate text-lg font-bold text-[var(--clinic-text)]">
                     {selectedSession?.className ?? "선택된 수업 없음"}
                   </h3>
                 </div>
@@ -1421,9 +1421,9 @@ function AttendanceLedgerTable({
   }
 
   return (
-    <div className="overflow-x-auto bg-[var(--clinic-panel)]">
+    <div className="overflow-x-auto bg-white">
       <table className="w-full min-w-full table-fixed border-separate border-spacing-0 text-left">
-        <thead className="bg-[#e6eef1] text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--clinic-muted)]">
+        <thead className="bg-[#E6EEF1] text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--clinic-muted)]">
           <tr>
             <th className="w-8 border-b border-[var(--clinic-border)] px-2 py-2">선택</th>
             <th className="w-[30%] border-b border-[var(--clinic-border)] px-2 py-2">학생 차트</th>
@@ -1467,8 +1467,8 @@ function AttendanceLedgerTable({
                 className={[
                   "group cursor-pointer border-b border-[var(--clinic-border)] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
                   isSelected
-                    ? "bg-[#edf9f7] shadow-[inset_4px_0_0_var(--clinic-primary)]"
-                    : "bg-[var(--clinic-panel)] hover:bg-[#f4f9fa]",
+                    ? "bg-[#EAF6F5] shadow-[inset_4px_0_0_var(--clinic-primary)]"
+                    : "bg-white hover:bg-[#F4F9FA]",
                 ].join(" ")}
               >
                 <td className="border-b border-[#dbe6ea] px-2 py-2.5 align-middle">

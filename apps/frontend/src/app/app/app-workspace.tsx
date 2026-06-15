@@ -15,6 +15,7 @@ import {
   AttendanceBoard,
   type AttendanceRecordItem,
 } from "@/app/app/attendance-board";
+import { LogoutButton } from "@/app/app/logout-button";
 import { ManagementHome } from "@/app/app/management-home";
 import { WorkspaceHome } from "@/app/app/workspace-home";
 import type {
@@ -229,15 +230,17 @@ export function AppWorkspace({
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl pb-20 sm:max-w-none sm:px-4 sm:pb-0 xl:px-5">
-      <div className="sm:grid sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-4 lg:grid-cols-[16rem_minmax(0,1fr)]">
+    <div className="mx-auto w-full max-w-[120rem] pb-20 sm:pb-0">
+      <div className="sm:grid sm:min-h-[calc(100vh-4.5rem)] sm:grid-cols-[15.75rem_minmax(0,1fr)] lg:grid-cols-[16.5rem_minmax(0,1fr)]">
         <WorkspaceNavigation
           activeView={visibleView}
+          academyName={academyName}
+          roleLabel={roleLabel}
           canManage={canManage}
           onChange={handleViewChange}
         />
 
-        <div className="min-w-0 space-y-4 sm:space-y-5">
+        <div className="min-w-0 space-y-4 px-3 py-4 sm:space-y-5 sm:px-5 sm:py-5 xl:px-6">
           <WorkspaceContextHeader
             academyName={academyName}
             teacherName={teacherName}
@@ -366,23 +369,24 @@ function WorkspaceContextHeader({
   canManage: boolean;
 }) {
   return (
-    <section className="hidden rounded-xl border border-[#DED8CE] bg-white px-4 py-3 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4">
+    <section className="hidden min-h-14 rounded-md border border-[#D2DDE2] bg-white px-4 py-2.5 shadow-[0_1px_2px_rgba(13,38,48,0.08)] sm:flex sm:items-center sm:justify-between sm:gap-4">
       <div className="min-w-0">
-        <p className="text-xs font-semibold text-[#315C7C]">
+        <p className="text-xs font-semibold text-[var(--clinic-primary)]">
           {getWorkspaceViewLabel(activeView, canManage)}
         </p>
-        <h2 className="mt-0.5 truncate text-lg font-semibold text-stone-950">
+        <h2 className="mt-0.5 truncate text-lg font-semibold text-[var(--clinic-text)]">
           {academyName}
         </h2>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2 text-xs text-stone-600">
-        <span className="rounded-full border border-[#E6E0D5] bg-[#FBFAF7] px-3 py-1.5 font-semibold text-stone-800">
+      <div className="flex shrink-0 items-center gap-2 text-xs text-[var(--clinic-muted)]">
+        <span className="rounded-md border border-[#D2DDE2] bg-[#F6FAFA] px-3 py-1.5 font-semibold text-[var(--clinic-text)]">
           운영 기준 {formatContextDate(selectedDate)}
         </span>
-        <span className="rounded-full border border-[#E6E0D5] bg-white px-3 py-1.5">
+        <span className="rounded-md border border-[#D2DDE2] bg-white px-3 py-1.5">
           {teacherName} · {roleLabel}
         </span>
+        <LogoutButton />
       </div>
     </section>
   );
@@ -461,10 +465,14 @@ function getDayOfWeek(dateValue: string) {
 
 function WorkspaceNavigation({
   activeView,
+  academyName,
+  roleLabel,
   canManage,
   onChange,
 }: {
   activeView: WorkspaceView;
+  academyName: string;
+  roleLabel: string;
   canManage: boolean;
   onChange: (view: WorkspaceView) => void;
 }) {
@@ -477,15 +485,24 @@ function WorkspaceNavigation({
 
   return (
     <>
-      <aside className="hidden sm:sticky sm:top-5 sm:block sm:self-start">
-        <section className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm">
-          <div className="border-b border-[#EEE7DC] bg-[#FBFAF7] px-3 py-3">
-            <p className="text-xs font-semibold text-[#315C7C]">{shellLabel}</p>
-            <p className="mt-1 text-xs leading-5 text-stone-500">{shellDescription}</p>
+      <aside className="hidden sm:sticky sm:top-0 sm:block sm:h-screen sm:self-start">
+        <section className="flex h-full flex-col overflow-hidden border-r border-[#123A48] bg-[linear-gradient(180deg,#062837_0%,#08384A_54%,#052332_100%)] text-white shadow-[8px_0_30px_rgba(5,35,50,0.10)]">
+          <div className="border-b border-white/10 px-5 py-5">
+            <div className="flex items-center gap-3">
+              <div className="flex size-11 items-center justify-center rounded-md border border-white/20 bg-white/10 text-white">
+                <ClipboardCheck size={20} />
+              </div>
+              <div>
+                <p className="max-w-[10rem] truncate text-sm font-bold leading-tight">{academyName}</p>
+                <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-cyan-100/60">ACADEMY OS</p>
+              </div>
+            </div>
+            <p className="mt-4 text-xs font-semibold text-cyan-50/80">{shellLabel}</p>
+            <p className="mt-1 text-xs leading-5 text-cyan-50/62">{shellDescription}</p>
           </div>
           <nav
             aria-label={shellLabel}
-            className="space-y-1 p-2"
+            className="flex-1 space-y-1.5 p-3"
           >
             {navItems.map((item) => (
               <WorkspaceNavButton
@@ -500,10 +517,14 @@ function WorkspaceNavigation({
               />
             ))}
           </nav>
+          <div className="border-t border-white/10 px-5 py-4 text-xs text-cyan-50/55">
+            <p className="font-semibold">{roleLabel}</p>
+            <p className="mt-1">v1.0.0</p>
+          </div>
         </section>
       </aside>
 
-      <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[#DED8CE] bg-white/95 px-3 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:hidden">
+      <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[#D2DDE2] bg-white/95 px-3 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-12px_30px_rgba(13,38,48,0.14)] backdrop-blur sm:hidden">
         <nav
           aria-label={shellLabel}
           className={["grid gap-1.5", getMobileGridClass(mobileItems.length)].join(" ")}
@@ -652,18 +673,18 @@ function WorkspaceNavButton({
         aria-pressed={isActive}
         onClick={onClick}
         className={[
-          "group relative flex min-h-10 w-full items-center gap-2 border-l-2 px-2.5 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+          "group relative flex min-h-11 w-full items-center gap-3 rounded-md border-l-[3px] px-3 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70",
           isActive
-            ? "border-l-[#315C7C] bg-[#F8FBFD] text-stone-950"
-            : "border-l-transparent bg-white text-stone-700 hover:border-l-[#C9D6E2] hover:bg-[#FBFAF7]",
+            ? "border-l-[#2DD4BF] bg-cyan-300/13 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.10)]"
+            : "border-l-transparent text-cyan-50/72 hover:border-l-cyan-200/45 hover:bg-white/6 hover:text-white",
           disabled ? "cursor-not-allowed opacity-55" : "",
         ].join(" ")}
       >
         <span
           aria-hidden="true"
           className={[
-            "flex size-7 shrink-0 items-center justify-center rounded",
-            isActive ? "bg-[#EAF1F8] text-[#315C7C]" : "bg-transparent text-stone-500 group-hover:text-[#315C7C]",
+            "flex size-8 shrink-0 items-center justify-center rounded-md",
+            isActive ? "bg-cyan-300/18 text-cyan-100" : "bg-white/5 text-cyan-50/62 group-hover:text-cyan-100",
           ].join(" ")}
         >
           {icon}
@@ -683,7 +704,7 @@ function WorkspaceNavButton({
           aria-hidden="true"
           className={[
             "text-xs font-semibold",
-            isActive ? "text-[#315C7C]" : "text-stone-300 group-hover:text-stone-500",
+            isActive ? "text-cyan-100" : "text-cyan-50/30 group-hover:text-cyan-50/60",
           ].join(" ")}
         >
           ›

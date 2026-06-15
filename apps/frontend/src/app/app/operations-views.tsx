@@ -52,7 +52,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
         totalStudents={props.totalStudents}
       />
 
-      <section className="grid min-w-0 gap-3 lg:grid-cols-[14rem_minmax(0,1fr)] lg:items-start xl:grid-cols-[15.5rem_minmax(0,1fr)_21rem] 2xl:grid-cols-[16rem_minmax(0,1fr)_22rem]">
+      <section className="grid min-w-0 gap-3 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start xl:grid-cols-[18rem_minmax(0,1fr)_23rem] 2xl:grid-cols-[20rem_minmax(0,1fr)_25rem]">
         <aside className="min-w-0 space-y-3">
           <ClassPicker
             classes={props.classes}
@@ -154,19 +154,19 @@ function OperationsHeader({
   totalStudents: number;
 }) {
   return (
-    <section className="mb-3 border-b border-[#DED8CE] bg-transparent px-1 pb-3 sm:mb-4 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-4 sm:py-3 sm:shadow-sm">
+    <section className="mb-3 rounded-md border border-[#C2D1D8] bg-white px-4 py-3.5 shadow-[0_1px_2px_rgba(13,38,48,0.08)] sm:mb-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-[#315C7C]">{academyName}</p>
-          <h2 className="mt-1 text-xl font-semibold leading-tight text-stone-950 sm:text-2xl">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">{academyName}</p>
+          <h2 className="mt-1 text-2xl font-bold leading-tight text-[var(--clinic-text)]">
             수업 후 연락
           </h2>
-          <p className="mt-1 max-w-2xl text-sm leading-5 text-stone-600">
+          <p className="mt-1 max-w-2xl text-sm leading-5 text-[var(--clinic-muted)]">
             반과 학생을 선택하면 학부모 문자 초안이 준비됩니다.
           </p>
         </div>
 
-        <dl className="flex gap-3 border-t border-stone-200 pt-3 text-sm lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
+        <dl className="flex gap-3 border-t border-[#D2DDE2] pt-3 text-sm lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
           <StatusItem label="반" value={`${classCount}개`} />
           <StatusItem label="학생" value={`${totalStudents}명`} />
         </dl>
@@ -187,14 +187,14 @@ function ClassPicker({
   return (
     <section aria-label="반 선택" className="space-y-2">
       <div className="flex items-center justify-between gap-2 px-1">
-        <p className="text-xs font-semibold text-stone-500">반 선택</p>
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--clinic-muted)]">반 선택</p>
         {selectedClass ? (
-          <p className="truncate text-xs font-medium text-stone-500">
+          <p className="truncate text-xs font-semibold text-[var(--clinic-muted)]">
             {selectedClass.name} · {selectedClass.students.length}명
           </p>
         ) : null}
       </div>
-      <div className="max-h-[12rem] divide-y divide-stone-100 overflow-y-auto rounded-lg border border-stone-200 bg-white">
+      <div className="max-h-[14rem] divide-y divide-[#E1EAEE] overflow-y-auto rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
         {classes.map((classItem) => {
           const isSelected = classItem.id === selectedClass?.id;
           return (
@@ -204,17 +204,17 @@ function ClassPicker({
               aria-pressed={isSelected}
               onClick={() => onClassSelect(classItem.id)}
               className={[
-                "min-h-11 w-full border-l-2 px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]",
+                "min-h-11 w-full border-l-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
                 isSelected
-                  ? "border-l-[#315C7C] bg-[#F8FBFD] text-stone-950"
-                  : "border-l-transparent bg-white text-stone-700 hover:border-l-[#C9D6E2] hover:bg-stone-50",
+                  ? "border-l-[var(--clinic-primary)] bg-[#EAF6F5] text-[var(--clinic-text)]"
+                  : "border-l-transparent bg-white text-[var(--clinic-text)] hover:border-l-[#B8C9D0] hover:bg-[#F5FAFA]",
               ].join(" ")}
             >
-              <span className="block text-sm font-semibold">{classItem.name}</span>
+              <span className="block text-sm font-bold">{classItem.name}</span>
               <span
                 className={[
                   "mt-0.5 block text-xs",
-                  isSelected ? "text-[#315C7C]" : "text-stone-500",
+                  isSelected ? "text-[var(--clinic-primary)]" : "text-[var(--clinic-muted)]",
                 ].join(" ")}
               >
                 {classItem.subject ?? "과목 미지정"} · {classItem.students.length}명
@@ -244,19 +244,19 @@ function StudentSelectionList({
     <section aria-labelledby="student-flow-title" className="min-w-0 space-y-2 lg:order-1">
       <div className="flex items-end justify-between gap-3 px-1">
         <div>
-          <h2 id="student-flow-title" className="text-sm font-semibold text-stone-950">
+          <h2 id="student-flow-title" className="text-sm font-bold text-[var(--clinic-text)]">
             학생 확인 목록
           </h2>
-          <p className="mt-1 text-xs text-stone-500">
+          <p className="mt-1 text-xs text-[var(--clinic-muted)]">
             학생을 확인하고 필요한 연락 사유를 바로 선택합니다.
           </p>
         </div>
-        <span className="shrink-0 text-xs font-medium text-stone-500">
+        <span className="shrink-0 text-xs font-bold text-[var(--clinic-muted)]">
           {selectedClass?.students.length ?? 0}명
         </span>
       </div>
 
-      <div className="max-h-[min(42rem,calc(100vh-18rem))] overflow-y-auto rounded-lg border border-[#DED8CE] bg-white shadow-sm">
+      <div className="max-h-[min(42rem,calc(100vh-18rem))] overflow-y-auto rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
         {selectedClass?.students.length ? (
           selectedClass.students.map((student) => {
             const isSelected = student.id === selectedStudent?.id;
