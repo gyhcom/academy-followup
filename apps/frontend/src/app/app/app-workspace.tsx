@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   BarChart3,
+  BookOpenText,
   ClipboardCheck,
   Home,
   MessageSquareText,
@@ -91,6 +92,7 @@ type WorkspaceView =
   | "operations"
   | "attendance"
   | "students"
+  | "fees"
   | "reports"
   | "management";
 
@@ -227,75 +229,93 @@ export function AppWorkspace({
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 pb-20 sm:space-y-5 sm:pb-0 xl:max-w-[82rem] 2xl:max-w-[88rem]">
-      <WorkspaceNavigation
-        activeView={visibleView}
-        canManage={canManage}
-        onChange={handleViewChange}
-      />
+    <div className="mx-auto max-w-6xl pb-20 sm:pb-0 xl:max-w-[88rem] 2xl:max-w-[94rem]">
+      <div className="sm:grid sm:grid-cols-[15.5rem_minmax(0,1fr)] sm:gap-4 lg:grid-cols-[16.5rem_minmax(0,1fr)]">
+        <WorkspaceNavigation
+          activeView={visibleView}
+          canManage={canManage}
+          onChange={handleViewChange}
+        />
 
-      {visibleView === "home" ? (
-        <WorkspaceHome
-          key={selectedDate}
-          academyName={academyName}
-          teacherName={teacherName}
-          role={role}
-          roleLabel={roleLabel}
-          canManage={canManage}
-          classes={classes}
-          scheduleItems={homeScheduleItems}
-          scheduleSummaryItems={homeScheduleSummaryItems}
-          selectedDate={selectedDate}
-          records={workspaceAttendanceRecords}
-          loadState={attendanceLoadState}
-          onDateChange={setSelectedDate}
-          onNavigate={handleViewChange}
-          onStudentSelect={handleHomeStudentSelect}
-        />
-      ) : visibleView === "operations" ? (
-        <OperationsBoard
-          academyName={academyName}
-          teacherName={teacherName}
-          role={role}
-          roleLabel={roleLabel}
-          allowAssistantSend={managementSettings.allowAssistantSend}
-          canManage={canManage}
-          classes={classes}
-          initialSelection={operationsSelection}
-        />
-      ) : visibleView === "attendance" ? (
-        <AttendanceBoard
-          academyName={academyName}
-          teacherName={teacherName}
-          role={role}
-          allowAssistantSend={managementSettings.allowAssistantSend}
-          classes={classes}
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          initialRecords={workspaceAttendanceRecords}
-          onRecordsChange={setWorkspaceAttendanceRecords}
-        />
-      ) : (
-        <ManagementHome
-          key={visibleView}
-          academyName={academyName}
-          classes={managementClasses}
-          members={managementMembers}
-          students={managementStudents}
-          settings={managementSettings}
-          templates={managementTemplates}
-          auditLogs={managementAuditLogs}
-          attendanceSessionCount={attendanceSessionCount}
-          initialSection={getManagementInitialSection(visibleView)}
-          onNavigate={handleViewChange}
-        />
-      )}
+        <div className="min-w-0 space-y-4 sm:space-y-5">
+          <WorkspaceContextHeader
+            academyName={academyName}
+            teacherName={teacherName}
+            roleLabel={roleLabel}
+            selectedDate={selectedDate}
+            activeView={visibleView}
+            canManage={canManage}
+          />
+
+          {visibleView === "home" ? (
+            <WorkspaceHome
+              key={selectedDate}
+              academyName={academyName}
+              teacherName={teacherName}
+              role={role}
+              roleLabel={roleLabel}
+              canManage={canManage}
+              classes={classes}
+              scheduleItems={homeScheduleItems}
+              scheduleSummaryItems={homeScheduleSummaryItems}
+              selectedDate={selectedDate}
+              records={workspaceAttendanceRecords}
+              loadState={attendanceLoadState}
+              onDateChange={setSelectedDate}
+              onNavigate={handleViewChange}
+              onStudentSelect={handleHomeStudentSelect}
+            />
+          ) : visibleView === "operations" ? (
+            <OperationsBoard
+              academyName={academyName}
+              teacherName={teacherName}
+              role={role}
+              roleLabel={roleLabel}
+              allowAssistantSend={managementSettings.allowAssistantSend}
+              canManage={canManage}
+              classes={classes}
+              initialSelection={operationsSelection}
+            />
+          ) : visibleView === "attendance" ? (
+            <AttendanceBoard
+              academyName={academyName}
+              teacherName={teacherName}
+              role={role}
+              allowAssistantSend={managementSettings.allowAssistantSend}
+              classes={classes}
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+              initialRecords={workspaceAttendanceRecords}
+              onRecordsChange={setWorkspaceAttendanceRecords}
+            />
+          ) : visibleView === "fees" ? (
+            <FeesPlaceholder
+              onOpenStudents={() => handleViewChange("students")}
+              onOpenReports={() => handleViewChange("reports")}
+            />
+          ) : (
+            <ManagementHome
+              key={visibleView}
+              academyName={academyName}
+              classes={managementClasses}
+              members={managementMembers}
+              students={managementStudents}
+              settings={managementSettings}
+              templates={managementTemplates}
+              auditLogs={managementAuditLogs}
+              attendanceSessionCount={attendanceSessionCount}
+              initialSection={getManagementInitialSection(visibleView)}
+              onNavigate={handleViewChange}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
 function normalizeWorkspaceView(view: WorkspaceView, canManage: boolean): WorkspaceView {
-  if (!canManage && ["students", "reports", "management"].includes(view)) {
+  if (!canManage && ["students", "fees", "reports", "management"].includes(view)) {
     return "home";
   }
 
@@ -312,6 +332,120 @@ function getManagementInitialSection(view: WorkspaceView) {
   }
 
   return "setup";
+}
+
+function getWorkspaceViewLabel(view: WorkspaceView, canManage: boolean) {
+  if (!canManage) {
+    if (view === "attendance") return "출석부";
+    if (view === "operations") return "문자";
+    return "오늘";
+  }
+
+  if (view === "attendance") return "출석부";
+  if (view === "students") return "학생";
+  if (view === "operations") return "문자";
+  if (view === "fees") return "교재/비용";
+  if (view === "reports") return "리포트";
+  if (view === "management") return "관리";
+  return "오늘";
+}
+
+function WorkspaceContextHeader({
+  academyName,
+  teacherName,
+  roleLabel,
+  selectedDate,
+  activeView,
+  canManage,
+}: {
+  academyName: string;
+  teacherName: string;
+  roleLabel: string;
+  selectedDate: string;
+  activeView: WorkspaceView;
+  canManage: boolean;
+}) {
+  return (
+    <section className="hidden rounded-xl border border-[#DED8CE] bg-white px-4 py-3 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4">
+      <div className="min-w-0">
+        <p className="text-xs font-semibold text-[#315C7C]">
+          {getWorkspaceViewLabel(activeView, canManage)}
+        </p>
+        <h2 className="mt-0.5 truncate text-lg font-semibold text-stone-950">
+          {academyName}
+        </h2>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2 text-xs text-stone-600">
+        <span className="rounded-full border border-[#E6E0D5] bg-[#FBFAF7] px-3 py-1.5 font-semibold text-stone-800">
+          운영 기준 {formatContextDate(selectedDate)}
+        </span>
+        <span className="rounded-full border border-[#E6E0D5] bg-white px-3 py-1.5">
+          {teacherName} · {roleLabel}
+        </span>
+      </div>
+    </section>
+  );
+}
+
+function FeesPlaceholder({
+  onOpenStudents,
+  onOpenReports,
+}: {
+  onOpenStudents: () => void;
+  onOpenReports: () => void;
+}) {
+  return (
+    <section className="rounded-2xl border border-[#DED8CE] bg-white p-6 shadow-sm">
+      <div className="max-w-3xl">
+        <p className="text-xs font-semibold text-[#315C7C]">준비 중인 운영 영역</p>
+        <h2 className="mt-2 text-2xl font-semibold text-stone-950">교재/비용</h2>
+        <p className="mt-2 text-sm leading-6 text-stone-600">
+          교재비와 수강료는 결제/수납 시스템으로 바로 확장하지 않고, 학생별 금액 기록과
+          월말 안내 문자에 필요한 변수 관리부터 설계합니다.
+        </p>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={onOpenStudents}
+          className="min-h-12 rounded-lg border border-[#D9E2EA] bg-[#F8FBFD] px-4 text-left text-sm font-semibold text-[#244B67] transition hover:bg-[#EAF1F8] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+        >
+          학생별 기본 정보 확인
+          <span className="mt-1 block text-xs font-normal text-stone-500">
+            실제 비용 기능 전 학생 명단과 반 배정을 먼저 고정합니다.
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={onOpenReports}
+          className="min-h-12 rounded-lg border border-[#E6E0D5] bg-white px-4 text-left text-sm font-semibold text-stone-800 transition hover:bg-[#FBFAF7] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+        >
+          운영 기록 리포트 확인
+          <span className="mt-1 block text-xs font-normal text-stone-500">
+            출석, 문자, 이력 CSV 보관 흐름은 기존 리포트에서 확인합니다.
+          </span>
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function formatContextDate(dateValue: string) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateValue;
+  }
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  }).format(date);
 }
 
 function getDayOfWeek(dateValue: string) {
@@ -338,23 +472,20 @@ function WorkspaceNavigation({
   const mobileItems = navItems.filter((item) => item.showOnMobile);
   const shellLabel = canManage ? "학원 운영 콘솔" : "수업 처리 도구";
   const shellDescription = canManage
-    ? "PC에서는 학생 명단과 리포트까지 바로 접근합니다."
+    ? "학생, 출석, 문자, 비용, 리포트를 업무 순서대로 봅니다."
     : "담당 수업 출석과 연락 처리만 빠르게 사용합니다.";
 
   return (
     <>
-      <section className="hidden overflow-hidden rounded-xl border border-[#DED8CE] bg-white shadow-sm sm:block">
-        <div className="flex flex-col gap-2 px-3 py-2 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0">
+      <aside className="hidden sm:sticky sm:top-5 sm:block sm:self-start">
+        <section className="overflow-hidden rounded-2xl border border-[#DED8CE] bg-white shadow-sm">
+          <div className="border-b border-[#EEE7DC] bg-[#FBFAF7] px-4 py-4">
             <p className="text-xs font-semibold text-[#315C7C]">{shellLabel}</p>
-            <p className="mt-0.5 hidden text-xs text-stone-500 lg:block">
-              {shellDescription}
-            </p>
+            <p className="mt-1 text-xs leading-5 text-stone-500">{shellDescription}</p>
           </div>
-
           <nav
             aria-label={shellLabel}
-            className="grid gap-1.5 md:grid-cols-3 lg:flex lg:items-center"
+            className="space-y-1 p-2"
           >
             {navItems.map((item) => (
               <WorkspaceNavButton
@@ -369,8 +500,8 @@ function WorkspaceNavigation({
               />
             ))}
           </nav>
-        </div>
-      </section>
+        </section>
+      </aside>
 
       <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[#DED8CE] bg-white/95 px-3 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-12px_30px_rgba(33,32,30,0.10)] backdrop-blur sm:hidden">
         <nav
@@ -407,8 +538,8 @@ function getWorkspaceNavItems(canManage: boolean) {
     {
       view: "home",
       icon: <Home size={17} />,
-      label: canManage ? "운영 홈" : "홈",
-      shortLabel: "홈",
+      label: "오늘",
+      shortLabel: "오늘",
       description: canManage ? "오늘 운영 현황" : "담당 수업 요약",
       showOnMobile: true,
     },
@@ -440,6 +571,14 @@ function getWorkspaceNavItems(canManage: boolean) {
         shortLabel: "문자",
         description: "연락 기록·발송",
         showOnMobile: true,
+      },
+      {
+        view: "fees" as const,
+        icon: <BookOpenText size={17} />,
+        label: "교재/비용",
+        shortLabel: "비용",
+        description: "월말 안내 준비",
+        showOnMobile: false,
       },
       {
         view: "reports" as const,
@@ -513,7 +652,7 @@ function WorkspaceNavButton({
         aria-pressed={isActive}
         onClick={onClick}
         className={[
-          "flex min-h-11 min-w-[8.25rem] items-center gap-2 rounded-lg border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+          "flex min-h-11 w-full items-center gap-2 rounded-lg border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
           isActive
             ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm"
             : "border-transparent bg-white text-stone-700 hover:border-[#D9E2EA] hover:bg-[#F8FBFD]",
