@@ -25,10 +25,18 @@ import {
   saveAttendanceRecord,
   type AttendanceRecordItem as AttendanceClientRecordItem,
 } from "@/lib/client/attendance";
-import { createFollowup, fetchFollowupHistory } from "@/lib/client/followups";
+import {
+  createBulkAttendanceFollowups,
+  createFollowup,
+  fetchFollowupHistory,
+} from "@/lib/client/followups";
 import { sendFollowupMessage } from "@/lib/client/message-send";
 import { fetchMessagePreview } from "@/lib/client/message-preview";
-import { followupReasons, type FollowupReason } from "@/lib/followup-templates";
+import {
+  followupReasons,
+  getDefaultFollowupTemplate,
+  type FollowupReason,
+} from "@/lib/followup-templates";
 import { getMessageLengthMetrics } from "@/lib/message-length";
 import {
   messageRecipientLabels,
@@ -91,6 +99,14 @@ type AttendanceFollowupTarget = {
   reason: FollowupReason;
 };
 
+type BulkAttendanceReason = Extract<FollowupReason, "late" | "absence">;
+
+type BulkAttendanceTarget = {
+  reason: BulkAttendanceReason;
+  session: AttendanceSession;
+  students: AttendanceStudent[];
+};
+
 type AttendanceOverview = {
   totalSessions: number;
   totalStudents: number;
@@ -121,6 +137,15 @@ type MessageSendState = {
   dryRun: boolean;
   message: string;
   error: string;
+};
+
+type BulkSubmitState = {
+  status: "idle" | "saving" | "saved" | "sending" | "sent" | "error";
+  message: string;
+  error: string;
+  dryRun: boolean;
+  savedFollowupCount: number;
+  messageLogCount: number;
 };
 
 const editableStatuses: AttendanceStatus[] = [
@@ -190,6 +215,19 @@ export function AttendanceBoard({
     error: "",
   });
   const [duplicateWarning, setDuplicateWarning] = useState("");
+  const [bulkTarget, setBulkTarget] = useState<BulkAttendanceTarget | null>(null);
+  const [bulkSelectedStudentIds, setBulkSelectedStudentIds] = useState<string[]>([]);
+  const [bulkMessageTemplate, setBulkMessageTemplate] = useState("");
+  const [bulkRecipientType, setBulkRecipientType] =
+    useState<MessageRecipientType>("parent");
+  const [bulkSubmit, setBulkSubmit] = useState<BulkSubmitState>({
+    status: "idle",
+    message: "",
+    error: "",
+    dryRun: true,
+    savedFollowupCount: 0,
+    messageLogCount: 0,
+  });
   const selectedDayOfWeek = getDayOfWeek(selectedDate);
   const dateAttendanceRecords = useMemo(
     () => attendanceRecords.filter((record) => record.attendanceDate === selectedDate),
@@ -245,6 +283,25 @@ export function AttendanceBoard({
           "needs_check",
       )
     : [];
+  const lateStudents = selectedSession
+    ? selectedSession.students.filter(
+        (student) => normalizeAttendanceStatus(recordsByStudent.get(student.id)?.status) === "late",
+      )
+    : [];
+  const absentStudents = selectedSession
+    ? selectedSession.students.filter(
+        (student) =>
+          normalizeAttendanceStatus(recordsByStudent.get(student.id)?.status) === "absent",
+      )
+    : [];
+  const selectedBulkStudents = bulkTarget
+    ? bulkTarget.students.filter((student) => bulkSelectedStudentIds.includes(student.id))
+    : [];
+  const effectiveBulkRecipientType =
+    selectedBulkStudents.some((student) => !student.maskedStudentPhone) &&
+    bulkRecipientType !== "parent"
+      ? "parent"
+      : bulkRecipientType;
   const effectiveRecipientType =
     followupTarget?.student.maskedStudentPhone ? selectedRecipientType : "parent";
   const followupTargetKey = followupTarget
@@ -586,6 +643,98 @@ export function AttendanceBoard({
     }
   }
 
+  function handleStartBulkAttendance(reason: BulkAttendanceReason) {
+    if (!selectedSession) {
+      return;
+    }
+
+    const students = reason === "late" ? lateStudents : absentStudents;
+
+    if (students.length === 0) {
+      return;
+    }
+
+    setFollowupTarget(null);
+    setDuplicateWarning("");
+    setBulkTarget({ reason, session: selectedSession, students });
+    setBulkSelectedStudentIds(students.map((student) => student.id));
+    setBulkMessageTemplate(getDefaultFollowupTemplate(reason));
+    setBulkRecipientType("parent");
+    setBulkSubmit({
+      status: "idle",
+      message: "",
+      error: "",
+      dryRun: true,
+      savedFollowupCount: 0,
+      messageLogCount: 0,
+    });
+  }
+
+  function handleToggleBulkStudent(studentId: string) {
+    setBulkSelectedStudentIds((current) =>
+      current.includes(studentId)
+        ? current.filter((id) => id !== studentId)
+        : [...current, studentId],
+    );
+    setBulkSubmit((current) => ({ ...current, status: "idle", message: "", error: "" }));
+  }
+
+  async function handleSubmitBulkAttendance(sendNow: boolean) {
+    if (!bulkTarget || selectedBulkStudents.length === 0) {
+      return;
+    }
+
+    setBulkSubmit({
+      status: sendNow ? "sending" : "saving",
+      message: "",
+      error: "",
+      dryRun: true,
+      savedFollowupCount: 0,
+      messageLogCount: 0,
+    });
+
+    try {
+      const payload = await createBulkAttendanceFollowups({
+        reason: bulkTarget.reason,
+        studentIds: selectedBulkStudents.map((student) => student.id),
+        classId: bulkTarget.session.classId,
+        attendanceDate: selectedDate,
+        scheduledStartTime: bulkTarget.session.startTime,
+        scheduledEndTime: bulkTarget.session.endTime,
+        recipientType: effectiveBulkRecipientType,
+        messageTemplate: bulkMessageTemplate,
+        sendNow,
+      });
+      const recordsPayload = await fetchAttendanceRecords(selectedDate);
+
+      applyAttendanceRecords(recordsPayload.records ?? attendanceRecordsRef.current);
+      setBulkSubmit({
+        status: sendNow ? "sent" : "saved",
+        message: sendNow
+          ? payload.dryRun
+            ? "실제 문자는 보내지 않고 학생별 발송 로그를 저장했습니다."
+            : "선택 학생에게 문자를 발송했습니다."
+          : "선택 학생의 연락 기록을 저장했습니다.",
+        error: "",
+        dryRun: payload.dryRun,
+        savedFollowupCount: payload.savedFollowupCount,
+        messageLogCount: payload.messageLogCount,
+      });
+    } catch (error) {
+      setBulkSubmit({
+        status: "error",
+        message: "",
+        error:
+          error instanceof Error
+            ? error.message
+            : "일괄 문자 처리를 완료하지 못했습니다.",
+        dryRun: true,
+        savedFollowupCount: 0,
+        messageLogCount: 0,
+      });
+    }
+  }
+
   const assistantSendBlockedMessage =
     role === "assistant" && !allowAssistantSend
       ? "보조 선생님은 현재 테스트 발송 권한이 없습니다. 연락 기록 저장은 가능하며, 발송은 원장/관리자에게 요청하세요."
@@ -621,6 +770,8 @@ export function AttendanceBoard({
             setSelectedSessionKey(sessionKey);
             setAttendanceFilter("all");
             setExpandedExceptionKey("");
+            setBulkTarget(null);
+            setBulkSelectedStudentIds([]);
           }}
         />
 
@@ -655,6 +806,20 @@ export function AttendanceBoard({
                 summary={summary}
                 totalCount={selectedSession.students.length}
                 onChange={setAttendanceFilter}
+              />
+            ) : null}
+
+            {selectedSession ? (
+              <AttendanceBulkActionBar
+                lateCount={lateStudents.length}
+                absentCount={absentStudents.length}
+                activeReason={bulkTarget?.reason ?? null}
+                selectedCount={selectedBulkStudents.length}
+                onStart={handleStartBulkAttendance}
+                onClear={() => {
+                  setBulkTarget(null);
+                  setBulkSelectedStudentIds([]);
+                }}
               />
             ) : null}
 
@@ -694,6 +859,10 @@ export function AttendanceBoard({
                         ? saveState.error
                         : "";
                     const isExceptionOpen = expandedExceptionKey === updateKey;
+                    const isBulkSelectable =
+                      bulkTarget !== null &&
+                      status === attendanceStatusForBulkReason(bulkTarget.reason);
+                    const isBulkSelected = bulkSelectedStudentIds.includes(student.id);
 
                     return (
                       <AttendanceStudentRow
@@ -705,6 +874,10 @@ export function AttendanceBoard({
                         isSaved={isSaved}
                         saveError={saveError}
                         isExceptionOpen={isExceptionOpen}
+                        isBulkSelectable={isBulkSelectable}
+                        isBulkSelected={isBulkSelected}
+                        bulkReason={bulkTarget?.reason ?? null}
+                        onToggleBulkSelection={() => handleToggleBulkStudent(student.id)}
                         onToggleException={() =>
                           setExpandedExceptionKey((current) =>
                             current === updateKey ? "" : updateKey,
@@ -740,37 +913,64 @@ export function AttendanceBoard({
           )}
         </section>
 
-        <AttendanceFollowupPanel
-          className="lg:col-span-2 xl:col-span-1"
-          duplicateWarning={duplicateWarning}
-          followupSaveError={followupSaveError}
-          followupTarget={followupTarget}
-          selectedRecipientType={effectiveRecipientType}
-          isDraftEdited={isDraftEdited}
-          isFollowupSaved={isFollowupSaved}
-          isFollowupSaving={isFollowupSaving}
-          isMessageBlank={isMessageBlank}
-          isMessageSending={isMessageSending}
-          isMessageSent={isMessageSent}
-          isPreviewError={isPreviewError}
-          isPreviewLoading={isPreviewLoading}
-          isPreviewReady={isPreviewReady}
-          messageBody={messageBody}
-          messagePreview={messagePreview}
-          messageSend={messageSend}
-          messageSendError={messageSendError}
-          needsCheckStudents={needsCheckStudents}
-          sendBlockedMessage={assistantSendBlockedMessage}
-          onDismiss={() => {
-            setDuplicateWarning("");
-            setFollowupTarget(null);
-          }}
-          onMessageChange={(body) => setMessageDraft({ key: followupTargetKey, body })}
-          onRecipientTypeChange={setSelectedRecipientType}
-          onRestorePreview={handleRestorePreview}
-          onSaveFollowup={handleSaveAttendanceFollowup}
-          onSendMessage={handleSendAttendanceMessage}
-        />
+        {bulkTarget ? (
+          <BulkAttendanceFollowupPanel
+            className="lg:col-span-2 xl:col-span-1"
+            bulkTarget={bulkTarget}
+            messageTemplate={bulkMessageTemplate}
+            selectedRecipientType={effectiveBulkRecipientType}
+            selectedStudents={selectedBulkStudents}
+            submitState={bulkSubmit}
+            sendBlockedMessage={assistantSendBlockedMessage}
+            onDismiss={() => {
+              setBulkTarget(null);
+              setBulkSelectedStudentIds([]);
+            }}
+            onMessageTemplateChange={(body) => {
+              setBulkMessageTemplate(body);
+              setBulkSubmit((current) => ({
+                ...current,
+                status: "idle",
+                message: "",
+                error: "",
+              }));
+            }}
+            onRecipientTypeChange={setBulkRecipientType}
+            onSubmit={handleSubmitBulkAttendance}
+          />
+        ) : (
+          <AttendanceFollowupPanel
+            className="lg:col-span-2 xl:col-span-1"
+            duplicateWarning={duplicateWarning}
+            followupSaveError={followupSaveError}
+            followupTarget={followupTarget}
+            selectedRecipientType={effectiveRecipientType}
+            isDraftEdited={isDraftEdited}
+            isFollowupSaved={isFollowupSaved}
+            isFollowupSaving={isFollowupSaving}
+            isMessageBlank={isMessageBlank}
+            isMessageSending={isMessageSending}
+            isMessageSent={isMessageSent}
+            isPreviewError={isPreviewError}
+            isPreviewLoading={isPreviewLoading}
+            isPreviewReady={isPreviewReady}
+            messageBody={messageBody}
+            messagePreview={messagePreview}
+            messageSend={messageSend}
+            messageSendError={messageSendError}
+            needsCheckStudents={needsCheckStudents}
+            sendBlockedMessage={assistantSendBlockedMessage}
+            onDismiss={() => {
+              setDuplicateWarning("");
+              setFollowupTarget(null);
+            }}
+            onMessageChange={(body) => setMessageDraft({ key: followupTargetKey, body })}
+            onRecipientTypeChange={setSelectedRecipientType}
+            onRestorePreview={handleRestorePreview}
+            onSaveFollowup={handleSaveAttendanceFollowup}
+            onSendMessage={handleSendAttendanceMessage}
+          />
+        )}
       </section>
     </div>
   );
@@ -1075,6 +1275,80 @@ function AttendanceFilterBar({
   );
 }
 
+function AttendanceBulkActionBar({
+  lateCount,
+  absentCount,
+  activeReason,
+  selectedCount,
+  onStart,
+  onClear,
+}: {
+  lateCount: number;
+  absentCount: number;
+  activeReason: BulkAttendanceReason | null;
+  selectedCount: number;
+  onStart: (reason: BulkAttendanceReason) => void;
+  onClear: () => void;
+}) {
+  if (lateCount === 0 && absentCount === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-2 rounded-md border border-stone-200 bg-stone-50 px-2.5 py-2 sm:mt-3 sm:px-3">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="mr-0.5 text-xs font-semibold text-stone-600">
+          일괄 문자
+        </span>
+        <button
+          type="button"
+          disabled={lateCount === 0}
+          aria-pressed={activeReason === "late"}
+          onClick={() => onStart("late")}
+          className={[
+            "min-h-8 rounded-full border px-2.5 text-xs font-semibold transition",
+            activeReason === "late"
+              ? "border-amber-300 bg-amber-50 text-amber-900"
+              : "border-stone-200 bg-white text-stone-700 hover:border-amber-200 hover:bg-amber-50",
+            lateCount === 0 ? "cursor-not-allowed opacity-45" : "",
+          ].join(" ")}
+        >
+          지각 {lateCount}명 선택
+        </button>
+        <button
+          type="button"
+          disabled={absentCount === 0}
+          aria-pressed={activeReason === "absence"}
+          onClick={() => onStart("absence")}
+          className={[
+            "min-h-8 rounded-full border px-2.5 text-xs font-semibold transition",
+            activeReason === "absence"
+              ? "border-red-200 bg-red-50 text-red-800"
+              : "border-stone-200 bg-white text-stone-700 hover:border-red-200 hover:bg-red-50",
+            absentCount === 0 ? "cursor-not-allowed opacity-45" : "",
+          ].join(" ")}
+        >
+          결석 {absentCount}명 선택
+        </button>
+        {activeReason ? (
+          <>
+            <span className="ml-auto rounded-full bg-stone-950 px-2 py-1 text-[11px] font-semibold text-white">
+              {selectedCount}명 선택됨
+            </span>
+            <button
+              type="button"
+              onClick={onClear}
+              className="min-h-8 rounded-full border border-stone-200 bg-white px-2.5 text-xs font-semibold text-stone-600 hover:bg-stone-100"
+            >
+              해제
+            </button>
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function AttendanceSummary({
   summary,
 }: {
@@ -1109,7 +1383,11 @@ function AttendanceStudentRow({
   isSaving,
   isSaved,
   isExceptionOpen,
+  isBulkSelectable,
+  isBulkSelected,
+  bulkReason,
   saveError,
+  onToggleBulkSelection,
   onToggleException,
   onStatusChange,
 }: {
@@ -1119,7 +1397,11 @@ function AttendanceStudentRow({
   isSaving: boolean;
   isSaved: boolean;
   isExceptionOpen: boolean;
+  isBulkSelectable: boolean;
+  isBulkSelected: boolean;
+  bulkReason: BulkAttendanceReason | null;
   saveError: string;
+  onToggleBulkSelection: () => void;
   onToggleException: () => void;
   onStatusChange: (status: AttendanceStatus) => void;
 }) {
@@ -1130,10 +1412,23 @@ function AttendanceStudentRow({
 
   return (
     <article className="px-3 py-2.5 sm:px-5 sm:py-3 xl:py-2.5">
-      <div className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 sm:grid-cols-[2.25rem_minmax(0,1fr)_auto] sm:gap-3 xl:grid-cols-[2.25rem_minmax(0,1fr)_auto]">
-        <span className="flex size-8 items-center justify-center rounded-full bg-stone-100 text-xs font-semibold text-stone-600 sm:size-9 sm:text-sm">
-          {getStudentInitial(student.name)}
-        </span>
+      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5">
+          {isBulkSelectable ? (
+            <label className="flex size-8 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-700 transition hover:border-[#315C7C] hover:bg-[#EAF1F8]">
+              <input
+                type="checkbox"
+                checked={isBulkSelected}
+                onChange={onToggleBulkSelection}
+                className="size-4 accent-[#315C7C]"
+                aria-label={`${student.name} ${bulkReason === "late" ? "지각" : "결석"} 문자 대상 선택`}
+              />
+            </label>
+          ) : null}
+          <span className="flex size-8 items-center justify-center rounded-full bg-stone-100 text-xs font-semibold text-stone-600 sm:size-9 sm:text-sm">
+            {getStudentInitial(student.name)}
+          </span>
+        </div>
 
         <div className="min-w-0">
           <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
@@ -1303,6 +1598,263 @@ function AttendanceSaveStatus({
   }
 
   return <p className="text-[11px] text-stone-400">대기</p>;
+}
+
+function BulkAttendanceFollowupPanel({
+  className = "",
+  bulkTarget,
+  messageTemplate,
+  selectedRecipientType,
+  selectedStudents,
+  submitState,
+  sendBlockedMessage,
+  onDismiss,
+  onMessageTemplateChange,
+  onRecipientTypeChange,
+  onSubmit,
+}: {
+  className?: string;
+  bulkTarget: BulkAttendanceTarget;
+  messageTemplate: string;
+  selectedRecipientType: MessageRecipientType;
+  selectedStudents: AttendanceStudent[];
+  submitState: BulkSubmitState;
+  sendBlockedMessage: string;
+  onDismiss: () => void;
+  onMessageTemplateChange: (body: string) => void;
+  onRecipientTypeChange: (recipientType: MessageRecipientType) => void;
+  onSubmit: (sendNow: boolean) => void;
+}) {
+  const messageMetrics = getMessageLengthMetrics(messageTemplate);
+  const isMessageBlank = messageTemplate.trim().length === 0;
+  const isBusy = submitState.status === "saving" || submitState.status === "sending";
+  const canSave =
+    selectedStudents.length > 0 &&
+    !isMessageBlank &&
+    !messageMetrics.isOverLimit &&
+    !isBusy;
+  const canSend = canSave && !sendBlockedMessage;
+  const selectedStudentPhoneMissing = selectedStudents.some(
+    (student) => !student.maskedStudentPhone,
+  );
+
+  return (
+    <section className={["rounded-lg border border-stone-200 bg-white shadow-sm xl:sticky xl:top-5", className].join(" ")}>
+      <div className="border-b border-stone-200 px-3 py-2.5 sm:px-4 sm:py-3">
+        <div className="flex items-center gap-2">
+          <MessageSquareText className="text-[#315C7C]" size={18} />
+          <h3 className="text-sm font-semibold text-stone-950">
+            {reasonLabel(bulkTarget.reason)} 일괄 문자
+          </h3>
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="ml-auto rounded-md border border-stone-200 px-2 py-1 text-xs font-semibold text-stone-600"
+          >
+            닫기
+          </button>
+        </div>
+        <p className="mt-1 text-xs leading-5 text-stone-500">
+          선택 학생마다 이름 변수를 치환해 개별 연락 기록을 저장합니다.
+        </p>
+      </div>
+
+      <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
+        <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-stone-950">
+              선택 학생 {selectedStudents.length}명
+            </p>
+            <span
+              className={[
+                "rounded-full px-2 py-1 text-xs font-semibold",
+                bulkTarget.reason === "late"
+                  ? "bg-amber-50 text-amber-900"
+                  : "bg-red-50 text-red-800",
+              ].join(" ")}
+            >
+              {reasonLabel(bulkTarget.reason)}
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-stone-500">
+            {bulkTarget.session.className} · {bulkTarget.session.startTime}-
+            {bulkTarget.session.endTime}
+          </p>
+          <div className="mt-2 flex max-h-24 flex-wrap gap-1.5 overflow-y-auto">
+            {selectedStudents.length > 0 ? (
+              selectedStudents.map((student) => (
+                <span
+                  key={student.id}
+                  className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-stone-700"
+                >
+                  {student.name}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs text-red-700">
+                왼쪽 학생 목록에서 문자 대상 학생을 선택해 주세요.
+              </span>
+            )}
+          </div>
+        </div>
+
+        <fieldset>
+          <legend className="text-sm font-semibold text-stone-800">수신자</legend>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {messageRecipientTypes.map((recipientType) => {
+              const needsStudentPhone = recipientType !== "parent";
+              const isDisabled = needsStudentPhone && selectedStudentPhoneMissing;
+              const isSelected = selectedRecipientType === recipientType;
+
+              return (
+                <button
+                  key={recipientType}
+                  type="button"
+                  disabled={isDisabled}
+                  aria-pressed={isSelected}
+                  onClick={() => onRecipientTypeChange(recipientType)}
+                  className={[
+                    "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                    isSelected
+                      ? "border-[#315C7C] bg-[#315C7C] text-white"
+                      : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
+                    isDisabled ? "cursor-not-allowed opacity-45" : "",
+                  ].join(" ")}
+                >
+                  {messageRecipientLabels[recipientType]}
+                </button>
+              );
+            })}
+          </div>
+          {selectedStudentPhoneMissing ? (
+            <p className="mt-2 text-xs leading-5 text-stone-500">
+              학생 연락처가 없는 대상이 있어 학부모 수신으로 처리합니다.
+            </p>
+          ) : null}
+        </fieldset>
+
+        <div>
+          <label
+            htmlFor="bulk-attendance-followup-message"
+            className="text-sm font-semibold text-stone-800"
+          >
+            공통 문자 본문
+          </label>
+          <textarea
+            id="bulk-attendance-followup-message"
+            value={messageTemplate}
+            onChange={(event) => onMessageTemplateChange(event.target.value)}
+            rows={8}
+            className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+          />
+          <p
+            className={[
+              "mt-2 text-xs leading-5",
+              isMessageBlank || messageMetrics.isOverLimit
+                ? "text-red-700"
+                : messageMetrics.transportType === "lms"
+                  ? "text-amber-700"
+                  : "text-stone-500",
+            ].join(" ")}
+          >
+            공통 본문 {messageMetrics.charCount}자 · {messageMetrics.byteCount}byte ·{" "}
+            {isMessageBlank
+              ? "본문이 비어 있으면 저장할 수 없습니다."
+              : messageMetrics.isOverLimit
+                ? "2000byte를 초과해 저장할 수 없습니다."
+                : messageMetrics.transportType === "lms"
+                  ? "학생별 치환 후 LMS로 발송될 수 있습니다."
+                  : "학생별 이름으로 치환됩니다."}
+          </p>
+        </div>
+
+        <div className="rounded-md border border-stone-200 bg-stone-50 p-3 text-sm leading-6 text-stone-700">
+          <div className="flex items-start gap-2">
+            <CheckCircle2 className="mt-0.5 shrink-0 text-[#315C7C]" size={17} />
+            <p>
+              `{"{{studentName}}"}` 변수는 학생별 이름으로 바뀝니다. 예:{" "}
+              {selectedStudents[0]?.name ?? "학생명"}
+            </p>
+          </div>
+        </div>
+
+        {sendBlockedMessage ? (
+          <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-950">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="mt-0.5 shrink-0" size={17} />
+              <p>{sendBlockedMessage}</p>
+            </div>
+          </div>
+        ) : null}
+
+        {submitState.status === "error" ||
+        submitState.status === "saved" ||
+        submitState.status === "sent" ? (
+          <div
+            className={[
+              "rounded-md border p-3 text-sm leading-6",
+              submitState.status === "error"
+                ? "border-red-200 bg-red-50 text-red-900"
+                : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
+            ].join(" ")}
+          >
+            <div className="flex items-start gap-2">
+              {submitState.status === "error" ? (
+                <AlertCircle className="mt-0.5 shrink-0" size={17} />
+              ) : (
+                <CheckCircle2 className="mt-0.5 shrink-0" size={17} />
+              )}
+              <p>
+                {submitState.error ||
+                  `${submitState.message} 연락 기록 ${submitState.savedFollowupCount}건${
+                    submitState.messageLogCount > 0
+                      ? ` · 발송 로그 ${submitState.messageLogCount}건`
+                      : ""
+                  }`}
+              </p>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          <button
+            type="button"
+            disabled={!canSave}
+            onClick={() => onSubmit(false)}
+            className={[
+              "flex min-h-12 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+              canSave
+                ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                : "bg-stone-300 text-stone-600",
+            ].join(" ")}
+          >
+            <Send size={17} />
+            {submitState.status === "saving" ? "저장 중" : "기록 저장"}
+          </button>
+          <button
+            type="button"
+            disabled={!canSend}
+            onClick={() => onSubmit(true)}
+            className={[
+              "flex min-h-12 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+              canSend
+                ? "bg-stone-950 text-white hover:bg-stone-800"
+                : "bg-[#C9D6E2] text-[#244B67]",
+            ].join(" ")}
+          >
+            <Send size={17} />
+            {submitState.status === "sending"
+              ? "발송 처리 중"
+              : submitState.status === "sent"
+                ? submitState.dryRun
+                  ? "테스트 발송 완료"
+                  : "문자 발송 완료"
+                : "테스트 발송"}
+          </button>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function AttendanceFollowupPanel({
@@ -1894,6 +2446,10 @@ function normalizeAttendanceStatus(status: string | undefined): AttendanceStatus
   }
 
   return "pending";
+}
+
+function attendanceStatusForBulkReason(reason: BulkAttendanceReason): AttendanceStatus {
+  return reason === "late" ? "late" : "absent";
 }
 
 function mergeAttendanceRecord(

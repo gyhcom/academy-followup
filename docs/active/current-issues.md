@@ -40,6 +40,7 @@
 | T-648 플랫폼 학원 관리 API 이관 | 완료 | P1 | 플랫폼 학원 생성/상태 관리를 Spring에 추가 | T-647 | 플랫폼 콘솔 Spring 우선 호출과 Next.js fallback 회귀 확인 |
 | T-649 남은 운영 API 이관 | 완료 | P1 | bulk 학생/스케줄, 타 학원 수업, 스케줄 공유 API를 Spring에 추가 | T-648 | 관리/학생 상세/보강 화면 Spring 우선 호출과 Next.js fallback 회귀 확인 |
 | T-650 Spring 전환 배포 준비 완료 | 완료 | P1 | Railway 배포 준비 문서와 최종 전환 기준 고정 | T-649 | Railway 결제 후 배포 smoke test 진행 |
+| T-654 출석부 지각/결석 다중 선택 일괄 문자 | 완료 | P1 | 출석부에서 지각/결석 학생을 여러 명 선택해 학생명 변수 치환 문자 기록/테스트 발송 처리 | 출석부 문자 흐름, SOLAPI dry-run 유지 | 실제 수업 단위 dry-run 검증 |
 
 ## 현재 원칙
 
