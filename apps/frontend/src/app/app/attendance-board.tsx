@@ -220,6 +220,7 @@ export function AttendanceBoard({
   const [bulkMessageTemplate, setBulkMessageTemplate] = useState("");
   const [bulkRecipientType, setBulkRecipientType] =
     useState<MessageRecipientType>("parent");
+  const [selectedWorkbenchStudentId, setSelectedWorkbenchStudentId] = useState("");
   const [bulkSubmit, setBulkSubmit] = useState<BulkSubmitState>({
     status: "idle",
     message: "",
@@ -346,6 +347,9 @@ export function AttendanceBoard({
     messageSend.status === "error"
       ? messageSend.error
       : "";
+  const selectedWorkbenchStudent =
+    filteredStudents.find((student) => student.id === selectedWorkbenchStudentId) ??
+    filteredStudents[0];
 
   const applyAttendanceRecords = useCallback((nextRecords: AttendanceRecordItem[]) => {
     attendanceRecordsRef.current = nextRecords;
@@ -740,8 +744,124 @@ export function AttendanceBoard({
       ? "보조 선생님은 현재 테스트 발송 권한이 없습니다. 연락 기록 저장은 가능하며, 발송은 원장/관리자에게 요청하세요."
       : "";
 
+  function handleOpenWorkbenchFollowup(student: AttendanceStudent) {
+    if (!selectedSession) {
+      return;
+    }
+
+    const record = recordsByStudent.get(student.id);
+    const status = normalizeAttendanceStatus(record?.status);
+    const followupReason = getFollowupReasonForAttendanceStatus(status);
+
+    if (!record || !followupReason) {
+      return;
+    }
+
+    setBulkTarget(null);
+    setBulkSelectedStudentIds([]);
+    setDuplicateWarning("");
+    setFollowupTarget({
+      key: `${record.id}:${followupReason}`,
+      student,
+      session: selectedSession,
+      record,
+      reason: followupReason,
+    });
+  }
+
   return (
-    <div className="mx-auto max-w-6xl space-y-3 sm:space-y-5">
+    <div className="mx-auto max-w-6xl space-y-3 sm:space-y-5 xl:max-w-[90rem]">
+      <div className="hidden lg:block">
+        <AttendanceWorkbench
+          academyName={academyName}
+          teacherName={teacherName}
+          selectedDate={selectedDate}
+          onDateChange={onDateChange}
+          sessions={sessions}
+          selectedSession={selectedSession}
+          selectedSessionKey={selectedSession?.key ?? ""}
+          dateAttendanceRecords={dateAttendanceRecords}
+          loadState={loadState}
+          overview={overview}
+          summary={summary}
+          attendanceFilter={attendanceFilter}
+          filteredStudents={filteredStudents}
+          recordsByStudent={recordsByStudent}
+          saveState={saveState}
+          selectedWorkbenchStudent={selectedWorkbenchStudent}
+          bulkTarget={bulkTarget}
+          selectedBulkStudents={selectedBulkStudents}
+          bulkSelectedStudentIds={bulkSelectedStudentIds}
+          bulkMessageTemplate={bulkMessageTemplate}
+          bulkSubmit={bulkSubmit}
+          effectiveBulkRecipientType={effectiveBulkRecipientType}
+          lateStudents={lateStudents}
+          absentStudents={absentStudents}
+          followupTarget={followupTarget}
+          duplicateWarning={duplicateWarning}
+          effectiveRecipientType={effectiveRecipientType}
+          isDraftEdited={isDraftEdited}
+          isFollowupSaved={isFollowupSaved}
+          isFollowupSaving={isFollowupSaving}
+          isMessageBlank={isMessageBlank}
+          isMessageSending={isMessageSending}
+          isMessageSent={isMessageSent}
+          isPreviewError={isPreviewError}
+          isPreviewLoading={isPreviewLoading}
+          isPreviewReady={isPreviewReady}
+          messageBody={messageBody}
+          messagePreview={messagePreview}
+          messageSend={messageSend}
+          followupSaveError={followupSaveError}
+          messageSendError={messageSendError}
+          needsCheckStudents={needsCheckStudents}
+          sendBlockedMessage={assistantSendBlockedMessage}
+          onSelectSession={(sessionKey) => {
+            setSelectedSessionKey(sessionKey);
+            setAttendanceFilter("all");
+            setExpandedExceptionKey("");
+            setBulkTarget(null);
+            setBulkSelectedStudentIds([]);
+            setSelectedWorkbenchStudentId("");
+          }}
+          onFilterChange={setAttendanceFilter}
+          onStartBulk={handleStartBulkAttendance}
+          onClearBulk={() => {
+            setBulkTarget(null);
+            setBulkSelectedStudentIds([]);
+          }}
+          onToggleBulkStudent={handleToggleBulkStudent}
+          onSelectStudent={(studentId) => setSelectedWorkbenchStudentId(studentId)}
+          onStatusChange={handleStatusChange}
+          onOpenStudentFollowup={handleOpenWorkbenchFollowup}
+          onDismissBulk={() => {
+            setBulkTarget(null);
+            setBulkSelectedStudentIds([]);
+          }}
+          onBulkMessageTemplateChange={(body) => {
+            setBulkMessageTemplate(body);
+            setBulkSubmit((current) => ({
+              ...current,
+              status: "idle",
+              message: "",
+              error: "",
+            }));
+          }}
+          onBulkRecipientTypeChange={setBulkRecipientType}
+          onSubmitBulk={handleSubmitBulkAttendance}
+          onDismissFollowup={() => {
+            setDuplicateWarning("");
+            setFollowupTarget(null);
+          }}
+          onMessageChange={(body) => setMessageDraft({ key: followupTargetKey, body })}
+          onRecipientTypeChange={setSelectedRecipientType}
+          onRestorePreview={handleRestorePreview}
+          onSaveFollowup={handleSaveAttendanceFollowup}
+          onSendMessage={handleSendAttendanceMessage}
+        />
+      </div>
+
+      <div className="lg:hidden">
       <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-2 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
         <div className="flex flex-col gap-2.5 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
@@ -972,7 +1092,640 @@ export function AttendanceBoard({
           />
         )}
       </section>
+      </div>
     </div>
+  );
+}
+
+function AttendanceWorkbench({
+  academyName,
+  teacherName,
+  selectedDate,
+  onDateChange,
+  sessions,
+  selectedSession,
+  selectedSessionKey,
+  dateAttendanceRecords,
+  loadState,
+  overview,
+  summary,
+  attendanceFilter,
+  filteredStudents,
+  recordsByStudent,
+  saveState,
+  selectedWorkbenchStudent,
+  bulkTarget,
+  selectedBulkStudents,
+  bulkSelectedStudentIds,
+  bulkMessageTemplate,
+  bulkSubmit,
+  effectiveBulkRecipientType,
+  lateStudents,
+  absentStudents,
+  followupTarget,
+  duplicateWarning,
+  effectiveRecipientType,
+  isDraftEdited,
+  isFollowupSaved,
+  isFollowupSaving,
+  isMessageBlank,
+  isMessageSending,
+  isMessageSent,
+  isPreviewError,
+  isPreviewLoading,
+  isPreviewReady,
+  messageBody,
+  messagePreview,
+  messageSend,
+  followupSaveError,
+  messageSendError,
+  needsCheckStudents,
+  sendBlockedMessage,
+  onSelectSession,
+  onFilterChange,
+  onStartBulk,
+  onClearBulk,
+  onToggleBulkStudent,
+  onSelectStudent,
+  onStatusChange,
+  onOpenStudentFollowup,
+  onDismissBulk,
+  onBulkMessageTemplateChange,
+  onBulkRecipientTypeChange,
+  onSubmitBulk,
+  onDismissFollowup,
+  onMessageChange,
+  onRecipientTypeChange,
+  onRestorePreview,
+  onSaveFollowup,
+  onSendMessage,
+}: {
+  academyName: string;
+  teacherName: string;
+  selectedDate: string;
+  onDateChange: (date: string) => void;
+  sessions: AttendanceSession[];
+  selectedSession: AttendanceSession | undefined;
+  selectedSessionKey: string;
+  dateAttendanceRecords: AttendanceRecordItem[];
+  loadState: { status: "idle" | "loading" | "error"; error: string };
+  overview: AttendanceOverview;
+  summary: Record<AttendanceStatus, number> | null;
+  attendanceFilter: AttendanceFilter;
+  filteredStudents: AttendanceStudent[];
+  recordsByStudent: Map<string, AttendanceRecordItem>;
+  saveState: { key: string; status: "idle" | "saving" | "saved" | "error"; error: string };
+  selectedWorkbenchStudent: AttendanceStudent | undefined;
+  bulkTarget: BulkAttendanceTarget | null;
+  selectedBulkStudents: AttendanceStudent[];
+  bulkSelectedStudentIds: string[];
+  bulkMessageTemplate: string;
+  bulkSubmit: BulkSubmitState;
+  effectiveBulkRecipientType: MessageRecipientType;
+  lateStudents: AttendanceStudent[];
+  absentStudents: AttendanceStudent[];
+  followupTarget: AttendanceFollowupTarget | null;
+  duplicateWarning: string;
+  effectiveRecipientType: MessageRecipientType;
+  isDraftEdited: boolean;
+  isFollowupSaved: boolean;
+  isFollowupSaving: boolean;
+  isMessageBlank: boolean;
+  isMessageSending: boolean;
+  isMessageSent: boolean;
+  isPreviewError: boolean;
+  isPreviewLoading: boolean;
+  isPreviewReady: boolean;
+  messageBody: string;
+  messagePreview: MessagePreviewState;
+  messageSend: MessageSendState;
+  followupSaveError: string;
+  messageSendError: string;
+  needsCheckStudents: AttendanceStudent[];
+  sendBlockedMessage: string;
+  onSelectSession: (sessionKey: string) => void;
+  onFilterChange: (filter: AttendanceFilter) => void;
+  onStartBulk: (reason: BulkAttendanceReason) => void;
+  onClearBulk: () => void;
+  onToggleBulkStudent: (studentId: string) => void;
+  onSelectStudent: (studentId: string) => void;
+  onStatusChange: (student: AttendanceStudent, status: AttendanceStatus) => void;
+  onOpenStudentFollowup: (student: AttendanceStudent) => void;
+  onDismissBulk: () => void;
+  onBulkMessageTemplateChange: (body: string) => void;
+  onBulkRecipientTypeChange: (recipientType: MessageRecipientType) => void;
+  onSubmitBulk: (sendNow: boolean) => void;
+  onDismissFollowup: () => void;
+  onMessageChange: (body: string) => void;
+  onRecipientTypeChange: (recipientType: MessageRecipientType) => void;
+  onRestorePreview: () => void;
+  onSaveFollowup: () => void;
+  onSendMessage: () => void;
+}) {
+  const selectedRecord = selectedWorkbenchStudent
+    ? recordsByStudent.get(selectedWorkbenchStudent.id)
+    : undefined;
+  const selectedStatus = normalizeAttendanceStatus(selectedRecord?.status);
+
+  return (
+    <section className="space-y-4">
+      <header className="rounded-2xl border border-stone-200 bg-white px-5 py-4 shadow-sm">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-[#315C7C]">{academyName}</p>
+            <h2 className="mt-1 text-2xl font-semibold text-stone-950">출석부 장부</h2>
+            <p className="mt-1 text-sm leading-6 text-stone-600">
+              {teacherName}님, 수업을 선택하고 학생 row에서 출석·지각·결석을 바로 처리합니다.
+            </p>
+          </div>
+          <div className="w-80 shrink-0">
+            <AttendanceDateControl value={selectedDate} onChange={onDateChange} />
+          </div>
+        </div>
+      </header>
+
+      <div className="grid min-h-[42rem] gap-4 xl:grid-cols-[19rem_minmax(0,1fr)_25rem] 2xl:grid-cols-[20rem_minmax(0,1fr)_27rem]">
+        <aside className="space-y-3">
+          <AttendanceOverviewStrip overview={overview} />
+          <SessionList
+            sessions={sessions}
+            selectedSessionKey={selectedSessionKey}
+            records={dateAttendanceRecords}
+            loadState={loadState.status}
+            onSelect={onSelectSession}
+          />
+        </aside>
+
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+          <div className="border-b border-stone-200 bg-[#FBFAF7] px-4 py-3">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <UserCheck size={18} className="text-[#315C7C]" />
+                  <h3 className="truncate text-base font-semibold text-stone-950">
+                    {selectedSession?.className ?? "선택된 수업 없음"}
+                  </h3>
+                </div>
+                {selectedSession ? (
+                  <p className="mt-1 text-sm text-stone-500">
+                    {selectedSession.startTime}-{selectedSession.endTime} ·{" "}
+                    {selectedSession.subject ?? "과목 미지정"} ·{" "}
+                    {selectedSession.students.length}명
+                  </p>
+                ) : (
+                  <p className="mt-1 text-sm text-stone-500">
+                    이 날짜에 수업이 없습니다. 날짜나 수업 시간 등록 상태를 확인해 주세요.
+                  </p>
+                )}
+              </div>
+              {summary ? <AttendanceSummary summary={summary} /> : null}
+            </div>
+
+            {selectedSession ? (
+              <>
+                <AttendanceFilterBar
+                  value={attendanceFilter}
+                  summary={summary}
+                  totalCount={selectedSession.students.length}
+                  onChange={onFilterChange}
+                />
+                <AttendanceBulkActionBar
+                  lateCount={lateStudents.length}
+                  absentCount={absentStudents.length}
+                  activeReason={bulkTarget?.reason ?? null}
+                  selectedCount={selectedBulkStudents.length}
+                  onStart={onStartBulk}
+                  onClear={onClearBulk}
+                />
+              </>
+            ) : null}
+
+            {loadState.status === "error" ? (
+              <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-900">
+                {loadState.error}
+              </div>
+            ) : null}
+          </div>
+
+          {selectedSession ? (
+            <AttendanceLedgerTable
+              students={filteredStudents}
+              session={selectedSession}
+              selectedDate={selectedDate}
+              recordsByStudent={recordsByStudent}
+              saveState={saveState}
+              selectedStudentId={selectedWorkbenchStudent?.id ?? ""}
+              bulkTarget={bulkTarget}
+              selectedBulkStudentIds={bulkSelectedStudentIds}
+              onSelectStudent={onSelectStudent}
+              onToggleBulkStudent={onToggleBulkStudent}
+              onStatusChange={onStatusChange}
+            />
+          ) : (
+            <div className="p-8 text-center text-sm leading-6 text-stone-500">
+              선택한 날짜에 수업 기록이나 주간 스케줄이 없습니다.
+            </div>
+          )}
+        </section>
+
+        <aside className="min-w-0">
+          {bulkTarget ? (
+            <BulkAttendanceFollowupPanel
+              bulkTarget={bulkTarget}
+              messageTemplate={bulkMessageTemplate}
+              selectedRecipientType={effectiveBulkRecipientType}
+              selectedStudents={selectedBulkStudents}
+              submitState={bulkSubmit}
+              sendBlockedMessage={sendBlockedMessage}
+              onDismiss={onDismissBulk}
+              onMessageTemplateChange={onBulkMessageTemplateChange}
+              onRecipientTypeChange={onBulkRecipientTypeChange}
+              onSubmit={onSubmitBulk}
+            />
+          ) : followupTarget ? (
+            <AttendanceFollowupPanel
+              duplicateWarning={duplicateWarning}
+              followupSaveError={followupSaveError}
+              followupTarget={followupTarget}
+              selectedRecipientType={effectiveRecipientType}
+              isDraftEdited={isDraftEdited}
+              isFollowupSaved={isFollowupSaved}
+              isFollowupSaving={isFollowupSaving}
+              isMessageBlank={isMessageBlank}
+              isMessageSending={isMessageSending}
+              isMessageSent={isMessageSent}
+              isPreviewError={isPreviewError}
+              isPreviewLoading={isPreviewLoading}
+              isPreviewReady={isPreviewReady}
+              messageBody={messageBody}
+              messagePreview={messagePreview}
+              messageSend={messageSend}
+              messageSendError={messageSendError}
+              needsCheckStudents={needsCheckStudents}
+              sendBlockedMessage={sendBlockedMessage}
+              onDismiss={onDismissFollowup}
+              onMessageChange={onMessageChange}
+              onRecipientTypeChange={onRecipientTypeChange}
+              onRestorePreview={onRestorePreview}
+              onSaveFollowup={onSaveFollowup}
+              onSendMessage={onSendMessage}
+            />
+          ) : (
+            <WorkbenchStudentPanel
+              student={selectedWorkbenchStudent}
+              record={selectedRecord}
+              status={selectedStatus}
+              session={selectedSession}
+              onOpenFollowup={onOpenStudentFollowup}
+            />
+          )}
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function AttendanceLedgerTable({
+  students,
+  session,
+  selectedDate,
+  recordsByStudent,
+  saveState,
+  selectedStudentId,
+  bulkTarget,
+  selectedBulkStudentIds,
+  onSelectStudent,
+  onToggleBulkStudent,
+  onStatusChange,
+}: {
+  students: AttendanceStudent[];
+  session: AttendanceSession;
+  selectedDate: string;
+  recordsByStudent: Map<string, AttendanceRecordItem>;
+  saveState: { key: string; status: "idle" | "saving" | "saved" | "error"; error: string };
+  selectedStudentId: string;
+  bulkTarget: BulkAttendanceTarget | null;
+  selectedBulkStudentIds: string[];
+  onSelectStudent: (studentId: string) => void;
+  onToggleBulkStudent: (studentId: string) => void;
+  onStatusChange: (student: AttendanceStudent, status: AttendanceStatus) => void;
+}) {
+  if (students.length === 0) {
+    return (
+      <div className="px-4 py-10 text-center text-sm leading-6 text-stone-500">
+        현재 필터에 해당하는 학생이 없습니다. 필터를 전체로 바꾸거나 출석 상태를 확인해 주세요.
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-[54rem] w-full border-separate border-spacing-0 text-left">
+        <thead className="bg-white text-xs font-semibold text-stone-500">
+          <tr>
+            <th className="w-10 border-b border-stone-200 px-3 py-2">선택</th>
+            <th className="border-b border-stone-200 px-3 py-2">학생</th>
+            <th className="border-b border-stone-200 px-3 py-2">수업시간</th>
+            <th className="border-b border-stone-200 px-3 py-2">출석 상태</th>
+            <th className="border-b border-stone-200 px-3 py-2">연락 상태</th>
+            <th className="border-b border-stone-200 px-3 py-2">메모</th>
+            <th className="border-b border-stone-200 px-3 py-2 text-right">처리</th>
+          </tr>
+        </thead>
+        <tbody>
+          {students.map((student) => {
+            const record = recordsByStudent.get(student.id);
+            const status = normalizeAttendanceStatus(record?.status);
+            const updateKey = getAttendanceUpdateKey({
+              studentId: student.id,
+              classId: session.classId,
+              attendanceDate: selectedDate,
+              scheduledStartTime: session.startTime,
+              scheduledEndTime: session.endTime,
+            });
+            const isSaving = saveState.key === updateKey && saveState.status === "saving";
+            const isSelected = selectedStudentId === student.id;
+            const isBulkSelectable =
+              bulkTarget !== null &&
+              status === attendanceStatusForBulkReason(bulkTarget.reason);
+            const isBulkSelected = selectedBulkStudentIds.includes(student.id);
+
+            return (
+              <tr
+                key={student.id}
+                tabIndex={0}
+                aria-selected={isSelected}
+                onClick={() => onSelectStudent(student.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectStudent(student.id);
+                  }
+                }}
+                className={[
+                  "group cursor-pointer border-b border-stone-100 transition focus:outline-none",
+                  isSelected ? "bg-[#F8FBFD]" : "bg-white hover:bg-stone-50",
+                ].join(" ")}
+              >
+                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                  <input
+                    type="checkbox"
+                    checked={isBulkSelected}
+                    disabled={!isBulkSelectable}
+                    onClick={(event) => event.stopPropagation()}
+                    onChange={() => onToggleBulkStudent(student.id)}
+                    className="size-4 accent-[#315C7C] disabled:opacity-30"
+                    aria-label={`${student.name} 일괄 문자 대상 선택`}
+                  />
+                </td>
+                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                  <div className="flex items-center gap-2">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-stone-100 text-xs font-semibold text-stone-600">
+                      {getStudentInitial(student.name)}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-stone-950">
+                        {student.name}
+                      </p>
+                      <p className="truncate text-xs text-stone-500">
+                        {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
+                          "학교/학년 미등록"}{" "}
+                        · {student.maskedParentPhone}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="border-b border-stone-100 px-3 py-2.5 align-middle text-sm tabular-nums text-stone-700">
+                  {session.startTime}-{session.endTime}
+                </td>
+                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                  <StatusLozenge status={status} />
+                </td>
+                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                  <ContactLozenge record={record} status={status} />
+                </td>
+                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                  <span className="rounded-full bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-500">
+                    {record?.note ? "메모 있음" : "메모 없음"}
+                  </span>
+                </td>
+                <td className="border-b border-stone-100 px-3 py-2.5 align-middle">
+                  <div className="flex justify-end gap-1">
+                    <LedgerStatusButton
+                      label="출석"
+                      active={status === "present"}
+                      disabled={isSaving}
+                      onClick={() => onStatusChange(student, status === "present" ? "pending" : "present")}
+                    />
+                    <LedgerStatusButton
+                      label="지각"
+                      active={status === "late"}
+                      disabled={isSaving}
+                      tone="amber"
+                      onClick={() => onStatusChange(student, status === "late" ? "pending" : "late")}
+                    />
+                    <LedgerStatusButton
+                      label="결석"
+                      active={status === "absent"}
+                      disabled={isSaving}
+                      tone="red"
+                      onClick={() => onStatusChange(student, status === "absent" ? "pending" : "absent")}
+                    />
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function LedgerStatusButton({
+  label,
+  active,
+  disabled,
+  tone = "blue",
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  disabled: boolean;
+  tone?: "blue" | "amber" | "red";
+  onClick: () => void;
+}) {
+  const activeClass =
+    tone === "amber"
+      ? "border-amber-300 bg-amber-50 text-amber-900"
+      : tone === "red"
+        ? "border-red-200 bg-red-50 text-red-800"
+        : "border-[#315C7C] bg-[#EAF1F8] text-[#244B67]";
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      aria-pressed={active}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
+      className={[
+        "min-h-8 rounded-md border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+        active ? activeClass : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50",
+        disabled ? "cursor-wait opacity-60" : "",
+      ].join(" ")}
+    >
+      {label}
+    </button>
+  );
+}
+
+function StatusLozenge({ status }: { status: AttendanceStatus }) {
+  return (
+    <span
+      className={[
+        "inline-flex min-h-6 items-center rounded-full px-2.5 text-xs font-semibold",
+        attendanceStatusClass(status),
+      ].join(" ")}
+    >
+      {attendanceDisplayLabel(status)}
+    </span>
+  );
+}
+
+function ContactLozenge({
+  record,
+  status,
+}: {
+  record: AttendanceRecordItem | undefined;
+  status: AttendanceStatus;
+}) {
+  if (record?.followupStatus === "sent") {
+    return (
+      <span className="inline-flex min-h-6 items-center rounded-full bg-emerald-50 px-2.5 text-xs font-semibold text-emerald-700">
+        문자 완료
+      </span>
+    );
+  }
+
+  if (status === "late" || status === "absent") {
+    return (
+      <span className="inline-flex min-h-6 items-center rounded-full bg-amber-50 px-2.5 text-xs font-semibold text-amber-800">
+        연락 필요
+      </span>
+    );
+  }
+
+  if (status === "needs_check") {
+    return (
+      <span className="inline-flex min-h-6 items-center rounded-full bg-orange-50 px-2.5 text-xs font-semibold text-orange-800">
+        확인 필요
+      </span>
+    );
+  }
+
+  return (
+    <span className="inline-flex min-h-6 items-center rounded-full bg-stone-100 px-2.5 text-xs font-semibold text-stone-500">
+      대기
+    </span>
+  );
+}
+
+function WorkbenchStudentPanel({
+  student,
+  record,
+  status,
+  session,
+  onOpenFollowup,
+}: {
+  student: AttendanceStudent | undefined;
+  record: AttendanceRecordItem | undefined;
+  status: AttendanceStatus;
+  session: AttendanceSession | undefined;
+  onOpenFollowup: (student: AttendanceStudent) => void;
+}) {
+  const canOpenFollowup =
+    Boolean(student && record && getFollowupReasonForAttendanceStatus(status));
+
+  return (
+    <section className="sticky top-5 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <div className="border-b border-stone-200 bg-[#FBFAF7] px-4 py-3">
+        <h3 className="text-sm font-semibold text-stone-950">작업 패널</h3>
+        <p className="mt-1 text-xs leading-5 text-stone-500">
+          학생 row를 선택하면 문자, 메모, 연락 상태를 확인합니다.
+        </p>
+      </div>
+
+      {!student ? (
+        <div className="p-4 text-sm leading-6 text-stone-500">
+          학생을 선택하면 상세 정보가 표시됩니다.
+        </div>
+      ) : (
+        <div className="space-y-4 p-4">
+          <div>
+            <p className="text-xs font-medium text-stone-500">선택 학생</p>
+            <h4 className="mt-1 text-xl font-semibold text-stone-950">{student.name}</h4>
+            <p className="mt-1 text-sm text-stone-500">
+              {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
+                "학교/학년 미등록"}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
+              <p className="text-xs font-medium text-stone-500">출석 상태</p>
+              <div className="mt-2">
+                <StatusLozenge status={status} />
+              </div>
+            </div>
+            <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
+              <p className="text-xs font-medium text-stone-500">연락 상태</p>
+              <div className="mt-2">
+                <ContactLozenge record={record} status={status} />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-stone-200 p-3">
+            <p className="text-xs font-medium text-stone-500">오늘 수업</p>
+            <p className="mt-1 text-sm font-semibold text-stone-900">
+              {session?.className ?? "선택된 수업 없음"}
+            </p>
+            <p className="mt-1 text-xs text-stone-500">
+              {session ? `${session.startTime}-${session.endTime}` : "시간 정보 없음"}
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-stone-200 p-3">
+            <p className="text-xs font-medium text-stone-500">연락/메모</p>
+            <p className="mt-1 text-sm leading-6 text-stone-700">
+              {record?.note ?? "등록된 메모가 없습니다."}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            disabled={!canOpenFollowup}
+            onClick={() => {
+              if (student) {
+                onOpenFollowup(student);
+              }
+            }}
+            className={[
+              "flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition",
+              canOpenFollowup
+                ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                : "bg-stone-200 text-stone-500",
+            ].join(" ")}
+          >
+            <MessageSquareText size={17} />
+            문자 작성
+          </button>
+        </div>
+      )}
+    </section>
   );
 }
 
