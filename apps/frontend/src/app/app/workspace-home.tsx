@@ -561,7 +561,7 @@ function PcOperationsDashboard({
             ) : null}
           </div>
 
-          <div className="max-h-[38rem] space-y-2 overflow-y-auto bg-stone-50/70 px-3 py-3" role="listbox" aria-label="오늘 학생 상태 목록">
+          <div className="max-h-[38rem] divide-y divide-stone-100 overflow-y-auto bg-white" role="listbox" aria-label="오늘 학생 상태 목록">
             {filteredStudentRows.length > 0 ? (
               filteredStudentRows.map((row) => (
                 <PcStudentBoardRowItem
@@ -746,10 +746,10 @@ function PcStudentBoardRowItem({
       aria-label={`${row.student.name} 학생 상세 보기, ${row.className}, ${row.startTime}-${row.endTime}, 출석 ${attendanceDisplayLabel(row.status)}, 연락 ${contactLabel}`}
       onClick={onClick}
       className={[
-        "flex min-h-[4.35rem] w-full items-center gap-3 rounded-lg border px-3.5 py-2.5 text-left shadow-sm transition focus:outline-none focus:ring-2 focus:ring-[#7EA7C4] focus:ring-offset-2 focus:ring-offset-stone-50",
+        "flex min-h-[4.35rem] w-full items-center gap-3 border-l-2 px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#7EA7C4]",
         isSelected
-          ? "border-[#7EA7C4] bg-[#F3F8FC] shadow-[0_6px_18px_rgba(49,92,124,0.10)]"
-          : "border-stone-200 bg-white hover:border-stone-300 hover:bg-white",
+          ? "border-l-[#315C7C] bg-[#F3F8FC]"
+          : "border-l-transparent bg-white hover:border-l-[#C9D6E2] hover:bg-stone-50",
       ].join(" ")}
     >
       <span className="min-w-0 flex-[1.25]">
@@ -829,8 +829,8 @@ function PcStudentDetailPanel({
   const studentSchedules = row ? getSortedActiveSchedules(row.student.schedules).slice(0, 5) : [];
 
   return (
-    <aside className="sticky top-4 space-y-4">
-      <section className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
+    <aside className="sticky top-4 space-y-3">
+      <section className="overflow-hidden rounded-lg border border-stone-200 bg-white">
         <div className="border-b border-stone-200 bg-stone-50/70 px-4 py-3">
           <h3 className="text-sm font-semibold text-stone-950">학생 미니 프로필</h3>
           <p className="mt-0.5 text-xs text-stone-500">
@@ -839,8 +839,8 @@ function PcStudentDetailPanel({
         </div>
 
         {row ? (
-          <div className="space-y-4 px-4 py-4">
-            <div className="rounded-lg border border-stone-200 bg-white p-3">
+          <div>
+            <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-lg font-semibold text-stone-950">
@@ -860,21 +860,36 @@ function PcStudentDetailPanel({
                   {attendanceDisplayLabel(row.status)}
                 </span>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                <div className="rounded-md bg-stone-50 px-3 py-2">
-                  <p className="font-semibold text-stone-500">오늘 수업</p>
-                  <p className="mt-1 truncate font-semibold text-stone-900">{row.className}</p>
-                </div>
-                <div className="rounded-md bg-stone-50 px-3 py-2">
-                  <p className="font-semibold text-stone-500">수업 시간</p>
-                  <p className="mt-1 font-semibold tabular-nums text-stone-900">
-                    {row.startTime}-{row.endTime}
-                  </p>
-                </div>
-              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="divide-y divide-stone-100">
+              <ConsoleDetailRow label="오늘 수업" value={row.className} />
+              <ConsoleDetailRow label="수업 시간" value={`${row.startTime}-${row.endTime}`} mono />
+              <ConsoleDetailRow
+                label="연락 상태"
+                value={
+                  row.followupStatus === "sent"
+                    ? "연락 완료"
+                    : isAttentionStatus(row.status)
+                      ? "연락 필요"
+                      : "대기"
+                }
+                tone={
+                  row.followupStatus === "sent"
+                    ? "success"
+                    : isAttentionStatus(row.status)
+                      ? "warning"
+                      : "default"
+                }
+              />
+              <ConsoleDetailRow
+                label="보강 제외"
+                value={studentBlockedItems.length > 0 ? `${studentBlockedItems.length}건` : "없음"}
+                tone={studentBlockedItems.length > 0 ? "violet" : "default"}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 border-t border-stone-100 px-4 py-3">
               <button
                 type="button"
                 onClick={() => onNavigate("attendance")}
@@ -901,43 +916,43 @@ function PcStudentDetailPanel({
 
             <DetailBlock title="주간 스케줄">
               {studentSchedules.length > 0 ? (
-                <div className="space-y-2">
+                <div className="divide-y divide-stone-100">
                   {studentSchedules.map((schedule) => (
                     <div
                       key={schedule.id}
-                      className="rounded-md border border-stone-200 bg-stone-50 px-3 py-2"
+                      className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-3 px-4 py-2.5"
                     >
-                      <p className="text-xs font-semibold text-stone-500">
+                      <p className="text-xs font-semibold tabular-nums text-stone-500">
                         {weekDayShortLabel(schedule.dayOfWeek)} · {schedule.startTime}-
                         {schedule.endTime}
                       </p>
-                      <p className="mt-0.5 truncate text-sm font-semibold text-stone-900">
+                      <p className="truncate text-sm font-semibold text-stone-900">
                         {schedule.title}
                       </p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-stone-500">등록된 주간 스케줄이 없습니다.</p>
+                <p className="px-4 py-3 text-sm text-stone-500">등록된 주간 스케줄이 없습니다.</p>
               )}
             </DetailBlock>
 
             <DetailBlock title="보강 제외 일정">
               {studentBlockedItems.length > 0 ? (
-                <div className="space-y-2">
+                <div className="divide-y divide-stone-100">
                   {studentBlockedItems.map((item) => (
-                    <div key={item.id} className="rounded-md border border-violet-100 bg-violet-50 px-3 py-2">
-                      <p className="text-xs font-semibold text-violet-800">
+                    <div key={item.id} className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-3 px-4 py-2.5">
+                      <p className="text-xs font-semibold tabular-nums text-violet-800">
                         {item.startTime}-{item.endTime} · {getBlockedScheduleBadgeLabel(item)}
                       </p>
-                      <p className="mt-0.5 truncate text-sm font-semibold text-stone-900">
+                      <p className="truncate text-sm font-semibold text-stone-900">
                         {getBlockedScheduleDetail(item)}
                       </p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-stone-500">오늘 보강 제외 일정이 없습니다.</p>
+                <p className="px-4 py-3 text-sm text-stone-500">오늘 보강 제외 일정이 없습니다.</p>
               )}
             </DetailBlock>
           </div>
@@ -948,7 +963,7 @@ function PcStudentDetailPanel({
         )}
       </section>
 
-      <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-lg border border-stone-200 bg-white">
         <div className="border-b border-stone-200 px-4 py-3">
           <h3 className="text-sm font-semibold text-stone-950">오늘 연락 큐</h3>
           <p className="mt-0.5 text-xs text-stone-500">
@@ -1000,11 +1015,39 @@ function DetailBlock({
   children: ReactNode;
 }) {
   return (
-    <div>
-      <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+    <div className="border-t border-stone-100">
+      <h4 className="bg-stone-50/70 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
         {title}
       </h4>
       {children}
+    </div>
+  );
+}
+
+function ConsoleDetailRow({
+  label,
+  value,
+  tone = "default",
+  mono = false,
+}: {
+  label: string;
+  value: string;
+  tone?: "default" | "success" | "warning" | "violet";
+  mono?: boolean;
+}) {
+  const toneClass = {
+    default: "text-stone-900",
+    success: "text-emerald-700",
+    warning: "text-amber-800",
+    violet: "text-violet-800",
+  }[tone];
+
+  return (
+    <div className="grid min-h-10 grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 px-4 py-2">
+      <span className="text-xs font-semibold text-stone-500">{label}</span>
+      <span className={`truncate text-sm font-semibold ${toneClass} ${mono ? "tabular-nums" : ""}`}>
+        {value}
+      </span>
     </div>
   );
 }

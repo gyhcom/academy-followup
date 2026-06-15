@@ -194,7 +194,7 @@ function ClassPicker({
           </p>
         ) : null}
       </div>
-      <div className="max-h-[12rem] space-y-1.5 overflow-y-auto rounded-lg border border-stone-200 bg-white p-1.5 shadow-sm">
+      <div className="max-h-[12rem] divide-y divide-stone-100 overflow-y-auto rounded-lg border border-stone-200 bg-white">
         {classes.map((classItem) => {
           const isSelected = classItem.id === selectedClass?.id;
           return (
@@ -204,17 +204,17 @@ function ClassPicker({
               aria-pressed={isSelected}
               onClick={() => onClassSelect(classItem.id)}
               className={[
-                "min-h-10 w-full rounded-md border px-2.5 text-left transition",
+                "min-h-11 w-full border-l-2 px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]",
                 isSelected
-                  ? "border-[#315C7C] bg-[#315C7C] text-white"
-                  : "border-stone-200 bg-white text-stone-700 hover:border-stone-300",
+                  ? "border-l-[#315C7C] bg-[#F8FBFD] text-stone-950"
+                  : "border-l-transparent bg-white text-stone-700 hover:border-l-[#C9D6E2] hover:bg-stone-50",
               ].join(" ")}
             >
               <span className="block text-sm font-semibold">{classItem.name}</span>
               <span
                 className={[
                   "mt-0.5 block text-xs",
-                  isSelected ? "text-stone-300" : "text-stone-500",
+                  isSelected ? "text-[#315C7C]" : "text-stone-500",
                 ].join(" ")}
               >
                 {classItem.subject ?? "과목 미지정"} · {classItem.students.length}명

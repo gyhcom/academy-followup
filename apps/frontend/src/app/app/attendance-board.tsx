@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import {
   AlertCircle,
   CalendarDays,
@@ -1650,7 +1651,7 @@ function WorkbenchStudentPanel({
     Boolean(student && record && getFollowupReasonForAttendanceStatus(status));
 
   return (
-    <section className="sticky top-5 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+    <section className="sticky top-5 overflow-hidden rounded-lg border border-stone-200 bg-white">
       <div className="border-b border-stone-200 bg-[#FBFAF7] px-4 py-3">
         <h3 className="text-sm font-semibold text-stone-950">작업 패널</h3>
         <p className="mt-1 text-xs leading-5 text-stone-500">
@@ -1663,69 +1664,79 @@ function WorkbenchStudentPanel({
           학생을 선택하면 상세 정보가 표시됩니다.
         </div>
       ) : (
-        <div className="space-y-4 p-4">
-          <div>
+        <div>
+          <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
             <p className="text-xs font-medium text-stone-500">선택 학생</p>
-            <h4 className="mt-1 text-xl font-semibold text-stone-950">{student.name}</h4>
-            <p className="mt-1 text-sm text-stone-500">
+            <h4 className="mt-1 truncate text-xl font-semibold text-stone-950">{student.name}</h4>
+            <p className="mt-1 truncate text-sm text-stone-500">
               {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
                 "학교/학년 미등록"}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-              <p className="text-xs font-medium text-stone-500">출석 상태</p>
-              <div className="mt-2">
-                <StatusLozenge status={status} />
-              </div>
-            </div>
-            <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-              <p className="text-xs font-medium text-stone-500">연락 상태</p>
-              <div className="mt-2">
-                <ContactLozenge record={record} status={status} />
-              </div>
-            </div>
+          <div className="divide-y divide-stone-100">
+            <AttendancePanelRow label="출석 상태">
+              <StatusLozenge status={status} />
+            </AttendancePanelRow>
+            <AttendancePanelRow label="연락 상태">
+              <ContactLozenge record={record} status={status} />
+            </AttendancePanelRow>
+            <AttendancePanelRow
+              label="오늘 수업"
+              value={session?.className ?? "선택된 수업 없음"}
+            />
+            <AttendancePanelRow
+              label="수업 시간"
+              value={session ? `${session.startTime}-${session.endTime}` : "시간 정보 없음"}
+              mono
+            />
+            <AttendancePanelRow label="연락/메모" value={record?.note ?? "등록된 메모가 없습니다."} />
           </div>
 
-          <div className="rounded-lg border border-stone-200 p-3">
-            <p className="text-xs font-medium text-stone-500">오늘 수업</p>
-            <p className="mt-1 text-sm font-semibold text-stone-900">
-              {session?.className ?? "선택된 수업 없음"}
-            </p>
-            <p className="mt-1 text-xs text-stone-500">
-              {session ? `${session.startTime}-${session.endTime}` : "시간 정보 없음"}
-            </p>
+          <div className="border-t border-stone-100 p-3">
+            <button
+              type="button"
+              disabled={!canOpenFollowup}
+              onClick={() => {
+                if (student) {
+                  onOpenFollowup(student);
+                }
+              }}
+              className={[
+                "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+                canOpenFollowup
+                  ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                  : "bg-stone-200 text-stone-500",
+              ].join(" ")}
+            >
+              <MessageSquareText size={17} />
+              문자 작성
+            </button>
           </div>
-
-          <div className="rounded-lg border border-stone-200 p-3">
-            <p className="text-xs font-medium text-stone-500">연락/메모</p>
-            <p className="mt-1 text-sm leading-6 text-stone-700">
-              {record?.note ?? "등록된 메모가 없습니다."}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            disabled={!canOpenFollowup}
-            onClick={() => {
-              if (student) {
-                onOpenFollowup(student);
-              }
-            }}
-            className={[
-              "flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition",
-              canOpenFollowup
-                ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
-                : "bg-stone-200 text-stone-500",
-            ].join(" ")}
-          >
-            <MessageSquareText size={17} />
-            문자 작성
-          </button>
         </div>
       )}
     </section>
+  );
+}
+
+function AttendancePanelRow({
+  label,
+  value,
+  children,
+  mono = false,
+}: {
+  label: string;
+  value?: string;
+  children?: ReactNode;
+  mono?: boolean;
+}) {
+  return (
+    <div className="grid min-h-10 grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 px-4 py-2.5">
+      <span className="text-xs font-semibold text-stone-500">{label}</span>
+      <span className={`min-w-0 truncate text-sm font-semibold text-stone-900 ${mono ? "tabular-nums" : ""}`}>
+        {children ?? value}
+      </span>
+    </div>
   );
 }
 
@@ -2392,7 +2403,7 @@ function BulkAttendanceFollowupPanel({
   );
 
   return (
-    <section className={["rounded-lg border border-stone-200 bg-white shadow-sm xl:sticky xl:top-5", className].join(" ")}>
+    <section className={["rounded-lg border border-stone-200 bg-white xl:sticky xl:top-5", className].join(" ")}>
       <div className="border-b border-stone-200 px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
           <MessageSquareText className="text-[#315C7C]" size={18} />
@@ -2413,7 +2424,7 @@ function BulkAttendanceFollowupPanel({
       </div>
 
       <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-        <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
+        <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-3 py-3">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-stone-950">
               선택 학생 {selectedStudents.length}명
@@ -2438,7 +2449,7 @@ function BulkAttendanceFollowupPanel({
               selectedStudents.map((student) => (
                 <span
                   key={student.id}
-                  className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-stone-700"
+                  className="rounded border border-stone-200 bg-white px-2 py-1 text-xs font-semibold text-stone-700"
                 >
                   {student.name}
                 </span>
@@ -2671,7 +2682,7 @@ function AttendanceFollowupPanel({
   const canSendMessage = isFollowupSaved && !isMessageSending && !sendBlockedMessage;
 
   return (
-    <section className={["rounded-lg border border-stone-200 bg-white shadow-sm xl:sticky xl:top-5", className].join(" ")}>
+    <section className={["rounded-lg border border-stone-200 bg-white xl:sticky xl:top-5", className].join(" ")}>
       <div className="border-b border-stone-200 px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
           <MessageSquareText className="text-[#315C7C]" size={18} />
@@ -2721,7 +2732,7 @@ function AttendanceFollowupPanel({
         </div>
       ) : (
         <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-          <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
+          <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-3 py-3">
             <p className="text-xs font-medium text-stone-500">선택 학생</p>
             <p className="mt-1 text-base font-semibold text-stone-950">
               {followupTarget.student.name}
