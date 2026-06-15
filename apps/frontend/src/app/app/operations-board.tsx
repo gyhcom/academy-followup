@@ -1008,7 +1008,7 @@ export function OperationsBoard({
         desktopComposer={
           <MessageComposer
             {...commonComposerProps}
-            className="lg:order-2 xl:order-3"
+            className="min-w-0 lg:col-span-2 xl:col-span-1"
             composerId="desktop-message-composer"
           />
         }
