@@ -5,6 +5,8 @@
 
 운영 데이터 정리 전에는 [운영 데이터 정리 전 선행 점검](./operations-pre-reset-checklist-2026-06.md)을 먼저 실행합니다. 이 문서의 Preview/Cleanup/Verify 순서를 통과하기 전에는 seed/demo 데이터를 삭제하지 않습니다.
 
+실제 운영 데이터는 [실제 구조 데이터 운영 전환 검증](./operations-real-data-transition-2026-06.md) 기준으로 20~30명만 먼저 투입합니다. 실제 문자 발송은 [SOLAPI 테스트 번호 제한 발송 준비](./solapi-test-number-readiness-2026-06.md)를 통과한 뒤 별도 승인으로 진행합니다.
+
 ## 1. 운영 전환 원칙
 
 - Production 앱은 Vercel + 기존 Next.js API 기준으로 안정 운영합니다.
@@ -22,7 +24,7 @@
 | Supabase health | `/api/health/supabase`가 `connected` 반환 |
 | Supabase migration | `audit_logs`, 외부 학원 수업, 스케줄 공유 동의 컬럼 적용 완료 |
 | SMS 설정 | 실제 발송 전에는 `sms_dry_run=true` 유지 |
-| Spring backend | Production 미연결, 로컬 검증만 사용 |
+| Spring backend | 운영 API 코드 전환 완료, Production 미연결, 로컬 검증 및 Next.js fallback 유지 |
 | Backend env | Production에 `NEXT_PUBLIC_BACKEND_API_URL` 미설정 |
 
 ## 3. 권한별 운영 확인
@@ -71,6 +73,10 @@ CSV 필수 필드:
 - 담당 선생님
 - 타 학원 스케줄 공유 동의 여부
 
+템플릿:
+
+- [operations-real-data-template-2026-06.csv](./operations-real-data-template-2026-06.csv)
+
 실행 전 결정:
 
 - 200명 seed를 유지한 별도 파일럿 DB에서 검증할지, 실제 운영 DB를 새로 만들지 결정
@@ -108,7 +114,7 @@ CSV 필수 필드:
 
 ## 6. SOLAPI 테스트 번호 제한 발송 준비
 
-실제 발송은 T-310에서 별도 승인 후 진행합니다.
+실제 발송은 T-310에서 별도 승인 후 진행합니다. 상세 기준은 [SOLAPI 테스트 번호 제한 발송 준비](./solapi-test-number-readiness-2026-06.md)를 따릅니다.
 
 사전 확인:
 

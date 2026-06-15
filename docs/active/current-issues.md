@@ -15,8 +15,8 @@
 | T-624 빈 상태 문구 개선 | 완료 | P2 | 빈 화면에서 다음 행동 안내 | role별 빈 상태 확인 | 운영 중 빈 상태 문구 회귀 확인 |
 | T-625 assistant 발송 버튼 권한 안내 개선 | 완료 | P2 | 보조 선생님 발송 제한을 버튼/문구에서 사전 안내 | T-620 실계정 UAT | 운영 중 assistant 권한 문구 회귀 확인 |
 | T-604 운영 전환 릴리즈 체크리스트 | 완료 | P0 | 실제 운영 전 배포/권한/실데이터/SMS/Spring 상태 점검 | T-625 완료 | 운영 전환 체크리스트 기준으로 릴리즈 확인 |
-| T-501 실제 구조 데이터 운영 전환 검증 | 다음 실행 | P0 | 실제 구조 20~30명 데이터로 운영 흐름 검증 | 운영 전환 체크리스트 | CSV 투입 전 데이터 유지/삭제 정책 결정 |
-| T-310 SOLAPI 테스트 번호 제한 발송 | 예정 | P0 | 테스트 번호 1건 실제 수신으로 발송 전환 위험 확인 | 실데이터 dry-run 확인 | SOLAPI env/발신번호/테스트 번호 준비 |
+| T-501 실제 구조 데이터 운영 전환 검증 | 준비 완료 | P0 | 실제 구조 20~30명 데이터로 운영 흐름 검증 | 운영 전환 체크리스트 | CSV 템플릿 기준으로 원장 확인 후 투입 |
+| T-310 SOLAPI 테스트 번호 제한 발송 | 준비 완료 | P0 | 테스트 번호 1건 실제 수신으로 발송 전환 위험 확인 | 실데이터 dry-run 확인 | SOLAPI env/발신번호/테스트 번호 확정 후 실행 |
 | T-628 docs 정리 및 monorepo 전환 준비 | 완료 | P1 | 문서 기준 정리와 구조 전환 준비 | 현재 docs 목록 점검 | 기준 문서 유지 |
 | T-629 Next.js 앱 frontend 디렉터리 이동 | 완료 | P1 | monorepo 목표 구조로 프론트 이동 | T-628 완료 | Vercel frontend 기준 유지 |
 | T-630 Spring Boot backend skeleton 추가 | 완료 | P1 | 백엔드 전환을 위한 최소 Spring Boot 앱 추가 | T-629 완료 | 로컬 backend 유지 |
@@ -53,4 +53,6 @@
 - 현재 Spring 전환 완료 기준은 기존 Next.js API를 즉시 제거하는 것이 아니라, 운영 API를 Spring Boot에 추가하고 frontend에서 Spring 우선 호출 + Next.js fallback을 유지하며 Railway 배포 준비 문서를 갖춘 상태입니다.
 - 주요 운영 API는 Spring Boot에 추가됐고 Next.js fallback을 유지합니다. 남은 Next 전용 라우트인 `/api/auth/redirect-target`는 로그인 화면용 Next server helper라 Spring 전환 대상 운영 API에서 제외합니다.
 - 실제 Railway 배포와 Vercel `NEXT_PUBLIC_BACKEND_API_URL` 설정은 결제 후 smoke test를 통과한 뒤 별도 승인으로 진행합니다.
+- PC 홈/관리 콘솔 개선은 main에 반영됐고 Vercel frontend 자동 배포 기준입니다.
+- 실제 운영 전환 기준 문서는 `docs/testing/operations-real-data-transition-2026-06.md`, SOLAPI 테스트 번호 기준은 `docs/testing/solapi-test-number-readiness-2026-06.md`를 봅니다.
 - 7월 13일 전까지는 파일럿 운영 개선과 안정화를 우선합니다.

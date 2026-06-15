@@ -1229,7 +1229,7 @@
 
 ### T-310 SOLAPI 실제 발송
 
-상태: 예정
+상태: 준비 완료
 
 목표:
 - production 환경에서 실제 SMS/LMS 발송을 테스트 번호 1건부터 제한적으로 검증
@@ -1237,7 +1237,7 @@
 작업:
 - SOLAPI 키와 발신번호 설정 확인: 예정
 - Vercel server env에 SOLAPI secret 설정 확인: 예정
-- 테스트 번호 1개 제한 발송 기준 확인: 예정
+- 테스트 번호 1개 제한 발송 기준 문서화: 완료
 - 실제 SMS/LMS 1건 수신 확인: 예정
 - 성공/실패 로그 저장과 UI 오류 문구 확인: 예정
 - 실제 학부모 번호 확대 발송 승인 기준 정리: 예정
@@ -1246,6 +1246,10 @@
 - 테스트 번호로 실제 문자 수신 확인
 - 중복 발송 방지와 2000byte 차단이 실제 발송 전에도 유지됨
 - 실제 학부모 대상 발송은 테스트 번호 검증 후 별도 승인으로만 진행
+
+구현 메모:
+- 실행 기준은 `docs/testing/solapi-test-number-readiness-2026-06.md`에서 관리합니다.
+- 테스트 번호 1건 수신 확인 전까지 기본 운영값은 `sms_dry_run=true`입니다.
 
 ### T-311 학생별 팔로업 히스토리 패널
 
@@ -1409,6 +1413,8 @@
 - 2026-06-03 verify 기준값은 학생 200명, 반 20개, active 스케줄 580개, pilot 정규 스케줄 580개, 스케줄 미등록 active 학생 0명입니다.
 - 실행/확인 기준은 `docs/testing/pilot-200-students-data-plan-2026-05-31.md`입니다.
 - 실제 운영 전환 기준은 `docs/testing/operations-release-readiness-2026-06.md`입니다.
+- 실제 구조 데이터 투입 기준은 `docs/testing/operations-real-data-transition-2026-06.md`입니다.
+- 실제 구조 CSV 템플릿은 `docs/testing/operations-real-data-template-2026-06.csv`입니다.
 - 원장 체크리스트는 `docs/testing/director-pilot-checklist-2026-05-31.md`입니다.
 - 선생님 체크리스트는 `docs/testing/teacher-pilot-checklist-2026-05-31.md`입니다.
 - 원장 피드백 양식은 `docs/testing/director-feedback-form-2026-05-31.md`입니다.

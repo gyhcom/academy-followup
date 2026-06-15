@@ -14,6 +14,7 @@
 - Next.js 앱은 `apps/frontend`, Spring Boot는 `apps/backend`로 분리 완료
 - 200명 seed 검증에서 실제 구조 데이터 20~30명 운영 전환 검증으로 이동
 - SOLAPI 테스트 번호 1건 제한 발송 준비
+- PC 홈/관리 콘솔은 선생님 PC 사용을 고려한 업무형 레이아웃으로 개선 완료
 - 기존 PR/이슈 정리
 - 문서 기준 정리
 
@@ -23,6 +24,7 @@
 - Spring Boot API를 `apps/backend`에 추가 완료
 - IntelliJ에서 루트 프로젝트 기준으로 관리 가능하게 정리
 - Railway 결제 후 Spring Boot backend를 배포하고 Vercel frontend와 제한적으로 연결
+- 실제 운영 데이터는 20~30명부터 투입하고, dry-run 검증 후 테스트 번호 1건 발송으로 확대
 
 ## 4. 장기 목표
 
