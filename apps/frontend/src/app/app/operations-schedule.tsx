@@ -68,7 +68,7 @@ export function WeeklySchedulePanel({
   return (
     <section
       aria-labelledby="weekly-schedule-title"
-      className="rounded-lg border border-stone-200 bg-white shadow-sm"
+      className="rounded-lg border border-stone-200 bg-white"
     >
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
@@ -89,9 +89,9 @@ export function WeeklySchedulePanel({
         </p>
       </div>
 
-      <div className="space-y-3 p-4">
+      <div>
         {selectedStudent ? (
-          <div className="rounded-md border border-[#C9D6E2] bg-[#EAF1F8] p-3">
+          <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
             <p className="text-xs font-medium text-[#315C7C]">
               {selectedClassName ?? "반 미지정"}
             </p>
@@ -102,14 +102,14 @@ export function WeeklySchedulePanel({
         ) : null}
 
         {selectedStudent && activeSchedules.length === 0 ? (
-          <div className="rounded-md border border-dashed border-stone-300 bg-stone-50 p-4 text-sm leading-6 text-stone-600">
+          <div className="border-t border-stone-100 px-4 py-4 text-sm leading-6 text-stone-600">
             등록된 스케줄이 없습니다. 관리 탭에서 정규 수업이나 개인/기타 일정을 먼저
             입력해 주세요.
           </div>
         ) : null}
 
         {selectedStudent ? (
-          <div className="space-y-2">
+          <div className="divide-y divide-stone-100">
             {weekDays.map((dayOfWeek) => {
               const daySchedules = schedulesByDay.get(dayOfWeek) ?? [];
 
@@ -117,13 +117,13 @@ export function WeeklySchedulePanel({
                 <div
                   key={dayOfWeek}
                   className={[
-                    "grid grid-cols-[2.6rem_minmax(0,1fr)] gap-3 rounded-md border p-3",
+                    "grid grid-cols-[2.6rem_minmax(0,1fr)] gap-3 px-4 py-3",
                     daySchedules.length > 0
-                      ? "border-stone-200 bg-white"
-                      : "border-stone-100 bg-stone-50",
+                      ? "bg-white"
+                      : "bg-stone-50/60",
                   ].join(" ")}
                 >
-                  <div className="flex size-10 items-center justify-center rounded-md bg-[#315C7C] text-sm font-semibold text-white">
+                  <div className="flex size-9 items-center justify-center rounded bg-[#315C7C] text-sm font-semibold text-white">
                     {weekDayShortLabel(dayOfWeek)}
                   </div>
 
@@ -145,7 +145,7 @@ export function WeeklySchedulePanel({
             })}
           </div>
         ) : (
-          <div className="rounded-md border border-stone-200 bg-stone-50 p-4 text-sm leading-6 text-stone-600">
+          <div className="px-4 py-4 text-sm leading-6 text-stone-600">
             왼쪽 학생 목록에서 학생을 선택하면 주간 시간표가 여기에 표시됩니다.
           </div>
         )}
@@ -161,7 +161,7 @@ function ScheduleRow({
   onMakeupCandidateSelect: (schedule: OperationsStudentSchedule) => void;
 }) {
   return (
-    <div className="rounded-md border border-stone-200 bg-white p-3">
+    <div className="border-l-2 border-l-stone-200 bg-white px-3 py-2.5">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 text-lg font-semibold tabular-nums text-stone-950">
@@ -195,7 +195,7 @@ function ScheduleRow({
         </p>
       ) : null}
 
-      <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+      <p className="mt-2 border-t border-amber-100 pt-2 text-xs font-medium text-amber-800">
         이미 등록된 일정입니다. 이 시간은 보강 후보에서 제외합니다.
       </p>
     </div>

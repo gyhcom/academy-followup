@@ -2129,8 +2129,8 @@ function SetupWorkflow({
   const nextStep = setupSteps.find((step) => !step.isDone) ?? setupSteps[setupSteps.length - 1];
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
-      <div className="rounded-lg border border-[#C9D6E2] bg-[#F8FBFD] p-4 lg:col-span-2">
+    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,0.75fr)]">
+      <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3 lg:col-span-2">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
@@ -2157,13 +2157,15 @@ function SetupWorkflow({
 
       <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
         {setupSteps.map((step) => (
-          <div
+          <button
             key={step.step}
-            className="grid gap-3 border-b border-[#EFE9DE] px-4 py-4 last:border-b-0 sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
+            type="button"
+            onClick={step.onAction}
+            className="grid w-full gap-3 border-b border-[#EFE9DE] border-l-2 border-l-transparent px-4 py-3 text-left transition last:border-b-0 hover:border-l-[#C9D6E2] hover:bg-[#FBFAF7] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
           >
             <div
               className={[
-                "flex size-9 items-center justify-center rounded-md text-sm font-semibold",
+                "flex size-8 items-center justify-center rounded text-sm font-semibold",
                 step.isDone ? "bg-[#EAF1F8] text-[#244B67]" : "bg-[#111827] text-white",
               ].join(" ")}
             >
@@ -2189,38 +2191,38 @@ function SetupWorkflow({
               </div>
               <p className="mt-1 text-sm leading-6 text-stone-600">{step.description}</p>
             </div>
-            <button
-              type="button"
-              onClick={step.onAction}
+            <span
               className={[
-                "min-h-10 rounded-md px-3 text-sm font-semibold transition",
+                "inline-flex min-h-10 items-center justify-center rounded-md px-3 text-sm font-semibold transition",
                 step.isDone
                   ? "border border-[#D8D0C4] bg-white text-stone-800 hover:bg-[#F7F5F0]"
                   : "border border-[#D8D0C4] bg-white text-stone-800 hover:bg-[#F7F5F0]",
               ].join(" ")}
             >
               {step.actionLabel}
-            </button>
-          </div>
+            </span>
+          </button>
         ))}
       </div>
 
-      <aside className="rounded-lg border border-[#C9D6E2] bg-[#EAF1F8] p-4">
-        <p className="text-sm font-semibold text-[#244B67]">현재 배정 모델</p>
-        <dl className="mt-3 space-y-3 text-sm">
-          <div>
+      <aside className="overflow-hidden rounded-lg border border-[#C9D6E2] bg-white">
+        <div className="border-b border-[#C9D6E2] bg-[#F8FBFD] px-4 py-3">
+          <p className="text-sm font-semibold text-[#244B67]">현재 배정 모델</p>
+        </div>
+        <dl className="divide-y divide-[#EAF1F8] text-sm">
+          <div className="px-4 py-3">
             <dt className="font-semibold text-stone-950">반 담당</dt>
             <dd className="mt-1 leading-6 text-stone-600">
               한 반은 우선 한 명의 주 담당 선생님을 가집니다.
             </dd>
           </div>
-          <div>
+          <div className="px-4 py-3">
             <dt className="font-semibold text-stone-950">학생 소속</dt>
             <dd className="mt-1 leading-6 text-stone-600">
               학생은 하나의 소속 반을 기준으로 문자, 출석, 스케줄 권한이 정해집니다.
             </dd>
           </div>
-          <div>
+          <div className="px-4 py-3">
             <dt className="font-semibold text-stone-950">보조 선생님</dt>
             <dd className="mt-1 leading-6 text-stone-600">
               파일럿에서는 주 담당 방식으로 검증하고, 다중 배정은 별도 모델로 확장합니다.

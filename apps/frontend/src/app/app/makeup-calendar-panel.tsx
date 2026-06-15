@@ -97,7 +97,7 @@ export function MakeupCalendarPanel({
   return (
     <section
       aria-labelledby="makeup-calendar-title"
-      className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm"
+      className="overflow-hidden rounded-lg border border-stone-200 bg-white"
     >
       <div className="border-b border-stone-200 px-4 py-3">
         <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export function MakeupCalendarPanel({
       </div>
 
       <div className="space-y-3 p-4">
-        <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
+        <div className="border border-stone-200 bg-stone-50 px-3 py-3">
           <div className="flex items-center justify-between gap-2">
             <button
               type="button"
@@ -203,7 +203,7 @@ export function MakeupCalendarPanel({
           </div>
         )}
 
-        <div className="rounded-md border border-stone-200 p-3">
+        <div className="border-y border-stone-100 px-3 py-3">
           <p className="text-xs font-semibold text-stone-500">선택 날짜</p>
           <p className="mt-1 text-sm font-semibold text-stone-950">
             {formatDateForCandidate(selectedDate)}
@@ -333,7 +333,7 @@ function SelectedDateSchedule({
   sharedError: string;
 }) {
   return (
-    <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
+    <div className="border-y border-stone-100 bg-stone-50 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-semibold text-stone-600">
           {formatDateForCandidate(date)} 일정
@@ -344,11 +344,11 @@ function SelectedDateSchedule({
       </div>
 
       {schedules.length > 0 ? (
-        <div className="mt-2 space-y-1.5">
+        <div className="mt-2 divide-y divide-stone-100 overflow-hidden rounded-md border border-stone-200 bg-white">
           {schedules.map((schedule) => (
             <div
               key={`${schedule.id}:${schedule.scheduleDate ?? "weekly"}`}
-              className="grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-2 rounded-md bg-white px-2 py-2"
+              className="grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-2 px-2 py-2"
             >
               <span className="flex items-center gap-1 text-xs font-semibold tabular-nums text-stone-900">
                 <Clock3 size={13} className="text-stone-400" />
@@ -371,12 +371,12 @@ function SelectedDateSchedule({
           ))}
         </div>
       ) : (
-        <p className="mt-2 rounded-md bg-white px-3 py-2 text-xs leading-5 text-stone-500">
+        <p className="mt-2 border border-dashed border-stone-200 bg-white px-3 py-2 text-xs leading-5 text-stone-500">
           이 날짜에 겹치는 등록 일정이 없습니다.
         </p>
       )}
       {isSharedLoading ? (
-        <p className="mt-2 rounded-md bg-white px-3 py-2 text-[11px] font-medium text-stone-500">
+        <p className="mt-2 border border-stone-200 bg-white px-3 py-2 text-[11px] font-medium text-stone-500">
           연결 학원 일정을 불러오는 중입니다.
         </p>
       ) : null}
