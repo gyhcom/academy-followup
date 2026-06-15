@@ -1431,7 +1431,7 @@ function MessageComposer({
       id={composerId}
       aria-labelledby={`${composerId}-title`}
       className={[
-        "rounded-lg border border-stone-200 bg-white shadow-sm lg:sticky lg:top-5",
+        "rounded-lg border border-stone-200 bg-white lg:sticky lg:top-5",
         className,
       ].join(" ")}
     >
@@ -1467,21 +1467,29 @@ function MessageComposer({
 
       <div className="space-y-4 p-4">
         {selectedStudent ? (
-          <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
-            <p className="text-xs font-medium text-stone-500">선택 학생</p>
-            <p className="mt-1 text-base font-semibold text-stone-950">
-              {selectedStudent.name}
-            </p>
-            <p className="mt-1 text-xs text-stone-500">
-              {selectedStudent.parentName ?? "학부모"} · {selectedStudent.maskedParentPhone}
-            </p>
-            {selectedReason === "makeup" && makeupCandidateTime ? (
-              <p className="mt-2 rounded-md bg-[#EAF1F8] px-2 py-1 text-xs font-semibold text-[#315C7C]">
-                보강 후보 {makeupCandidateTime}
+          <div className="-mx-4 border-y border-stone-100">
+            <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
+              <p className="text-xs font-medium text-stone-500">선택 학생</p>
+              <p className="mt-1 truncate text-base font-semibold text-stone-950">
+                {selectedStudent.name}
               </p>
+              <p className="mt-1 truncate text-xs text-stone-500">
+                {selectedStudent.parentName ?? "학부모"} · {selectedStudent.maskedParentPhone}
+              </p>
+            </div>
+            <ComposerSummaryRow
+              label="처리 사유"
+              value={followupReasons.find((reason) => reason.id === selectedReason)?.label ?? selectedReason}
+            />
+            <ComposerSummaryRow
+              label="학생 연락처"
+              value={selectedStudent.maskedStudentPhone ?? "미등록"}
+            />
+            {selectedReason === "makeup" && makeupCandidateTime ? (
+              <ComposerSummaryRow label="보강 후보" value={makeupCandidateTime} tone="blue" />
             ) : null}
             {selectedReason === "makeup" && !selectedMakeupCandidate && makeupCandidateTime ? (
-              <p className="mt-2 rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-900">
+              <p className="border-t border-stone-100 px-4 py-2 text-xs font-semibold text-amber-900">
                 주간 반복 시간 기준입니다. 날짜별 보강 등록은 달력에서 날짜를 선택해야 합니다.
               </p>
             ) : null}
@@ -1794,6 +1802,30 @@ function MessageComposer({
         ) : null}
       </div>
     </section>
+  );
+}
+
+function ComposerSummaryRow({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: string;
+  tone?: "default" | "blue";
+}) {
+  return (
+    <div className="grid min-h-9 grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 border-t border-stone-100 px-4 py-2">
+      <span className="text-xs font-semibold text-stone-500">{label}</span>
+      <span
+        className={[
+          "truncate text-sm font-semibold",
+          tone === "blue" ? "text-[#315C7C]" : "text-stone-900",
+        ].join(" ")}
+      >
+        {value}
+      </span>
+    </div>
   );
 }
 

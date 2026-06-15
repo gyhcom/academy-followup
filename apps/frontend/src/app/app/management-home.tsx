@@ -1861,16 +1861,19 @@ function ManagementStatusSidebar({
   const recentLogs = auditLogs.slice(0, 4);
 
   return (
-    <aside className="hidden space-y-3 xl:sticky xl:top-4 xl:block">
-      <section className="overflow-hidden rounded-2xl border border-[#DED8CE] bg-white shadow-sm">
+    <aside className="hidden xl:sticky xl:top-4 xl:block">
+      <section className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white">
         <div className="border-b border-[#EEE7DC] bg-[#FBFAF7] px-4 py-3">
-          <h3 className="text-sm font-semibold text-stone-950">운영 상태</h3>
+          <h3 className="text-sm font-semibold text-stone-950">운영 상태 패널</h3>
           <p className="mt-0.5 text-xs leading-5 text-stone-500">
-            실제 운영 전 확인할 설정과 누락 항목입니다.
+            설정, 누락 항목, 변경 이력을 row 단위로 확인합니다.
           </p>
         </div>
 
         <div className="divide-y divide-[#EFE9DE]">
+          <div className="bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+            기준 데이터
+          </div>
           <ManagementStatusRow
             label="재원 학생"
             value={`${activeStudents}명`}
@@ -1901,14 +1904,9 @@ function ManagementStatusSidebar({
             isActive={activeSection === "templates"}
             onClick={() => onSelectSection("templates")}
           />
-        </div>
-      </section>
-
-      <section className="overflow-hidden rounded-2xl border border-[#DED8CE] bg-white shadow-sm">
-        <div className="border-b border-[#EEE7DC] bg-[#FBFAF7] px-4 py-3">
-          <h3 className="text-sm font-semibold text-stone-950">발송 정책</h3>
-        </div>
-        <div className="space-y-2 p-3">
+          <div className="bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+            발송 정책
+          </div>
           <PolicyPill
             label={smsDryRun ? "테스트 발송 모드" : "실제 발송 가능"}
             detail={smsDryRun ? "학부모에게 실제 문자가 나가지 않습니다." : "실제 발송 전 대상 확인이 필요합니다."}
@@ -1919,23 +1917,20 @@ function ManagementStatusSidebar({
             detail={allowAssistantSend ? "보조 계정도 테스트 발송 가능" : "보조 계정은 기록 저장만 가능"}
             tone={allowAssistantSend ? "warning" : "safe"}
           />
-        </div>
-      </section>
-
-      <section className="overflow-hidden rounded-2xl border border-[#DED8CE] bg-white shadow-sm">
-        <div className="flex items-center justify-between gap-2 border-b border-[#EEE7DC] bg-[#FBFAF7] px-4 py-3">
-          <h3 className="text-sm font-semibold text-stone-950">최근 변경</h3>
-          <button
-            type="button"
-            onClick={() => onSelectSection("history")}
-            className="rounded-md px-2 py-1 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
-          >
-            이력 보기
-          </button>
-        </div>
-        {recentLogs.length > 0 ? (
-          <div className="divide-y divide-[#EFE9DE]">
-            {recentLogs.map((log) => (
+          <div className="flex items-center justify-between gap-2 bg-white px-4 py-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+              최근 변경
+            </span>
+            <button
+              type="button"
+              onClick={() => onSelectSection("history")}
+              className="rounded-md px-2 py-1 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+            >
+              이력 보기
+            </button>
+          </div>
+          {recentLogs.length > 0 ? (
+            recentLogs.map((log) => (
               <button
                 key={log.id}
                 type="button"
@@ -1949,13 +1944,13 @@ function ManagementStatusSidebar({
                   {log.actorName} · {formatAuditDate(log.createdAt)}
                 </p>
               </button>
-            ))}
-          </div>
-        ) : (
-          <p className="px-4 py-5 text-sm leading-6 text-stone-500">
-            아직 기록된 변경 이력이 없습니다.
-          </p>
-        )}
+            ))
+          ) : (
+            <p className="px-4 py-5 text-sm leading-6 text-stone-500">
+              아직 기록된 변경 이력이 없습니다.
+            </p>
+          )}
+        </div>
       </section>
     </aside>
   );
@@ -2014,14 +2009,23 @@ function PolicyPill({
   return (
     <div
       className={[
-        "rounded-lg border px-3 py-2",
+        "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 py-3",
         tone === "safe"
-          ? "border-emerald-100 bg-emerald-50 text-emerald-900"
-          : "border-amber-100 bg-amber-50 text-amber-900",
+          ? "text-emerald-900"
+          : "text-amber-900",
       ].join(" ")}
     >
-      <p className="text-xs font-semibold">{label}</p>
-      <p className="mt-1 text-[11px] leading-4 opacity-80">{detail}</p>
+      <span className="min-w-0">
+        <span className="block truncate text-xs font-semibold">{label}</span>
+        <span className="mt-1 block truncate text-[11px] leading-4 opacity-80">{detail}</span>
+      </span>
+      <span
+        className={[
+          "h-2 w-2 rounded-full",
+          tone === "safe" ? "bg-emerald-500" : "bg-amber-500",
+        ].join(" ")}
+        aria-hidden="true"
+      />
     </div>
   );
 }
