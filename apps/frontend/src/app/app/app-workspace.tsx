@@ -290,6 +290,7 @@ export function AppWorkspace({
               onDateChange={setSelectedDate}
               initialRecords={workspaceAttendanceRecords}
               onRecordsChange={setWorkspaceAttendanceRecords}
+              onNavigate={handleViewChange}
             />
           ) : visibleView === "fees" ? (
             <FeesPlaceholder
