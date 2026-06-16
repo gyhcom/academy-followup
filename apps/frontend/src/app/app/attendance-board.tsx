@@ -1225,7 +1225,7 @@ function AttendanceViewTabs({
   const visibleTabs = tabs.filter((tab) => !tab.ownerOnly || canUseCalendarView);
 
   return (
-    <div className="rounded-md border border-[#CBD9DE] bg-white px-2 py-2 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
+    <div className="rounded-md border border-[#B9CAD1] bg-[#F7F9F7] px-2 py-2 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
       <div className="flex gap-1 overflow-x-auto" role="tablist" aria-label="출석부 보기 전환">
         {visibleTabs.map((tab) => {
           const isActive = value === tab.id;
@@ -1240,8 +1240,8 @@ function AttendanceViewTabs({
               className={[
                 "min-h-10 shrink-0 rounded-sm border px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                 isActive
-                  ? "border-[#007A7C] bg-[#EAF6F5] text-[#0B3F46] shadow-[inset_3px_0_0_#007A7C]"
-                  : "border-transparent bg-white text-[#526A75] hover:bg-[#F3F7F8]",
+                  ? "border-[#0F766E] bg-[#DDEEEB] text-[#0B3F46] shadow-[inset_3px_0_0_#0F766E]"
+                  : "border-transparent bg-[#F7F9F7] text-[#526A75] hover:bg-[#EDF4F2]",
               ].join(" ")}
             >
               <span className="block text-sm font-bold">{tab.label}</span>
@@ -1298,14 +1298,14 @@ function AttendanceCalendarView({
   onOpenMessages: () => void;
 }) {
   return (
-    <section className="relative overflow-hidden rounded-md border border-[#C2D1D8] bg-[#F3F7F8] shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
-      <div className="border-b border-[#D3E0E5] bg-white px-3 py-3 sm:px-4 lg:px-5">
+    <section className="relative overflow-hidden rounded-md border border-[#B9CAD1] bg-[#E8EEF0] shadow-[0_10px_30px_rgba(13,38,48,0.07)]">
+      <div className="border-b border-[#C9D8DD] bg-[#F7F9F7] px-3 py-3 sm:px-4 lg:px-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#007A7C]">
               Attendance Calendar
             </p>
-            <h2 className="mt-1 text-xl font-bold tracking-[-0.02em] text-[#17232B] sm:text-2xl">
+            <h2 className="mt-1 text-xl font-extrabold tracking-[-0.02em] text-[#14262D] sm:text-2xl">
               {formatMonthTitle(selectedMonth)}
             </h2>
             <p className="mt-1 text-sm leading-6 text-[#60717B]">
@@ -1317,7 +1317,7 @@ function AttendanceCalendarView({
             <button
               type="button"
               onClick={() => onMonthChange(shiftMonth(selectedMonth, -1))}
-              className="inline-flex min-h-9 items-center gap-1 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-semibold text-[#334B58] hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+              className="inline-flex min-h-9 items-center gap-1 rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] px-3 text-sm font-semibold text-[#334B58] shadow-[0_1px_1px_rgba(13,38,48,0.04)] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
             >
               <ChevronLeft size={16} aria-hidden="true" />
               이전 달
@@ -1325,14 +1325,14 @@ function AttendanceCalendarView({
             <button
               type="button"
               onClick={onTodaySelect}
-              className="inline-flex min-h-9 items-center rounded-sm border border-[#007A7C] bg-[#EAF6F5] px-3 text-sm font-bold text-[#00676A] hover:bg-[#DDF1F0] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+              className="inline-flex min-h-9 items-center rounded-sm border border-[#0F766E] bg-[#DDEEEB] px-3 text-sm font-bold text-[#0B625D] shadow-[0_1px_1px_rgba(15,118,110,0.16)] hover:bg-[#CFE7E2] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
             >
               오늘
             </button>
             <button
               type="button"
               onClick={() => onMonthChange(shiftMonth(selectedMonth, 1))}
-              className="inline-flex min-h-9 items-center gap-1 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-semibold text-[#334B58] hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+              className="inline-flex min-h-9 items-center gap-1 rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] px-3 text-sm font-semibold text-[#334B58] shadow-[0_1px_1px_rgba(13,38,48,0.04)] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
             >
               다음 달
               <ChevronRight size={16} aria-hidden="true" />
@@ -1344,7 +1344,7 @@ function AttendanceCalendarView({
           <CompactFilterLabel label="반 필터" value="전체 반" />
           <CompactFilterLabel label="선생님" value="전체" />
           <CompactFilterLabel label="상태" value="전체 상태" />
-          <label className="flex min-h-10 items-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm text-[#526A75]">
+          <label className="flex min-h-10 items-center gap-2 rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] px-3 text-sm text-[#526A75] shadow-[0_1px_1px_rgba(13,38,48,0.04)]">
             <Search size={15} aria-hidden="true" />
             <span className="sr-only">학생 또는 반 검색</span>
             <input
@@ -1396,7 +1396,7 @@ function AttendanceCalendarView({
 
 function CompactFilterLabel({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex min-h-10 items-center justify-between gap-3 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm">
+    <div className="flex min-h-10 items-center justify-between gap-3 rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] px-3 text-sm shadow-[0_1px_1px_rgba(13,38,48,0.04)]">
       <span className="font-semibold text-[#60717B]">{label}</span>
       <span className="font-bold text-[#263A45]">{value}</span>
     </div>
@@ -1420,15 +1420,15 @@ function AttendanceMonthCalendar({
   const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
 
   return (
-    <div className="min-w-0 border-r border-[#D3E0E5] bg-white p-3 sm:p-4">
-      <div className="grid grid-cols-7 border-b border-l border-[#D7E2E6] bg-[#EEF4F6] text-center text-[12px] font-bold text-[#526A75]">
+    <div className="min-w-0 border-r border-[#C9D8DD] bg-[#EFF4F5] p-3 sm:p-4">
+      <div className="grid grid-cols-7 overflow-hidden rounded-t-sm border-b border-l border-[#C9D8DD] bg-[#E0EAED] text-center text-[12px] font-bold text-[#526A75]">
         {weekdays.map((weekday) => (
-          <div key={weekday} className="border-r border-[#D7E2E6] px-2 py-2">
+          <div key={weekday} className="border-r border-[#C9D8DD] px-2 py-2">
             {weekday}
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 border-l border-[#D7E2E6] sm:grid-cols-7">
+      <div className="grid grid-cols-1 overflow-visible border-l border-[#C9D8DD] sm:grid-cols-7">
         {days.map((date) => {
           const summary = buildDateSummary(classes, records, date);
           return (
@@ -1437,6 +1437,7 @@ function AttendanceMonthCalendar({
               date={date}
               selectedMonth={selectedMonth}
               isSelected={date === selectedDate}
+              isToday={date === getTodayDate()}
               summary={summary}
               onSelect={onDateSelect}
             />
@@ -1451,12 +1452,14 @@ function AttendanceCalendarDayCell({
   date,
   selectedMonth,
   isSelected,
+  isToday,
   summary,
   onSelect,
 }: {
   date: string;
   selectedMonth: string;
   isSelected: boolean;
+  isToday: boolean;
   summary: AttendanceOverview;
   onSelect: (date: string) => void;
 }) {
@@ -1469,6 +1472,11 @@ function AttendanceCalendarDayCell({
   const hasClass = summary.totalSessions > 0;
   const hasUnchecked = summary.counts.pending > 0;
   const hasMakeup = summary.counts.makeup > 0;
+  const selectedClassName = isSelected
+    ? "relative z-10 min-h-[8.35rem] border-[#0F766E] bg-[#DDEEEB] p-2.5 shadow-[0_10px_24px_rgba(15,118,110,0.18),inset_4px_0_0_#0F766E] ring-2 ring-[#0F766E]/35 sm:-m-1 sm:min-h-[9.45rem] sm:p-3"
+    : hasUnchecked && hasClass
+      ? "bg-[#FBF4E6] hover:bg-[#F6EDD8]"
+      : "bg-[#F8FAF8] hover:bg-[#EDF5F3]";
 
   return (
     <button
@@ -1476,38 +1484,79 @@ function AttendanceCalendarDayCell({
       onClick={() => onSelect(date)}
       aria-pressed={isSelected}
       className={[
-        "min-h-[7.25rem] border-b border-r border-[#D7E2E6] bg-white p-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] sm:min-h-[8.5rem]",
-        !isCurrentMonth ? "bg-[#F6F8F9] text-[#9BAAB0]" : "",
-        isSelected ? "bg-[#EAF6F5] shadow-[inset_4px_0_0_#007A7C]" : "hover:bg-[#F7FBFC]",
+        "group min-h-[7.25rem] border-b border-r border-[#C9D8DD] text-left transition duration-150 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] sm:min-h-[8.5rem]",
+        !isCurrentMonth ? "bg-[#E7ECEE] text-[#9BAAB0]" : selectedClassName,
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-2">
         <div>
-          <span className="text-base font-bold text-[#17232B]">{dayNumber}</span>
-          <span className="ml-1 text-xs font-semibold text-[#60717B]">{weekdayLabel}</span>
+          <span
+            className={[
+              "text-base font-extrabold",
+              isSelected ? "text-[#063B3A]" : "text-[#17232B]",
+            ].join(" ")}
+          >
+            {dayNumber}
+          </span>
+          <span className="ml-1 whitespace-nowrap text-xs font-semibold text-[#60717B]">
+            {weekdayLabel}
+          </span>
+          {isToday ? (
+            <span className="ml-1 whitespace-nowrap rounded-sm bg-[#E0EAED] px-1 py-0.5 text-[10px] font-bold text-[#0B4B56]">
+              오늘
+            </span>
+          ) : null}
         </div>
-        <span
-          className={[
-            "rounded-sm px-1.5 py-0.5 text-[10px] font-bold",
-            !hasClass
-              ? "bg-[#EEF2F3] text-[#78909A]"
-              : attentionCount > 0
-                ? "bg-red-50 text-red-700"
-                : hasUnchecked
-                  ? "bg-amber-50 text-amber-700"
-                  : "bg-emerald-50 text-emerald-700",
-          ].join(" ")}
-        >
-          {!hasClass ? "수업 없음" : attentionCount > 0 ? "연락" : hasUnchecked ? "미체크" : "정상"}
-        </span>
+        {isSelected ? (
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#0F766E] text-white shadow-[0_2px_8px_rgba(15,118,110,0.24)]">
+            <Check size={13} strokeWidth={3} aria-hidden="true" />
+          </span>
+        ) : (
+          <span
+            className={[
+              "whitespace-nowrap rounded-sm px-1.5 py-0.5 text-[10px] font-bold",
+              !hasClass
+                ? "bg-[#E4EAEC] text-[#78909A]"
+                : attentionCount > 0
+                  ? "bg-red-50 text-red-700"
+                  : hasUnchecked
+                    ? "bg-amber-50 text-amber-700"
+                    : "bg-emerald-50 text-emerald-700",
+            ].join(" ")}
+          >
+            {!hasClass ? "수업 없음" : attentionCount > 0 ? "연락" : hasUnchecked ? "미체크" : "정상"}
+          </span>
+        )}
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-x-2 gap-y-1 text-[12px] leading-5 text-[#405763]">
-        <MetricLine label="수업" value={summary.totalSessions} />
-        <MetricLine label="학생" value={summary.totalStudents} />
-        <MetricLine label="미체크" value={summary.counts.pending} tone={hasUnchecked ? "warning" : "muted"} />
-        <MetricLine label="연락" value={attentionCount} tone={attentionCount > 0 ? "danger" : "muted"} />
-        <MetricLine label="지각" value={summary.counts.late} tone={summary.counts.late > 0 ? "warning" : "muted"} />
-        <MetricLine label="결석" value={summary.counts.absent} tone={summary.counts.absent > 0 ? "danger" : "muted"} />
+      {isSelected ? (
+        <div className="mt-1">
+          <span
+            className={[
+              "inline-flex whitespace-nowrap rounded-sm px-1.5 py-0.5 text-[10px] font-bold",
+              !hasClass
+                ? "bg-[#E4EAEC] text-[#78909A]"
+                : attentionCount > 0
+                  ? "bg-red-50 text-red-700"
+                  : hasUnchecked
+                    ? "bg-amber-50 text-amber-700"
+                    : "bg-emerald-50 text-emerald-700",
+            ].join(" ")}
+          >
+            {!hasClass ? "수업 없음" : attentionCount > 0 ? "연락" : hasUnchecked ? "미체크" : "정상"}
+          </span>
+        </div>
+      ) : null}
+      <div className="mt-3 space-y-1.5 text-[12px] leading-5 text-[#405763]">
+        <div className="grid grid-cols-2 gap-1.5">
+          <CalendarMetricTile label="수업" value={summary.totalSessions} emphasis={isSelected} />
+          <CalendarMetricTile label="학생" value={summary.totalStudents} emphasis={isSelected} />
+        </div>
+        <div className="grid grid-cols-1 gap-y-0.5 text-[11px] leading-4">
+          <MetricLine label="미체크" value={summary.counts.pending} tone={hasUnchecked ? "warning" : "muted"} icon="!" />
+          <MetricLine label="연락" value={attentionCount} tone={attentionCount > 0 ? "danger" : "muted"} icon="•" />
+          <MetricLine label="지각" value={summary.counts.late} tone={summary.counts.late > 0 ? "warning" : "muted"} icon="●" />
+          <MetricLine label="결석" value={summary.counts.absent} tone={summary.counts.absent > 0 ? "danger" : "muted"} icon="●" />
+        </div>
       </div>
       {hasMakeup ? (
         <div className="mt-2 inline-flex rounded-sm border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[11px] font-bold text-blue-700">
@@ -1522,10 +1571,14 @@ function MetricLine({
   label,
   value,
   tone = "default",
+  icon,
+  emphasis = false,
 }: {
   label: string;
   value: number;
   tone?: "default" | "muted" | "warning" | "danger";
+  icon?: string;
+  emphasis?: boolean;
 }) {
   const toneClass =
     tone === "warning"
@@ -1535,11 +1588,58 @@ function MetricLine({
         : tone === "muted"
           ? "text-[#8CA0A8]"
           : "text-[#17232B]";
+  const dotClass =
+    tone === "warning"
+      ? "bg-amber-400"
+      : tone === "danger"
+        ? "bg-red-500"
+        : tone === "muted"
+          ? "bg-[#B8C6CB]"
+          : "bg-[#0F766E]";
 
   return (
-    <span className="flex items-center justify-between gap-2">
-      <span className="text-[#78909A]">{label}</span>
-      <b className={toneClass}>{value}</b>
+    <span className="flex min-w-0 items-center justify-between gap-1">
+      <span className="flex min-w-0 items-center gap-1 whitespace-nowrap text-[#78909A]">
+        {icon ? (
+          <span
+            className={[
+              "flex size-1.5 shrink-0 items-center justify-center rounded-full text-[0px]",
+              dotClass,
+            ].join(" ")}
+            aria-hidden="true"
+          >
+            {icon}
+          </span>
+        ) : null}
+        {label}
+      </span>
+      <b className={["shrink-0 tabular-nums", toneClass, emphasis ? "text-sm" : ""].join(" ")}>{value}</b>
+    </span>
+  );
+}
+
+function CalendarMetricTile({
+  label,
+  value,
+  emphasis = false,
+}: {
+  label: string;
+  value: number;
+  emphasis?: boolean;
+}) {
+  return (
+    <span
+      className={[
+        "flex items-center justify-between rounded-sm border px-1.5 py-1",
+        emphasis
+          ? "border-[#9FCFCA] bg-[#F2FAF8] text-[#063B3A]"
+          : "border-[#D2DEE2] bg-[#F5F8F7] text-[#263A45]",
+      ].join(" ")}
+    >
+      <span className="whitespace-nowrap text-[11px] font-semibold text-[#78909A]">
+        {label}
+      </span>
+      <b className="shrink-0 text-sm font-extrabold tabular-nums">{value}</b>
     </span>
   );
 }
@@ -1576,15 +1676,22 @@ function AttendanceDayDetailPanel({
   ];
 
   return (
-    <aside className="min-w-0 bg-[#F8FBFC] p-3 sm:p-4">
-      <div className="rounded-md border border-[#D3E0E5] bg-white">
-        <div className="border-b border-[#D3E0E5] p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#007A7C]">
-            선택 날짜
-          </p>
-          <h3 className="mt-1 text-lg font-bold text-[#17232B]">
-            {formatDateKoreanLong(selectedDate)}
-          </h3>
+    <aside className="min-w-0 bg-[#E8EEF0] p-3 sm:p-4">
+      <div className="rounded-md border border-[#B9CAD1] bg-[#F7F9F7] shadow-[0_6px_18px_rgba(13,38,48,0.06)]">
+        <div className="border-b border-[#C9D8DD] bg-[#EEF7F4] p-4 shadow-[inset_4px_0_0_#0F766E]">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0F766E]">
+                선택 날짜
+              </p>
+              <h3 className="mt-1 text-xl font-extrabold tracking-[-0.01em] text-[#14262D]">
+                {formatDateKoreanLong(selectedDate)}
+              </h3>
+            </div>
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-[#A6D4CD] bg-[#D7ECE8] text-[#0F766E]">
+              <CheckCircle2 size={18} aria-hidden="true" />
+            </span>
+          </div>
           <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
             <SummaryPill label="수업" value={overview.totalSessions} />
             <SummaryPill label="학생" value={overview.totalStudents} />
@@ -1596,13 +1703,13 @@ function AttendanceDayDetailPanel({
           <button
             type="button"
             onClick={onOpenToday}
-            className="mt-3 inline-flex min-h-9 w-full items-center justify-center rounded-sm border border-[#007A7C] bg-[#EAF6F5] px-3 text-sm font-bold text-[#00676A] hover:bg-[#DDF1F0] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            className="mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-sm border border-[#0F766E] bg-[#0F766E] px-3 text-sm font-bold text-white shadow-[0_4px_14px_rgba(15,118,110,0.18)] hover:bg-[#0B625D] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
           >
             오늘 처리 화면에서 출석 체크
           </button>
         </div>
 
-        <div className="flex border-b border-[#D3E0E5] bg-[#F1F5F6] p-1" role="tablist">
+        <div className="flex border-b border-[#C9D8DD] bg-[#E7EEF0] p-1" role="tablist">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -1613,8 +1720,8 @@ function AttendanceDayDetailPanel({
               className={[
                 "min-h-9 flex-1 rounded-sm px-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                 activeTab === tab.id
-                  ? "bg-white text-[#0B3F46] shadow-sm"
-                  : "text-[#60717B] hover:bg-white/70",
+                  ? "bg-[#F8FAF8] text-[#0B3F46] shadow-sm"
+                  : "text-[#60717B] hover:bg-[#F8FAF8]/80",
               ].join(" ")}
             >
               {tab.label} <span className="font-semibold text-[#8CA0A8]">{tab.count}</span>
@@ -1622,7 +1729,7 @@ function AttendanceDayDetailPanel({
           ))}
         </div>
 
-        <div className="max-h-[43rem] overflow-y-auto p-3">
+        <div className="max-h-[43rem] overflow-y-auto bg-[#F1F5F5] p-3">
           {activeTab === "classes" ? (
             <AttendanceClassSummaryList sessions={sessions} records={records} />
           ) : null}
@@ -1654,17 +1761,22 @@ function SummaryPill({
 }) {
   const toneClass =
     tone === "success"
-      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+      ? "border-emerald-200 bg-[#E6F5ED] text-emerald-700"
       : tone === "warning"
-        ? "border-amber-200 bg-amber-50 text-amber-700"
+        ? "border-amber-200 bg-[#FFF3D8] text-amber-700"
         : tone === "danger"
-          ? "border-red-200 bg-red-50 text-red-700"
-          : "border-[#D3E0E5] bg-[#F5F8F9] text-[#405763]";
+          ? "border-red-200 bg-[#FDE8E6] text-red-700"
+          : "border-[#C9D8DD] bg-[#F8FAF8] text-[#334B58]";
 
   return (
-    <span className={["rounded-sm border px-2 py-1.5 font-bold", toneClass].join(" ")}>
-      <span className="block text-[11px] font-semibold opacity-80">{label}</span>
-      {value}
+    <span
+      className={[
+        "rounded-sm border px-2.5 py-2 font-extrabold shadow-[0_1px_2px_rgba(13,38,48,0.04)]",
+        toneClass,
+      ].join(" ")}
+    >
+      <span className="block text-[11px] font-semibold leading-4 opacity-75">{label}</span>
+      <span className="text-lg leading-6 tabular-nums">{value}</span>
     </span>
   );
 }
@@ -1685,7 +1797,7 @@ function AttendanceClassSummaryList({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {sessions.map((session) => {
         const summary = getSessionSummary(session, records);
         const contactNeeded = summary.late + summary.absent + summary.needs_check;
@@ -1693,11 +1805,11 @@ function AttendanceClassSummaryList({
         return (
           <div
             key={session.key}
-            className="rounded-sm border border-[#D3E0E5] bg-white p-3 shadow-[0_1px_2px_rgba(13,38,48,0.04)]"
+            className="rounded-sm border border-[#C9D8DD] bg-[#F8FAF8] p-3 shadow-[0_1px_2px_rgba(13,38,48,0.05)] transition hover:-translate-y-0.5 hover:border-[#A8C3C5] hover:bg-[#FBFCFA] hover:shadow-[0_8px_18px_rgba(13,38,48,0.08)]"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-bold text-[#17232B]">
+                <p className="text-sm font-extrabold text-[#17232B]">
                   {session.startTime} {session.className}
                 </p>
                 <p className="mt-1 text-xs font-medium text-[#60717B]">
@@ -1705,19 +1817,47 @@ function AttendanceClassSummaryList({
                 </p>
               </div>
               {contactNeeded > 0 ? (
-                <span className="rounded-sm border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-bold text-amber-700">
+                <span className="rounded-sm border border-amber-200 bg-[#FFF3D8] px-2 py-1 text-[11px] font-bold text-amber-700">
                   연락 {contactNeeded}
                 </span>
               ) : null}
             </div>
-            <p className="mt-2 text-xs leading-5 text-[#526A75]">
-              출석 {summary.present} · 지각 {summary.late} · 결석 {summary.absent} · 미체크{" "}
-              {summary.pending}
-            </p>
+            <div className="mt-3 grid grid-cols-4 gap-1 text-center text-[11px]">
+              <MiniStat label="출석" value={summary.present} tone="success" />
+              <MiniStat label="지각" value={summary.late} tone="warning" />
+              <MiniStat label="결석" value={summary.absent} tone="danger" />
+              <MiniStat label="미체크" value={summary.pending} />
+            </div>
           </div>
         );
       })}
     </div>
+  );
+}
+
+function MiniStat({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "success" | "warning" | "danger";
+}) {
+  const toneClass =
+    tone === "success"
+      ? "text-emerald-700"
+      : tone === "warning"
+        ? "text-amber-700"
+        : tone === "danger"
+          ? "text-red-700"
+          : "text-[#60717B]";
+
+  return (
+    <span className="rounded-sm bg-[#EEF4F3] px-1.5 py-1">
+      <span className="block font-medium text-[#78909A]">{label}</span>
+      <b className={["tabular-nums", toneClass].join(" ")}>{value}</b>
+    </span>
   );
 }
 
