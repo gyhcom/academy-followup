@@ -35,9 +35,9 @@ export async function fetchAuditLogsFromBackend(signal: AbortSignal, limit = 20)
     };
 
     return payload.logs ?? null;
-  } catch (error) {
+  } catch {
     if (signal.aborted) {
-      throw error;
+      return null;
     }
 
     return null;
