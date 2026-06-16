@@ -950,7 +950,7 @@ export function ManagementHome({
             templateFormStatus.status === "error") ? (
             <p
               className={[
-                "mb-3 rounded-md border px-3 py-2 text-sm",
+                "mb-3 rounded-sm border px-3 py-2 text-sm",
                 templateFormStatus.status === "saved"
                   ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
@@ -978,18 +978,18 @@ export function ManagementHome({
         onAction={saveSettingsForm}
       >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          <label className="grid gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
             학원명
             <input
               value={settingsForm.academyName}
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, academyName: event.target.value })
               }
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
-          <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          <label className="grid gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
             발신명
             <input
               value={settingsForm.senderName}
@@ -997,11 +997,11 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderName: event.target.value })
               }
               placeholder="문자에 표시할 학원명"
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
-          <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          <label className="grid gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
             발신번호
             <input
               value={settingsForm.senderPhone}
@@ -1009,11 +1009,11 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderPhone: event.target.value })
               }
               placeholder="0410000000"
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
-          <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+          <label className="grid gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
             중복 발송 방지 시간
             <input
               type="number"
@@ -1025,11 +1025,11 @@ export function ManagementHome({
                   duplicateGuardMinutes: Number(event.target.value),
                 })
               }
-              className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
             />
           </label>
 
-          <label className="flex min-h-11 items-center gap-3 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-800">
+          <label className="flex min-h-11 items-center gap-3 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm font-medium text-[var(--clinic-text)]">
             <input
               type="checkbox"
               checked={settingsForm.smsDryRun}
@@ -1041,7 +1041,7 @@ export function ManagementHome({
             실제 문자 발송 막기
           </label>
 
-          <label className="flex min-h-11 items-center gap-3 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-800">
+          <label className="flex min-h-11 items-center gap-3 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm font-medium text-[var(--clinic-text)]">
             <input
               type="checkbox"
               checked={settingsForm.allowAssistantSend}
@@ -1060,7 +1060,7 @@ export function ManagementHome({
         {settingsFormStatus.status === "saved" || settingsFormStatus.status === "error" ? (
           <p
             className={[
-              "mt-3 rounded-md border px-3 py-2 text-sm",
+              "mt-3 rounded-sm border px-3 py-2 text-sm",
               settingsFormStatus.status === "saved"
                 ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
@@ -1129,7 +1129,7 @@ export function ManagementHome({
           {classFormStatus.status === "saved" || classFormStatus.status === "error" ? (
             <p
               className={[
-                "mb-3 rounded-md border px-3 py-2 text-sm",
+                "mb-3 rounded-sm border px-3 py-2 text-sm",
                 classFormStatus.status === "saved"
                   ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
@@ -1143,7 +1143,7 @@ export function ManagementHome({
           bulkScheduleFormStatus.status === "error" ? (
             <p
               className={[
-                "mb-3 rounded-md border px-3 py-2 text-sm",
+                "mb-3 rounded-sm border px-3 py-2 text-sm",
                 bulkScheduleFormStatus.status === "saved"
                   ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
@@ -1153,13 +1153,13 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="mb-3 rounded-lg border border-[#C9D6E2] bg-[#F8FBFD] px-3 py-3 text-sm text-[#244B67]">
+          <div className="mb-3 rounded-sm border border-[#C9D6E2] bg-[#F8FBFD] px-3 py-3 text-sm text-[#244B67]">
             반을 만든 뒤 <span className="font-semibold">수업 시간 등록</span>을 누르면
             그 반의 재원 학생 전체에게 같은 주간 스케줄이 추가됩니다.
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
-            <div className="hidden grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_220px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
+          <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
+            <div className="hidden grid-cols-[minmax(140px,1fr)_72px_64px_minmax(96px,0.8fr)_220px] border-b border-[#B8C9D0] bg-[#E7EEF1] px-3 py-2.5 text-xs font-semibold text-[var(--clinic-muted)] md:grid">
               <span>반</span>
               <span>과목</span>
               <span>학년</span>
@@ -1169,25 +1169,25 @@ export function ManagementHome({
             {classes.map((classItem) => (
               <div
                 key={classItem.id}
-                className="grid min-w-0 gap-3 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(180px,1.2fr)_120px_120px_minmax(140px,1fr)_220px] md:items-center"
+                className="grid min-w-0 gap-3 border-b border-[#D6E0E5] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(140px,1fr)_72px_64px_minmax(96px,0.8fr)_220px] md:items-center"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-stone-950">{classItem.name}</p>
-                  <p className="mt-1 text-xs text-stone-500 md:hidden">
+                  <p className="truncate text-sm font-semibold text-[var(--clinic-text)]">{classItem.name}</p>
+                  <p className="mt-1 text-xs text-[var(--clinic-muted)] md:hidden">
                     {[classItem.subject, displayGradeLabel(classItem.gradeLabel), classItem.teacherName ?? "담당 미지정"].filter(Boolean).join(" · ")}
                   </p>
                 </div>
-                <p className="hidden text-sm text-stone-700 md:block">{classItem.subject ?? "-"}</p>
-                <p className="hidden text-sm text-stone-700 md:block">{displayGradeLabel(classItem.gradeLabel) ?? "-"}</p>
-                <p className="hidden truncate text-sm text-stone-700 md:block">{classItem.teacherName ?? "미지정"}</p>
+                <p className="hidden text-sm text-[#405763] md:block">{classItem.subject ?? "-"}</p>
+                <p className="hidden text-sm text-[#405763] md:block">{displayGradeLabel(classItem.gradeLabel) ?? "-"}</p>
+                <p className="hidden truncate text-sm text-[#405763] md:block">{classItem.teacherName ?? "미지정"}</p>
                 <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
-                  <span className="w-fit shrink-0 rounded-md bg-[#F7F5F0] px-2.5 py-1 text-xs font-semibold text-stone-700">
+                  <span className="w-fit shrink-0 rounded-md bg-[#EDF3F5] px-2.5 py-1 text-xs font-semibold text-[#405763]">
                     학생 {classItem.studentCount}명
                   </span>
                   <button
                     type="button"
                     onClick={() => openBulkScheduleForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md bg-[#315C7C] px-2.5 text-xs font-semibold text-white transition hover:bg-[#244B67]"
+                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-sm bg-[var(--clinic-primary)] px-2.5 text-xs font-semibold text-white transition hover:bg-[var(--clinic-primary-dark)]"
                   >
                     <ClipboardList size={13} />
                     수업 시간 등록
@@ -1195,7 +1195,7 @@ export function ManagementHome({
                   <button
                     type="button"
                     onClick={() => openEditClassForm(classItem)}
-                    className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0]"
+                    className="flex min-h-8 min-w-[58px] shrink-0 items-center justify-center gap-1 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-2.5 text-xs font-semibold text-[#405763] transition hover:bg-[#EDF3F5]"
                   >
                     <Pencil size={13} />
                     수정
@@ -1231,7 +1231,7 @@ export function ManagementHome({
           {memberFormStatus.status === "saved" || memberFormStatus.status === "error" ? (
             <p
               className={[
-                "mb-3 rounded-md border px-3 py-2 text-sm",
+                "mb-3 rounded-sm border px-3 py-2 text-sm",
                 memberFormStatus.status === "saved"
                   ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                   : "border-red-200 bg-red-50 text-red-900",
@@ -1241,8 +1241,8 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
-            <div className="hidden grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
+          <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
+            <div className="hidden grid-cols-[minmax(120px,1fr)_minmax(160px,1.05fr)_72px_96px_68px_76px] border-b border-[#B8C9D0] bg-[#E7EEF1] px-3 py-2.5 text-xs font-semibold text-[var(--clinic-muted)] md:grid">
               <span>이름</span>
               <span>이메일</span>
               <span>직위</span>
@@ -1253,20 +1253,20 @@ export function ManagementHome({
             {members.map((member) => (
               <div
                 key={member.id}
-                className="grid min-w-0 gap-2 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(160px,1fr)_minmax(180px,1.1fr)_100px_110px_90px_80px] md:items-center"
+                className="grid min-w-0 gap-2 border-b border-[#D6E0E5] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(120px,1fr)_minmax(160px,1.05fr)_72px_96px_68px_76px] md:items-center"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-stone-950">{member.name}</p>
-                  <p className="mt-1 truncate text-xs text-stone-500 md:hidden">{member.email}</p>
+                  <p className="truncate text-sm font-semibold text-[var(--clinic-text)]">{member.name}</p>
+                  <p className="mt-1 truncate text-xs text-[var(--clinic-muted)] md:hidden">{member.email}</p>
                 </div>
-                <p className="hidden truncate text-sm text-stone-700 md:block">{member.email}</p>
-                <p className="text-sm text-stone-700">{roleLabel(member.role)}</p>
-                <p className="text-sm text-stone-700">{member.maskedPhone ?? "미등록"}</p>
-                <p className="text-sm text-stone-700">담당 {member.classCount}개</p>
+                <p className="hidden truncate text-sm text-[#405763] md:block">{member.email}</p>
+                <p className="text-sm text-[#405763]">{roleLabel(member.role)}</p>
+                <p className="text-sm text-[#405763]">{member.maskedPhone ?? "미등록"}</p>
+                <p className="text-sm text-[#405763]">담당 {member.classCount}개</p>
                 <button
                   type="button"
                   onClick={() => openEditMemberForm(member)}
-                  className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0] md:ml-auto"
+                  className="flex min-h-8 min-w-[64px] shrink-0 items-center justify-center gap-1 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-2.5 text-xs font-semibold text-[#405763] transition hover:bg-[#EDF3F5] md:ml-auto"
                 >
                   <Pencil size={13} />
                   수정
@@ -1287,8 +1287,8 @@ export function ManagementHome({
       >
         <div className="mb-3 grid gap-2 border border-[#B8C9D0] bg-[#E7EEF1] p-2.5 sm:mb-4 sm:p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-stone-950">학생 등록 후 반 배정과 스케줄까지 확인합니다.</p>
-            <p className="mt-1 hidden text-xs leading-5 text-stone-500 sm:block">
+            <p className="text-sm font-semibold text-[var(--clinic-text)]">학생 등록 후 반 배정과 스케줄까지 확인합니다.</p>
+            <p className="mt-1 hidden text-xs leading-5 text-[var(--clinic-muted)] sm:block">
               반이 없는 학생은 권한과 출석 흐름이 애매해지고, 스케줄이 없는 학생은 출석부에 나타나지 않습니다.
             </p>
           </div>
@@ -1330,7 +1330,7 @@ export function ManagementHome({
           bulkStudentImportStatus.status === "error") ? (
           <p
             className={[
-              "mb-3 rounded-md border px-3 py-2 text-sm",
+              "mb-3 rounded-sm border px-3 py-2 text-sm",
               bulkStudentImportStatus.status === "saved"
                 ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
@@ -1357,7 +1357,7 @@ export function ManagementHome({
         {studentFormStatus.status === "saved" || studentFormStatus.status === "error" ? (
           <p
             className={[
-              "mb-3 rounded-md border px-3 py-2 text-sm",
+              "mb-3 rounded-sm border px-3 py-2 text-sm",
               studentFormStatus.status === "saved"
                 ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
@@ -1386,7 +1386,7 @@ export function ManagementHome({
         {scheduleFormStatus.status === "saved" || scheduleFormStatus.status === "error" ? (
           <p
             className={[
-              "mb-3 rounded-md border px-3 py-2 text-sm",
+              "mb-3 rounded-sm border px-3 py-2 text-sm",
               scheduleFormStatus.status === "saved"
                 ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
                 : "border-red-200 bg-red-50 text-red-900",
@@ -1651,10 +1651,10 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
                   <FileText size={17} />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-stone-950">
+                  <span className="block text-sm font-semibold text-[var(--clinic-text)]">
                     {title}
                   </span>
-                  <span className="mt-0.5 block truncate text-xs text-stone-500">
+                  <span className="mt-0.5 block truncate text-xs text-[var(--clinic-muted)]">
                     {detail}
                   </span>
                 </span>
@@ -1691,17 +1691,17 @@ function MessageTemplateForm({
   const bodyMetrics = getMessageLengthMetrics(form.body);
 
   return (
-    <div className="mb-4 rounded-lg border border-[#C9D6E2] bg-[#F8FBFD] p-3 sm:p-4">
+    <div className="mb-4 rounded-sm border border-[#C9D6E2] bg-[#F8FBFD] p-3 sm:p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
             {form.reasonLabel}
           </p>
-          <h4 className="mt-1 text-base font-semibold text-stone-950">
+          <h4 className="mt-1 text-base font-semibold text-[var(--clinic-text)]">
             문자 템플릿 수정
           </h4>
         </div>
-        <label className="flex w-fit items-center gap-2 rounded-md border border-[#D8D0C4] bg-white px-3 py-2 text-xs font-semibold text-stone-700">
+        <label className="flex w-fit items-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 py-2 text-xs font-semibold text-[#405763]">
           <input
             type="checkbox"
             checked={form.isActive}
@@ -1715,23 +1715,23 @@ function MessageTemplateForm({
       </div>
 
       <div className="mt-4 grid gap-3">
-        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           템플릿 제목
           <input
             value={form.title}
             onChange={(event) => onChange({ ...form, title: event.target.value })}
             placeholder={`${form.reasonLabel} 안내`}
-            className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
           />
         </label>
 
-        <label className="grid gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           문자 본문
           <textarea
             value={form.body}
             onChange={(event) => onChange({ ...form, body: event.target.value })}
             rows={7}
-            className="min-h-40 rounded-md border border-stone-300 bg-white px-3 py-2 text-sm leading-6 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-40 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 py-2 text-sm leading-6 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
           />
           <span
             className={[
@@ -1740,7 +1740,7 @@ function MessageTemplateForm({
                 ? "text-red-700"
                 : bodyMetrics.transportType === "lms"
                   ? "text-amber-700"
-                  : "text-stone-500",
+                  : "text-[var(--clinic-muted)]",
             ].join(" ")}
           >
             {bodyMetrics.charCount}자 · {bodyMetrics.byteCount}byte ·{" "}
@@ -1754,16 +1754,16 @@ function MessageTemplateForm({
         </label>
       </div>
 
-      <div className="mt-3 rounded-md border border-[#E6E0D5] bg-white px-3 py-2 text-xs leading-5 text-stone-600">
+      <div className="mt-3 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-3 py-2 text-xs leading-5 text-[var(--clinic-muted)]">
         사용할 수 있는 변수:
-        <span className="ml-1 font-semibold text-stone-800">
+        <span className="ml-1 font-semibold text-[var(--clinic-text)]">
           {"{{academyName}}"}, {"{{studentName}}"}, {"{{teacherName}}"},{" "}
           {"{{className}}"}, {"{{makeupCandidateTime}}"}
         </span>
       </div>
 
       {status.status === "error" ? (
-        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+        <p className="mt-3 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
           {status.message}
         </p>
       ) : null}
@@ -1772,7 +1772,7 @@ function MessageTemplateForm({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-4 text-sm font-semibold text-stone-700 transition hover:bg-[#F7F5F0]"
+          className="min-h-10 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-4 text-sm font-semibold text-[#405763] transition hover:bg-[#EDF3F5]"
         >
           취소
         </button>
@@ -1780,7 +1780,7 @@ function MessageTemplateForm({
           type="button"
           disabled={isSaving || bodyMetrics.isOverLimit}
           onClick={onSave}
-          className="min-h-10 rounded-md bg-[#315C7C] px-4 text-sm font-semibold text-white transition hover:bg-[#244B67] disabled:cursor-not-allowed disabled:opacity-60"
+          className="min-h-10 rounded-sm bg-[var(--clinic-primary)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--clinic-primary-dark)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSaving ? "저장 중" : "템플릿 저장"}
         </button>
@@ -1799,8 +1799,8 @@ function MessageTemplateList({
   onEditTemplate: (template: ManagementMessageTemplate) => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
-      <div className="hidden grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 md:grid">
+    <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
+      <div className="hidden grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] border-b border-[#B8C9D0] bg-[#E7EEF1] px-3 py-2.5 text-xs font-semibold text-[var(--clinic-muted)] md:grid">
         <span>사유</span>
         <span>제목</span>
         <span>본문 미리보기</span>
@@ -1813,22 +1813,22 @@ function MessageTemplateList({
           <div
             key={template.reason}
             className={[
-              "grid min-w-0 gap-2 border-b border-[#EFE9DE] px-3 py-3.5 last:border-b-0 md:grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] md:items-center",
+              "grid min-w-0 gap-2 border-b border-[#D6E0E5] px-3 py-3.5 last:border-b-0 md:grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] md:items-center",
               isActive ? "bg-[#F8FBFD]" : "",
             ].join(" ")}
           >
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-stone-950">
+              <p className="truncate text-sm font-semibold text-[var(--clinic-text)]">
                 {template.reasonLabel}
               </p>
-              <p className="mt-1 text-xs text-stone-500 md:hidden">
+              <p className="mt-1 text-xs text-[var(--clinic-muted)] md:hidden">
                 {template.title}
               </p>
             </div>
-            <p className="hidden truncate text-sm font-medium text-stone-800 md:block">
+            <p className="hidden truncate text-sm font-medium text-[var(--clinic-text)] md:block">
               {template.title}
             </p>
-            <p className="line-clamp-2 min-w-0 text-sm leading-6 text-stone-600">
+            <p className="line-clamp-2 min-w-0 text-sm leading-6 text-[var(--clinic-muted)]">
               {template.body}
             </p>
             <div className="flex items-center justify-between gap-2 md:justify-end">
@@ -1840,7 +1840,7 @@ function MessageTemplateList({
               <button
                 type="button"
                 onClick={() => onEditTemplate(template)}
-                className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2.5 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0] md:ml-auto"
+                className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-2.5 text-xs font-semibold text-[#405763] transition hover:bg-[#EDF3F5] md:ml-auto"
               >
                 <Pencil size={13} />
                 수정
@@ -1891,7 +1891,7 @@ function ManagementStatusSidebar({
         </div>
 
         <div className="divide-y divide-[#C9D7DC]">
-          <div className="bg-[#EDF3F5] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+          <div className="bg-[#EDF3F5] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--clinic-muted)]">
             기준 데이터
           </div>
           <ManagementStatusRow
@@ -1924,7 +1924,7 @@ function ManagementStatusSidebar({
             isActive={activeSection === "templates"}
             onClick={() => onSelectSection("templates")}
           />
-          <div className="bg-[#EDF3F5] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+          <div className="bg-[#EDF3F5] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--clinic-muted)]">
             발송 정책
           </div>
           <PolicyPill
@@ -1938,7 +1938,7 @@ function ManagementStatusSidebar({
             tone={allowAssistantSend ? "warning" : "safe"}
           />
           <div className="flex items-center justify-between gap-2 bg-[#EDF3F5] px-4 py-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--clinic-muted)]">
               최근 변경
             </span>
             <button
@@ -1957,16 +1957,16 @@ function ManagementStatusSidebar({
                 onClick={() => onSelectSection("history")}
                 className="block w-full bg-[#F7FAFA] px-4 py-3 text-left transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]"
               >
-                <p className="truncate text-xs font-semibold text-stone-900">
+                <p className="truncate text-xs font-semibold text-[var(--clinic-text)]">
                   {log.summary}
                 </p>
-                <p className="mt-1 text-[11px] text-stone-500">
+                <p className="mt-1 text-[11px] text-[var(--clinic-muted)]">
                   {log.actorName} · {formatAuditDate(log.createdAt)}
                 </p>
               </button>
             ))
           ) : (
-            <p className="px-4 py-5 text-sm leading-6 text-stone-500">
+            <p className="px-4 py-5 text-sm leading-6 text-[var(--clinic-muted)]">
               아직 기록된 변경 이력이 없습니다.
             </p>
           )}
@@ -2009,8 +2009,8 @@ function ManagementStatusRow({
       ].join(" ")}
     >
       <span className="min-w-0">
-        <span className="block text-xs font-semibold text-stone-500">{label}</span>
-        <span className="mt-1 block truncate text-xs text-stone-500">{detail}</span>
+        <span className="block text-xs font-semibold text-[var(--clinic-muted)]">{label}</span>
+        <span className="mt-1 block truncate text-xs text-[var(--clinic-muted)]">{detail}</span>
       </span>
       <span className={`text-sm font-semibold tabular-nums ${toneClass}`}>{value}</span>
     </button>
@@ -2156,18 +2156,18 @@ function SetupWorkflow({
             <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
               Director Setup
             </p>
-            <h3 className="mt-1 text-lg font-semibold text-stone-950">
+            <h3 className="mt-1 text-lg font-semibold text-[var(--clinic-text)]">
               {completedCount} / {setupSteps.length} 단계 완료
             </h3>
-            <p className="mt-1 text-sm leading-6 text-stone-600">
-              원장님이 처음 운영을 시작할 때는 <span className="font-semibold text-stone-900">선생님 등록 → 반 만들기 → 학생 등록 → 수업 시간 등록 → 출석 확인</span>{" "}
-              순서로 진행하면 됩니다. 다음 작업은 <span className="font-semibold text-stone-900">{nextStep.title}</span>입니다.
+            <p className="mt-1 text-sm leading-6 text-[var(--clinic-muted)]">
+              원장님이 처음 운영을 시작할 때는 <span className="font-semibold text-[var(--clinic-text)]">선생님 등록 → 반 만들기 → 학생 등록 → 수업 시간 등록 → 출석 확인</span>{" "}
+              순서로 진행하면 됩니다. 다음 작업은 <span className="font-semibold text-[var(--clinic-text)]">{nextStep.title}</span>입니다.
             </p>
           </div>
           <button
             type="button"
             onClick={nextStep.onAction}
-            className="flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-[#315C7C] px-4 text-sm font-semibold text-white transition hover:bg-[#244B67]"
+            className="flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-sm bg-[var(--clinic-primary)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--clinic-primary-dark)]"
           >
             {nextStep.actionLabel}
             <ArrowRight size={15} />
@@ -2175,13 +2175,13 @@ function SetupWorkflow({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+      <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
         {setupSteps.map((step) => (
           <button
             key={step.step}
             type="button"
             onClick={step.onAction}
-            className="grid w-full gap-3 border-b border-[#EFE9DE] border-l-2 border-l-transparent px-4 py-3 text-left transition last:border-b-0 hover:border-l-[#C9D6E2] hover:bg-[#FBFAF7] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
+            className="grid w-full gap-3 border-b border-[#D6E0E5] border-l-2 border-l-transparent px-4 py-3 text-left transition last:border-b-0 hover:border-l-[#C9D6E2] hover:bg-[#F7FAFA] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
           >
             <div
               className={[
@@ -2193,10 +2193,10 @@ function SetupWorkflow({
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm font-semibold text-stone-950">{step.title}</p>
+                <p className="text-sm font-semibold text-[var(--clinic-text)]">{step.title}</p>
                 <span
                   className={[
-                    "rounded px-2 py-0.5 text-xs font-semibold",
+                    "rounded-sm px-2 py-0.5 text-xs font-semibold",
                     step.isDone
                       ? "bg-[#EAF1F8] text-[#244B67]"
                       : "bg-amber-50 text-amber-800",
@@ -2204,19 +2204,19 @@ function SetupWorkflow({
                 >
                   {step.metric}
                 </span>
-                <span className="flex items-center gap-1 text-xs font-semibold text-stone-500">
+                <span className="flex items-center gap-1 text-xs font-semibold text-[var(--clinic-muted)]">
                   {step.isDone ? <CheckCircle2 size={13} /> : <CircleDashed size={13} />}
                   {step.isDone ? "완료" : "확인 필요"}
                 </span>
               </div>
-              <p className="mt-1 text-sm leading-6 text-stone-600">{step.description}</p>
+              <p className="mt-1 text-sm leading-6 text-[var(--clinic-muted)]">{step.description}</p>
             </div>
             <span
               className={[
                 "inline-flex min-h-10 items-center justify-center rounded-md px-3 text-sm font-semibold transition",
                 step.isDone
-                  ? "border border-[#D8D0C4] bg-white text-stone-800 hover:bg-[#F7F5F0]"
-                  : "border border-[#D8D0C4] bg-white text-stone-800 hover:bg-[#F7F5F0]",
+                  ? "border border-[#8FA6B0] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#EDF3F5]"
+                  : "border border-[#8FA6B0] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#EDF3F5]",
               ].join(" ")}
             >
               {step.actionLabel}
@@ -2225,26 +2225,26 @@ function SetupWorkflow({
         ))}
       </div>
 
-      <aside className="overflow-hidden rounded-lg border border-[#C9D6E2] bg-white">
+      <aside className="overflow-hidden rounded-sm border border-[#C9D6E2] bg-[#F7FAFA]">
         <div className="border-b border-[#C9D6E2] bg-[#F8FBFD] px-4 py-3">
           <p className="text-sm font-semibold text-[#244B67]">현재 배정 모델</p>
         </div>
         <dl className="divide-y divide-[#EAF1F8] text-sm">
           <div className="px-4 py-3">
-            <dt className="font-semibold text-stone-950">반 담당</dt>
-            <dd className="mt-1 leading-6 text-stone-600">
+            <dt className="font-semibold text-[var(--clinic-text)]">반 담당</dt>
+            <dd className="mt-1 leading-6 text-[var(--clinic-muted)]">
               한 반은 우선 한 명의 주 담당 선생님을 가집니다.
             </dd>
           </div>
           <div className="px-4 py-3">
-            <dt className="font-semibold text-stone-950">학생 소속</dt>
-            <dd className="mt-1 leading-6 text-stone-600">
+            <dt className="font-semibold text-[var(--clinic-text)]">학생 소속</dt>
+            <dd className="mt-1 leading-6 text-[var(--clinic-muted)]">
               학생은 하나의 소속 반을 기준으로 문자, 출석, 스케줄 권한이 정해집니다.
             </dd>
           </div>
           <div className="px-4 py-3">
-            <dt className="font-semibold text-stone-950">보조 선생님</dt>
-            <dd className="mt-1 leading-6 text-stone-600">
+            <dt className="font-semibold text-[var(--clinic-text)]">보조 선생님</dt>
+            <dd className="mt-1 leading-6 text-[var(--clinic-muted)]">
               파일럿에서는 주 담당 방식으로 검증하고, 다중 배정은 별도 모델로 확장합니다.
             </dd>
           </div>
@@ -2257,11 +2257,11 @@ function SetupWorkflow({
 function AuditLogList({ auditLogs }: { auditLogs: ManagementAuditLog[] }) {
   if (auditLogs.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-[#DED8CE] bg-[#FBFAF7] px-4 py-8 text-center">
-        <p className="text-sm font-semibold text-stone-900">
+      <div className="rounded-sm border border-dashed border-[#DED8CE] bg-[#F7FAFA] px-4 py-8 text-center">
+        <p className="text-sm font-semibold text-[var(--clinic-text)]">
           아직 기록된 변경 이력이 없습니다.
         </p>
-        <p className="mt-2 text-sm leading-6 text-stone-600">
+        <p className="mt-2 text-sm leading-6 text-[var(--clinic-muted)]">
           학생, 반, 스케줄, 템플릿, 설정을 수정하면 이곳에 최근 20건이 표시됩니다. 파일럿 중 변경 이력을 확인하는 기준으로 사용하세요.
         </p>
       </div>
@@ -2269,26 +2269,26 @@ function AuditLogList({ auditLogs }: { auditLogs: ManagementAuditLog[] }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-[#E6E0D5] bg-white">
+    <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
       {auditLogs.map((log) => (
         <div
           key={log.id}
-          className="grid gap-2 border-b border-[#EFE9DE] px-3 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+          className="grid gap-2 border-b border-[#D6E0E5] px-3 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
         >
           <div className="min-w-0">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <span className="rounded-md bg-[#F3EFE7] px-2 py-0.5 text-[11px] font-semibold text-stone-700">
+              <span className="rounded-md bg-[#F3EFE7] px-2 py-0.5 text-[11px] font-semibold text-[#405763]">
                 {getAuditActionLabel(log.action)}
               </span>
-              <span className="truncate text-sm font-semibold text-stone-950">
+              <span className="truncate text-sm font-semibold text-[var(--clinic-text)]">
                 {log.summary}
               </span>
             </div>
-            <p className="mt-1 text-xs leading-5 text-stone-500">
+            <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
               {log.actorName} · {getAuditEntityLabel(log.entityType)}
             </p>
           </div>
-          <time className="text-xs font-medium text-stone-500" dateTime={log.createdAt}>
+          <time className="text-xs font-medium text-[var(--clinic-muted)]" dateTime={log.createdAt}>
             {formatAuditDate(log.createdAt)}
           </time>
         </div>
