@@ -1428,7 +1428,7 @@ function AttendanceMonthCalendar({
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 overflow-visible border-l border-[#C9D8DD] sm:grid-cols-7">
+      <div className="grid grid-cols-1 overflow-hidden rounded-b-sm border-l border-[#C9D8DD] sm:grid-cols-7">
         {days.map((date) => {
           const summary = buildDateSummary(classes, records, date);
           return (
@@ -1472,11 +1472,27 @@ function AttendanceCalendarDayCell({
   const hasClass = summary.totalSessions > 0;
   const hasUnchecked = summary.counts.pending > 0;
   const hasMakeup = summary.counts.makeup > 0;
+  const statusLabel = !hasClass
+    ? "수업 없음"
+    : attentionCount > 0
+      ? "연락"
+      : hasUnchecked
+        ? "미체크"
+        : "정상";
+  const statusClass = !hasClass
+    ? "border-[#D6E0E3] bg-[#E7EEF0] text-[#78909A]"
+    : attentionCount > 0
+      ? "border-red-200 bg-red-50 text-red-700"
+      : hasUnchecked
+        ? "border-amber-200 bg-amber-50 text-amber-700"
+        : "border-emerald-200 bg-emerald-50 text-emerald-700";
   const selectedClassName = isSelected
-    ? "relative z-10 min-h-[8.35rem] border-[#0F766E] bg-[#DDEEEB] p-2.5 shadow-[0_10px_24px_rgba(15,118,110,0.18),inset_4px_0_0_#0F766E] ring-2 ring-[#0F766E]/35 sm:-m-1 sm:min-h-[9.45rem] sm:p-3"
-    : hasUnchecked && hasClass
-      ? "bg-[#FBF4E6] hover:bg-[#F6EDD8]"
-      : "bg-[#F8FAF8] hover:bg-[#EDF5F3]";
+    ? "border-[#0F766E] bg-[#E2F1EE] shadow-[inset_4px_0_0_#0F766E,0_2px_10px_rgba(15,118,110,0.10)] ring-1 ring-inset ring-[#0F766E]/45"
+    : attentionCount > 0 && hasClass
+      ? "bg-[#FFF4EF] hover:bg-[#FCEBE4]"
+      : hasUnchecked && hasClass
+        ? "bg-[#FBF4E6] hover:bg-[#F6EDD8]"
+        : "bg-[#F8FAF8] hover:bg-[#EDF5F3]";
 
   return (
     <button
@@ -1484,65 +1500,60 @@ function AttendanceCalendarDayCell({
       onClick={() => onSelect(date)}
       aria-pressed={isSelected}
       className={[
-        "group min-h-[7.25rem] border-b border-r border-[#C9D8DD] text-left transition duration-150 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] sm:min-h-[8.5rem]",
-        !isCurrentMonth ? "bg-[#E7ECEE] text-[#9BAAB0]" : selectedClassName,
+        "group relative min-h-[7.25rem] border-b border-r border-[#C9D8DD] p-2.5 text-left transition duration-150 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] sm:min-h-[8.5rem]",
+        !isCurrentMonth
+          ? "bg-[#E3EAEC] text-[#9BAAB0] hover:bg-[#DDE6E8]"
+          : selectedClassName,
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-2">
-        <div>
-          <span
-            className={[
-              "text-base font-extrabold",
-              isSelected ? "text-[#063B3A]" : "text-[#17232B]",
-            ].join(" ")}
-          >
-            {dayNumber}
-          </span>
-          <span className="ml-1 whitespace-nowrap text-xs font-semibold text-[#60717B]">
+        <div
+          className={[
+            "flex min-w-[3.45rem] items-baseline gap-1.5 rounded-sm border px-2 py-1",
+            isSelected
+              ? "border-[#9FCFCA] bg-[#F6FBF9] text-[#063B3A]"
+              : isToday
+                ? "border-[#B7D7D6] bg-[#EEF8F6] text-[#0B4B56]"
+                : "border-transparent bg-transparent text-[#17232B]",
+          ].join(" ")}
+        >
+          <span className="text-lg font-extrabold leading-none tabular-nums">{dayNumber}</span>
+          <span className="whitespace-nowrap text-xs font-bold text-[#60717B]">
             {weekdayLabel}
           </span>
           {isToday ? (
-            <span className="ml-1 whitespace-nowrap rounded-sm bg-[#E0EAED] px-1 py-0.5 text-[10px] font-bold text-[#0B4B56]">
+            <span className="ml-0.5 whitespace-nowrap rounded-sm bg-[#D7EDEA] px-1 py-0.5 text-[10px] font-bold text-[#0B4B56]">
               오늘
             </span>
           ) : null}
         </div>
-        {isSelected ? (
-          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#0F766E] text-white shadow-[0_2px_8px_rgba(15,118,110,0.24)]">
-            <Check size={13} strokeWidth={3} aria-hidden="true" />
-          </span>
-        ) : (
-          <span
-            className={[
-              "whitespace-nowrap rounded-sm px-1.5 py-0.5 text-[10px] font-bold",
-              !hasClass
-                ? "bg-[#E4EAEC] text-[#78909A]"
-                : attentionCount > 0
-                  ? "bg-red-50 text-red-700"
-                  : hasUnchecked
-                    ? "bg-amber-50 text-amber-700"
-                    : "bg-emerald-50 text-emerald-700",
-            ].join(" ")}
-          >
-            {!hasClass ? "수업 없음" : attentionCount > 0 ? "연락" : hasUnchecked ? "미체크" : "정상"}
-          </span>
-        )}
+        <div className="flex shrink-0 items-center gap-1.5">
+          {!isSelected ? (
+            <span
+              className={[
+                "whitespace-nowrap rounded-sm border px-1.5 py-0.5 text-[10px] font-bold",
+                statusClass,
+              ].join(" ")}
+            >
+              {statusLabel}
+            </span>
+          ) : null}
+          {isSelected ? (
+            <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#0F766E] text-white shadow-[0_2px_6px_rgba(15,118,110,0.18)]">
+              <Check size={13} strokeWidth={3} aria-hidden="true" />
+            </span>
+          ) : null}
+        </div>
       </div>
       {isSelected ? (
-        <div className="mt-1">
+        <div className="mt-1.5 flex justify-end">
           <span
             className={[
-              "inline-flex whitespace-nowrap rounded-sm px-1.5 py-0.5 text-[10px] font-bold",
-              !hasClass
-                ? "bg-[#E4EAEC] text-[#78909A]"
-                : attentionCount > 0
-                  ? "bg-red-50 text-red-700"
-                  : hasUnchecked
-                    ? "bg-amber-50 text-amber-700"
-                    : "bg-emerald-50 text-emerald-700",
+              "whitespace-nowrap rounded-sm border px-1.5 py-0.5 text-[10px] font-bold",
+              statusClass,
             ].join(" ")}
           >
-            {!hasClass ? "수업 없음" : attentionCount > 0 ? "연락" : hasUnchecked ? "미체크" : "정상"}
+            {statusLabel}
           </span>
         </div>
       ) : null}
