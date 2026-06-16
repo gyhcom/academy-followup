@@ -19,6 +19,7 @@ import {
   RefreshCw,
   RotateCcw,
   Send,
+  Search,
   UserCheck,
   X,
 } from "lucide-react";
@@ -122,6 +123,16 @@ type AttendanceOverview = {
 };
 
 type AttendanceFilter = "all" | "unchecked" | "attention";
+type AttendanceBoardView = "calendar" | "today" | "ledger";
+type AttendanceDayDetailTab = "classes" | "students" | "attention";
+
+type AttendanceDayStudentRow = {
+  id: string;
+  student: AttendanceStudent;
+  session: AttendanceSession;
+  status: AttendanceStatus;
+  record: AttendanceRecordItem | undefined;
+};
 
 type MessagePreviewState = {
   key: string;
@@ -360,6 +371,22 @@ export function AttendanceBoard({
   const selectedWorkbenchStudent =
     filteredStudents.find((student) => student.id === selectedWorkbenchStudentId) ??
     filteredStudents[0];
+  const canUseCalendarView = role === "owner" || role === "manager";
+  const [attendanceView, setAttendanceView] = useState<AttendanceBoardView>(
+    canUseCalendarView ? "calendar" : "today",
+  );
+  const [calendarMonth, setCalendarMonth] = useState(() =>
+    normalizeMonthValue(selectedDate),
+  );
+  const [dayDetailTab, setDayDetailTab] =
+    useState<AttendanceDayDetailTab>("classes");
+  const [drawerStudentRow, setDrawerStudentRow] =
+    useState<AttendanceDayStudentRow | null>(null);
+  const selectedDayStudentRows = useMemo(
+    () => buildDayStudentRows(sessions, dateAttendanceRecords),
+    [dateAttendanceRecords, sessions],
+  );
+  const effectiveAttendanceView = canUseCalendarView ? attendanceView : "today";
 
   const applyAttendanceRecords = useCallback((nextRecords: AttendanceRecordItem[]) => {
     attendanceRecordsRef.current = nextRecords;
@@ -781,6 +808,53 @@ export function AttendanceBoard({
 
   return (
     <div className="mx-auto max-w-6xl space-y-3 sm:space-y-5 lg:max-w-none xl:max-w-none">
+      <AttendanceViewTabs
+        value={effectiveAttendanceView}
+        canUseCalendarView={canUseCalendarView}
+        onChange={setAttendanceView}
+      />
+
+      {effectiveAttendanceView === "calendar" && canUseCalendarView ? (
+        <AttendanceCalendarView
+          classes={classes}
+          records={attendanceRecords}
+          selectedDate={selectedDate}
+          selectedMonth={calendarMonth}
+          sessions={sessions}
+          dateAttendanceRecords={dateAttendanceRecords}
+          selectedDayStudentRows={selectedDayStudentRows}
+          selectedDayOverview={overview}
+          dayDetailTab={dayDetailTab}
+          drawerStudentRow={drawerStudentRow}
+          teacherName={teacherName}
+          onMonthChange={setCalendarMonth}
+          onDateSelect={(date) => {
+            onDateChange(date);
+            setDayDetailTab("classes");
+            setCalendarMonth(normalizeMonthValue(date));
+            setDrawerStudentRow(null);
+          }}
+          onTodaySelect={() => {
+            const today = getTodayDate();
+            onDateChange(today);
+            setCalendarMonth(normalizeMonthValue(today));
+            setDayDetailTab("classes");
+            setDrawerStudentRow(null);
+          }}
+          onDayDetailTabChange={setDayDetailTab}
+          onOpenStudent={setDrawerStudentRow}
+          onCloseDrawer={() => setDrawerStudentRow(null)}
+          onOpenToday={() => setAttendanceView("today")}
+          onOpenMessages={() => onNavigate?.("operations")}
+        />
+      ) : null}
+
+      {effectiveAttendanceView === "ledger" && canUseCalendarView ? (
+        <AttendanceLedgerSkeleton onOpenCalendar={() => setAttendanceView("calendar")} />
+      ) : null}
+
+      {effectiveAttendanceView === "today" ? (
+        <>
       <div className="hidden lg:block">
         <AttendanceWorkbench
           teacherName={teacherName}
@@ -1109,7 +1183,849 @@ export function AttendanceBoard({
         )}
       </section>
       </div>
+        </>
+      ) : null}
     </div>
+  );
+}
+
+function AttendanceViewTabs({
+  value,
+  canUseCalendarView,
+  onChange,
+}: {
+  value: AttendanceBoardView;
+  canUseCalendarView: boolean;
+  onChange: (view: AttendanceBoardView) => void;
+}) {
+  const tabs: Array<{
+    id: AttendanceBoardView;
+    label: string;
+    description: string;
+    ownerOnly?: boolean;
+  }> = [
+    {
+      id: "calendar",
+      label: "달력 보기",
+      description: "월간 운영 현황",
+      ownerOnly: true,
+    },
+    {
+      id: "today",
+      label: "오늘 처리",
+      description: "수업 직후 출석/문자",
+    },
+    {
+      id: "ledger",
+      label: "학생별 장부",
+      description: "월간 matrix 준비",
+      ownerOnly: true,
+    },
+  ];
+  const visibleTabs = tabs.filter((tab) => !tab.ownerOnly || canUseCalendarView);
+
+  return (
+    <div className="rounded-md border border-[#CBD9DE] bg-white px-2 py-2 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
+      <div className="flex gap-1 overflow-x-auto" role="tablist" aria-label="출석부 보기 전환">
+        {visibleTabs.map((tab) => {
+          const isActive = value === tab.id;
+
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onChange(tab.id)}
+              className={[
+                "min-h-10 shrink-0 rounded-sm border px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                isActive
+                  ? "border-[#007A7C] bg-[#EAF6F5] text-[#0B3F46] shadow-[inset_3px_0_0_#007A7C]"
+                  : "border-transparent bg-white text-[#526A75] hover:bg-[#F3F7F8]",
+              ].join(" ")}
+            >
+              <span className="block text-sm font-bold">{tab.label}</span>
+              <span className="hidden text-[11px] font-medium text-[#6F8188] sm:block">
+                {tab.description}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AttendanceCalendarView({
+  classes,
+  records,
+  selectedDate,
+  selectedMonth,
+  sessions,
+  dateAttendanceRecords,
+  selectedDayStudentRows,
+  selectedDayOverview,
+  dayDetailTab,
+  drawerStudentRow,
+  teacherName,
+  onMonthChange,
+  onDateSelect,
+  onTodaySelect,
+  onDayDetailTabChange,
+  onOpenStudent,
+  onCloseDrawer,
+  onOpenToday,
+  onOpenMessages,
+}: {
+  classes: AttendanceClass[];
+  records: AttendanceRecordItem[];
+  selectedDate: string;
+  selectedMonth: string;
+  sessions: AttendanceSession[];
+  dateAttendanceRecords: AttendanceRecordItem[];
+  selectedDayStudentRows: AttendanceDayStudentRow[];
+  selectedDayOverview: AttendanceOverview;
+  dayDetailTab: AttendanceDayDetailTab;
+  drawerStudentRow: AttendanceDayStudentRow | null;
+  teacherName: string;
+  onMonthChange: (month: string) => void;
+  onDateSelect: (date: string) => void;
+  onTodaySelect: () => void;
+  onDayDetailTabChange: (tab: AttendanceDayDetailTab) => void;
+  onOpenStudent: (row: AttendanceDayStudentRow) => void;
+  onCloseDrawer: () => void;
+  onOpenToday: () => void;
+  onOpenMessages: () => void;
+}) {
+  return (
+    <section className="relative overflow-hidden rounded-md border border-[#C2D1D8] bg-[#F3F7F8] shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+      <div className="border-b border-[#D3E0E5] bg-white px-3 py-3 sm:px-4 lg:px-5">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#007A7C]">
+              Attendance Calendar
+            </p>
+            <h2 className="mt-1 text-xl font-bold tracking-[-0.02em] text-[#17232B] sm:text-2xl">
+              {formatMonthTitle(selectedMonth)}
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-[#60717B]">
+              날짜를 선택하면 해당 날짜의 수업과 학생 목록을 확인할 수 있습니다.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onMonthChange(shiftMonth(selectedMonth, -1))}
+              className="inline-flex min-h-9 items-center gap-1 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-semibold text-[#334B58] hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            >
+              <ChevronLeft size={16} aria-hidden="true" />
+              이전 달
+            </button>
+            <button
+              type="button"
+              onClick={onTodaySelect}
+              className="inline-flex min-h-9 items-center rounded-sm border border-[#007A7C] bg-[#EAF6F5] px-3 text-sm font-bold text-[#00676A] hover:bg-[#DDF1F0] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            >
+              오늘
+            </button>
+            <button
+              type="button"
+              onClick={() => onMonthChange(shiftMonth(selectedMonth, 1))}
+              className="inline-flex min-h-9 items-center gap-1 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-semibold text-[#334B58] hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            >
+              다음 달
+              <ChevronRight size={16} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.2fr]">
+          <CompactFilterLabel label="반 필터" value="전체 반" />
+          <CompactFilterLabel label="선생님" value="전체" />
+          <CompactFilterLabel label="상태" value="전체 상태" />
+          <label className="flex min-h-10 items-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm text-[#526A75]">
+            <Search size={15} aria-hidden="true" />
+            <span className="sr-only">학생 또는 반 검색</span>
+            <input
+              type="search"
+              placeholder="학생/반 검색은 후속 보강"
+              disabled
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#8CA0A8] disabled:cursor-not-allowed"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_25rem] xl:grid-cols-[minmax(0,1fr)_28rem]">
+        <AttendanceMonthCalendar
+          classes={classes}
+          records={records}
+          selectedDate={selectedDate}
+          selectedMonth={selectedMonth}
+          onDateSelect={onDateSelect}
+        />
+        <AttendanceDayDetailPanel
+          selectedDate={selectedDate}
+          sessions={sessions}
+          records={dateAttendanceRecords}
+          overview={selectedDayOverview}
+          studentRows={selectedDayStudentRows}
+          activeTab={dayDetailTab}
+          onTabChange={onDayDetailTabChange}
+          onOpenStudent={onOpenStudent}
+          onOpenToday={onOpenToday}
+        />
+      </div>
+
+      {drawerStudentRow ? (
+        <StudentScheduleDrawer
+          key={drawerStudentRow.id}
+          row={drawerStudentRow}
+          selectedDate={selectedDate}
+          selectedMonth={selectedMonth}
+          teacherName={teacherName}
+          records={records}
+          onClose={onCloseDrawer}
+          onOpenMessages={onOpenMessages}
+        />
+      ) : null}
+    </section>
+  );
+}
+
+function CompactFilterLabel({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex min-h-10 items-center justify-between gap-3 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm">
+      <span className="font-semibold text-[#60717B]">{label}</span>
+      <span className="font-bold text-[#263A45]">{value}</span>
+    </div>
+  );
+}
+
+function AttendanceMonthCalendar({
+  classes,
+  records,
+  selectedDate,
+  selectedMonth,
+  onDateSelect,
+}: {
+  classes: AttendanceClass[];
+  records: AttendanceRecordItem[];
+  selectedDate: string;
+  selectedMonth: string;
+  onDateSelect: (date: string) => void;
+}) {
+  const days = useMemo(() => getCalendarGridDays(selectedMonth), [selectedMonth]);
+  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+
+  return (
+    <div className="min-w-0 border-r border-[#D3E0E5] bg-white p-3 sm:p-4">
+      <div className="grid grid-cols-7 border-b border-l border-[#D7E2E6] bg-[#EEF4F6] text-center text-[12px] font-bold text-[#526A75]">
+        {weekdays.map((weekday) => (
+          <div key={weekday} className="border-r border-[#D7E2E6] px-2 py-2">
+            {weekday}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 border-l border-[#D7E2E6] sm:grid-cols-7">
+        {days.map((date) => {
+          const summary = buildDateSummary(classes, records, date);
+          return (
+            <AttendanceCalendarDayCell
+              key={date}
+              date={date}
+              selectedMonth={selectedMonth}
+              isSelected={date === selectedDate}
+              summary={summary}
+              onSelect={onDateSelect}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AttendanceCalendarDayCell({
+  date,
+  selectedMonth,
+  isSelected,
+  summary,
+  onSelect,
+}: {
+  date: string;
+  selectedMonth: string;
+  isSelected: boolean;
+  summary: AttendanceOverview;
+  onSelect: (date: string) => void;
+}) {
+  const dateObject = new Date(`${date}T00:00:00`);
+  const dayNumber = dateObject.getDate();
+  const weekdayLabel = weekdayShortLabel(dateObject.getDay());
+  const isCurrentMonth = normalizeMonthValue(date) === selectedMonth;
+  const attentionCount =
+    summary.counts.late + summary.counts.absent + summary.counts.needs_check;
+  const hasClass = summary.totalSessions > 0;
+  const hasUnchecked = summary.counts.pending > 0;
+  const hasMakeup = summary.counts.makeup > 0;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(date)}
+      aria-pressed={isSelected}
+      className={[
+        "min-h-[7.25rem] border-b border-r border-[#D7E2E6] bg-white p-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] sm:min-h-[8.5rem]",
+        !isCurrentMonth ? "bg-[#F6F8F9] text-[#9BAAB0]" : "",
+        isSelected ? "bg-[#EAF6F5] shadow-[inset_4px_0_0_#007A7C]" : "hover:bg-[#F7FBFC]",
+      ].join(" ")}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <span className="text-base font-bold text-[#17232B]">{dayNumber}</span>
+          <span className="ml-1 text-xs font-semibold text-[#60717B]">{weekdayLabel}</span>
+        </div>
+        <span
+          className={[
+            "rounded-sm px-1.5 py-0.5 text-[10px] font-bold",
+            !hasClass
+              ? "bg-[#EEF2F3] text-[#78909A]"
+              : attentionCount > 0
+                ? "bg-red-50 text-red-700"
+                : hasUnchecked
+                  ? "bg-amber-50 text-amber-700"
+                  : "bg-emerald-50 text-emerald-700",
+          ].join(" ")}
+        >
+          {!hasClass ? "수업 없음" : attentionCount > 0 ? "연락" : hasUnchecked ? "미체크" : "정상"}
+        </span>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-x-2 gap-y-1 text-[12px] leading-5 text-[#405763]">
+        <MetricLine label="수업" value={summary.totalSessions} />
+        <MetricLine label="학생" value={summary.totalStudents} />
+        <MetricLine label="미체크" value={summary.counts.pending} tone={hasUnchecked ? "warning" : "muted"} />
+        <MetricLine label="연락" value={attentionCount} tone={attentionCount > 0 ? "danger" : "muted"} />
+        <MetricLine label="지각" value={summary.counts.late} tone={summary.counts.late > 0 ? "warning" : "muted"} />
+        <MetricLine label="결석" value={summary.counts.absent} tone={summary.counts.absent > 0 ? "danger" : "muted"} />
+      </div>
+      {hasMakeup ? (
+        <div className="mt-2 inline-flex rounded-sm border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[11px] font-bold text-blue-700">
+          보강 {summary.counts.makeup}
+        </div>
+      ) : null}
+    </button>
+  );
+}
+
+function MetricLine({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "muted" | "warning" | "danger";
+}) {
+  const toneClass =
+    tone === "warning"
+      ? "text-amber-700"
+      : tone === "danger"
+        ? "text-red-700"
+        : tone === "muted"
+          ? "text-[#8CA0A8]"
+          : "text-[#17232B]";
+
+  return (
+    <span className="flex items-center justify-between gap-2">
+      <span className="text-[#78909A]">{label}</span>
+      <b className={toneClass}>{value}</b>
+    </span>
+  );
+}
+
+function AttendanceDayDetailPanel({
+  selectedDate,
+  sessions,
+  records,
+  overview,
+  studentRows,
+  activeTab,
+  onTabChange,
+  onOpenStudent,
+  onOpenToday,
+}: {
+  selectedDate: string;
+  sessions: AttendanceSession[];
+  records: AttendanceRecordItem[];
+  overview: AttendanceOverview;
+  studentRows: AttendanceDayStudentRow[];
+  activeTab: AttendanceDayDetailTab;
+  onTabChange: (tab: AttendanceDayDetailTab) => void;
+  onOpenStudent: (row: AttendanceDayStudentRow) => void;
+  onOpenToday: () => void;
+}) {
+  const attentionRows = studentRows.filter(
+    (row) =>
+      row.status === "late" || row.status === "absent" || row.status === "needs_check",
+  );
+  const tabs: Array<{ id: AttendanceDayDetailTab; label: string; count: number }> = [
+    { id: "classes", label: "수업별", count: sessions.length },
+    { id: "students", label: "학생별", count: studentRows.length },
+    { id: "attention", label: "연락 필요", count: attentionRows.length },
+  ];
+
+  return (
+    <aside className="min-w-0 bg-[#F8FBFC] p-3 sm:p-4">
+      <div className="rounded-md border border-[#D3E0E5] bg-white">
+        <div className="border-b border-[#D3E0E5] p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#007A7C]">
+            선택 날짜
+          </p>
+          <h3 className="mt-1 text-lg font-bold text-[#17232B]">
+            {formatDateKoreanLong(selectedDate)}
+          </h3>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
+            <SummaryPill label="수업" value={overview.totalSessions} />
+            <SummaryPill label="학생" value={overview.totalStudents} />
+            <SummaryPill label="출석" value={overview.counts.present} tone="success" />
+            <SummaryPill label="지각" value={overview.counts.late} tone="warning" />
+            <SummaryPill label="결석" value={overview.counts.absent} tone="danger" />
+            <SummaryPill label="미체크" value={overview.counts.pending} />
+          </div>
+          <button
+            type="button"
+            onClick={onOpenToday}
+            className="mt-3 inline-flex min-h-9 w-full items-center justify-center rounded-sm border border-[#007A7C] bg-[#EAF6F5] px-3 text-sm font-bold text-[#00676A] hover:bg-[#DDF1F0] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+          >
+            오늘 처리 화면에서 출석 체크
+          </button>
+        </div>
+
+        <div className="flex border-b border-[#D3E0E5] bg-[#F1F5F6] p-1" role="tablist">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={[
+                "min-h-9 flex-1 rounded-sm px-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                activeTab === tab.id
+                  ? "bg-white text-[#0B3F46] shadow-sm"
+                  : "text-[#60717B] hover:bg-white/70",
+              ].join(" ")}
+            >
+              {tab.label} <span className="font-semibold text-[#8CA0A8]">{tab.count}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="max-h-[43rem] overflow-y-auto p-3">
+          {activeTab === "classes" ? (
+            <AttendanceClassSummaryList sessions={sessions} records={records} />
+          ) : null}
+          {activeTab === "students" ? (
+            <AttendanceDayStudentList rows={studentRows} onOpenStudent={onOpenStudent} />
+          ) : null}
+          {activeTab === "attention" ? (
+            <AttendanceDayStudentList
+              rows={attentionRows}
+              onOpenStudent={onOpenStudent}
+              emptyMessage="연락 필요 학생이 없습니다."
+              selectable
+            />
+          ) : null}
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function SummaryPill({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "success" | "warning" | "danger";
+}) {
+  const toneClass =
+    tone === "success"
+      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+      : tone === "warning"
+        ? "border-amber-200 bg-amber-50 text-amber-700"
+        : tone === "danger"
+          ? "border-red-200 bg-red-50 text-red-700"
+          : "border-[#D3E0E5] bg-[#F5F8F9] text-[#405763]";
+
+  return (
+    <span className={["rounded-sm border px-2 py-1.5 font-bold", toneClass].join(" ")}>
+      <span className="block text-[11px] font-semibold opacity-80">{label}</span>
+      {value}
+    </span>
+  );
+}
+
+function AttendanceClassSummaryList({
+  sessions,
+  records,
+}: {
+  sessions: AttendanceSession[];
+  records: AttendanceRecordItem[];
+}) {
+  if (sessions.length === 0) {
+    return (
+      <p className="rounded-sm border border-[#D3E0E5] bg-[#F8FBFC] p-4 text-sm leading-6 text-[#60717B]">
+        선택 날짜에 등록된 수업이 없습니다.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {sessions.map((session) => {
+        const summary = getSessionSummary(session, records);
+        const contactNeeded = summary.late + summary.absent + summary.needs_check;
+
+        return (
+          <div
+            key={session.key}
+            className="rounded-sm border border-[#D3E0E5] bg-white p-3 shadow-[0_1px_2px_rgba(13,38,48,0.04)]"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-[#17232B]">
+                  {session.startTime} {session.className}
+                </p>
+                <p className="mt-1 text-xs font-medium text-[#60717B]">
+                  담당 {session.subject ?? "과목 미지정"} · 학생 {session.students.length}명
+                </p>
+              </div>
+              {contactNeeded > 0 ? (
+                <span className="rounded-sm border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-bold text-amber-700">
+                  연락 {contactNeeded}
+                </span>
+              ) : null}
+            </div>
+            <p className="mt-2 text-xs leading-5 text-[#526A75]">
+              출석 {summary.present} · 지각 {summary.late} · 결석 {summary.absent} · 미체크{" "}
+              {summary.pending}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function AttendanceDayStudentList({
+  rows,
+  onOpenStudent,
+  emptyMessage = "선택 날짜의 학생이 없습니다.",
+  selectable = false,
+}: {
+  rows: AttendanceDayStudentRow[];
+  onOpenStudent: (row: AttendanceDayStudentRow) => void;
+  emptyMessage?: string;
+  selectable?: boolean;
+}) {
+  if (rows.length === 0) {
+    return (
+      <p className="rounded-sm border border-[#D3E0E5] bg-[#F8FBFC] p-4 text-sm leading-6 text-[#60717B]">
+        {emptyMessage}
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {rows.map((row) => (
+        <button
+          key={row.id}
+          type="button"
+          onClick={() => onOpenStudent(row)}
+          className="w-full rounded-sm border border-[#D3E0E5] bg-white p-3 text-left transition hover:bg-[#F4F9FA] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+        >
+          <div className="flex items-start gap-2">
+            {selectable ? (
+              <span
+                className="mt-1 flex size-4 shrink-0 rounded-sm border border-[#9DB4BD] bg-white"
+                aria-hidden="true"
+              />
+            ) : null}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <p className="truncate text-sm font-bold text-[#17232B]">{row.student.name}</p>
+                <StatusLozenge status={row.status} />
+              </div>
+              <p className="mt-1 truncate text-xs text-[#60717B]">
+                {[row.student.schoolName, row.student.gradeLabel].filter(Boolean).join(" · ") ||
+                  "학교/학년 미등록"}{" "}
+                · {row.session.className}
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <span className="rounded-sm border border-[#D3E0E5] bg-[#F5F8F9] px-1.5 py-0.5 text-[11px] font-semibold text-[#526A75]">
+                  {row.session.startTime}-{row.session.endTime}
+                </span>
+                <ContactLozenge record={row.record} status={row.status} />
+                {row.record?.note ? (
+                  <span className="rounded-sm border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-[11px] font-bold text-violet-700">
+                    메모
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function StudentScheduleDrawer({
+  row,
+  selectedDate,
+  selectedMonth,
+  teacherName,
+  records,
+  onClose,
+  onOpenMessages,
+}: {
+  row: AttendanceDayStudentRow;
+  selectedDate: string;
+  selectedMonth: string;
+  teacherName: string;
+  records: AttendanceRecordItem[];
+  onClose: () => void;
+  onOpenMessages: () => void;
+}) {
+  const [historyState, setHistoryState] = useState<{
+    status: "idle" | "loading" | "ready" | "error";
+    items: Array<{ id: string; reason: string; status: string; sentAt: string | null; createdAt: string }>;
+  }>({ status: "loading", items: [] });
+  const monthlyRecords = records.filter(
+    (record) =>
+      record.studentId === row.student.id &&
+      normalizeMonthValue(record.attendanceDate) === selectedMonth,
+  );
+  const monthlySummary = createEmptyAttendanceCounts();
+
+  monthlyRecords.forEach((record) => {
+    monthlySummary[normalizeAttendanceStatus(record.status)] += 1;
+  });
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetchFollowupHistory(row.student.id, controller.signal)
+      .then((payload) => {
+        if (!controller.signal.aborted) {
+          setHistoryState({ status: "ready", items: (payload.followups ?? []).slice(0, 5) });
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setHistoryState({ status: "error", items: [] });
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [row.student.id]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-[#0B2530]/30 backdrop-blur-[1px]">
+      <aside className="h-full w-full max-w-[27rem] overflow-y-auto border-l border-[#C2D1D8] bg-[#F8FBFC] shadow-2xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#D3E0E5] bg-white px-4 py-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#007A7C]">
+              학생 스케줄
+            </p>
+            <h3 className="text-lg font-bold text-[#17232B]">{row.student.name}</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex size-9 items-center justify-center rounded-sm border border-[#C6D4DA] bg-white text-[#526A75] hover:bg-[#F3F7F8] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            aria-label="학생 스케줄 drawer 닫기"
+          >
+            <X size={18} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="space-y-3 p-4">
+          <section className="rounded-md border border-[#D3E0E5] bg-white p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xl font-bold text-[#17232B]">{row.student.name}</p>
+                <p className="mt-1 text-sm text-[#60717B]">
+                  {[row.student.schoolName, row.student.gradeLabel].filter(Boolean).join(" · ") ||
+                    "학교/학년 미등록"}
+                </p>
+                <p className="mt-2 text-sm font-semibold tabular-nums text-[#405763]">
+                  {row.student.maskedStudentPhone ?? row.student.maskedParentPhone}
+                </p>
+              </div>
+              <StatusLozenge status={row.status} />
+            </div>
+          </section>
+
+          <DrawerSection title="선택 날짜 수업 정보">
+            <InfoRow label="날짜" value={formatDateKoreanLong(selectedDate)} />
+            <InfoRow label="수업" value={row.session.className} />
+            <InfoRow label="시간" value={`${row.session.startTime} - ${row.session.endTime}`} />
+            <InfoRow label="담당" value={`${teacherName} 선생님`} />
+            <div className="mt-2 flex flex-wrap gap-2">
+              <StatusLozenge status={row.status} />
+              <ContactLozenge record={row.record} status={row.status} />
+            </div>
+          </DrawerSection>
+
+          <DrawerSection title="주간 스케줄">
+            <div className="space-y-2">
+              {getSortedActiveSchedules(row.student.schedules).length > 0 ? (
+                getSortedActiveSchedules(row.student.schedules)
+                  .slice(0, 6)
+                  .map((schedule) => (
+                    <div
+                      key={`${schedule.dayOfWeek}:${schedule.startTime}:${schedule.title}`}
+                      className="flex items-center justify-between gap-3 border-b border-[#EDF2F4] pb-2 text-sm last:border-b-0 last:pb-0"
+                    >
+                      <span className="font-bold text-[#263A45]">
+                        {weekdayShortLabel(schedule.dayOfWeek)}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-[#526A75]">
+                        {schedule.startTime} {schedule.title}
+                      </span>
+                    </div>
+                  ))
+              ) : (
+                <p className="text-sm text-[#60717B]">등록된 주간 스케줄이 없습니다.</p>
+              )}
+            </div>
+          </DrawerSection>
+
+          <DrawerSection title="이번 달 출석 이력">
+            <div className="grid grid-cols-4 gap-2 text-center text-xs">
+              <SummaryPill label="출석" value={monthlySummary.present} tone="success" />
+              <SummaryPill label="지각" value={monthlySummary.late} tone="warning" />
+              <SummaryPill label="결석" value={monthlySummary.absent} tone="danger" />
+              <SummaryPill label="미체크" value={monthlySummary.pending} />
+            </div>
+            <p className="mt-2 text-xs leading-5 text-[#78909A]">
+              현재 로드된 출석 기록 기준입니다. 학생별 월간 matrix는 후속 단계에서 보강합니다.
+            </p>
+          </DrawerSection>
+
+          <DrawerSection title="최근 연락 기록">
+            {historyState.status === "loading" ? (
+              <p className="text-sm text-[#60717B]">연락 기록을 불러오는 중입니다.</p>
+            ) : historyState.items.length > 0 ? (
+              <div className="space-y-2">
+                {historyState.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="border-b border-[#EDF2F4] pb-2 text-sm last:border-b-0 last:pb-0"
+                  >
+                    <p className="font-semibold text-[#263A45]">
+                      {formatCompactDateTime(item.sentAt ?? item.createdAt)}
+                    </p>
+                    <p className="text-xs text-[#60717B]">
+                      {reasonLabel(item.reason as FollowupReason)} · {item.status}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-[#60717B]">최근 연락 기록이 없습니다.</p>
+            )}
+          </DrawerSection>
+
+          <DrawerSection title="작업">
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={onOpenMessages}
+                className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-sm bg-[#007A7C] px-3 text-sm font-bold text-white hover:bg-[#00686A] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+              >
+                <Send size={16} aria-hidden="true" />
+                문자 작성
+              </button>
+              <button
+                type="button"
+                disabled
+                className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-bold text-[#8CA0A8]"
+              >
+                <Pencil size={16} aria-hidden="true" />
+                메모 작성 준비 중
+              </button>
+              <button
+                type="button"
+                disabled
+                className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-bold text-[#8CA0A8]"
+              >
+                <List size={16} aria-hidden="true" />
+                연락 이력 전체 보기 준비 중
+              </button>
+            </div>
+          </DrawerSection>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function DrawerSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-md border border-[#D3E0E5] bg-white p-4">
+      <h4 className="mb-3 text-sm font-bold text-[#17232B]">{title}</h4>
+      {children}
+    </section>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-[#EDF2F4] py-2 text-sm last:border-b-0">
+      <span className="font-semibold text-[#60717B]">{label}</span>
+      <span className="min-w-0 truncate text-right font-bold text-[#263A45]">{value}</span>
+    </div>
+  );
+}
+
+function AttendanceLedgerSkeleton({
+  onOpenCalendar,
+}: {
+  onOpenCalendar: () => void;
+}) {
+  return (
+    <section className="rounded-md border border-[#C2D1D8] bg-white p-6 shadow-[0_1px_2px_rgba(13,38,48,0.06)]">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#007A7C]">
+        Student Ledger
+      </p>
+      <h2 className="mt-2 text-2xl font-bold text-[#17232B]">학생별 월간 출석 장부</h2>
+      <p className="mt-2 max-w-2xl text-sm leading-6 text-[#60717B]">
+        학생 row와 날짜 column을 사용하는 월간 matrix는 다음 단계에서 구현합니다. 학생명 column
+        sticky, 날짜 column horizontal scroll, cell 상태 badge 기준으로 설계합니다.
+      </p>
+      <button
+        type="button"
+        onClick={onOpenCalendar}
+        className="mt-4 inline-flex min-h-10 items-center rounded-sm bg-[#007A7C] px-4 text-sm font-bold text-white hover:bg-[#00686A] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+      >
+        달력 보기로 돌아가기
+      </button>
+    </section>
   );
 }
 
@@ -3726,4 +4642,85 @@ function formatCompactDateTime(value: string) {
 
 function weekdayShortLabel(dayOfWeek: number) {
   return ["일", "월", "화", "수", "목", "금", "토"][dayOfWeek] ?? "-";
+}
+
+function normalizeMonthValue(dateOrMonth: string) {
+  return dateOrMonth.slice(0, 7);
+}
+
+function shiftMonth(monthValue: string, monthOffset: number) {
+  const [year, month] = monthValue.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1 + monthOffset, 1));
+
+  return date.toISOString().slice(0, 7);
+}
+
+function formatMonthTitle(monthValue: string) {
+  const [year, month] = monthValue.split("-");
+
+  return `${year}년 ${Number(month)}월 출석부`;
+}
+
+function formatDateKoreanLong(dateString: string) {
+  const [year, month, day] = dateString.split("-");
+  const dayLabel = weekdayShortLabel(getDayOfWeek(dateString));
+
+  return `${year}.${month}.${day} ${dayLabel}요일`;
+}
+
+function getCalendarGridDays(monthValue: string) {
+  const [year, month] = monthValue.split("-").map(Number);
+  const firstDay = new Date(Date.UTC(year, month - 1, 1));
+  const lastDay = new Date(Date.UTC(year, month, 0));
+  const startOffset = firstDay.getUTCDay();
+  const endOffset = 6 - lastDay.getUTCDay();
+  const startDate = new Date(Date.UTC(year, month - 1, 1 - startOffset));
+  const totalDays = lastDay.getUTCDate() + startOffset + endOffset;
+
+  return Array.from({ length: totalDays }, (_, index) => {
+    const date = new Date(startDate);
+    date.setUTCDate(startDate.getUTCDate() + index);
+    return date.toISOString().slice(0, 10);
+  });
+}
+
+function buildDateSummary(
+  classes: AttendanceClass[],
+  records: AttendanceRecordItem[],
+  dateString: string,
+) {
+  const dayOfWeek = getDayOfWeek(dateString);
+  const dateRecords = records.filter((record) => record.attendanceDate === dateString);
+  const sessions = buildAttendanceSessions(classes, dateRecords, dayOfWeek);
+
+  return buildAttendanceOverview(sessions, dateRecords);
+}
+
+function buildDayStudentRows(
+  sessions: AttendanceSession[],
+  records: AttendanceRecordItem[],
+): AttendanceDayStudentRow[] {
+  return sessions.flatMap((session) => {
+    const sessionRecords = records.filter(
+      (record) =>
+        record.classId === session.classId &&
+        record.scheduledStartTime === session.startTime &&
+        record.scheduledEndTime === session.endTime,
+    );
+    const recordsByStudent = new Map(
+      sessionRecords.map((record) => [record.studentId, record]),
+    );
+
+    return session.students.map((student) => {
+      const record = recordsByStudent.get(student.id);
+
+      return {
+        id: `${session.key}:${student.id}`,
+        student,
+        session,
+        record,
+        status: normalizeAttendanceStatus(record?.status),
+      };
+    });
+  });
 }
