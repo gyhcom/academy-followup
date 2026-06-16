@@ -2360,7 +2360,7 @@ function AttendanceWorkbench({
 
   return (
     <section className="rounded-none bg-[#F3F7F8]">
-      <div className="grid min-h-[calc(100vh-7.25rem)] gap-0 overflow-hidden rounded-md border border-[#C2D1D8] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)] lg:grid-cols-[15.5rem_minmax(0,1fr)_17.25rem] xl:grid-cols-[16rem_minmax(0,1fr)_18rem] 2xl:grid-cols-[19.5rem_minmax(0,1fr)_22rem]">
+      <div className="grid min-h-[calc(100vh-7.25rem)] gap-0 overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9] lg:grid-cols-[15.5rem_minmax(0,1fr)_17.25rem] xl:grid-cols-[16rem_minmax(0,1fr)_18rem] 2xl:grid-cols-[19.5rem_minmax(0,1fr)_22rem]">
         <aside className="min-w-0 border-r border-[#D5E0E4] bg-[#F8FBFC]">
           <SessionList
             sessions={sessions}
@@ -2377,8 +2377,8 @@ function AttendanceWorkbench({
           />
         </aside>
 
-        <section className="min-w-0 overflow-hidden bg-white">
-          <div className="border-b border-[#D2DDE2] bg-white px-4 py-4">
+        <section className="min-w-0 overflow-hidden bg-[#F7FAFA]">
+          <div className="border-b border-[#B8C9D0] bg-[#F4F8F9] px-4 py-4">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <h2 className="truncate text-2xl font-bold tracking-[-0.02em] text-[#17232B]">
@@ -2399,7 +2399,7 @@ function AttendanceWorkbench({
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex min-h-9 items-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                  className="inline-flex min-h-9 items-center gap-2 border border-[#AEBFC7] bg-[#F7FAFA] px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
                 >
                   <Printer size={16} aria-hidden="true" />
                   출석부 인쇄
@@ -2407,7 +2407,7 @@ function AttendanceWorkbench({
                 <button
                   type="button"
                   onClick={onRefresh}
-                  className="inline-flex min-h-9 items-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                  className="inline-flex min-h-9 items-center gap-2 border border-[#AEBFC7] bg-[#F7FAFA] px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
                 >
                   <RefreshCw size={16} aria-hidden="true" />
                   새로고침
@@ -2558,10 +2558,10 @@ function AttendanceLedgerTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-md border border-[#D6E0E4] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
+    <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
       <div className="overflow-x-auto">
       <table className="w-full min-w-full table-fixed border-separate border-spacing-0 text-left">
-        <thead className="bg-[#F1F5F6] text-[12px] font-bold text-[#405763]">
+        <thead className="bg-[#E7EEF1] text-[12px] font-bold text-[#405763]">
           <tr>
             <th className="w-8 border-b border-r border-[#D6E0E4] px-2 py-3">
               <span className="sr-only">선택</span>
@@ -2608,8 +2608,8 @@ function AttendanceLedgerTable({
                 className={[
                   "group cursor-pointer border-b border-[var(--clinic-border)] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
                   isSelected
-                    ? "bg-[#EAF6F5] shadow-[inset_4px_0_0_var(--clinic-primary)]"
-                    : "bg-white hover:bg-[#F4F9FA]",
+                    ? "bg-[#E1F0EF] shadow-[inset_4px_0_0_var(--clinic-primary)]"
+                    : "bg-[#F7FAFA] hover:bg-[#EDF3F5]",
                   isSaving ? "opacity-70" : "",
                 ].join(" ")}
               >
@@ -2626,7 +2626,7 @@ function AttendanceLedgerTable({
                 </td>
                 <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
                   <div className="flex items-center gap-2">
-                    <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#B7CED3] bg-[#E7F3F4] text-xs font-bold text-[#005F62]">
+                    <span className="flex size-7 shrink-0 items-center justify-center border border-[#AFC3CA] bg-[#E3EEF0] text-xs font-bold text-[#005F62]">
                       {getStudentInitial(student.name)}
                     </span>
                     <div className="min-w-0">
@@ -2666,7 +2666,7 @@ function AttendanceLedgerTable({
         </tbody>
       </table>
       </div>
-      <div className="flex items-center justify-between gap-3 border-t border-[#D6E0E4] bg-white px-4 py-3 text-sm text-[#405763]">
+      <div className="flex items-center justify-between gap-3 border-t border-[#B8C9D0] bg-[#F4F8F9] px-4 py-3 text-sm text-[#405763]">
         <div className="flex flex-wrap items-center gap-4">
           <span className="font-semibold">전체 {students.length}명</span>
           <span>출석 <b className="text-[#007A7C]">{summary?.present ?? 0}</b></span>
@@ -2709,7 +2709,7 @@ function StatusLozenge({ status }: { status: AttendanceStatus }) {
   return (
     <span
       className={[
-        "inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border px-2 text-[11px] font-bold",
+        "inline-flex min-h-6 items-center whitespace-nowrap border px-2 text-[11px] font-bold",
         attendanceStatusClass(status),
       ].join(" ")}
     >
@@ -2727,7 +2727,7 @@ function ContactLozenge({
 }) {
   if (record?.followupStatus === "sent") {
     return (
-      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-emerald-200 bg-emerald-50 px-2 text-[11px] font-bold text-[var(--clinic-success)]">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-emerald-300 bg-[#EEF8F3] px-2 text-[11px] font-bold text-[var(--clinic-success)]">
         문자 완료
       </span>
     );
@@ -2735,7 +2735,7 @@ function ContactLozenge({
 
   if (status === "late" || status === "absent") {
     return (
-      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-amber-200 bg-amber-50 px-2 text-[11px] font-bold text-[var(--clinic-warning)]">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-amber-300 bg-[#FFF7E8] px-2 text-[11px] font-bold text-[var(--clinic-warning)]">
         연락 필요
       </span>
     );
@@ -2743,14 +2743,14 @@ function ContactLozenge({
 
   if (status === "needs_check") {
     return (
-      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-red-200 bg-red-50 px-2 text-[11px] font-bold text-[var(--clinic-danger)]">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-red-300 bg-[#FFF1F0] px-2 text-[11px] font-bold text-[var(--clinic-danger)]">
         확인 필요
       </span>
     );
   }
 
   return (
-    <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-[#d5e1e5] bg-[#f5f9fa] px-2 text-[11px] font-bold text-[var(--clinic-muted)]">
+    <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-[#C9D7DC] bg-[#EEF4F6] px-2 text-[11px] font-bold text-[var(--clinic-muted)]">
       대기
     </span>
   );
@@ -2844,7 +2844,7 @@ function WorkbenchStudentPanel({
                     <h4 className="truncate text-2xl font-black tracking-[-0.03em] text-[#132934]">
                       {student.name}
                     </h4>
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-[#B8D0D6] bg-[#E7F3F4] text-[11px] font-bold text-[#005F62]">
+                    <span className="flex size-6 shrink-0 items-center justify-center border border-[#AFC3CA] bg-[#E3EEF0] text-[11px] font-bold text-[#005F62]">
                       {getStudentInitial(student.name)}
                     </span>
                   </div>
@@ -2855,7 +2855,7 @@ function WorkbenchStudentPanel({
                 <button
                   type="button"
                   onClick={onOpenStudentProfile}
-                  className="min-h-8 shrink-0 rounded-sm border border-[#B6C8CE] bg-white px-2.5 text-xs font-bold text-[#334B58] transition hover:bg-[#EEF6F6] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                className="min-h-8 shrink-0 border border-[#AEBFC7] bg-[#F7FAFA] px-2.5 text-xs font-bold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
                 >
                   프로필
                 </button>
@@ -2864,7 +2864,7 @@ function WorkbenchStudentPanel({
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <StatusLozenge status={status} />
                 <ContactLozenge record={record} status={status} />
-                <span className="inline-flex min-h-6 items-center rounded-sm border border-[#CEDCE1] bg-white px-2 text-[11px] font-bold tabular-nums text-[#526873]">
+                <span className="inline-flex min-h-6 items-center border border-[#C9D7DC] bg-[#F7FAFA] px-2 text-[11px] font-bold tabular-nums text-[#526873]">
                   {student.maskedStudentPhone ?? student.maskedParentPhone}
                   <span className="ml-1 font-medium text-[#78909A]">(학생)</span>
                 </span>
@@ -2967,9 +2967,9 @@ function WorkbenchStudentPanel({
               disabled={!canOpenFollowup}
               onClick={() => onOpenFollowup(student)}
               className={[
-                "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                "flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                 canOpenFollowup
-                  ? "bg-[#007A7C] text-white shadow-[0_2px_0_rgba(0,73,76,0.35)] hover:bg-[#006266]"
+                  ? "border border-[#005F62] bg-[#007A7C] text-white hover:bg-[#006266]"
                   : "bg-[#DCE6EA] text-[#78909A]",
               ].join(" ")}
             >
@@ -2981,7 +2981,7 @@ function WorkbenchStudentPanel({
                 type="button"
                 disabled={!canOpenFollowup}
                 onClick={() => onOpenFollowup(student)}
-                className="flex min-h-10 items-center justify-center gap-2 rounded-sm border border-[#AEBFC7] bg-white px-3 text-sm font-bold text-[#334B58] transition hover:bg-[#F0F6F7] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] disabled:cursor-not-allowed disabled:bg-[#EEF3F5] disabled:text-[#93A3AA]"
+                className="flex min-h-10 items-center justify-center gap-2 border border-[#AEBFC7] bg-[#F7FAFA] px-3 text-sm font-bold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] disabled:cursor-not-allowed disabled:bg-[#EEF3F5] disabled:text-[#93A3AA]"
               >
                 <Pencil size={16} aria-hidden="true" />
                 메모
@@ -2989,7 +2989,7 @@ function WorkbenchStudentPanel({
               <button
                 type="button"
                 onClick={onOpenMessages}
-                className="flex min-h-10 items-center justify-center gap-2 rounded-sm border border-[#AEBFC7] bg-white px-3 text-sm font-bold text-[#334B58] transition hover:bg-[#F0F6F7] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                className="flex min-h-10 items-center justify-center gap-2 border border-[#AEBFC7] bg-[#F7FAFA] px-3 text-sm font-bold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
               >
                 <List size={16} aria-hidden="true" />
                 이력
@@ -4826,13 +4826,13 @@ function createDefaultNote(status: AttendanceStatus) {
 
 function attendanceStatusClass(status: AttendanceStatus) {
   const classes: Record<AttendanceStatus, string> = {
-    pending: "border-[#c9d8dd] bg-[#f4f9fa] text-[var(--clinic-muted)]",
-    present: "border-[#b7d8d4] bg-[#e3f3f1] text-[var(--clinic-primary)]",
-    late: "border-amber-200 bg-amber-50 text-[var(--clinic-warning)]",
-    absent: "border-red-200 bg-red-50 text-[var(--clinic-danger)]",
-    makeup: "border-violet-200 bg-violet-50 text-[var(--clinic-violet)]",
-    excused: "border-violet-200 bg-violet-50 text-[var(--clinic-violet)]",
-    needs_check: "border-red-200 bg-red-50 text-[var(--clinic-danger)]",
+    pending: "border-[#C9D7DC] bg-[#EEF4F6] text-[var(--clinic-muted)]",
+    present: "border-[#8BC9BF] bg-[#EAF6F4] text-[var(--clinic-primary)]",
+    late: "border-amber-300 bg-[#FFF7E8] text-[var(--clinic-warning)]",
+    absent: "border-red-300 bg-[#FFF1F0] text-[var(--clinic-danger)]",
+    makeup: "border-violet-300 bg-[#F1ECF8] text-[var(--clinic-violet)]",
+    excused: "border-violet-300 bg-[#F1ECF8] text-[var(--clinic-violet)]",
+    needs_check: "border-red-300 bg-[#FFF1F0] text-[var(--clinic-danger)]",
   };
 
   return classes[status];

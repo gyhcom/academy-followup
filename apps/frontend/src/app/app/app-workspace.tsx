@@ -232,7 +232,7 @@ export function AppWorkspace({
   }
 
   return (
-    <div className="mx-auto w-full max-w-[120rem] pb-20 sm:pb-0">
+    <div className="academy-console min-h-screen w-full bg-[var(--clinic-page)] pb-20 sm:pb-0">
       <div
         className={[
           "sm:grid sm:min-h-[calc(100vh-4.5rem)]",
@@ -251,7 +251,7 @@ export function AppWorkspace({
 
         <div
           className={[
-            "min-w-0 space-y-4 px-3 py-4 sm:space-y-5 sm:px-5 sm:py-5",
+            "min-w-0 space-y-4 px-3 py-4 sm:space-y-4 sm:px-4 sm:py-4",
             visibleView === "attendance" ? "xl:px-3 2xl:px-4" : "xl:px-6",
           ].join(" ")}
         >
@@ -395,7 +395,7 @@ function WorkspaceContextHeader({
 }) {
   if (activeView === "attendance") {
     return (
-      <section className="hidden min-h-12 border-b border-[#CBD7DD] bg-white px-4 py-2 shadow-[0_1px_2px_rgba(13,38,48,0.04)] sm:flex sm:items-center sm:justify-between sm:gap-4">
+      <section className="hidden min-h-12 border border-[#B8C9D0] bg-[#F4F8F9] px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <span className="text-sm font-semibold text-[#243844]">운영 기준일</span>
           <span className="text-lg font-bold tabular-nums text-[#17232B]">
@@ -414,7 +414,7 @@ function WorkspaceContextHeader({
           </button>
           <span className="h-6 w-px bg-[#D5E0E4]" aria-hidden="true" />
           <div className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center rounded-full border border-[#D5E0E4] bg-[#F2F6F7] text-[#334B58]">
+            <span className="flex size-9 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[#334B58]">
               <User size={17} aria-hidden="true" />
             </span>
             <span className="leading-tight">
@@ -429,7 +429,7 @@ function WorkspaceContextHeader({
   }
 
   return (
-    <section className="hidden min-h-14 rounded-md border border-[#D2DDE2] bg-white px-4 py-2.5 shadow-[0_1px_2px_rgba(13,38,48,0.08)] sm:flex sm:items-center sm:justify-between sm:gap-4">
+    <section className="hidden min-h-14 border border-[#B8C9D0] bg-[#F4F8F9] px-4 py-2.5 sm:flex sm:items-center sm:justify-between sm:gap-4">
       <div className="min-w-0">
         <p className="text-xs font-semibold text-[var(--clinic-primary)]">
           {getWorkspaceViewLabel(activeView, canManage)}
@@ -440,10 +440,10 @@ function WorkspaceContextHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-2 text-xs text-[var(--clinic-muted)]">
-        <span className="rounded-md border border-[#D2DDE2] bg-[#F6FAFA] px-3 py-1.5 font-semibold text-[var(--clinic-text)]">
+        <span className="border border-[#B8C9D0] bg-[#EAF1F3] px-3 py-1.5 font-semibold text-[var(--clinic-text)]">
           운영 기준 {formatContextDate(selectedDate)}
         </span>
-        <span className="rounded-md border border-[#D2DDE2] bg-white px-3 py-1.5">
+        <span className="border border-[#B8C9D0] bg-[#F7FAFA] px-3 py-1.5">
           {teacherName} · {roleLabel}
         </span>
         <LogoutButton />
@@ -460,7 +460,7 @@ function FeesPlaceholder({
   onOpenReports: () => void;
 }) {
   return (
-    <section className="rounded-2xl border border-[#DED8CE] bg-white p-6 shadow-sm">
+    <section className="border border-[#B8C9D0] bg-[#F4F8F9] p-6">
       <div className="max-w-3xl">
         <p className="text-xs font-semibold text-[#315C7C]">준비 중인 운영 영역</p>
         <h2 className="mt-2 text-2xl font-semibold text-stone-950">교재/비용</h2>
@@ -474,7 +474,7 @@ function FeesPlaceholder({
         <button
           type="button"
           onClick={onOpenStudents}
-          className="min-h-12 rounded-lg border border-[#D9E2EA] bg-[#F8FBFD] px-4 text-left text-sm font-semibold text-[#244B67] transition hover:bg-[#EAF1F8] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+          className="min-h-12 border border-[#B8C9D0] bg-[#EDF3F5] px-4 text-left text-sm font-semibold text-[#244B67] transition hover:bg-[#E3ECEF] focus:outline-none focus:ring-2 focus:ring-[#0F8F87]"
         >
           학생별 기본 정보 확인
           <span className="mt-1 block text-xs font-normal text-stone-500">
@@ -484,7 +484,7 @@ function FeesPlaceholder({
         <button
           type="button"
           onClick={onOpenReports}
-          className="min-h-12 rounded-lg border border-[#E6E0D5] bg-white px-4 text-left text-sm font-semibold text-stone-800 transition hover:bg-[#FBFAF7] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+          className="min-h-12 border border-[#B8C9D0] bg-[#F7FAFA] px-4 text-left text-sm font-semibold text-stone-800 transition hover:bg-[#EEF4F6] focus:outline-none focus:ring-2 focus:ring-[#0F8F87]"
         >
           운영 기록 리포트 확인
           <span className="mt-1 block text-xs font-normal text-stone-500">
@@ -546,10 +546,10 @@ function WorkspaceNavigation({
   return (
     <>
       <aside className="hidden sm:sticky sm:top-0 sm:block sm:h-screen sm:self-start">
-        <section className="flex h-full flex-col overflow-hidden border-r border-[#123A48] bg-[linear-gradient(180deg,#062837_0%,#08384A_54%,#052332_100%)] text-white shadow-[8px_0_30px_rgba(5,35,50,0.10)]">
+        <section className="flex h-full flex-col overflow-hidden border-r border-[#0F4050] bg-[#062634] text-white">
           <div className="border-b border-white/10 px-5 py-5">
             <div className="flex items-center gap-3">
-              <div className="flex size-11 items-center justify-center rounded-md border border-white/20 bg-white/10 text-white">
+              <div className="flex size-11 items-center justify-center border border-white/20 bg-white/8 text-white">
                 <ShieldCheck size={22} aria-hidden="true" />
               </div>
               <div>
@@ -584,7 +584,7 @@ function WorkspaceNavigation({
         </section>
       </aside>
 
-      <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[#D2DDE2] bg-white/95 px-3 pb-[env(safe-area-inset-bottom)] pt-2 shadow-[0_-12px_30px_rgba(13,38,48,0.14)] backdrop-blur sm:hidden">
+      <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[#B8C9D0] bg-[#F4F8F9]/96 px-3 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur sm:hidden">
         <nav
           aria-label={shellLabel}
           className={["grid gap-1.5", getMobileGridClass(mobileItems.length)].join(" ")}
@@ -733,18 +733,20 @@ function WorkspaceNavButton({
         aria-pressed={isActive}
         onClick={onClick}
         className={[
-          "group relative flex min-h-12 w-full items-center gap-3 border-l-[4px] px-5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70",
+          "group relative flex min-h-11 w-full items-center gap-3 border-l-[4px] px-5 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70",
           isActive
-            ? "border-l-[#2DD4BF] bg-[#0D5262] text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.12)]"
-            : "border-l-transparent text-cyan-50/74 hover:border-l-cyan-200/45 hover:bg-white/7 hover:text-white",
+            ? "border-l-[#22C7BD] bg-[#0D5262] text-white"
+            : "border-l-transparent text-cyan-50/74 hover:border-l-cyan-200/45 hover:bg-white/6 hover:text-white",
           disabled ? "cursor-not-allowed opacity-55" : "",
         ].join(" ")}
       >
         <span
           aria-hidden="true"
           className={[
-            "flex size-8 shrink-0 items-center justify-center rounded-md",
-            isActive ? "bg-cyan-300/16 text-cyan-50" : "bg-white/5 text-cyan-50/62 group-hover:text-cyan-100",
+            "flex size-8 shrink-0 items-center justify-center border",
+            isActive
+              ? "border-cyan-200/30 bg-cyan-300/14 text-cyan-50"
+              : "border-white/10 bg-white/4 text-cyan-50/62 group-hover:text-cyan-100",
           ].join(" ")}
         >
           {icon}
@@ -781,17 +783,17 @@ function WorkspaceNavButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "flex min-h-12 flex-col items-center justify-center gap-1 rounded-md border px-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+        "flex min-h-12 flex-col items-center justify-center gap-1 border px-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-[#0F8F87]",
         isActive
-          ? "border-[#315C7C] bg-[#EAF1F8] text-[#244B67]"
-          : "border-transparent bg-transparent text-stone-700 hover:bg-[#F2F5F8]",
+          ? "border-[#006F73] bg-[#DCEBEC] text-[#073342]"
+          : "border-transparent bg-transparent text-stone-700 hover:bg-[#E8EFF1]",
         disabled ? "cursor-not-allowed opacity-55" : "",
       ].join(" ")}
     >
       <span
         aria-hidden="true"
         className={[
-          "flex size-6 shrink-0 items-center justify-center rounded-md",
+          "flex size-6 shrink-0 items-center justify-center",
           isActive ? "text-[#244B67]" : "text-stone-500",
         ].join(" ")}
       >

@@ -451,7 +451,7 @@ function PcOperationsDashboard({
 
   return (
     <div className="hidden xl:block">
-      <section className="rounded-md border border-[#CAD8DE] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+      <section className="border border-[#B8C9D0] bg-[#F4F8F9] px-5 py-4">
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-end">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">{academyName}</p>
@@ -465,7 +465,7 @@ function PcOperationsDashboard({
           <HomeDateControl value={selectedDate} onChange={onDateChange} />
         </div>
 
-        <div className="mt-4 grid grid-cols-5 overflow-hidden rounded-md border border-[#D2DDE2] bg-[#F4F8F9]">
+        <div className="mt-4 grid grid-cols-5 overflow-hidden border border-[#B8C9D0] bg-[#EAF1F3]">
           <PcKpi label="오늘 수업" value={`${scheduleSummary.academyScheduleCount}개`} />
           <PcKpi label="학생 체크" value={`${studentRows.length}명`} />
           <PcKpi label="체크 필요" value={`${boardSummary.unchecked}명`} tone="warning" />
@@ -476,8 +476,8 @@ function PcOperationsDashboard({
 
       <section className="mt-5 grid gap-4 xl:grid-cols-[20rem_minmax(0,1fr)_24rem] 2xl:grid-cols-[21rem_minmax(0,1fr)_26rem] xl:items-start">
         <aside className="space-y-4">
-          <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
-            <div className="border-b border-[#D6E0E5] bg-[#F7FAFB] px-4 py-3">
+          <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9]">
+            <div className="border-b border-[#B8C9D0] bg-[#EAF1F3] px-4 py-3">
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <h3 className="text-sm font-bold text-[var(--clinic-text)]">
@@ -485,7 +485,7 @@ function PcOperationsDashboard({
                   </h3>
                   <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">수업을 누르면 출석부로 이동합니다.</p>
                 </div>
-                <span className="rounded-full bg-[#DCECEF] px-2 py-1 text-xs font-bold text-[var(--clinic-primary-dark)]">
+                <span className="border border-[#B8C9D0] bg-[#DCEBEC] px-2 py-1 text-xs font-bold text-[var(--clinic-primary-dark)]">
                   {academyItems.length}개
                 </span>
               </div>
@@ -503,8 +503,8 @@ function PcOperationsDashboard({
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
-            <div className="border-b border-[#D6E0E5] bg-[#F7FAFB] px-4 py-3">
+          <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9]">
+            <div className="border-b border-[#B8C9D0] bg-[#EAF1F3] px-4 py-3">
               <h3 className="text-sm font-bold text-[var(--clinic-text)]">작업</h3>
             </div>
             <HomeActionButton
@@ -530,8 +530,8 @@ function PcOperationsDashboard({
           </section>
         </aside>
 
-        <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
-          <div className="border-b border-[#D6E0E5] bg-[#F7FAFB] px-4 py-3">
+        <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9]">
+          <div className="border-b border-[#B8C9D0] bg-[#EAF1F3] px-4 py-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h3 className="text-base font-bold text-[var(--clinic-text)]">
@@ -542,7 +542,7 @@ function PcOperationsDashboard({
                 </p>
               </div>
               {loadState.status === "loading" ? (
-                <span className="inline-flex items-center gap-1.5 rounded-md bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-500">
+                <span className="inline-flex items-center gap-1.5 border border-[#B8C9D0] bg-[#EDF3F5] px-2 py-1 text-xs font-semibold text-stone-500">
                   <Loader2 size={13} className="animate-spin" />
                   불러오는 중
                 </span>
@@ -555,13 +555,13 @@ function PcOperationsDashboard({
               onChange={onStudentFilterChange}
             />
             {loadState.status === "error" ? (
-              <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-900">
+              <div className="mt-3 border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-900">
                 {loadState.error}
               </div>
             ) : null}
           </div>
 
-          <div className="max-h-[38rem] divide-y divide-[#E1EAEE] overflow-y-auto bg-white" role="listbox" aria-label="오늘 학생 상태 목록">
+          <div className="max-h-[38rem] divide-y divide-[#D8E3E7] overflow-y-auto bg-[#F7FAFA]" role="listbox" aria-label="오늘 학생 상태 목록">
             {filteredStudentRows.length > 0 ? (
               filteredStudentRows.map((row) => (
                 <PcStudentBoardRowItem
@@ -643,7 +643,7 @@ function PcScheduleButton({
           {item.studentCount ? ` · ${item.studentCount}명` : ""}
         </span>
       </span>
-      <span className="rounded-md bg-[var(--clinic-primary-dark)] px-2.5 py-1 text-[11px] font-bold text-white">
+      <span className="border border-[#073342] bg-[var(--clinic-primary-dark)] px-2.5 py-1 text-[11px] font-bold text-white">
         출석
       </span>
     </>
@@ -703,17 +703,17 @@ function PcStudentFilterBar({
             aria-pressed={isSelected}
             onClick={() => onChange(option.value)}
             className={[
-              "inline-flex min-h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
+              "inline-flex min-h-8 items-center gap-1.5 border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
               isSelected
                 ? selectedChipTone(option.tone)
-                : "border-[#CAD8DE] bg-white text-[var(--clinic-muted)] hover:border-[#9FB7C0] hover:bg-[#F4F8F9]",
+                : "border-[#B8C9D0] bg-[#F7FAFA] text-[var(--clinic-muted)] hover:border-[#839AA4] hover:bg-[#EDF3F5]",
             ].join(" ")}
           >
             {option.label}
             <span
               className={[
-                "rounded-full px-1.5 py-0.5 tabular-nums",
-                isSelected ? "bg-white/20 text-white" : "bg-[#E8F0F2] text-[var(--clinic-muted)]",
+                "border px-1.5 py-0.5 tabular-nums",
+                isSelected ? "border-white/20 bg-white/15 text-white" : "border-[#C9D7DC] bg-[#E8F0F2] text-[var(--clinic-muted)]",
               ].join(" ")}
             >
               {option.count}
@@ -748,8 +748,8 @@ function PcStudentBoardRowItem({
       className={[
         "flex min-h-[4.35rem] w-full items-center gap-3 border-l-[3px] px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
         isSelected
-          ? "border-l-[var(--clinic-primary)] bg-[#EAF6F5]"
-          : "border-l-transparent bg-white hover:border-l-[#B8C9D0] hover:bg-[#F5FAFA]",
+          ? "border-l-[var(--clinic-primary)] bg-[#E1F0EF]"
+          : "border-l-transparent bg-[#F7FAFA] hover:border-l-[#839AA4] hover:bg-[#EDF3F5]",
       ].join(" ")}
     >
       <span className="min-w-0 flex-[1.25]">
@@ -758,7 +758,7 @@ function PcStudentBoardRowItem({
             {row.student.name}
           </span>
           {row.hasBlockedSchedule ? (
-            <span className="shrink-0 rounded-md border border-violet-200 bg-violet-50 px-2 py-0.5 text-[11px] font-bold text-violet-800">
+            <span className="shrink-0 border border-violet-300 bg-[#F1ECF8] px-2 py-0.5 text-[11px] font-bold text-violet-900">
               보강 제외
             </span>
           ) : null}
@@ -769,7 +769,7 @@ function PcStudentBoardRowItem({
         </span>
       </span>
       <span className="min-w-0 flex flex-[1.15] items-center gap-2">
-        <span className="shrink-0 rounded-md bg-[#F0F6F7] px-2 py-1 text-xs font-bold tabular-nums text-[var(--clinic-text)]">
+        <span className="shrink-0 border border-[#C9D7DC] bg-[#EAF1F3] px-2 py-1 text-xs font-bold tabular-nums text-[var(--clinic-text)]">
           {row.startTime}-{row.endTime}
         </span>
         <span className="min-w-0 truncate text-xs font-semibold text-[var(--clinic-muted)]">
@@ -779,7 +779,7 @@ function PcStudentBoardRowItem({
       <span className="flex shrink-0 items-center gap-1.5">
         <span
           className={[
-            "rounded-full px-2 py-1 text-[11px] font-semibold",
+            "border px-2 py-1 text-[11px] font-bold",
             statusTone(row.status),
           ].join(" ")}
         >
@@ -787,7 +787,7 @@ function PcStudentBoardRowItem({
         </span>
         <span
           className={[
-            "rounded-full px-2 py-1 text-[11px] font-semibold",
+            "border px-2 py-1 text-[11px] font-bold",
             isSent
               ? "bg-emerald-50 text-emerald-800"
               : needsContact
@@ -2470,32 +2470,32 @@ function filterLabel(filter: FollowupFilter) {
 
 function statusTone(status: AttendanceStatus) {
   if (status === "absent") {
-    return "bg-red-50 text-red-700";
+    return "border-red-300 bg-[#FFF1F0] text-red-800";
   }
 
   if (status === "late" || status === "needs_check") {
-    return "bg-amber-50 text-amber-800";
+    return "border-amber-300 bg-[#FFF7E8] text-amber-900";
   }
 
   if (status === "present") {
-    return "bg-emerald-50 text-emerald-800";
+    return "border-emerald-300 bg-[#EEF8F3] text-emerald-900";
   }
 
   if (status === "pending") {
-    return "bg-stone-100 text-stone-700";
+    return "border-[#C9D7DC] bg-[#EEF4F6] text-stone-700";
   }
 
-  return "bg-violet-50 text-violet-800";
+  return "border-violet-300 bg-[#F1ECF8] text-violet-900";
 }
 
 function selectedChipTone(tone: "default" | "blue" | "green" | "amber" | "red" | "violet") {
   const tones = {
-    default: "border-stone-900 bg-stone-900 text-white",
-    blue: "border-[#315C7C] bg-[#315C7C] text-white",
-    green: "border-emerald-700 bg-emerald-700 text-white",
-    amber: "border-amber-700 bg-amber-700 text-white",
-    red: "border-red-700 bg-red-700 text-white",
-    violet: "border-violet-700 bg-violet-700 text-white",
+    default: "border-[#10232C] bg-[#10232C] text-white",
+    blue: "border-[#073342] bg-[#073342] text-white",
+    green: "border-emerald-800 bg-emerald-800 text-white",
+    amber: "border-amber-800 bg-amber-800 text-white",
+    red: "border-red-800 bg-red-800 text-white",
+    violet: "border-violet-800 bg-violet-800 text-white",
   };
 
   return tones[tone];

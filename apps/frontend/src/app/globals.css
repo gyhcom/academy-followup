@@ -1,25 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafaf9;
-  --foreground: #1c1917;
-  --clinic-page: #eef3f5;
-  --clinic-panel: #fbfdfe;
-  --clinic-panel-muted: #f3f7f8;
-  --clinic-border: #cbd9de;
-  --clinic-border-strong: #9eb4bd;
-  --clinic-primary: #0f5f63;
-  --clinic-primary-dark: #073b46;
-  --clinic-navy: #052332;
-  --clinic-navy-2: #08384a;
-  --clinic-accent: #19a195;
-  --clinic-text: #102a33;
-  --clinic-muted: #657982;
+  --background: #e7eef1;
+  --foreground: #10232c;
+  --clinic-page: #e7eef1;
+  --clinic-panel: #f4f8f9;
+  --clinic-panel-muted: #edf3f5;
+  --clinic-panel-strong: #dfe9ec;
+  --clinic-border: #b8c9d0;
+  --clinic-border-strong: #839aa4;
+  --clinic-primary: #006f73;
+  --clinic-primary-dark: #073342;
+  --clinic-navy: #062634;
+  --clinic-navy-2: #0a3949;
+  --clinic-accent: #0f8f87;
+  --clinic-text: #10232c;
+  --clinic-muted: #526873;
   --clinic-rail: #0f5f63;
   --clinic-warning: #b56a00;
   --clinic-danger: #b42318;
   --clinic-success: #087443;
   --clinic-violet: #6d4ca0;
+  --console-radius: 2px;
+  --console-shadow: none;
 }
 
 @theme inline {
@@ -45,6 +48,16 @@ button:not(:disabled) {
 }
 
 :where(a, button, input, textarea, select):focus-visible {
-  outline: 3px solid #a7f3d0;
+  outline: 2px solid #0f8f87;
   outline-offset: 2px;
+}
+
+@media (min-width: 640px) {
+  .academy-console :where(button, input, select, textarea, section, aside, [class*="rounded"]) {
+    border-radius: var(--console-radius) !important;
+  }
+
+  .academy-console :where([class*="shadow"]) {
+    box-shadow: none !important;
+  }
 }
