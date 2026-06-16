@@ -2813,184 +2813,236 @@ function WorkbenchStudentPanel({
   const weeklySchedules = student
     ? getSortedActiveSchedules(student.schedules).slice(0, 3)
     : [];
+  const processedAt = record?.arrivedAt ?? record?.checkedAt ?? null;
+  const classDescriptor = [student?.schoolName, student?.gradeLabel, session?.className]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
-    <section className="sticky top-4 h-[calc(100vh-9rem)] overflow-y-auto border-l-0 bg-[#F8FBFC]">
-      <div className="flex items-center justify-between border-b border-[#D5E0E4] bg-white px-4 py-4">
-        <h3 className="text-base font-bold text-[#17232B]">학생 차트</h3>
-        <ChevronRight size={17} className="rotate-90 text-[#60717B]" aria-hidden="true" />
+    <section className="sticky top-4 flex h-[calc(100vh-9rem)] flex-col overflow-hidden border-l border-[#C9D7DC] bg-[#EDF4F5]">
+      <div className="flex items-center justify-between border-b border-[#0F4050] bg-[#082A3A] px-4 py-3 text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)]">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#7DD6D4]">
+            student case
+          </p>
+          <h3 className="mt-1 text-base font-bold">학생 처리 패널</h3>
+        </div>
+        <ChevronRight size={17} className="rotate-90 text-[#B8D0D6]" aria-hidden="true" />
       </div>
 
       {!student ? (
-        <div className="p-4 text-sm leading-6 text-[#60717B]">
-          학생을 선택하면 상세 정보가 표시됩니다.
+        <div className="m-3 border border-dashed border-[#B8C9CE] bg-[#F5FAFA] p-4 text-sm leading-6 text-[#60717B]">
+          학생을 선택하면 오늘 처리 상태와 연락 작업이 표시됩니다.
         </div>
       ) : (
-        <div className="space-y-3 p-3">
-          <section className="rounded-md border border-[#D5E0E4] bg-white p-4 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="flex min-w-0 items-center gap-2">
-                  <h4 className="truncate text-2xl font-bold tracking-[-0.02em] text-[#17232B]">
-                    {student.name}
-                  </h4>
-                  <StatusLozenge status={status} />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <section className="border-b border-[#C9D7DC] bg-[#F7FBFB] px-4 py-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <h4 className="truncate text-2xl font-black tracking-[-0.03em] text-[#132934]">
+                      {student.name}
+                    </h4>
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-[#B8D0D6] bg-[#E7F3F4] text-[11px] font-bold text-[#005F62]">
+                      {getStudentInitial(student.name)}
+                    </span>
+                  </div>
+                  <p className="mt-1 truncate text-sm font-semibold text-[#526873]">
+                    {classDescriptor || "학교/학년 미등록"}
+                  </p>
                 </div>
-                <p className="mt-2 truncate text-sm font-medium text-[#60717B]">
-                  {[student.schoolName, student.gradeLabel, session?.className]
-                    .filter(Boolean)
-                    .join(" · ") || "학교/학년 미등록"}
-                </p>
-                <p className="mt-4 text-sm font-semibold tabular-nums text-[#60717B]">
-                  {student.maskedStudentPhone ?? student.maskedParentPhone}
-                  <span className="ml-1 font-normal">(학생)</span>
-                </p>
+                <button
+                  type="button"
+                  onClick={onOpenStudentProfile}
+                  className="min-h-8 shrink-0 rounded-sm border border-[#B6C8CE] bg-white px-2.5 text-xs font-bold text-[#334B58] transition hover:bg-[#EEF6F6] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                >
+                  프로필
+                </button>
               </div>
-            </div>
-            <button
-              type="button"
-              onClick={onOpenStudentProfile}
-              className="mt-3 min-h-9 w-full rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
-            >
-              프로필 보기
-            </button>
-          </section>
 
-          <section className="rounded-md border border-[#D5E0E4] bg-white p-4 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
-            <h4 className="text-base font-bold text-[#17232B]">오늘 수업 정보</h4>
-            <div className="mt-3 divide-y divide-[#E3EAED]">
-              <AttendancePanelRow label="수업시간" value={session ? `${session.startTime} - ${session.endTime}` : "시간 정보 없음"} mono />
-              <AttendancePanelRow label="담당 선생님" value={`${teacherName} 선생님`} />
-              <AttendancePanelRow label="출석 상태">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
                 <StatusLozenge status={status} />
-              </AttendancePanelRow>
-              <AttendancePanelRow label="연락 상태">
                 <ContactLozenge record={record} status={status} />
-              </AttendancePanelRow>
-            </div>
-          </section>
+                <span className="inline-flex min-h-6 items-center rounded-sm border border-[#CEDCE1] bg-white px-2 text-[11px] font-bold tabular-nums text-[#526873]">
+                  {student.maskedStudentPhone ?? student.maskedParentPhone}
+                  <span className="ml-1 font-medium text-[#78909A]">(학생)</span>
+                </span>
+              </div>
+            </section>
 
-          <section className="rounded-md border border-[#D5E0E4] bg-white p-4 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
-            <div className="flex items-center justify-between gap-2">
-              <h4 className="text-base font-bold text-[#17232B]">최근 연락 기록</h4>
-              <button
-                type="button"
-                onClick={onOpenMessages}
-                className="text-xs font-semibold text-[#007A7C] hover:underline"
-              >
-                더보기
-              </button>
-            </div>
-            <div className="mt-3 space-y-2">
+            <section className="border-b border-[#C9D7DC] bg-[#E3F3F2] px-4 py-3 shadow-[inset_4px_0_0_#007A7C]">
+              <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#006266]">
+                <CheckCircle2 size={14} aria-hidden="true" />
+                오늘 처리
+              </div>
+              <p className="mt-1 text-sm font-bold text-[#132934]">
+                {session ? `${session.className} · ${session.startTime}-${session.endTime}` : "선택된 수업 없음"}
+              </p>
+              <p className="mt-1 text-xs font-medium text-[#526873]">
+                {processedAt ? `${formatCompactDateTime(processedAt)} 처리 기록` : "아직 처리 시각이 없습니다."}
+              </p>
+            </section>
+
+            <PanelBlock title="수업 정보">
+              <PanelDataRow icon={<Clock3 size={14} />} label="수업시간" mono>
+                {session ? `${session.startTime} - ${session.endTime}` : "시간 정보 없음"}
+              </PanelDataRow>
+              <PanelDataRow icon={<UserCheck size={14} />} label="담당">
+                {teacherName} 선생님
+              </PanelDataRow>
+              <PanelDataRow icon={<CheckCircle2 size={14} />} label="출석">
+                <StatusLozenge status={status} />
+              </PanelDataRow>
+              <PanelDataRow icon={<MessageSquareText size={14} />} label="연락">
+                <ContactLozenge record={record} status={status} />
+              </PanelDataRow>
+            </PanelBlock>
+
+            <PanelBlock
+              title="최근 연락"
+              action={
+                <button
+                  type="button"
+                  onClick={onOpenMessages}
+                  className="text-xs font-bold text-[#007A7C] hover:underline"
+                >
+                  전체 보기
+                </button>
+              }
+            >
               {historyState.status === "loading" ? (
-                <p className="text-sm text-[#60717B]">연락 기록을 불러오는 중입니다.</p>
+                <p className="px-4 py-3 text-sm text-[#60717B]">연락 기록을 불러오는 중입니다.</p>
               ) : historyState.items.length > 0 ? (
                 historyState.items.map((item) => (
                   <div
                     key={item.id}
-                    className="grid grid-cols-[6.5rem_minmax(0,1fr)_auto] gap-2 border-b border-[#EEF2F3] pb-2 text-xs text-[#405763] last:border-b-0 last:pb-0"
+                    className="grid min-h-10 grid-cols-[5.8rem_minmax(0,1fr)_auto] items-center gap-2 border-b border-[#E0E9EC] px-4 py-2 text-xs text-[#405763] last:border-b-0"
                   >
-                    <span className="tabular-nums">{formatCompactDateTime(item.createdAt)}</span>
-                    <span className="truncate font-semibold">{reasonLabel(item.reason as FollowupReason)}</span>
-                    <span className="rounded-sm border border-[#D5E0E4] px-1.5 py-0.5 text-[10px] font-bold text-[#60717B]">
+                    <span className="tabular-nums text-[#60717B]">{formatCompactDateTime(item.createdAt)}</span>
+                    <span className="truncate font-bold">{reasonLabel(item.reason as FollowupReason)}</span>
+                    <span className="rounded-sm border border-[#C8D7DD] bg-[#F7FBFB] px-1.5 py-0.5 text-[10px] font-black text-[#60717B]">
                       {item.status === "sent" ? "발송" : "기록"}
                     </span>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-[#60717B]">아직 연락 기록이 없습니다.</p>
+                <p className="px-4 py-3 text-sm text-[#60717B]">아직 연락 기록이 없습니다.</p>
               )}
-            </div>
-          </section>
+            </PanelBlock>
 
-          <section className="rounded-md border border-[#D5E0E4] bg-white p-4 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
-            <div className="flex items-center justify-between gap-2">
-              <h4 className="text-base font-bold text-[#17232B]">주간 스케줄</h4>
-              <button
-                type="button"
-                onClick={onOpenStudentProfile}
-                className="text-xs font-semibold text-[#007A7C] hover:underline"
-              >
-                더보기
-              </button>
-            </div>
-            <div className="mt-3 space-y-2">
+            <PanelBlock
+              title="주간 스케줄"
+              action={
+                <button
+                  type="button"
+                  onClick={onOpenStudentProfile}
+                  className="text-xs font-bold text-[#007A7C] hover:underline"
+                >
+                  관리
+                </button>
+              }
+            >
               {weeklySchedules.length > 0 ? (
                 weeklySchedules.map((schedule) => (
                   <div
                     key={schedule.id}
-                    className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2 text-sm text-[#405763]"
+                    className="grid min-h-10 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 border-b border-[#E0E9EC] px-4 py-2 text-sm text-[#405763] last:border-b-0"
                   >
-                    <span className="font-bold text-[#60717B]">{weekdayShortLabel(schedule.dayOfWeek)}</span>
+                    <span className="font-black text-[#007A7C]">{weekdayShortLabel(schedule.dayOfWeek)}</span>
                     <span className="truncate tabular-nums">
                       {schedule.startTime} - {schedule.endTime} {session?.className ?? ""}
                     </span>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-[#60717B]">등록된 주간 스케줄이 없습니다.</p>
+                <p className="px-4 py-3 text-sm text-[#60717B]">등록된 주간 스케줄이 없습니다.</p>
               )}
-            </div>
-          </section>
+            </PanelBlock>
+          </div>
 
-          <section className="rounded-md border border-[#D5E0E4] bg-white p-3 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
-            <h4 className="px-1 pb-2 text-base font-bold text-[#17232B]">작업</h4>
-            <div className="space-y-2">
+          <div className="border-t border-[#C9D7DC] bg-[#F7FBFB] p-3 shadow-[0_-8px_18px_rgba(8,42,58,0.05)]">
+            <button
+              type="button"
+              disabled={!canOpenFollowup}
+              onClick={() => onOpenFollowup(student)}
+              className={[
+                "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                canOpenFollowup
+                  ? "bg-[#007A7C] text-white shadow-[0_2px_0_rgba(0,73,76,0.35)] hover:bg-[#006266]"
+                  : "bg-[#DCE6EA] text-[#78909A]",
+              ].join(" ")}
+            >
+              <Send size={17} aria-hidden="true" />
+              문자 작성 / 보내기
+            </button>
+            <div className="mt-2 grid grid-cols-2 gap-2">
               <button
                 type="button"
                 disabled={!canOpenFollowup}
                 onClick={() => onOpenFollowup(student)}
-                className={[
-                  "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
-                  canOpenFollowup
-                    ? "bg-[#007A7C] text-white hover:bg-[#006266]"
-                    : "bg-[#DCE6EA] text-[#78909A]",
-                ].join(" ")}
+                className="flex min-h-10 items-center justify-center gap-2 rounded-sm border border-[#AEBFC7] bg-white px-3 text-sm font-bold text-[#334B58] transition hover:bg-[#F0F6F7] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] disabled:cursor-not-allowed disabled:bg-[#EEF3F5] disabled:text-[#93A3AA]"
               >
-                <Send size={17} aria-hidden="true" />
-                문자 작성 / 보내기
+                <Pencil size={16} aria-hidden="true" />
+                메모
               </button>
               <button
                 type="button"
                 onClick={onOpenMessages}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-[#AEBFC7] bg-white px-4 text-sm font-bold text-[#334B58] transition hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                className="flex min-h-10 items-center justify-center gap-2 rounded-sm border border-[#AEBFC7] bg-white px-3 text-sm font-bold text-[#334B58] transition hover:bg-[#F0F6F7] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
               >
-                <List size={17} aria-hidden="true" />
-                연락 이력 전체 보기
-              </button>
-              <button
-                type="button"
-                disabled={!canOpenFollowup}
-                onClick={() => onOpenFollowup(student)}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-[#AEBFC7] bg-white px-4 text-sm font-bold text-[#334B58] transition hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] disabled:cursor-not-allowed disabled:bg-[#EEF3F5] disabled:text-[#93A3AA]"
-              >
-                <Pencil size={17} aria-hidden="true" />
-                메모 작성
+                <List size={16} aria-hidden="true" />
+                이력
               </button>
             </div>
-          </section>
+          </div>
         </div>
       )}
     </section>
   );
 }
 
-function AttendancePanelRow({
+function PanelBlock({
+  title,
+  action,
+  children,
+}: {
+  title: string;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="border-b border-[#C9D7DC] bg-[#F7FBFB]">
+      <div className="flex min-h-10 items-center justify-between gap-2 border-b border-[#DCE6EA] bg-[#F0F6F7] px-4">
+        <h4 className="text-[12px] font-black uppercase tracking-[0.14em] text-[#334B58]">
+          {title}
+        </h4>
+        {action}
+      </div>
+      <div>{children}</div>
+    </section>
+  );
+}
+
+function PanelDataRow({
+  icon,
   label,
-  value,
   children,
   mono = false,
 }: {
+  icon: ReactNode;
   label: string;
-  value?: string;
-  children?: ReactNode;
+  children: ReactNode;
   mono?: boolean;
 }) {
   return (
-    <div className="grid min-h-10 grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 px-4 py-2.5">
-      <span className="text-xs font-semibold text-[var(--clinic-muted)]">{label}</span>
-      <span className={`min-w-0 truncate text-sm font-semibold text-[var(--clinic-text)] ${mono ? "tabular-nums" : ""}`}>
-        {children ?? value}
+    <div className="grid min-h-11 grid-cols-[1.25rem_5rem_minmax(0,1fr)] items-center gap-2 border-b border-[#E0E9EC] px-4 py-2 last:border-b-0">
+      <span className="text-[#78909A]" aria-hidden="true">
+        {icon}
+      </span>
+      <span className="text-xs font-bold text-[#60717B]">{label}</span>
+      <span className={`min-w-0 truncate text-sm font-bold text-[#17232B] ${mono ? "tabular-nums" : ""}`}>
+        {children}
       </span>
     </div>
   );
