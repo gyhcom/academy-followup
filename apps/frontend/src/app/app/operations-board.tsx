@@ -1072,7 +1072,7 @@ function MessageModeTabs({
   onChange: (mode: "individual" | "bulk") => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-2 rounded-lg border border-[#DED8CE] bg-white p-1 shadow-sm">
+    <div className="grid grid-cols-2 gap-1 rounded-md border border-[#C2D1D8] bg-white p-1 shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
       {[
         { id: "individual" as const, label: "개별 연락", detail: "학생별 문자" },
         { id: "bulk" as const, label: "전체문자", detail: "중복 번호 제외" },
@@ -1086,14 +1086,14 @@ function MessageModeTabs({
             aria-pressed={isActive}
             onClick={() => onChange(item.id)}
             className={[
-              "min-h-12 rounded-md px-3 text-left transition",
+              "min-h-11 rounded-sm border-l-[3px] px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
               isActive
-                ? "bg-[#111827] text-white"
-                : "bg-white text-stone-700 hover:bg-[#F7F5F0]",
+                ? "border-l-[#007A7C] bg-[#F0FAF9] text-[#17232B]"
+                : "border-l-transparent bg-white text-[#405763] hover:bg-[#F8FBFC]",
             ].join(" ")}
           >
-            <span className="block text-sm font-semibold">{item.label}</span>
-            <span className={["mt-0.5 block text-xs", isActive ? "text-white/70" : "text-stone-500"].join(" ")}>
+            <span className="block text-sm font-bold">{item.label}</span>
+            <span className={["mt-0.5 block text-xs", isActive ? "text-[#007A7C]" : "text-[#60717B]"].join(" ")}>
               {item.detail}
             </span>
           </button>
@@ -1431,18 +1431,18 @@ function MessageComposer({
       id={composerId}
       aria-labelledby={`${composerId}-title`}
       className={[
-        "rounded-lg border border-stone-200 bg-white lg:sticky lg:top-5",
+        "border-[#D5E0E4] bg-[#F8FBFC] lg:sticky lg:top-4 lg:h-[calc(100vh-9rem)] lg:overflow-y-auto lg:border-l",
         className,
       ].join(" ")}
     >
-      <div className="border-b border-stone-200 px-4 py-3">
+      <div className="border-b border-[#D5E0E4] bg-white px-4 py-4">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[#315C7C]" size={18} />
-          <h2 id={`${composerId}-title`} className="text-sm font-semibold text-stone-950">
+          <MessageSquareText className="text-[#007A7C]" size={18} aria-hidden="true" />
+          <h2 id={`${composerId}-title`} className="text-base font-bold text-[#17232B]">
             문자 초안
           </h2>
           {isPreviewReady ? (
-            <span className="ml-auto rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-2 py-0.5 text-xs font-medium text-[#315C7C]">
+            <span className="ml-auto rounded-sm border border-[#BFD4D6] bg-[#F0FAF9] px-2 py-0.5 text-xs font-bold text-[#007A7C]">
               수정 가능
             </span>
           ) : null}
@@ -1452,28 +1452,28 @@ function MessageComposer({
               aria-label="문자 작성 닫기"
               title="닫기"
               onClick={onClose}
-              className="ml-1 flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+              className="ml-1 flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#D5E0E4] bg-white text-[#60717B]"
             >
-              <X size={16} />
+              <X size={16} aria-hidden="true" />
             </button>
           ) : null}
         </div>
-        <p className="mt-1 text-xs text-stone-500">
+        <p className="mt-1 text-xs text-[#60717B]">
           {selectedStudent
             ? `현재 선택: ${selectedStudent.name} · ${followupReasons.find((reason) => reason.id === selectedReason)?.label ?? selectedReason}`
             : "학생을 선택하면 문자 초안이 표시됩니다."}
         </p>
       </div>
 
-      <div className="space-y-4 p-4">
+      <div className="space-y-3 p-3">
         {selectedStudent ? (
-          <div className="-mx-4 border-y border-stone-100">
-            <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
-              <p className="text-xs font-medium text-stone-500">선택 학생</p>
-              <p className="mt-1 truncate text-base font-semibold text-stone-950">
+          <div className="overflow-hidden rounded-md border border-[#D5E0E4] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
+            <div className="border-l-4 border-l-[#007A7C] bg-[#F0FAF9] px-4 py-3">
+              <p className="text-xs font-bold text-[#60717B]">선택 학생</p>
+              <p className="mt-1 truncate text-lg font-bold tracking-[-0.01em] text-[#17232B]">
                 {selectedStudent.name}
               </p>
-              <p className="mt-1 truncate text-xs text-stone-500">
+              <p className="mt-1 truncate text-xs text-[#60717B]">
                 {selectedStudent.parentName ?? "학부모"} · {selectedStudent.maskedParentPhone}
               </p>
             </div>
@@ -1496,8 +1496,8 @@ function MessageComposer({
           </div>
         ) : null}
 
-        <fieldset>
-          <legend className="text-sm font-semibold text-stone-800">사유</legend>
+        <fieldset className="rounded-md border border-[#D5E0E4] bg-white p-3">
+          <legend className="px-1 text-sm font-bold text-[#17232B]">사유</legend>
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
             {followupReasons.map((reason) => {
               const isSelected = reason.id === selectedReason;
@@ -1508,10 +1508,10 @@ function MessageComposer({
                   aria-pressed={isSelected}
                   onClick={() => onReasonChange(reason.id)}
                   className={[
-                    "min-h-10 shrink-0 rounded-md border px-3 text-sm font-medium transition",
+                    "min-h-9 shrink-0 rounded-sm border px-3 text-sm font-bold transition",
                     isSelected
-                      ? "border-[#315C7C] bg-[#315C7C] text-white"
-                      : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
+                      ? "border-[#007A7C] bg-[#007A7C] text-white"
+                      : "border-[#D5E0E4] bg-white text-[#405763] hover:border-[#BFD4D6] hover:bg-[#F0FAF9]",
                   ].join(" ")}
                 >
                   {reason.label}
@@ -1521,8 +1521,8 @@ function MessageComposer({
           </div>
         </fieldset>
 
-        <fieldset>
-          <legend className="text-sm font-semibold text-stone-800">수신자</legend>
+        <fieldset className="rounded-md border border-[#D5E0E4] bg-white p-3">
+          <legend className="px-1 text-sm font-bold text-[#17232B]">수신자</legend>
           <div className="mt-2 grid grid-cols-3 gap-2">
             {messageRecipientTypes.map((recipientType) => {
               const needsStudentPhone = recipientType !== "parent";
@@ -1538,10 +1538,10 @@ function MessageComposer({
                   aria-pressed={isSelected}
                   onClick={() => onRecipientTypeChange(recipientType)}
                   className={[
-                    "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                    "min-h-9 rounded-sm border px-2 text-xs font-bold transition",
                     isSelected
-                      ? "border-[#315C7C] bg-[#315C7C] text-white"
-                      : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
+                      ? "border-[#007A7C] bg-[#007A7C] text-white"
+                      : "border-[#D5E0E4] bg-white text-[#405763] hover:border-[#BFD4D6] hover:bg-[#F0FAF9]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
                 >
@@ -1550,16 +1550,16 @@ function MessageComposer({
               );
             })}
           </div>
-          <p className="mt-2 text-xs leading-5 text-stone-500">
+          <p className="mt-2 text-xs leading-5 text-[#60717B]">
             학생 연락처: {selectedStudent?.maskedStudentPhone ?? "미등록"}
           </p>
         </fieldset>
 
-        <div>
+        <div className="rounded-md border border-[#D5E0E4] bg-white p-3">
           <div className="flex items-center justify-between gap-2">
             <label
               htmlFor={`${composerId}-message-body`}
-              className="truncate text-sm font-semibold text-stone-800"
+              className="truncate text-sm font-bold text-[#17232B]"
             >
               {isPreviewReady ? messagePreview.title : "문자 미리보기"}
             </label>
@@ -1569,9 +1569,9 @@ function MessageComposer({
               title="원문으로 되돌리기"
               disabled={!isDraftEdited}
               onClick={onRestorePreview}
-              className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600 transition hover:border-stone-300 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#D5E0E4] bg-white text-[#60717B] transition hover:border-[#BFD4D6] hover:bg-[#F0FAF9] disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <RotateCcw size={15} />
+              <RotateCcw size={15} aria-hidden="true" />
             </button>
           </div>
           <textarea
@@ -1586,7 +1586,7 @@ function MessageComposer({
                 : "학생과 사유를 선택하면 문자 초안이 표시됩니다."
             }
             rows={8}
-            className="mt-2 min-h-36 w-full resize-none rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 text-stone-800 outline-none transition disabled:bg-stone-50 disabled:text-stone-500 focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8] sm:min-h-44"
+            className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#C6D4DA] bg-white px-3 py-3 text-sm leading-6 text-[#334B58] outline-none transition disabled:bg-[#F5F8F9] disabled:text-[#78909A] focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB] sm:min-h-44"
           />
           <p
             className={[
@@ -1595,7 +1595,7 @@ function MessageComposer({
                 ? "text-red-700"
                 : messageMetrics.transportType === "lms"
                   ? "text-amber-700"
-                  : "text-stone-500",
+                : "text-[#60717B]",
             ].join(" ")}
           >
             {messageMetrics.charCount}자 · {messageMetrics.byteCount}byte ·{" "}
@@ -1615,14 +1615,14 @@ function MessageComposer({
             "rounded-md border p-3 text-sm leading-6",
             isPreviewError
               ? "border-red-200 bg-red-50 text-red-900"
-              : "border-stone-200 bg-stone-50 text-stone-700",
+              : "border-[#D5E0E4] bg-white text-[#405763]",
           ].join(" ")}
         >
           <div className="flex items-start gap-2">
             {isPreviewReady && !isPreviewError ? (
-              <CheckCircle2 className="mt-0.5 shrink-0 text-[#315C7C]" size={17} />
+              <CheckCircle2 className="mt-0.5 shrink-0 text-[#007A7C]" size={17} aria-hidden="true" />
             ) : (
-              <AlertCircle className="mt-0.5 shrink-0" size={17} />
+              <AlertCircle className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
             )}
             <p>
               {isPreviewLoading
@@ -1673,13 +1673,13 @@ function MessageComposer({
           disabled={!canSaveFollowup}
           onClick={onSaveFollowup}
           className={[
-            "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-bold transition",
             canSaveFollowup
-              ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
-              : "bg-stone-300 text-stone-600",
+              ? "bg-[#007A7C] text-white hover:bg-[#006266]"
+              : "bg-[#DCE6EA] text-[#78909A]",
           ].join(" ")}
         >
-          <Send size={17} />
+          <Send size={17} aria-hidden="true" />
           {isFollowupSaving
             ? "저장 중"
             : isFollowupSaved
@@ -1703,13 +1703,13 @@ function MessageComposer({
               disabled={!canSendMessage}
               onClick={onSendMessage}
               className={[
-                "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+                "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-bold transition",
                 canSendMessage
-                  ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
-                  : "bg-[#C9D6E2] text-[#244B67]",
+                  ? "bg-[#007A7C] text-white hover:bg-[#006266]"
+                  : "bg-[#DCE6EA] text-[#78909A]",
               ].join(" ")}
             >
-              <Send size={17} />
+              <Send size={17} aria-hidden="true" />
               {isMessageSending
                 ? "발송 처리 중"
                 : isMessageSent
@@ -1777,7 +1777,7 @@ function MessageComposer({
                       : "bg-[#C9D6E2] text-[#244B67]",
                   ].join(" ")}
                 >
-                  <CalendarDays size={16} />
+                  <CalendarDays size={16} aria-hidden="true" />
                   {makeupScheduleSave.status === "saving"
                     ? "등록 중"
                     : makeupScheduleSave.status === "saved"

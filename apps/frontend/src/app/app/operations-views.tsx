@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, MessageCircle, UsersRound } from "lucide-react";
 import type { FollowupReason } from "@/lib/followup-templates";
 import type { FollowupHistoryState } from "@/app/app/operations-history";
 import { StudentFollowupHistory } from "@/app/app/operations-history";
@@ -52,8 +52,8 @@ export function OperationsDesktopView(props: OperationsViewProps) {
         totalStudents={props.totalStudents}
       />
 
-      <section className="grid min-w-0 gap-3 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start xl:grid-cols-[18rem_minmax(0,1fr)_23rem] 2xl:grid-cols-[20rem_minmax(0,1fr)_25rem]">
-        <aside className="min-w-0 space-y-3">
+      <section className="grid min-w-0 overflow-hidden rounded-md border border-[#C2D1D8] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)] lg:grid-cols-[17rem_minmax(0,1fr)_19.5rem] xl:grid-cols-[18rem_minmax(0,1fr)_21rem] 2xl:grid-cols-[19rem_minmax(0,1fr)_22rem]">
+        <aside className="min-w-0 border-r border-[#D5E0E4] bg-[#F8FBFC]">
           <ClassPicker
             classes={props.classes}
             selectedClass={props.selectedClass}
@@ -68,15 +68,17 @@ export function OperationsDesktopView(props: OperationsViewProps) {
           />
         </aside>
 
-        <ScheduleAndHistoryPanel
-          selectedClassName={props.selectedClass?.name}
-          selectedStudent={props.selectedStudent}
-          selectedMakeupCandidate={props.selectedMakeupCandidate}
-          visibleFollowupHistory={props.visibleFollowupHistory}
-          onDateMakeupCandidateSelect={props.onDateMakeupCandidateSelect}
-          onMakeupCandidateSelect={props.onMakeupCandidateSelect}
-          className="min-w-0"
-        />
+        <section className="min-w-0 bg-white p-4">
+          <ScheduleAndHistoryPanel
+            selectedClassName={props.selectedClass?.name}
+            selectedStudent={props.selectedStudent}
+            selectedMakeupCandidate={props.selectedMakeupCandidate}
+            visibleFollowupHistory={props.visibleFollowupHistory}
+            onDateMakeupCandidateSelect={props.onDateMakeupCandidateSelect}
+            onMakeupCandidateSelect={props.onMakeupCandidateSelect}
+            className="min-w-0"
+          />
+        </section>
 
         {props.desktopComposer}
       </section>
@@ -154,14 +156,14 @@ function OperationsHeader({
   totalStudents: number;
 }) {
   return (
-    <section className="mb-3 rounded-md border border-[#C2D1D8] bg-white px-4 py-3.5 shadow-[0_1px_2px_rgba(13,38,48,0.08)] sm:mb-4">
+    <section className="mb-3 rounded-md border border-[#C2D1D8] bg-white px-4 py-3 shadow-[0_1px_2px_rgba(13,38,48,0.08)] sm:mb-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">{academyName}</p>
-          <h2 className="mt-1 text-2xl font-bold leading-tight text-[var(--clinic-text)]">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#007A7C]">{academyName}</p>
+          <h2 className="mt-1 text-2xl font-bold leading-tight tracking-[-0.02em] text-[#17232B]">
             수업 후 연락
           </h2>
-          <p className="mt-1 max-w-2xl text-sm leading-5 text-[var(--clinic-muted)]">
+          <p className="mt-1 max-w-2xl text-sm leading-5 text-[#60717B]">
             반과 학생을 선택하면 학부모 문자 초안이 준비됩니다.
           </p>
         </div>
@@ -185,16 +187,19 @@ function ClassPicker({
   onClassSelect: (classId: string) => void;
 }) {
   return (
-    <section aria-label="반 선택" className="space-y-2">
+    <section aria-label="반 선택" className="border-b border-[#D5E0E4] bg-white px-3 py-3">
       <div className="flex items-center justify-between gap-2 px-1">
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--clinic-muted)]">반 선택</p>
+        <p className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.12em] text-[#60717B]">
+          <UsersRound size={14} aria-hidden="true" />
+          반 선택
+        </p>
         {selectedClass ? (
-          <p className="truncate text-xs font-semibold text-[var(--clinic-muted)]">
+          <p className="truncate text-xs font-semibold text-[#60717B]">
             {selectedClass.name} · {selectedClass.students.length}명
           </p>
         ) : null}
       </div>
-      <div className="max-h-[14rem] divide-y divide-[#E1EAEE] overflow-y-auto rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+      <div className="mt-2 max-h-[12rem] divide-y divide-[#E1EAEE] overflow-y-auto rounded-md border border-[#C7D6DD] bg-white">
         {classes.map((classItem) => {
           const isSelected = classItem.id === selectedClass?.id;
           return (
@@ -206,15 +211,15 @@ function ClassPicker({
               className={[
                 "min-h-11 w-full border-l-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
                 isSelected
-                  ? "border-l-[var(--clinic-primary)] bg-[#EAF6F5] text-[var(--clinic-text)]"
-                  : "border-l-transparent bg-white text-[var(--clinic-text)] hover:border-l-[#B8C9D0] hover:bg-[#F5FAFA]",
+                  ? "border-l-[#007A7C] bg-[#F0FAF9] text-[#17232B]"
+                  : "border-l-transparent bg-white text-[#17232B] hover:border-l-[#B8C9D0] hover:bg-[#F5FAFA]",
               ].join(" ")}
             >
               <span className="block text-sm font-bold">{classItem.name}</span>
               <span
                 className={[
                   "mt-0.5 block text-xs",
-                  isSelected ? "text-[var(--clinic-primary)]" : "text-[var(--clinic-muted)]",
+                isSelected ? "text-[#007A7C]" : "text-[#60717B]",
                 ].join(" ")}
               >
                 {classItem.subject ?? "과목 미지정"} · {classItem.students.length}명
@@ -241,22 +246,23 @@ function StudentSelectionList({
   onStudentReasonSelect: (studentId: string, reasonId: FollowupReason) => void;
 }) {
   return (
-    <section aria-labelledby="student-flow-title" className="min-w-0 space-y-2 lg:order-1">
-      <div className="flex items-end justify-between gap-3 px-1">
+    <section aria-labelledby="student-flow-title" className="min-w-0 lg:order-1">
+      <div className="flex items-end justify-between gap-3 border-b border-[#D5E0E4] bg-white px-4 py-3">
         <div>
-          <h2 id="student-flow-title" className="text-sm font-bold text-[var(--clinic-text)]">
+          <h2 id="student-flow-title" className="inline-flex items-center gap-2 text-sm font-bold text-[#17232B]">
+            <MessageCircle size={15} className="text-[#007A7C]" aria-hidden="true" />
             학생 확인 목록
           </h2>
-          <p className="mt-1 text-xs text-[var(--clinic-muted)]">
+          <p className="mt-1 text-xs text-[#60717B]">
             학생을 확인하고 필요한 연락 사유를 바로 선택합니다.
           </p>
         </div>
-        <span className="shrink-0 text-xs font-bold text-[var(--clinic-muted)]">
+        <span className="shrink-0 rounded-sm border border-[#D5E0E4] bg-[#F5F9FA] px-2 py-1 text-xs font-bold text-[#60717B]">
           {selectedClass?.students.length ?? 0}명
         </span>
       </div>
 
-      <div className="max-h-[min(42rem,calc(100vh-18rem))] overflow-y-auto rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+      <div className="max-h-[min(42rem,calc(100vh-22rem))] overflow-y-auto bg-white">
         {selectedClass?.students.length ? (
           selectedClass.students.map((student) => {
             const isSelected = student.id === selectedStudent?.id;
@@ -265,38 +271,38 @@ function StudentSelectionList({
               <article
                 key={student.id}
                 className={[
-                  "border-b border-stone-100 border-l-4 px-2.5 py-2.5 last:border-b-0",
-                  isSelected ? "border-l-[#315C7C] bg-[#F3F8FC]" : "border-l-transparent bg-white",
+                  "border-b border-[#E3EAED] border-l-4 px-3 py-2.5 last:border-b-0",
+                  isSelected ? "border-l-[#007A7C] bg-[#EEF8F7]" : "border-l-transparent bg-white hover:bg-[#F8FBFC]",
                 ].join(" ")}
               >
                 <div className="grid gap-2">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <p className="text-sm font-semibold text-stone-950">
+                        <p className="text-sm font-bold text-[#17232B]">
                           {student.name}
                         </p>
                         {isSelected ? (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#315C7C] px-2 py-0.5 text-xs font-semibold text-white">
-                            <CheckCircle2 size={12} />
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-sm bg-[#007A7C] px-2 py-0.5 text-xs font-bold text-white">
+                            <CheckCircle2 size={12} aria-hidden="true" />
                             선택됨
                           </span>
                         ) : null}
                       </div>
-                      <p className="mt-1 truncate text-xs text-stone-500">
+                      <p className="mt-1 truncate text-xs text-[#60717B]">
                         {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
                           "학년 정보 없음"}
                       </p>
-                      <p className="mt-1 truncate text-xs text-stone-500">
+                      <p className="mt-1 truncate text-xs text-[#60717B]">
                         {student.parentName ?? "학부모"} · {student.maskedParentPhone}
                       </p>
                     </div>
                     <span
                       className={[
-                        "shrink-0 rounded-md px-2 py-1 text-xs font-semibold",
+                        "shrink-0 rounded-sm border px-2 py-1 text-xs font-bold",
                         primarySchedule
-                          ? "bg-blue-50 text-blue-800"
-                          : "bg-stone-100 text-stone-500",
+                          ? "border-[#BFD4D6] bg-[#EAF6F5] text-[#007A7C]"
+                          : "border-[#D5E0E4] bg-[#F5F9FA] text-[#60717B]",
                       ].join(" ")}
                     >
                       {primarySchedule
@@ -319,14 +325,14 @@ function StudentSelectionList({
                     type="button"
                     onClick={() => onStudentSelect(student.id)}
                     className={[
-                      "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+                      "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                       isSelected
-                        ? "border-[#315C7C] bg-white text-[#315C7C]"
-                        : "border-[#C9D6E2] bg-white text-[#315C7C] hover:bg-[#EAF1F8]",
+                        ? "border-[#007A7C] bg-white text-[#007A7C]"
+                        : "border-[#C9D6E2] bg-white text-[#334B58] hover:bg-[#F0FAF9]",
                     ].join(" ")}
                   >
                     문자 작성
-                    <ArrowRight size={13} />
+                    <ArrowRight size={13} aria-hidden="true" />
                   </button>
                   {quickReasonIds.map((reasonId) => {
                     const isReasonSelected = isSelected && selectedReason === reasonId;
@@ -337,10 +343,10 @@ function StudentSelectionList({
                         aria-pressed={isReasonSelected}
                         onClick={() => onStudentReasonSelect(student.id, reasonId)}
                         className={[
-                          "min-h-8 shrink-0 rounded-md border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+                          "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                           isReasonSelected
-                            ? "border-[#315C7C] bg-[#315C7C] text-white"
-                            : "border-stone-200 bg-stone-50 text-stone-700 hover:border-[#C9D6E2] hover:bg-[#EAF1F8]",
+                            ? "border-[#007A7C] bg-[#007A7C] text-white"
+                            : "border-[#D5E0E4] bg-[#F8FBFC] text-[#405763] hover:border-[#BFD4D6] hover:bg-[#F0FAF9]",
                         ].join(" ")}
                       >
                         {reasonLabel(reasonId)}
