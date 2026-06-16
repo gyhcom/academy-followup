@@ -1534,16 +1534,16 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
     : [];
 
   return (
-    <div className="grid gap-4">
-      <div className="rounded-lg border border-[#E6E0D5] bg-white p-3">
+    <div className="border border-[#B8C9D0] bg-[#F4F8F9]">
+      <div className="border-b border-[#B8C9D0] bg-[#E7EEF1] px-3 py-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-stone-950">조회 기간</p>
-            <p className="mt-1 text-xs leading-5 text-stone-500">
+            <p className="text-sm font-black text-[var(--clinic-text)]">조회 기간</p>
+            <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
               파일럿 기간 동안 남은 출석, 문자, 변경 기록을 요약합니다.
             </p>
           </div>
-          <div className="grid grid-cols-3 gap-1 rounded-md bg-[#F7F5F0] p-1">
+          <div className="grid grid-cols-3 border border-[#B8C9D0] bg-[#F4F8F9]">
             {[
               ["today", "오늘"],
               ["7d", "7일"],
@@ -1555,10 +1555,10 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
                 aria-pressed={range === rangeValue}
                 onClick={() => setRange(rangeValue as ReportRange)}
                 className={[
-                  "min-h-9 rounded px-3 text-xs font-semibold transition",
+                  "min-h-9 border-r border-[#B8C9D0] px-3 text-xs font-black transition last:border-r-0",
                   range === rangeValue
-                    ? "bg-white text-[#315C7C] shadow-sm"
-                    : "text-stone-600 hover:bg-white/70",
+                    ? "bg-[var(--clinic-primary)] text-white"
+                    : "text-[var(--clinic-muted)] hover:bg-[#E1F0EF]",
                 ].join(" ")}
               >
                 {label}
@@ -1569,45 +1569,53 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
       </div>
 
       {status.status === "error" ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+        <p className="m-3 border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
           {status.message}
         </p>
       ) : null}
 
       {summary ? (
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="divide-y divide-[#C9D7DC] border-b border-[#B8C9D0]">
           {reportCards.map((card) => (
-            <article
+            <div
               key={card.title}
-              className="rounded-lg border border-[#E6E0D5] bg-white px-3 py-3"
+              className="grid grid-cols-[minmax(0,1fr)_120px] items-center gap-3 bg-[#F7FAFA] px-3 py-3"
             >
-              <p className="text-xs font-semibold text-[#315C7C]">{card.title}</p>
-              <p className="mt-2 text-2xl font-semibold text-stone-950">{card.value}</p>
-              <p className="mt-2 text-xs leading-5 text-stone-500">{card.detail}</p>
-            </article>
+              <span className="min-w-0">
+                <span className="block text-sm font-black text-[var(--clinic-text)]">
+                  {card.title}
+                </span>
+                <span className="mt-1 block truncate text-xs font-medium text-[var(--clinic-muted)]">
+                  {card.detail}
+                </span>
+              </span>
+              <span className="text-right text-xl font-black tabular-nums text-[#0B4150]">
+                {card.value}
+              </span>
+            </div>
           ))}
         </div>
       ) : (
-        <div className="rounded-lg border border-[#E6E0D5] bg-white px-3 py-4 text-sm leading-6 text-stone-600">
+        <div className="border-b border-[#B8C9D0] bg-[#F7FAFA] px-3 py-4 text-sm leading-6 text-[var(--clinic-muted)]">
           {status.status === "saving"
             ? "운영 리포트를 불러오는 중입니다."
             : "조회할 리포트가 없습니다. 출석 체크나 문자 기록이 쌓이면 이곳에 요약이 표시됩니다."}
         </div>
       )}
 
-      <div className="rounded-lg border border-[#E6E0D5] bg-white p-3">
-        <div className="flex items-start justify-between gap-3">
+      <div className="bg-[#F4F8F9]">
+        <div className="flex items-start justify-between gap-3 border-b border-[#B8C9D0] px-3 py-3">
           <div>
-            <p className="text-sm font-semibold text-stone-950">CSV 내보내기</p>
-            <p className="mt-1 text-xs leading-5 text-stone-500">
+            <p className="text-sm font-black text-[var(--clinic-text)]">CSV 내보내기</p>
+            <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
               기본은 전화번호 마스킹입니다. 원장 보관용이 필요할 때만 원문 포함을 켭니다.
             </p>
           </div>
           <label
-            className={`flex shrink-0 items-center gap-2 rounded-md border px-2.5 py-2 text-xs font-semibold ${
+            className={`flex shrink-0 items-center gap-2 border px-2.5 py-2 text-xs font-bold ${
               includePrivate
                 ? "border-amber-300 bg-amber-50 text-amber-800"
-                : "border-[#E6E0D5] text-stone-700"
+                : "border-[#B8C9D0] bg-[#F7FAFA] text-[var(--clinic-text)]"
             }`}
           >
             <input
@@ -1620,7 +1628,7 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
           </label>
         </div>
 
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <div className="divide-y divide-[#C9D7DC]">
           {[
             ["students", "학생 목록", "반, 연락처, 공유 동의"],
             ["attendance", "출석 기록", "날짜, 수업, 상태"],
@@ -1632,14 +1640,14 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
               type="button"
               disabled={downloadType === type}
               onClick={() => void downloadReport(type as ReportExportType)}
-              className={`flex min-h-14 items-center justify-between gap-3 rounded-md border px-3 text-left transition disabled:cursor-wait disabled:opacity-70 ${
+              className={`flex min-h-14 w-full items-center justify-between gap-3 px-3 text-left transition disabled:cursor-wait disabled:opacity-70 ${
                 includePrivate
-                  ? "border-amber-200 bg-amber-50 hover:border-amber-300 hover:bg-amber-100/70"
-                  : "border-[#E6E0D5] bg-[#FBFAF7] hover:border-[#C9D6E2] hover:bg-[#F8FBFD]"
+                  ? "bg-amber-50 hover:bg-amber-100/70"
+                  : "bg-[#F7FAFA] hover:bg-[#E1F0EF]"
               }`}
             >
               <span className="flex min-w-0 items-center gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-white text-[#315C7C]">
+                <span className="flex size-8 shrink-0 items-center justify-center border border-[#B8D7D8] bg-[#E1F0EF] text-[#007A7C]">
                   <FileText size={17} />
                 </span>
                 <span className="min-w-0">
@@ -1651,13 +1659,13 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
                   </span>
                 </span>
               </span>
-              <Download size={16} className="shrink-0 text-stone-500" />
+              <Download size={16} className="shrink-0 text-[var(--clinic-muted)]" />
             </button>
           ))}
         </div>
 
         {status.status === "saved" ? (
-          <p className="mt-3 rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-3 py-2 text-sm text-[#244B67]">
+          <p className="m-3 border border-[#B8D7D8] bg-[#E1F0EF] px-3 py-2 text-sm text-[#244B67]">
             {status.message}
           </p>
         ) : null}
