@@ -52,8 +52,8 @@ export function OperationsDesktopView(props: OperationsViewProps) {
         totalStudents={props.totalStudents}
       />
 
-      <section className="grid min-w-0 overflow-hidden rounded-md border border-[#C2D1D8] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)] lg:grid-cols-[17rem_minmax(0,1fr)_19.5rem] xl:grid-cols-[18rem_minmax(0,1fr)_21rem] 2xl:grid-cols-[19rem_minmax(0,1fr)_22rem]">
-        <aside className="min-w-0 border-r border-[#D5E0E4] bg-[#F8FBFC]">
+      <section className="grid min-w-0 overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9] lg:grid-cols-[17rem_minmax(0,1fr)_19.5rem] xl:grid-cols-[18rem_minmax(0,1fr)_21rem] 2xl:grid-cols-[19rem_minmax(0,1fr)_22rem]">
+        <aside className="min-w-0 border-r border-[#B8C9D0] bg-[#EDF3F5]">
           <ClassPicker
             classes={props.classes}
             selectedClass={props.selectedClass}
@@ -68,7 +68,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
           />
         </aside>
 
-        <section className="min-w-0 bg-white p-4">
+        <section className="min-w-0 bg-[#F4F8F9] p-4">
           <ScheduleAndHistoryPanel
             selectedClassName={props.selectedClass?.name}
             selectedStudent={props.selectedStudent}
@@ -156,7 +156,7 @@ function OperationsHeader({
   totalStudents: number;
 }) {
   return (
-    <section className="mb-3 rounded-md border border-[#C2D1D8] bg-white px-4 py-3 shadow-[0_1px_2px_rgba(13,38,48,0.08)] sm:mb-4">
+    <section className="mb-3 border border-[#B8C9D0] bg-[#F4F8F9] px-4 py-3 sm:mb-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#007A7C]">{academyName}</p>
@@ -187,7 +187,7 @@ function ClassPicker({
   onClassSelect: (classId: string) => void;
 }) {
   return (
-    <section aria-label="반 선택" className="border-b border-[#D5E0E4] bg-white px-3 py-3">
+    <section aria-label="반 선택" className="border-b border-[#B8C9D0] bg-[#EDF3F5] px-3 py-3">
       <div className="flex items-center justify-between gap-2 px-1">
         <p className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.12em] text-[#60717B]">
           <UsersRound size={14} aria-hidden="true" />
@@ -199,7 +199,7 @@ function ClassPicker({
           </p>
         ) : null}
       </div>
-      <div className="mt-2 max-h-[12rem] divide-y divide-[#E1EAEE] overflow-y-auto rounded-md border border-[#C7D6DD] bg-white">
+      <div className="mt-2 max-h-[12rem] divide-y divide-[#D6E1E5] overflow-y-auto border border-[#B8C9D0] bg-[#F4F8F9]">
         {classes.map((classItem) => {
           const isSelected = classItem.id === selectedClass?.id;
           return (
@@ -211,8 +211,8 @@ function ClassPicker({
               className={[
                 "min-h-11 w-full border-l-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
                 isSelected
-                  ? "border-l-[#007A7C] bg-[#F0FAF9] text-[#17232B]"
-                  : "border-l-transparent bg-white text-[#17232B] hover:border-l-[#B8C9D0] hover:bg-[#F5FAFA]",
+                  ? "border-l-[#007A7C] bg-[#E1F0EF] text-[#17232B]"
+                  : "border-l-transparent bg-[#F4F8F9] text-[#17232B] hover:border-l-[#839AA4] hover:bg-[#E7EEF1]",
               ].join(" ")}
             >
               <span className="block text-sm font-bold">{classItem.name}</span>
@@ -247,7 +247,7 @@ function StudentSelectionList({
 }) {
   return (
     <section aria-labelledby="student-flow-title" className="min-w-0 lg:order-1">
-      <div className="flex items-end justify-between gap-3 border-b border-[#D5E0E4] bg-white px-4 py-3">
+      <div className="flex items-end justify-between gap-3 border-b border-[#B8C9D0] bg-[#E7EEF1] px-4 py-3">
         <div>
           <h2 id="student-flow-title" className="inline-flex items-center gap-2 text-sm font-bold text-[#17232B]">
             <MessageCircle size={15} className="text-[#007A7C]" aria-hidden="true" />
@@ -257,12 +257,12 @@ function StudentSelectionList({
             학생을 확인하고 필요한 연락 사유를 바로 선택합니다.
           </p>
         </div>
-        <span className="shrink-0 rounded-sm border border-[#D5E0E4] bg-[#F5F9FA] px-2 py-1 text-xs font-bold text-[#60717B]">
+        <span className="shrink-0 border border-[#B8C9D0] bg-[#F4F8F9] px-2 py-1 text-xs font-bold text-[#60717B]">
           {selectedClass?.students.length ?? 0}명
         </span>
       </div>
 
-      <div className="max-h-[min(42rem,calc(100vh-22rem))] overflow-y-auto bg-white">
+      <div className="max-h-[min(42rem,calc(100vh-22rem))] overflow-y-auto bg-[#F7FAFA]">
         {selectedClass?.students.length ? (
           selectedClass.students.map((student) => {
             const isSelected = student.id === selectedStudent?.id;
@@ -272,7 +272,7 @@ function StudentSelectionList({
                 key={student.id}
                 className={[
                   "border-b border-[#E3EAED] border-l-4 px-3 py-2.5 last:border-b-0",
-                  isSelected ? "border-l-[#007A7C] bg-[#EEF8F7]" : "border-l-transparent bg-white hover:bg-[#F8FBFC]",
+                  isSelected ? "border-l-[#007A7C] bg-[#E1F0EF]" : "border-l-transparent bg-[#F7FAFA] hover:bg-[#EDF3F5]",
                 ].join(" ")}
               >
                 <div className="grid gap-2">
@@ -283,7 +283,7 @@ function StudentSelectionList({
                           {student.name}
                         </p>
                         {isSelected ? (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-sm bg-[#007A7C] px-2 py-0.5 text-xs font-bold text-white">
+                          <span className="inline-flex shrink-0 items-center gap-1 border border-[#005F62] bg-[#007A7C] px-2 py-0.5 text-xs font-bold text-white">
                             <CheckCircle2 size={12} aria-hidden="true" />
                             선택됨
                           </span>
@@ -301,8 +301,8 @@ function StudentSelectionList({
                       className={[
                         "shrink-0 rounded-sm border px-2 py-1 text-xs font-bold",
                         primarySchedule
-                          ? "border-[#BFD4D6] bg-[#EAF6F5] text-[#007A7C]"
-                          : "border-[#D5E0E4] bg-[#F5F9FA] text-[#60717B]",
+                          ? "border-[#8BC9BF] bg-[#EAF6F4] text-[#007A7C]"
+                          : "border-[#C9D7DC] bg-[#EEF4F6] text-[#60717B]",
                       ].join(" ")}
                     >
                       {primarySchedule
@@ -327,8 +327,8 @@ function StudentSelectionList({
                     className={[
                       "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                       isSelected
-                        ? "border-[#007A7C] bg-white text-[#007A7C]"
-                        : "border-[#C9D6E2] bg-white text-[#334B58] hover:bg-[#F0FAF9]",
+                        ? "border-[#007A7C] bg-[#E1F0EF] text-[#007A7C]"
+                        : "border-[#B8C9D0] bg-[#F7FAFA] text-[#334B58] hover:bg-[#EDF3F5]",
                     ].join(" ")}
                   >
                     문자 작성
@@ -345,8 +345,8 @@ function StudentSelectionList({
                         className={[
                           "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                           isReasonSelected
-                            ? "border-[#007A7C] bg-[#007A7C] text-white"
-                            : "border-[#D5E0E4] bg-[#F8FBFC] text-[#405763] hover:border-[#BFD4D6] hover:bg-[#F0FAF9]",
+                            ? "border-[#005F62] bg-[#007A7C] text-white"
+                            : "border-[#B8C9D0] bg-[#F4F8F9] text-[#405763] hover:border-[#839AA4] hover:bg-[#EDF3F5]",
                         ].join(" ")}
                       >
                         {reasonLabel(reasonId)}

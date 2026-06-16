@@ -903,7 +903,7 @@ export function OperationsBoard({
         : "파일럿 시연을 위해 먼저 반과 학생 데이터를 추가해야 합니다.";
 
     return (
-      <section className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
+        <section className="border border-[#B8C9D0] bg-[#F4F8F9] p-6">
         <div className="flex gap-3">
           <AlertCircle className="mt-0.5 text-amber-700" size={21} />
           <div>
@@ -1072,7 +1072,7 @@ function MessageModeTabs({
   onChange: (mode: "individual" | "bulk") => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-1 rounded-md border border-[#C2D1D8] bg-white p-1 shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+    <div className="grid grid-cols-2 gap-1 border border-[#B8C9D0] bg-[#E7EEF1] p-1">
       {[
         { id: "individual" as const, label: "개별 연락", detail: "학생별 문자" },
         { id: "bulk" as const, label: "전체문자", detail: "중복 번호 제외" },
@@ -1088,8 +1088,8 @@ function MessageModeTabs({
             className={[
               "min-h-11 rounded-sm border-l-[3px] px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
               isActive
-                ? "border-l-[#007A7C] bg-[#F0FAF9] text-[#17232B]"
-                : "border-l-transparent bg-white text-[#405763] hover:bg-[#F8FBFC]",
+                ? "border-l-[#007A7C] bg-[#E1F0EF] text-[#17232B]"
+                : "border-l-transparent bg-[#F7FAFA] text-[#405763] hover:bg-[#EDF3F5]",
             ].join(" ")}
           >
             <span className="block text-sm font-bold">{item.label}</span>
@@ -1151,7 +1151,7 @@ function BulkMessagePanel({
     (targetType !== "grade" || Boolean(gradeLabel));
 
   return (
-    <section className="rounded-lg border border-stone-200 bg-white shadow-sm">
+    <section className="border border-[#B8C9D0] bg-[#F4F8F9]">
       <div className="border-b border-stone-200 px-4 py-4">
         <p className="text-sm font-semibold text-[#315C7C]">전체문자</p>
         <h2 className="mt-1 text-xl font-semibold text-stone-950">
@@ -1181,7 +1181,7 @@ function BulkMessagePanel({
                     "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
                     targetType === item.id
                       ? "border-[#315C7C] bg-[#315C7C] text-white"
-                      : "border-stone-200 bg-white text-stone-700 hover:bg-[#F7F5F0]",
+                      : "border-[#B8C9D0] bg-[#F7FAFA] text-stone-700 hover:bg-[#EDF3F5]",
                   ].join(" ")}
                 >
                   {item.label}
@@ -1196,7 +1196,7 @@ function BulkMessagePanel({
               <select
                 value={classId}
                 onChange={(event) => onClassIdChange(event.target.value)}
-                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+                className="min-h-11 border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB]"
               >
                 {classes.map((classItem) => (
                   <option key={classItem.id} value={classItem.id}>
@@ -1213,7 +1213,7 @@ function BulkMessagePanel({
               <select
                 value={gradeLabel}
                 onChange={(event) => onGradeLabelChange(event.target.value)}
-                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+                className="min-h-11 border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB]"
               >
                 <option value="">학년 선택</option>
                 {gradeOptions.map((grade) => (
@@ -1238,7 +1238,7 @@ function BulkMessagePanel({
                     "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
                     recipientType === nextType
                       ? "border-[#315C7C] bg-[#315C7C] text-white"
-                      : "border-stone-200 bg-white text-stone-700 hover:bg-[#F7F5F0]",
+                      : "border-[#B8C9D0] bg-[#F7FAFA] text-stone-700 hover:bg-[#EDF3F5]",
                   ].join(" ")}
                 >
                   {messageRecipientLabels[nextType]}
@@ -1247,7 +1247,7 @@ function BulkMessagePanel({
             </div>
           </fieldset>
 
-          <label className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
+          <label className="flex items-start gap-3 border border-amber-300 bg-[#FFF7E8] p-3 text-sm text-amber-950">
             <input
               type="checkbox"
               checked={excludeDuplicates}
@@ -1270,7 +1270,7 @@ function BulkMessagePanel({
               value={messageBody}
               onChange={(event) => onMessageBodyChange(event.target.value)}
               rows={9}
-              className="min-h-52 rounded-md border border-stone-300 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-52 border border-[#B8C9D0] bg-[#F7FAFA] px-3 py-3 text-sm leading-6 outline-none focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB]"
             />
           </label>
           <p
@@ -1291,7 +1291,7 @@ function BulkMessagePanel({
                 : "SMS 예상"}
           </p>
 
-          <div className="rounded-lg border border-[#C9D6E2] bg-[#F8FBFD] p-3 text-sm text-[#244B67]">
+          <div className="border border-[#B8C9D0] bg-[#EAF1F3] p-3 text-sm text-[#244B67]">
             <div className="flex items-center justify-between gap-3">
               <p className="font-semibold text-[#1F3F58]">발송 전 확인</p>
               {previewState.status === "loading" ? (
@@ -1314,7 +1314,7 @@ function BulkMessagePanel({
           </div>
 
           {state.status === "sent" ? (
-            <div className="rounded-md border border-[#C9D6E2] bg-[#EAF1F8] p-3 text-sm leading-6 text-[#244B67]">
+            <div className="border border-[#B8C9D0] bg-[#EAF1F3] p-3 text-sm leading-6 text-[#244B67]">
               <p className="font-semibold">{state.message}</p>
               <p className="mt-1">
                 대상 {state.targetStudentCount}명 · 발송 후보 {state.candidateRecipientCount}건 · 실제 발송 {state.recipientCount}건 · 중복 제외 {state.duplicateExcludedCount}건
@@ -1323,7 +1323,7 @@ function BulkMessagePanel({
           ) : null}
 
           {state.status === "error" ? (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm leading-6 text-red-900">
+            <div className="border border-red-300 bg-[#FFF1F0] p-3 text-sm leading-6 text-red-900">
               {state.error}
             </div>
           ) : null}
@@ -1435,14 +1435,14 @@ function MessageComposer({
         className,
       ].join(" ")}
     >
-      <div className="border-b border-[#D5E0E4] bg-white px-4 py-4">
+      <div className="border-b border-[#B8C9D0] bg-[#073342] px-4 py-4 text-white">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[#007A7C]" size={18} aria-hidden="true" />
-          <h2 id={`${composerId}-title`} className="text-base font-bold text-[#17232B]">
+          <MessageSquareText className="text-[#7DD6D4]" size={18} aria-hidden="true" />
+          <h2 id={`${composerId}-title`} className="text-base font-bold text-white">
             문자 초안
           </h2>
           {isPreviewReady ? (
-            <span className="ml-auto rounded-sm border border-[#BFD4D6] bg-[#F0FAF9] px-2 py-0.5 text-xs font-bold text-[#007A7C]">
+            <span className="ml-auto border border-[#7DD6D4]/40 bg-white/8 px-2 py-0.5 text-xs font-bold text-[#B8F0EA]">
               수정 가능
             </span>
           ) : null}
@@ -1452,13 +1452,13 @@ function MessageComposer({
               aria-label="문자 작성 닫기"
               title="닫기"
               onClick={onClose}
-              className="ml-1 flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#D5E0E4] bg-white text-[#60717B]"
+              className="ml-1 flex size-8 shrink-0 items-center justify-center border border-white/20 bg-white/8 text-[#D7E8ED]"
             >
               <X size={16} aria-hidden="true" />
             </button>
           ) : null}
         </div>
-        <p className="mt-1 text-xs text-[#60717B]">
+        <p className="mt-1 text-xs text-[#B8D0D6]">
           {selectedStudent
             ? `현재 선택: ${selectedStudent.name} · ${followupReasons.find((reason) => reason.id === selectedReason)?.label ?? selectedReason}`
             : "학생을 선택하면 문자 초안이 표시됩니다."}
@@ -1467,8 +1467,8 @@ function MessageComposer({
 
       <div className="space-y-3 p-3">
         {selectedStudent ? (
-          <div className="overflow-hidden rounded-md border border-[#D5E0E4] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
-            <div className="border-l-4 border-l-[#007A7C] bg-[#F0FAF9] px-4 py-3">
+          <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
+            <div className="border-l-4 border-l-[#007A7C] bg-[#E1F0EF] px-4 py-3">
               <p className="text-xs font-bold text-[#60717B]">선택 학생</p>
               <p className="mt-1 truncate text-lg font-bold tracking-[-0.01em] text-[#17232B]">
                 {selectedStudent.name}
@@ -1496,7 +1496,7 @@ function MessageComposer({
           </div>
         ) : null}
 
-        <fieldset className="rounded-md border border-[#D5E0E4] bg-white p-3">
+        <fieldset className="border border-[#B8C9D0] bg-[#F7FAFA] p-3">
           <legend className="px-1 text-sm font-bold text-[#17232B]">사유</legend>
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
             {followupReasons.map((reason) => {
@@ -1511,7 +1511,7 @@ function MessageComposer({
                     "min-h-9 shrink-0 rounded-sm border px-3 text-sm font-bold transition",
                     isSelected
                       ? "border-[#007A7C] bg-[#007A7C] text-white"
-                      : "border-[#D5E0E4] bg-white text-[#405763] hover:border-[#BFD4D6] hover:bg-[#F0FAF9]",
+                      : "border-[#B8C9D0] bg-[#F7FAFA] text-[#405763] hover:border-[#839AA4] hover:bg-[#EDF3F5]",
                   ].join(" ")}
                 >
                   {reason.label}
@@ -1521,7 +1521,7 @@ function MessageComposer({
           </div>
         </fieldset>
 
-        <fieldset className="rounded-md border border-[#D5E0E4] bg-white p-3">
+        <fieldset className="border border-[#B8C9D0] bg-[#F7FAFA] p-3">
           <legend className="px-1 text-sm font-bold text-[#17232B]">수신자</legend>
           <div className="mt-2 grid grid-cols-3 gap-2">
             {messageRecipientTypes.map((recipientType) => {
@@ -1541,7 +1541,7 @@ function MessageComposer({
                     "min-h-9 rounded-sm border px-2 text-xs font-bold transition",
                     isSelected
                       ? "border-[#007A7C] bg-[#007A7C] text-white"
-                      : "border-[#D5E0E4] bg-white text-[#405763] hover:border-[#BFD4D6] hover:bg-[#F0FAF9]",
+                      : "border-[#B8C9D0] bg-[#F7FAFA] text-[#405763] hover:border-[#839AA4] hover:bg-[#EDF3F5]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
                 >
@@ -1555,7 +1555,7 @@ function MessageComposer({
           </p>
         </fieldset>
 
-        <div className="rounded-md border border-[#D5E0E4] bg-white p-3">
+        <div className="border border-[#B8C9D0] bg-[#F7FAFA] p-3">
           <div className="flex items-center justify-between gap-2">
             <label
               htmlFor={`${composerId}-message-body`}
@@ -1569,7 +1569,7 @@ function MessageComposer({
               title="원문으로 되돌리기"
               disabled={!isDraftEdited}
               onClick={onRestorePreview}
-              className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#D5E0E4] bg-white text-[#60717B] transition hover:border-[#BFD4D6] hover:bg-[#F0FAF9] disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex size-8 shrink-0 items-center justify-center border border-[#B8C9D0] bg-[#F7FAFA] text-[#60717B] transition hover:border-[#839AA4] hover:bg-[#EDF3F5] disabled:cursor-not-allowed disabled:opacity-40"
             >
               <RotateCcw size={15} aria-hidden="true" />
             </button>
@@ -1586,7 +1586,7 @@ function MessageComposer({
                 : "학생과 사유를 선택하면 문자 초안이 표시됩니다."
             }
             rows={8}
-            className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#C6D4DA] bg-white px-3 py-3 text-sm leading-6 text-[#334B58] outline-none transition disabled:bg-[#F5F8F9] disabled:text-[#78909A] focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB] sm:min-h-44"
+            className="mt-2 min-h-36 w-full resize-none border border-[#AEBFC7] bg-[#F7FAFA] px-3 py-3 text-sm leading-6 text-[#334B58] outline-none transition disabled:bg-[#EDF3F5] disabled:text-[#78909A] focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB] sm:min-h-44"
           />
           <p
             className={[
