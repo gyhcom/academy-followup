@@ -1541,7 +1541,7 @@ function AttendanceCalendarDayCell({
         ? "border-amber-200 bg-amber-50 text-amber-700"
         : "border-emerald-200 bg-emerald-50 text-emerald-700";
   const selectedClassName = isSelected
-    ? "border-[#0F766E] bg-[#E2F1EE] shadow-[inset_4px_0_0_#0F766E,0_2px_10px_rgba(15,118,110,0.10)] ring-1 ring-inset ring-[#0F766E]/45"
+    ? "border-[#0F766E] bg-[#E2F1EE] shadow-[inset_4px_0_0_#0F766E,0_1px_6px_rgba(15,118,110,0.08)] ring-1 ring-inset ring-[#0F766E]/35"
     : attentionCount > 0 && hasClass
       ? "bg-[#FFF4EF] hover:bg-[#FCEBE4]"
       : hasUnchecked && hasClass
@@ -1560,10 +1560,25 @@ function AttendanceCalendarDayCell({
           : selectedClassName,
       ].join(" ")}
     >
-      <div className="flex min-w-0 items-start justify-between gap-1.5">
+      {isSelected ? (
+        <span className="absolute right-2 top-2 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#0F766E] text-white shadow-[0_2px_6px_rgba(15,118,110,0.18)]">
+          <Check size={13} strokeWidth={3} aria-hidden="true" />
+        </span>
+      ) : null}
+      {!isSelected ? (
+        <span
+          className={[
+            "absolute right-2 top-2 max-w-[4.85rem] truncate rounded-sm border px-1.5 py-0.5 text-[10px] font-bold",
+            statusClass,
+          ].join(" ")}
+        >
+          {statusLabel}
+        </span>
+      ) : null}
+      <div className="flex min-w-0 items-start">
         <div
           className={[
-            "flex min-w-0 max-w-[calc(100%-4.75rem)] items-baseline gap-1 rounded-sm border px-1.5 py-1 sm:gap-1.5 sm:px-2",
+            "inline-flex min-w-[3.9rem] shrink-0 items-baseline gap-1 rounded-sm border px-1.5 py-1 sm:min-w-[4.25rem] sm:gap-1.5 sm:px-2",
             isSelected
               ? "border-[#9FCFCA] bg-[#F6FBF9] text-[#063B3A]"
               : isToday
@@ -1576,57 +1591,28 @@ function AttendanceCalendarDayCell({
             {weekdayLabel}
           </span>
           {isToday ? (
-            <span className="ml-0.5 hidden whitespace-nowrap rounded-sm bg-[#D7EDEA] px-1 py-0.5 text-[10px] font-bold text-[#0B4B56] sm:inline">
+            <span className="ml-0.5 hidden whitespace-nowrap rounded-sm bg-[#D7EDEA] px-1 py-0.5 text-[10px] font-bold text-[#0B4B56] lg:inline">
               오늘
             </span>
           ) : null}
         </div>
-        <div className="flex min-w-0 shrink-0 items-center gap-1">
-          {!isSelected ? (
-            <span
-              className={[
-                "max-w-[4.25rem] truncate rounded-sm border px-1.5 py-0.5 text-[10px] font-bold sm:max-w-[4.85rem]",
-                statusClass,
-              ].join(" ")}
-            >
-              {statusLabel}
-            </span>
-          ) : null}
-          {isSelected ? (
-            <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#0F766E] text-white shadow-[0_2px_6px_rgba(15,118,110,0.18)]">
-              <Check size={13} strokeWidth={3} aria-hidden="true" />
-            </span>
-          ) : null}
-        </div>
       </div>
-      {isSelected ? (
-        <div className="mt-1.5 flex min-w-0 justify-end">
-          <span
-            className={[
-              "max-w-full truncate rounded-sm border px-1.5 py-0.5 text-[10px] font-bold",
-              statusClass,
-            ].join(" ")}
-          >
-            {statusLabel}
-          </span>
-        </div>
-      ) : null}
       <div className="mt-3 min-w-0 space-y-1.5 text-[12px] leading-5 text-[#405763]">
         <div
           className={[
-            "min-w-0 rounded-sm border px-1.5 py-1 text-[11px] font-semibold leading-4",
+            "min-w-0 rounded-sm px-1.5 py-1 text-[11px] font-semibold leading-4",
             hasClass
               ? isSelected
-                ? "border-[#A8D6D1] bg-[#F4FAF8] text-[#174D50]"
-                : "border-[#D2DEE2] bg-[#F6F9F8] text-[#3A505A]"
-              : "border-transparent bg-transparent text-[#96A6AD]",
+                ? "bg-[#F4FAF8] text-[#174D50]"
+                : "bg-[#F6F9F8] text-[#3A505A]"
+              : "bg-transparent text-[#96A6AD]",
           ].join(" ")}
         >
           {hasClass ? (
             <span className="block min-w-0 truncate">
               수업 <b className="font-extrabold tabular-nums text-[#17232B]">{summary.totalSessions}</b>
               <span className="mx-1 text-[#A3B0B6]">·</span>
-              학생 <b className="font-extrabold tabular-nums text-[#17232B]">{summary.totalStudents}</b>
+              <b className="font-extrabold tabular-nums text-[#17232B]">{summary.totalStudents}</b>명
             </span>
           ) : (
             <span className="block truncate">등록 수업 없음</span>
