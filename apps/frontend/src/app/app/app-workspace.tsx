@@ -4,12 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   BarChart3,
-  BookOpenText,
-  ClipboardCheck,
+  BookOpen,
+  CalendarDays,
+  CircleHelp,
   Home,
-  MessageSquareText,
+  MessageCircle,
   Settings,
-  UsersRound,
+  ShieldCheck,
+  User,
 } from "lucide-react";
 import {
   AttendanceBoard,
@@ -231,7 +233,14 @@ export function AppWorkspace({
 
   return (
     <div className="mx-auto w-full max-w-[120rem] pb-20 sm:pb-0">
-      <div className="sm:grid sm:min-h-[calc(100vh-4.5rem)] sm:grid-cols-[15.75rem_minmax(0,1fr)] lg:grid-cols-[16.5rem_minmax(0,1fr)]">
+      <div
+        className={[
+          "sm:grid sm:min-h-[calc(100vh-4.5rem)]",
+          visibleView === "attendance"
+            ? "sm:grid-cols-[13.5rem_minmax(0,1fr)] lg:grid-cols-[13.75rem_minmax(0,1fr)]"
+            : "sm:grid-cols-[15.75rem_minmax(0,1fr)] lg:grid-cols-[16.5rem_minmax(0,1fr)]",
+        ].join(" ")}
+      >
         <WorkspaceNavigation
           activeView={visibleView}
           academyName={academyName}
@@ -240,7 +249,12 @@ export function AppWorkspace({
           onChange={handleViewChange}
         />
 
-        <div className="min-w-0 space-y-4 px-3 py-4 sm:space-y-5 sm:px-5 sm:py-5 xl:px-6">
+        <div
+          className={[
+            "min-w-0 space-y-4 px-3 py-4 sm:space-y-5 sm:px-5 sm:py-5",
+            visibleView === "attendance" ? "xl:px-3 2xl:px-4" : "xl:px-6",
+          ].join(" ")}
+        >
           <WorkspaceContextHeader
             academyName={academyName}
             teacherName={teacherName}
@@ -354,6 +368,16 @@ function getWorkspaceViewLabel(view: WorkspaceView, canManage: boolean) {
   return "오늘";
 }
 
+function getContextViewTitle(view: WorkspaceView, canManage: boolean) {
+  if (view === "attendance") return "출석부";
+  if (view === "operations") return "문자";
+  if (view === "students") return "학생";
+  if (view === "fees") return "교재/비용";
+  if (view === "reports") return "리포트";
+  if (view === "management") return "관리";
+  return canManage ? "오늘 운영" : "오늘 수업";
+}
+
 function WorkspaceContextHeader({
   academyName,
   teacherName,
@@ -369,6 +393,41 @@ function WorkspaceContextHeader({
   activeView: WorkspaceView;
   canManage: boolean;
 }) {
+  if (activeView === "attendance") {
+    return (
+      <section className="hidden min-h-12 border-b border-[#CBD7DD] bg-white px-4 py-2 shadow-[0_1px_2px_rgba(13,38,48,0.04)] sm:flex sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="text-sm font-semibold text-[#243844]">운영 기준일</span>
+          <span className="text-lg font-bold tabular-nums text-[#17232B]">
+            {formatContextDate(selectedDate)}
+          </span>
+          <CalendarDays size={18} className="shrink-0 text-[#17232B]" aria-hidden="true" />
+        </div>
+
+        <div className="flex shrink-0 items-center gap-4 text-sm text-[#334B58]">
+          <button
+            type="button"
+            className="inline-flex min-h-9 items-center gap-1.5 px-1.5 text-sm font-semibold text-[#334B58] transition hover:text-[#007A7C] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+          >
+            <CircleHelp size={16} aria-hidden="true" />
+            도움말
+          </button>
+          <span className="h-6 w-px bg-[#D5E0E4]" aria-hidden="true" />
+          <div className="flex items-center gap-2">
+            <span className="flex size-9 items-center justify-center rounded-full border border-[#D5E0E4] bg-[#F2F6F7] text-[#334B58]">
+              <User size={17} aria-hidden="true" />
+            </span>
+            <span className="leading-tight">
+              <span className="block font-bold text-[#17232B]">{teacherName}</span>
+              <span className="block text-xs font-semibold text-[#60717B]">{roleLabel}</span>
+            </span>
+          </div>
+          <LogoutButton />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="hidden min-h-14 rounded-md border border-[#D2DDE2] bg-white px-4 py-2.5 shadow-[0_1px_2px_rgba(13,38,48,0.08)] sm:flex sm:items-center sm:justify-between sm:gap-4">
       <div className="min-w-0">
@@ -376,7 +435,7 @@ function WorkspaceContextHeader({
           {getWorkspaceViewLabel(activeView, canManage)}
         </p>
         <h2 className="mt-0.5 truncate text-lg font-semibold text-[var(--clinic-text)]">
-          {academyName}
+          {getContextViewTitle(activeView, canManage)} · {academyName}
         </h2>
       </div>
 
@@ -491,7 +550,7 @@ function WorkspaceNavigation({
           <div className="border-b border-white/10 px-5 py-5">
             <div className="flex items-center gap-3">
               <div className="flex size-11 items-center justify-center rounded-md border border-white/20 bg-white/10 text-white">
-                <ClipboardCheck size={20} />
+                <ShieldCheck size={22} aria-hidden="true" />
               </div>
               <div>
                 <p className="max-w-[10rem] truncate text-sm font-bold leading-tight">{academyName}</p>
@@ -567,7 +626,7 @@ function getWorkspaceNavItems(canManage: boolean) {
     },
     {
       view: "attendance",
-      icon: <ClipboardCheck size={17} />,
+      icon: <CalendarDays size={18} />,
       label: "출석부",
       shortLabel: "출석",
       description: "도착·지각 체크",
@@ -580,15 +639,15 @@ function getWorkspaceNavItems(canManage: boolean) {
       ...baseItems,
       {
         view: "students" as const,
-        icon: <UsersRound size={17} />,
-        label: "학생 명단",
+        icon: <User size={18} />,
+        label: "학생",
         shortLabel: "학생",
         description: "학생·반·스케줄",
         showOnMobile: true,
       },
       {
         view: "operations" as const,
-        icon: <MessageSquareText size={17} />,
+        icon: <MessageCircle size={18} />,
         label: "문자",
         shortLabel: "문자",
         description: "연락 기록·발송",
@@ -596,7 +655,7 @@ function getWorkspaceNavItems(canManage: boolean) {
       },
       {
         view: "fees" as const,
-        icon: <BookOpenText size={17} />,
+        icon: <BookOpen size={18} />,
         label: "교재/비용",
         shortLabel: "비용",
         description: "월말 안내 준비",
@@ -604,7 +663,7 @@ function getWorkspaceNavItems(canManage: boolean) {
       },
       {
         view: "reports" as const,
-        icon: <BarChart3 size={17} />,
+        icon: <BarChart3 size={18} />,
         label: "리포트",
         shortLabel: "리포트",
         description: "운영 기록·CSV",
@@ -612,7 +671,7 @@ function getWorkspaceNavItems(canManage: boolean) {
       },
       {
         view: "management" as const,
-        icon: <Settings size={17} />,
+        icon: <Settings size={18} />,
         label: "관리",
         shortLabel: "관리",
         description: "직원·정책·설정",
@@ -625,7 +684,7 @@ function getWorkspaceNavItems(canManage: boolean) {
     ...baseItems,
     {
       view: "operations" as const,
-      icon: <MessageSquareText size={17} />,
+      icon: <MessageCircle size={18} />,
       label: "문자",
       shortLabel: "문자",
       description: "수업 후 연락",
@@ -674,10 +733,10 @@ function WorkspaceNavButton({
         aria-pressed={isActive}
         onClick={onClick}
         className={[
-          "group relative flex min-h-11 w-full items-center gap-3 rounded-md border-l-[3px] px-3 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70",
+          "group relative flex min-h-12 w-full items-center gap-3 border-l-[4px] px-5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70",
           isActive
-            ? "border-l-[#2DD4BF] bg-cyan-300/13 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.10)]"
-            : "border-l-transparent text-cyan-50/72 hover:border-l-cyan-200/45 hover:bg-white/6 hover:text-white",
+            ? "border-l-[#2DD4BF] bg-[#0D5262] text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.12)]"
+            : "border-l-transparent text-cyan-50/74 hover:border-l-cyan-200/45 hover:bg-white/7 hover:text-white",
           disabled ? "cursor-not-allowed opacity-55" : "",
         ].join(" ")}
       >
@@ -685,7 +744,7 @@ function WorkspaceNavButton({
           aria-hidden="true"
           className={[
             "flex size-8 shrink-0 items-center justify-center rounded-md",
-            isActive ? "bg-cyan-300/18 text-cyan-100" : "bg-white/5 text-cyan-50/62 group-hover:text-cyan-100",
+            isActive ? "bg-cyan-300/16 text-cyan-50" : "bg-white/5 text-cyan-50/62 group-hover:text-cyan-100",
           ].join(" ")}
         >
           {icon}
@@ -695,7 +754,7 @@ function WorkspaceNavButton({
           <span
             className={[
               "mt-0.5 block truncate text-xs",
-              isActive ? "text-stone-500" : "text-stone-500",
+              isActive ? "text-cyan-50/72" : "text-cyan-50/48",
             ].join(" ")}
           >
             {description}

@@ -10,10 +10,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
-  FileText,
-  ListChecks,
+  List,
   Loader2,
   MessageSquareText,
+  Pencil,
   Plus,
   Printer,
   RefreshCw,
@@ -780,7 +780,7 @@ export function AttendanceBoard({
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-3 sm:space-y-5 xl:max-w-[90rem]">
+    <div className="mx-auto max-w-6xl space-y-3 sm:space-y-5 lg:max-w-none xl:max-w-none">
       <div className="hidden lg:block">
         <AttendanceWorkbench
           teacherName={teacherName}
@@ -901,6 +901,7 @@ export function AttendanceBoard({
           overview={overview}
           teacherName={teacherName}
           onOpenClassManagement={() => onNavigate?.("management")}
+          onOpenMessages={() => onNavigate?.("operations")}
           onSelect={(sessionKey) => {
             setSelectedSessionKey(sessionKey);
             setAttendanceFilter("all");
@@ -1245,8 +1246,8 @@ function AttendanceWorkbench({
   const selectedStatus = normalizeAttendanceStatus(selectedRecord?.status);
 
   return (
-    <section className="rounded-md bg-[#F3F7F8]">
-      <div className="grid min-h-[calc(100vh-8.5rem)] gap-0 overflow-hidden rounded-md border border-[#C2D1D8] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)] lg:grid-cols-[18rem_minmax(0,1fr)_20rem] xl:grid-cols-[20rem_minmax(0,1fr)_22rem] 2xl:grid-cols-[22rem_minmax(0,1fr)_24rem]">
+    <section className="rounded-none bg-[#F3F7F8]">
+      <div className="grid min-h-[calc(100vh-7.25rem)] gap-0 overflow-hidden rounded-md border border-[#C2D1D8] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)] lg:grid-cols-[15.5rem_minmax(0,1fr)_17.25rem] xl:grid-cols-[16rem_minmax(0,1fr)_18rem] 2xl:grid-cols-[19.5rem_minmax(0,1fr)_22rem]">
         <aside className="min-w-0 border-r border-[#D5E0E4] bg-[#F8FBFC]">
           <SessionList
             sessions={sessions}
@@ -1257,6 +1258,7 @@ function AttendanceWorkbench({
             overview={overview}
             teacherName={teacherName}
             onOpenClassManagement={onOpenClassManagement}
+            onOpenMessages={onOpenMessages}
             variant="workbench"
             onSelect={onSelectSession}
           />
@@ -1286,7 +1288,7 @@ function AttendanceWorkbench({
                   onClick={() => window.print()}
                   className="inline-flex min-h-9 items-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
                 >
-                  <Printer size={16} />
+                  <Printer size={16} aria-hidden="true" />
                   출석부 인쇄
                 </button>
                 <button
@@ -1294,7 +1296,7 @@ function AttendanceWorkbench({
                   onClick={onRefresh}
                   className="inline-flex min-h-9 items-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
                 >
-                  <RefreshCw size={16} />
+                  <RefreshCw size={16} aria-hidden="true" />
                   새로고침
                 </button>
               </div>
@@ -1451,8 +1453,8 @@ function AttendanceLedgerTable({
             <th className="w-8 border-b border-r border-[#D6E0E4] px-2 py-3">
               <span className="sr-only">선택</span>
             </th>
-            <th className="w-[22%] border-b border-r border-[#D6E0E4] px-2 py-3">학생명</th>
-            <th className="w-[15%] border-b border-r border-[#D6E0E4] px-2 py-3">학교 / 학년</th>
+            <th className="w-[23%] border-b border-r border-[#D6E0E4] px-2 py-3">학생명</th>
+            <th className="w-[16%] border-b border-r border-[#D6E0E4] px-2 py-3">학교 / 학년</th>
             <th className="w-[13%] border-b border-r border-[#D6E0E4] px-2 py-3">휴대폰</th>
             <th className="w-[13%] border-b border-r border-[#D6E0E4] px-2 py-3">수업시간</th>
             <th className="w-[12%] border-b border-r border-[#D6E0E4] px-2 py-3">출석 상태</th>
@@ -1498,7 +1500,7 @@ function AttendanceLedgerTable({
                   isSaving ? "opacity-70" : "",
                 ].join(" ")}
               >
-                <td className="border-b border-r border-[#E0E8EB] px-2 py-3 align-middle">
+                <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
                   <input
                     type="checkbox"
                     checked={isBulkSelected}
@@ -1509,9 +1511,9 @@ function AttendanceLedgerTable({
                     aria-label={`${student.name} 일괄 문자 대상 선택`}
                   />
                 </td>
-                <td className="border-b border-r border-[#E0E8EB] px-2 py-3 align-middle">
+                <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
                   <div className="flex items-center gap-2">
-                    <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#b9cbd2] bg-[#e7f2f3] text-xs font-semibold text-[var(--clinic-primary-dark)]">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#B7CED3] bg-[#E7F3F4] text-xs font-bold text-[#005F62]">
                       {getStudentInitial(student.name)}
                     </span>
                     <div className="min-w-0">
@@ -1524,23 +1526,23 @@ function AttendanceLedgerTable({
                     </div>
                   </div>
                 </td>
-                <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-3 align-middle text-xs text-[#435864]">
+                <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs text-[#435864]">
                   {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
                     "학교/학년 미등록"}
                 </td>
-                <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-3 align-middle text-xs tabular-nums text-[#435864]">
+                <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs tabular-nums text-[#435864]">
                   {student.maskedStudentPhone ?? student.maskedParentPhone}
                 </td>
-                <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-3 align-middle text-xs tabular-nums text-[#334B58]">
+                <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs tabular-nums text-[#334B58]">
                   {session.startTime}-{session.endTime}
                 </td>
-                <td className="border-b border-r border-[#E0E8EB] px-2 py-3 align-middle">
+                <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
                   <StatusLozenge status={status} />
                 </td>
-                <td className="border-b border-r border-[#E0E8EB] px-2 py-3 align-middle">
+                <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
                   <ContactLozenge record={record} status={status} />
                 </td>
-                <td className="border-b border-[#E0E8EB] px-2 py-3 align-middle">
+                <td className="border-b border-[#E0E8EB] px-2 py-2.5 align-middle">
                   <span className="rounded-sm border border-[#d5e1e5] bg-[#f5f9fa] px-1.5 py-1 text-[11px] font-semibold text-[var(--clinic-muted)]">
                     {record?.note ? "있음" : "-"}
                   </span>
@@ -1594,7 +1596,7 @@ function StatusLozenge({ status }: { status: AttendanceStatus }) {
   return (
     <span
       className={[
-        "inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border px-1.5 text-[11px] font-semibold",
+        "inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border px-2 text-[11px] font-bold",
         attendanceStatusClass(status),
       ].join(" ")}
     >
@@ -1612,7 +1614,7 @@ function ContactLozenge({
 }) {
   if (record?.followupStatus === "sent") {
     return (
-      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-emerald-200 bg-emerald-50 px-1.5 text-[11px] font-semibold text-[var(--clinic-success)]">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-emerald-200 bg-emerald-50 px-2 text-[11px] font-bold text-[var(--clinic-success)]">
         문자 완료
       </span>
     );
@@ -1620,7 +1622,7 @@ function ContactLozenge({
 
   if (status === "late" || status === "absent") {
     return (
-      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-amber-200 bg-amber-50 px-1.5 text-[11px] font-semibold text-[var(--clinic-warning)]">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-amber-200 bg-amber-50 px-2 text-[11px] font-bold text-[var(--clinic-warning)]">
         연락 필요
       </span>
     );
@@ -1628,14 +1630,14 @@ function ContactLozenge({
 
   if (status === "needs_check") {
     return (
-      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-red-200 bg-red-50 px-1.5 text-[11px] font-semibold text-[var(--clinic-danger)]">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-red-200 bg-red-50 px-2 text-[11px] font-bold text-[var(--clinic-danger)]">
         확인 필요
       </span>
     );
   }
 
   return (
-    <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-[#d5e1e5] bg-[#f5f9fa] px-1.5 text-[11px] font-semibold text-[var(--clinic-muted)]">
+    <span className="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm border border-[#d5e1e5] bg-[#f5f9fa] px-2 text-[11px] font-bold text-[var(--clinic-muted)]">
       대기
     </span>
   );
@@ -1832,7 +1834,7 @@ function WorkbenchStudentPanel({
                     : "bg-[#DCE6EA] text-[#78909A]",
                 ].join(" ")}
               >
-                <Send size={17} />
+                <Send size={17} aria-hidden="true" />
                 문자 작성 / 보내기
               </button>
               <button
@@ -1840,7 +1842,7 @@ function WorkbenchStudentPanel({
                 onClick={onOpenMessages}
                 className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-[#AEBFC7] bg-white px-4 text-sm font-bold text-[#334B58] transition hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
               >
-                <FileText size={17} />
+                <List size={17} aria-hidden="true" />
                 연락 이력 전체 보기
               </button>
               <button
@@ -1849,7 +1851,7 @@ function WorkbenchStudentPanel({
                 onClick={() => onOpenFollowup(student)}
                 className="flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-[#AEBFC7] bg-white px-4 text-sm font-bold text-[#334B58] transition hover:bg-[#F5F8F9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] disabled:cursor-not-allowed disabled:bg-[#EEF3F5] disabled:text-[#93A3AA]"
               >
-                <ListChecks size={17} />
+                <Pencil size={17} aria-hidden="true" />
                 메모 작성
               </button>
             </div>
@@ -2033,6 +2035,7 @@ function SessionList({
   overview,
   teacherName,
   onOpenClassManagement,
+  onOpenMessages,
   variant = "mobile",
   onSelect,
 }: {
@@ -2044,6 +2047,7 @@ function SessionList({
   overview: AttendanceOverview;
   teacherName: string;
   onOpenClassManagement: () => void;
+  onOpenMessages: () => void;
   variant?: "mobile" | "workbench";
   onSelect: (sessionKey: string) => void;
 }) {
@@ -2137,17 +2141,20 @@ function SessionList({
     <section className="h-full overflow-hidden bg-[#F8FBFC]">
       <div className="border-b border-[#D5E0E4] bg-white px-4 py-4">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-xl font-bold tracking-[-0.02em] text-[#17232B]">오늘 수업</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xl font-bold tracking-[-0.02em] text-[#17232B]">오늘 수업</h3>
+            <RefreshCw size={15} className="text-[#78909A]" aria-hidden="true" />
+          </div>
           <button
             type="button"
             onClick={onOpenClassManagement}
-            className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#9BADB6] bg-white px-2.5 text-sm font-semibold text-[#334B58] transition hover:bg-[#F2F6F7] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#9BADB6] bg-white px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#F2F6F7] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
           >
-            <Plus size={15} />
+            <Plus size={15} aria-hidden="true" />
             수업 추가
           </button>
         </div>
-        <p className="mt-5 text-base font-semibold text-[#17232B]">
+        <p className="mt-5 text-base font-bold text-[#17232B]">
           {formatAttendanceDate(selectedDate)}
         </p>
         <p className="mt-1 text-sm font-medium text-[#60717B]">
@@ -2161,7 +2168,7 @@ function SessionList({
         </p>
       </div>
 
-      <div className="max-h-[calc(100vh-16rem)] space-y-3 overflow-y-auto overscroll-contain p-3">
+      <div className="max-h-[calc(100vh-18rem)] space-y-3 overflow-y-auto overscroll-contain p-3 pb-4">
         {sessions.length > 0 ? (
           sessions.map((session) => {
             const isSelected = session.key === selectedSessionKey;
@@ -2186,7 +2193,7 @@ function SessionList({
                     <p className="text-sm font-semibold tabular-nums text-[#334B58]">
                       {session.startTime} - {session.endTime}
                     </p>
-                    <p className="mt-1 truncate text-base font-bold text-[#17232B]">
+                    <p className="mt-1 truncate text-[15px] font-bold text-[#17232B]">
                       {session.className}
                     </p>
                     <p className="mt-0.5 truncate text-xs font-medium text-[#60717B]">
@@ -2198,11 +2205,11 @@ function SessionList({
                     <p className="mt-0.5 text-xs text-[#78909A]">정원</p>
                   </div>
                 </div>
-                <div className="mt-3 grid grid-cols-4 gap-2 text-xs font-semibold">
-                  <span className="text-[#007A7C]">{sessionSummary.present} 출석</span>
-                  <span className="text-[#B26A00]">{sessionSummary.late} 지각</span>
-                  <span className="text-[#B42318]">{sessionSummary.absent} 결석</span>
-                  <span className="text-[#334B58]">{progress.pending} 미체크</span>
+                <div className="mt-3 flex items-center justify-between gap-1.5 text-[11px] font-bold xl:text-xs">
+                  <span className="whitespace-nowrap text-[#007A7C]">{sessionSummary.present} 출석</span>
+                  <span className="whitespace-nowrap text-[#B26A00]">{sessionSummary.late} 지각</span>
+                  <span className="whitespace-nowrap text-[#B42318]">{sessionSummary.absent} 결석</span>
+                  <span className="whitespace-nowrap text-[#334B58]">{progress.pending} 미체크</span>
                 </div>
               </button>
             );
@@ -2212,6 +2219,16 @@ function SessionList({
             이 날짜에 표시할 수업이 없습니다. 다른 날짜를 선택하거나 수업 시간 등록 상태를 확인해 주세요.
           </p>
         )}
+      </div>
+      <div className="border-t border-[#D5E0E4] bg-white p-3">
+        <button
+          type="button"
+          onClick={onOpenMessages}
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-[#007A7C] bg-white px-3 text-sm font-bold text-[#007A7C] transition hover:bg-[#F0FAF9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+        >
+          <Send size={16} aria-hidden="true" />
+          총 수업 일괄 문자
+        </button>
       </div>
     </section>
   );
@@ -2302,14 +2319,14 @@ function AttendanceBulkActionBar({
           aria-pressed={activeReason === "late"}
           onClick={() => onStart("late")}
           className={[
-            "min-h-9 rounded-sm border px-3 text-sm font-semibold transition",
+            "min-h-9 rounded-sm border px-4 text-sm font-bold transition",
             activeReason === "late"
               ? "border-amber-300 bg-amber-50 text-[var(--clinic-warning)]"
               : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-amber-200 hover:bg-amber-50",
             lateCount === 0 ? "cursor-not-allowed opacity-45" : "",
           ].join(" ")}
         >
-          지각 {lateCount}명 선택
+          {activeReason ? "지각 처리" : `지각 ${lateCount}명 선택`}
         </button>
         <button
           type="button"
@@ -2317,14 +2334,14 @@ function AttendanceBulkActionBar({
           aria-pressed={activeReason === "absence"}
           onClick={() => onStart("absence")}
           className={[
-            "min-h-9 rounded-sm border px-3 text-sm font-semibold transition",
+            "min-h-9 rounded-sm border px-4 text-sm font-bold transition",
             activeReason === "absence"
               ? "border-red-200 bg-red-50 text-[var(--clinic-danger)]"
               : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-red-200 hover:bg-red-50",
             absentCount === 0 ? "cursor-not-allowed opacity-45" : "",
           ].join(" ")}
         >
-          결석 {absentCount}명 선택
+          {activeReason ? "결석 처리" : `결석 ${absentCount}명 선택`}
         </button>
         {activeReason ? (
           <>
@@ -2333,10 +2350,10 @@ function AttendanceBulkActionBar({
             </span>
             <button
               type="button"
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#006F73] bg-[#007A7C] px-3 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(0,95,98,0.18)]"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#006F73] bg-[#007A7C] px-4 text-sm font-bold text-white shadow-[0_1px_2px_rgba(0,95,98,0.18)]"
               aria-label="선택 학생 문자 보내기 패널 보기"
             >
-              <MessageSquareText size={15} />
+              <Send size={15} aria-hidden="true" />
               문자 보내기
             </button>
             <button
@@ -2344,7 +2361,7 @@ function AttendanceBulkActionBar({
               onClick={onClear}
               className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#c9d8dd] bg-white px-3 text-sm font-semibold text-[var(--clinic-muted)] hover:bg-[#f3f9fa]"
             >
-              <X size={15} />
+              <X size={15} aria-hidden="true" />
               선택 해제
             </button>
           </>
@@ -2647,7 +2664,7 @@ function BulkAttendanceFollowupPanel({
     <section className={["overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)] xl:sticky xl:top-5", className].join(" ")}>
       <div className="border-b border-[var(--clinic-border)] bg-[var(--clinic-primary-dark)] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[var(--clinic-accent)]" size={18} />
+          <MessageSquareText className="text-[var(--clinic-accent)]" size={18} aria-hidden="true" />
           <h3 className="text-sm font-semibold text-white">
             {reasonLabel(bulkTarget.reason)} 일괄 문자
           </h3>
@@ -2926,7 +2943,7 @@ function AttendanceFollowupPanel({
     <section className={["overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)] xl:sticky xl:top-5", className].join(" ")}>
       <div className="border-b border-[var(--clinic-border)] bg-[var(--clinic-primary-dark)] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[var(--clinic-accent)]" size={18} />
+          <MessageSquareText className="text-[var(--clinic-accent)]" size={18} aria-hidden="true" />
           <h3 className="text-sm font-semibold text-white">결석/지각 문자</h3>
           {followupTarget ? (
             <button
