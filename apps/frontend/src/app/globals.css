@@ -60,4 +60,30 @@ button:not(:disabled) {
   .academy-console :where([class*="shadow"]) {
     box-shadow: none !important;
   }
+
+  .academy-console .bg-white {
+    background-color: #f7fafa !important;
+  }
+
+  .academy-console :where(
+    [class*="bg-[#FBFD"],
+    [class*="bg-[#F8FB"],
+    [class*="bg-[#F7FA"],
+    [class*="bg-[#F6FA"],
+    [class*="bg-[#F5F9"],
+    [class*="bg-[#F4F9"],
+    [class*="bg-stone-50"],
+    [class*="bg-slate-50"]
+  ) {
+    background-color: #f4f8f9 !important;
+  }
+
+  .academy-console :where(
+    [class*="bg-stone-100"],
+    [class*="bg-slate-100"],
+    [class*="bg-[#F2F6"],
+    [class*="bg-[#F1F5"]
+  ) {
+    background-color: #e7eef1 !important;
+  }
 }
