@@ -140,7 +140,6 @@ export function WorkspaceHome({
   academyName,
   teacherName,
   role,
-  roleLabel,
   canManage,
   classes,
   scheduleItems,
@@ -189,7 +188,7 @@ export function WorkspaceHome({
     filteredPcStudentRows[0] ??
     pcStudentRows[0];
   const pcBoardSummary = summarizePcStudentBoardRows(pcStudentRows);
-  const copy = getRoleHomeCopy({ academyName, teacherName, role, roleLabel });
+  const copy = getRoleHomeCopy({ academyName, teacherName, role });
   const isStaffHome = role === "teacher" || role === "assistant";
   const isToday = selectedDate === getTodayDate();
 
@@ -1104,40 +1103,40 @@ function MobileHomeExperience({
 
   return (
     <div className="space-y-4 sm:hidden">
-      <section className="relative overflow-hidden rounded-[2rem] bg-[#48B77A] px-5 pb-5 pt-5 text-white shadow-[0_22px_58px_rgba(38,101,73,0.22)]">
-        <div className="absolute right-[-1.5rem] top-5 h-28 w-32 rotate-6 rounded-[2rem] bg-[#05765D]" />
-        <div className="absolute right-5 top-9 h-16 w-24 -rotate-6 rounded-3xl bg-[#7EDFB0]" />
-        <div className="relative z-10">
+      <section className="overflow-hidden border border-[#9FB6BE] bg-[#E5EEF1] text-[var(--clinic-text)] shadow-[inset_4px_0_0_var(--clinic-primary)]">
+        <div className="border-b border-[#B8C9D0] bg-[#DCE8EB] px-4 py-3">
           <div className="flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-semibold backdrop-blur">
-              <Sparkles size={13} />
-              오늘 운영
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">
+              <Sparkles size={13} aria-hidden="true" />
+              Operations
             </span>
             {loadState.status === "loading" ? (
-              <Loader2 size={18} className="animate-spin text-white/80" />
+              <Loader2 size={18} className="animate-spin text-[var(--clinic-primary)]" />
             ) : null}
           </div>
-          <p className="mt-5 text-sm font-semibold text-white/85">{academyName}</p>
-          <h2 className="mt-1 max-w-[16rem] text-[2rem] font-black leading-[1.08] tracking-tight">
+          <p className="mt-3 text-xs font-semibold text-[var(--clinic-muted)]">{academyName}</p>
+          <h2 className="mt-1 text-[1.65rem] font-black leading-[1.12] tracking-tight">
             {copy.title}
           </h2>
-          <p className="mt-3 max-w-[18rem] text-sm leading-6 text-white/80">
+          <p className="mt-2 text-sm leading-6 text-[#405763]">
             {copy.description}
           </p>
+        </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-2">
+        <div className="px-4 py-3">
+          <div className="grid grid-cols-2 gap-2">
             <MobileHeroMetric label="확인할 학생" value={`${followupItems.length}명`} />
             <MobileHeroMetric label="연락 필요" value={`${unsentCount}명`} tone="warm" />
           </div>
-          <p className="mt-3 text-xs font-bold text-white/80">
+          <p className="mt-3 border-t border-[#C5D4DA] pt-3 text-xs font-bold text-[#405763]">
             오늘 {isStaffHome ? "담당 수업" : "학원 일정"}{" "}
             {scheduleSummary.academyScheduleCount}개 · 보강 불가{" "}
             {scheduleSummary.blockedScheduleCount}건
           </p>
 
-          <div className="mt-4 rounded-2xl bg-white/95 p-3 text-stone-950 shadow-[0_14px_32px_rgba(20,83,45,0.16)]">
+          <div className="mt-3 border border-[#B8C9D0] bg-[#F7FAFA] p-3">
             <div className="flex items-center gap-3">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#E9F8EF] text-[#05765D]">
+              <div className="flex size-10 shrink-0 items-center justify-center border border-[#AFC1C8] bg-[#E7EEF1] text-[var(--clinic-primary)]">
                 <Image
                   src="/icons/education/education-book.svg"
                   alt=""
@@ -1148,9 +1147,9 @@ function MobileHomeExperience({
                 />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-black">오늘 바로 할 일</p>
-                <p className="mt-0.5 truncate text-xs font-medium text-stone-500">
-                  문자, 출석, 관리 흐름을 이어서 처리합니다.
+                <p className="text-sm font-black text-[var(--clinic-text)]">수업 후 처리 큐</p>
+                <p className="mt-0.5 truncate text-xs font-medium text-[var(--clinic-muted)]">
+                  문자 미발송 {unsentCount}명 · 출석 체크 {scheduleSummary.academyScheduleCount}개
                 </p>
               </div>
             </div>
@@ -1174,14 +1173,13 @@ function MobileHomeExperience({
             <p className="text-lg font-black text-stone-950">빠른 시작</p>
             <p className="mt-0.5 text-xs font-medium text-stone-500">수업 후 처리할 일을 바로 엽니다.</p>
           </div>
-          <span className="rounded-full bg-[#F2EFE7] px-2.5 py-1 text-xs font-bold text-stone-600">
+          <span className="border border-[#B8C9D0] bg-[#E7EEF1] px-2.5 py-1 text-xs font-bold text-[#405763]">
             {isToday ? "오늘" : "선택일"}
           </span>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <MobileActionCard
             icon={<MessageSquareText size={18} />}
-            iconSrc="/icons/education/education-discuss.svg"
             title="문자"
             description="수업 후 연락"
             tone="coral"
@@ -1189,7 +1187,6 @@ function MobileHomeExperience({
           />
           <MobileActionCard
             icon={<ClipboardCheck size={18} />}
-            iconSrc="/icons/education/education-schedule.svg"
             title="출석"
             description="도착·지각 체크"
             tone="violet"
@@ -1198,7 +1195,6 @@ function MobileHomeExperience({
           {canManage ? (
             <MobileActionCard
               icon={<Settings size={18} />}
-              iconSrc="/icons/education/education-school.svg"
               title="관리"
               description="학생·반 설정"
               tone="mint"
@@ -1207,7 +1203,6 @@ function MobileHomeExperience({
           ) : null}
           <MobileActionCard
             icon={<Users size={18} />}
-            iconSrc="/icons/education/education-knowledge.svg"
             title="목록"
             description="대상 학생 보기"
             tone="amber"
@@ -1216,22 +1211,22 @@ function MobileHomeExperience({
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[1.5rem] border border-[#E6E0D5] bg-white shadow-[0_14px_42px_rgba(33,32,30,0.08)]">
-        <div className="border-b border-stone-100 px-4 py-4">
+      <section className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA] shadow-[inset_4px_0_0_#D4E4E2]">
+        <div className="border-b border-[#D6E0E5] bg-[#E7EEF1] px-4 py-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-[#05765D]">
+              <p className="text-xs font-bold uppercase tracking-wide text-[var(--clinic-primary)]">
                 {isToday ? "오늘 요약" : "선택 날짜 요약"}
               </p>
-              <h3 className="mt-1 text-xl font-black leading-tight text-stone-950">
+              <h3 className="mt-1 text-xl font-black leading-tight text-[var(--clinic-text)]">
                 {formatHomeDate(selectedDate)}
               </h3>
             </div>
-            <span className="rounded-full bg-[#F2F7F0] px-2.5 py-1 text-xs font-bold text-[#05765D]">
+            <span className="border border-[#AFC1C8] bg-[#F7FAFA] px-2.5 py-1 text-xs font-bold text-[var(--clinic-primary)]">
               운영 현황
             </span>
           </div>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
+          <p className="mt-2 text-sm leading-6 text-[#405763]">
             숫자를 누르면 해당 학생 목록이 펼쳐집니다.
           </p>
           {loadState.status === "error" ? (
@@ -1370,11 +1365,13 @@ function MobileHeroMetric({
   return (
     <div
       className={[
-        "rounded-2xl px-3 py-3 backdrop-blur",
-        tone === "warm" ? "bg-[#FFEFDD] text-[#7D3A15]" : "bg-white/20 text-white",
+        "border px-3 py-3",
+        tone === "warm"
+          ? "border-amber-300 bg-[#FFF6E7] text-[#7D3A15]"
+          : "border-[#B8C9D0] bg-[#F7FAFA] text-[var(--clinic-text)]",
       ].join(" ")}
     >
-      <p className={["text-xs font-bold", tone === "warm" ? "text-[#A0531D]" : "text-white/78"].join(" ")}>
+      <p className={["text-xs font-bold", tone === "warm" ? "text-[#A0531D]" : "text-[var(--clinic-muted)]"].join(" ")}>
         {label}
       </p>
       <p className="mt-1 text-2xl font-black tabular-nums">{value}</p>
@@ -1384,24 +1381,22 @@ function MobileHeroMetric({
 
 function MobileActionCard({
   icon,
-  iconSrc,
   title,
   description,
   tone,
   onClick,
 }: {
   icon: ReactNode;
-  iconSrc?: string;
   title: string;
   description: string;
   tone: "coral" | "violet" | "mint" | "amber";
   onClick: () => void;
 }) {
   const toneClass = {
-    coral: "bg-[#FF714D] text-white shadow-[0_12px_28px_rgba(255,113,77,0.22)]",
-    violet: "bg-[#8387F5] text-white shadow-[0_12px_28px_rgba(103,107,230,0.20)]",
-    mint: "bg-[#087A61] text-white shadow-[0_12px_28px_rgba(8,122,97,0.20)]",
-    amber: "bg-[#FFB65C] text-[#3B2507] shadow-[0_12px_28px_rgba(255,182,92,0.20)]",
+    coral: "border-l-[#A8532F]",
+    violet: "border-l-[#6E6094]",
+    mint: "border-l-[var(--clinic-primary)]",
+    amber: "border-l-[#B56A09]",
   }[tone];
 
   return (
@@ -1409,29 +1404,18 @@ function MobileActionCard({
       type="button"
       onClick={onClick}
       className={[
-        "group min-h-[7.2rem] overflow-hidden rounded-[1.35rem] p-3 text-left transition active:scale-[0.98]",
+        "group min-h-[5.75rem] border border-l-[4px] border-[#B8C9D0] bg-[#F7FAFA] p-3 text-left text-[var(--clinic-text)] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
         toneClass,
       ].join(" ")}
     >
       <span className="flex items-start justify-between gap-3">
-        <span className="flex size-9 items-center justify-center rounded-2xl bg-white/20">
-          {iconSrc ? (
-            <Image
-              src={iconSrc}
-              alt=""
-              width={28}
-              height={28}
-              aria-hidden="true"
-              style={{ width: 28, height: 28 }}
-            />
-          ) : (
-            icon
-          )}
+        <span className="flex size-9 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[var(--clinic-primary)]">
+          {icon}
         </span>
-        <ArrowRight size={16} className="mt-1 transition group-active:translate-x-0.5" />
+        <ArrowRight size={16} className="mt-1 text-[#78909A] transition group-active:translate-x-0.5" />
       </span>
-      <span className="mt-4 block text-lg font-black leading-none">{title}</span>
-      <span className="mt-1.5 block text-xs font-bold opacity-[0.82]">{description}</span>
+      <span className="mt-3 block text-base font-black leading-none">{title}</span>
+      <span className="mt-1 block text-xs font-bold text-[var(--clinic-muted)]">{description}</span>
     </button>
   );
 }
@@ -1470,21 +1454,21 @@ function TodayScheduleSection({
     <section
       aria-label="오늘 일정"
       className={[
-        "overflow-hidden rounded-[1.5rem] border border-[#E6E0D5] bg-white shadow-[0_14px_42px_rgba(33,32,30,0.08)] sm:rounded-lg sm:shadow-sm",
+        "overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA] shadow-[inset_4px_0_0_#D4E4E2]",
         className,
       ].join(" ")}
     >
-      <div className="border-b border-stone-100 px-4 py-3.5 sm:px-5">
+      <div className="border-b border-[#D6E0E5] bg-[#E7EEF1] px-4 py-3.5 sm:px-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-wide text-[#315C7C]">
               오늘 일정
             </p>
-            <h3 className="mt-1 text-lg font-black leading-tight text-stone-950 sm:text-xl">
+            <h3 className="mt-1 text-lg font-black leading-tight text-[var(--clinic-text)] sm:text-xl">
               {formatHomeDate(selectedDate)} 시간순
             </h3>
           </div>
-          <span className="shrink-0 rounded-full bg-[#EAF1F8] px-2.5 py-1 text-xs font-bold text-[#315C7C]">
+          <span className="shrink-0 border border-[#B8C9D0] bg-[#F7FAFA] px-2.5 py-1 text-xs font-bold text-[var(--clinic-primary)]">
             {isStaffHome ? "담당 " : ""}수업 {summary.academyScheduleCount} · 공유일정{" "}
             {summary.blockedScheduleCount}
           </span>
@@ -1498,7 +1482,7 @@ function TodayScheduleSection({
             : "이 날짜에는 학원 일정이 없습니다. 관리 탭에서 수업 시간이나 타 학원 일정을 등록하면 여기에 표시됩니다."}
         </div>
       ) : (
-        <div className="divide-y divide-stone-100">
+        <div className="divide-y divide-[#D6E0E5]">
           <div className="px-4 py-2.5 sm:px-5">
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -1507,7 +1491,7 @@ function TodayScheduleSection({
                   {academyScheduleDescription}
                 </p>
               </div>
-              <span className="rounded-full bg-stone-100 px-2 py-1 text-[11px] font-black text-stone-600">
+              <span className="border border-[#B8C9D0] bg-[#EDF3F5] px-2 py-1 text-[11px] font-black text-[#405763]">
                 {academyItems.length}개
               </span>
             </div>
@@ -1519,12 +1503,12 @@ function TodayScheduleSection({
                 : `${academyScheduleLabel}이 없습니다. 수업 시간 등록 후 출석 체크를 시작할 수 있습니다.`}
             </div>
           ) : (
-            <div className="divide-y divide-stone-100">
+            <div className="divide-y divide-[#D6E0E5]">
               {visibleAcademyItems.map((item) => (
                 <TodayScheduleRow key={item.id} item={item} onNavigate={onNavigate} />
               ))}
               {hiddenAcademyCount > 0 ? (
-                <div className="bg-[#FBFAF7] px-4 py-3 text-center text-xs font-bold text-stone-500 sm:px-5">
+                <div className="bg-[#EDF3F5] px-4 py-3 text-center text-xs font-bold text-[var(--clinic-muted)] sm:px-5">
                   그 외 학원 일정 {hiddenAcademyCount}건은 출석/관리 화면에서 확인하세요.
                 </div>
               ) : null}
@@ -1532,14 +1516,14 @@ function TodayScheduleSection({
           )}
 
           {hasBlockedSchedules ? (
-            <div className="bg-[#FFFDF8]">
-              <div className="border-t border-[#F1E7D6] px-4 py-2.5 sm:px-5">
+            <div className="bg-[#FAF5EA]">
+              <div className="border-t border-[#E5D7BC] px-4 py-2.5 sm:px-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-black text-[#7A4A08]">공유된 타 학원 일정</p>
                     <p className="mt-0.5 text-xs font-medium text-[#98610F]">보강 시간에서 제외됩니다</p>
                   </div>
-                  <span className="rounded-full bg-[#FFECC7] px-2 py-1 text-[11px] font-black text-[#8A5206]">
+                  <span className="border border-[#E6C981] bg-[#FFF6DE] px-2 py-1 text-[11px] font-black text-[#8A5206]">
                     {blockedItems.length}건
                   </span>
                 </div>
@@ -2133,12 +2117,10 @@ function getRoleHomeCopy({
   academyName,
   teacherName,
   role,
-  roleLabel,
 }: {
   academyName: string;
   teacherName: string;
   role: string;
-  roleLabel: string;
 }) {
   if (role === "teacher") {
     return {
@@ -2157,8 +2139,8 @@ function getRoleHomeCopy({
   }
 
   return {
-    title: "오늘 학원 운영 요약",
-    description: `${teacherName} ${roleLabel}님이 ${academyName}의 출석, 연락, 학생 관리를 한곳에서 시작할 수 있습니다.`,
+    title: "오늘 처리할 학생과 수업을 확인하세요.",
+    description: `${academyName}의 출석 체크, 미발송 연락, 보강 제외 일정을 기준 날짜별로 확인합니다.`,
   };
 }
 
