@@ -1,5 +1,5 @@
 -- Academy Follow-up 200-student pilot seed data
--- 개인정보 없는 1주 파일럿 검증용 운영형 데이터입니다.
+-- 개인정보 없는 월간 파일럿 검증용 운영형 데이터입니다.
 -- 실행 대상은 파일럿/시연용 DB입니다. 실제 학원 개인정보가 들어간 DB에서는 실행하지 마세요.
 -- 반복 실행하면 이 seed가 관리하는 고정 UUID 데이터만 정리한 뒤 다시 생성합니다.
 
@@ -187,10 +187,14 @@ insert into public.seed_pilot_200_dates (
   date_offset
 )
 select
-  current_date + offset_value,
-  extract(dow from current_date + offset_value)::smallint,
-  offset_value
-from generate_series(-3, 6) as offsets(offset_value);
+  date_value,
+  extract(dow from date_value)::smallint,
+  (date_value - current_date)::integer
+from generate_series(
+  date_trunc('month', current_date)::date,
+  (date_trunc('month', current_date) + interval '1 month - 1 day')::date,
+  interval '1 day'
+) as dates(date_value);
 
 insert into public.seed_pilot_200_external_academies (
   seq,
@@ -867,37 +871,38 @@ select
   date_item.attendance_date,
   class_item.start_time,
   class_item.end_time,
+  -- 실제 학원 운영에 가깝게 과거 날짜는 대부분 정상 출석으로 두고,
+  -- 날짜/반/학생 조합에 따라 소수의 지각, 결석, 확인 필요만 분산합니다.
+  -- 오늘은 수업 직후 처리 전인 미체크가 일부 남고, 미래 날짜는 예정 상태로 둡니다.
   case
+    when date_item.date_offset > 0 and ((student_item.seq + class_item.seq + date_item.date_offset) % 29) = 0 then 'makeup'
     when date_item.date_offset > 0 then 'pending'
-    when date_item.date_offset = 0 and student_item.seq % 19 = 0 then 'absent'
-    when date_item.date_offset = 0 and student_item.seq % 17 = 0 then 'late'
-    when date_item.date_offset = 0 and student_item.seq % 13 = 0 then 'needs_check'
-    when date_item.date_offset = 0 and student_item.seq % 29 = 0 then 'makeup'
-    when date_item.date_offset = 0 and student_item.seq % 5 = 0 then 'pending'
-    when date_item.date_offset < 0 and student_item.seq % 31 = 0 then 'absent'
-    when date_item.date_offset < 0 and student_item.seq % 23 = 0 then 'late'
+    when ((student_item.seq * 3 + class_item.seq * 5 + extract(day from date_item.attendance_date)::integer) % 97) = 0 then 'absent'
+    when ((student_item.seq * 5 + class_item.seq * 7 + extract(day from date_item.attendance_date)::integer) % 53) = 0 then 'late'
+    when ((student_item.seq * 7 + class_item.seq * 11 + extract(day from date_item.attendance_date)::integer) % 71) = 0 then 'needs_check'
+    when date_item.date_offset = 0 and ((student_item.seq + class_item.seq) % 11) = 0 then 'pending'
+    when ((student_item.seq + class_item.seq * 13 + extract(day from date_item.attendance_date)::integer) % 127) = 0 then 'makeup'
     else 'present'
   end::public.attendance_status,
   case
     when date_item.date_offset > 0 then null
-    when date_item.date_offset = 0 and student_item.seq % 5 = 0 then null
+    when date_item.date_offset = 0 and ((student_item.seq + class_item.seq) % 11) = 0 then null
     else now() - (abs(date_item.date_offset) || ' days')::interval
   end,
   case
     when date_item.date_offset > 0 then null
-    when date_item.date_offset = 0 and student_item.seq % 19 = 0 then null
-    when date_item.date_offset = 0 and student_item.seq % 13 = 0 then null
-    when date_item.date_offset = 0 and student_item.seq % 5 = 0 then null
-    when date_item.date_offset < 0 and student_item.seq % 31 = 0 then null
+    when ((student_item.seq * 3 + class_item.seq * 5 + extract(day from date_item.attendance_date)::integer) % 97) = 0 then null
+    when ((student_item.seq * 7 + class_item.seq * 11 + extract(day from date_item.attendance_date)::integer) % 71) = 0 then null
+    when date_item.date_offset = 0 and ((student_item.seq + class_item.seq) % 11) = 0 then null
     else now() - (abs(date_item.date_offset) || ' days')::interval
   end,
   case
     when date_item.date_offset > 0 then '파일럿 200명: 예정 수업'
-    when date_item.date_offset = 0 and student_item.seq % 19 = 0 then '파일럿 200명: 결석 연락 필요'
-    when date_item.date_offset = 0 and student_item.seq % 17 = 0 then '파일럿 200명: 지각'
-    when date_item.date_offset = 0 and student_item.seq % 13 = 0 then '파일럿 200명: 확인 필요'
-    when date_item.date_offset = 0 and student_item.seq % 29 = 0 then '파일럿 200명: 보강'
-    when date_item.date_offset = 0 and student_item.seq % 5 = 0 then '파일럿 200명: 미체크'
+    when ((student_item.seq * 3 + class_item.seq * 5 + extract(day from date_item.attendance_date)::integer) % 97) = 0 then '파일럿 200명: 날짜별 결석 연락 필요'
+    when ((student_item.seq * 5 + class_item.seq * 7 + extract(day from date_item.attendance_date)::integer) % 53) = 0 then '파일럿 200명: 날짜별 지각'
+    when ((student_item.seq * 7 + class_item.seq * 11 + extract(day from date_item.attendance_date)::integer) % 71) = 0 then '파일럿 200명: 날짜별 확인 필요'
+    when ((student_item.seq + class_item.seq * 13 + extract(day from date_item.attendance_date)::integer) % 127) = 0 then '파일럿 200명: 날짜별 보강'
+    when date_item.date_offset = 0 and ((student_item.seq + class_item.seq) % 11) = 0 then '파일럿 200명: 오늘 미체크'
     else '파일럿 200명: 정상 출석'
   end
 from public.seed_pilot_200_students student_item
