@@ -1687,9 +1687,9 @@ function AttendanceDayDetailPanel({
   ];
 
   return (
-    <aside className="min-w-0 bg-[#E8EEF0] p-3 sm:p-4">
-      <div className="rounded-md border border-[#B9CAD1] bg-[#F7F9F7] shadow-[0_6px_18px_rgba(13,38,48,0.06)]">
-        <div className="border-b border-[#C9D8DD] bg-[#EEF7F4] p-4 shadow-[inset_4px_0_0_#0F766E]">
+    <aside className="min-w-0 bg-[#E5ECEE] p-3 sm:p-4">
+      <div className="overflow-hidden rounded-md border border-[#AFC3CA] bg-[#F6F8F6] shadow-[0_6px_18px_rgba(13,38,48,0.05)]">
+        <div className="border-b border-[#C4D5DA] bg-[#EAF5F2] p-4 shadow-[inset_4px_0_0_#0F766E]">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0F766E]">
@@ -1703,7 +1703,7 @@ function AttendanceDayDetailPanel({
               <CheckCircle2 size={18} aria-hidden="true" />
             </span>
           </div>
-          <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
+          <div className="mt-3 grid grid-cols-3 gap-1.5 text-center text-xs">
             <SummaryPill label="수업" value={overview.totalSessions} />
             <SummaryPill label="학생" value={overview.totalStudents} />
             <SummaryPill label="출석" value={overview.counts.present} tone="success" />
@@ -1720,7 +1720,7 @@ function AttendanceDayDetailPanel({
           </button>
         </div>
 
-        <div className="flex border-b border-[#C9D8DD] bg-[#E7EEF0] p-1" role="tablist">
+        <div className="flex border-b border-[#C4D5DA] bg-[#DFE9EC] p-1" role="tablist">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -1731,8 +1731,8 @@ function AttendanceDayDetailPanel({
               className={[
                 "min-h-9 flex-1 rounded-sm px-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                 activeTab === tab.id
-                  ? "bg-[#F8FAF8] text-[#0B3F46] shadow-sm"
-                  : "text-[#60717B] hover:bg-[#F8FAF8]/80",
+                  ? "bg-[#F7FAF8] text-[#0B3F46] shadow-[inset_0_-2px_0_#0F766E,0_1px_2px_rgba(13,38,48,0.06)]"
+                  : "text-[#60717B] hover:bg-[#F7FAF8]/80",
               ].join(" ")}
             >
               {tab.label} <span className="font-semibold text-[#8CA0A8]">{tab.count}</span>
@@ -1740,7 +1740,7 @@ function AttendanceDayDetailPanel({
           ))}
         </div>
 
-        <div className="max-h-[43rem] overflow-y-auto bg-[#F1F5F5] p-3">
+        <div className="max-h-[43rem] overflow-y-auto bg-[#EEF4F4] p-3">
           {activeTab === "classes" ? (
             <AttendanceClassSummaryList sessions={sessions} records={records} />
           ) : null}
@@ -1782,12 +1782,12 @@ function SummaryPill({
   return (
     <span
       className={[
-        "rounded-sm border px-2.5 py-2 font-extrabold shadow-[0_1px_2px_rgba(13,38,48,0.04)]",
+        "rounded-sm border px-2 py-1.5 font-extrabold shadow-[0_1px_1px_rgba(13,38,48,0.03)]",
         toneClass,
       ].join(" ")}
     >
-      <span className="block text-[11px] font-semibold leading-4 opacity-75">{label}</span>
-      <span className="text-lg leading-6 tabular-nums">{value}</span>
+      <span className="block text-[10px] font-bold leading-4 opacity-75">{label}</span>
+      <span className="text-lg leading-5 tabular-nums">{value}</span>
     </span>
   );
 }
@@ -1808,7 +1808,7 @@ function AttendanceClassSummaryList({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {sessions.map((session) => {
         const summary = getSessionSummary(session, records);
         const contactNeeded = summary.late + summary.absent + summary.needs_check;
@@ -1816,24 +1816,29 @@ function AttendanceClassSummaryList({
         return (
           <div
             key={session.key}
-            className="rounded-sm border border-[#C9D8DD] bg-[#F8FAF8] p-3 shadow-[0_1px_2px_rgba(13,38,48,0.05)] transition hover:-translate-y-0.5 hover:border-[#A8C3C5] hover:bg-[#FBFCFA] hover:shadow-[0_8px_18px_rgba(13,38,48,0.08)]"
+            className="rounded-sm border border-[#C4D5DA] bg-[#F7FAF8] p-3 shadow-[inset_3px_0_0_#D4E4E2,0_1px_2px_rgba(13,38,48,0.04)] transition hover:border-[#8EB8B9] hover:bg-[#FBFCFA] hover:shadow-[inset_3px_0_0_#0F766E,0_6px_14px_rgba(13,38,48,0.07)]"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-extrabold text-[#17232B]">
-                  {session.startTime} {session.className}
-                </p>
-                <p className="mt-1 text-xs font-medium text-[#60717B]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-sm border border-[#C4D5DA] bg-[#EEF4F3] px-1.5 py-0.5 text-[11px] font-extrabold text-[#334B58] tabular-nums">
+                    {session.startTime}
+                  </span>
+                  <p className="text-sm font-extrabold text-[#17232B]">
+                    {session.className}
+                  </p>
+                </div>
+                <p className="mt-1.5 text-xs font-medium text-[#60717B]">
                   담당 {session.subject ?? "과목 미지정"} · 학생 {session.students.length}명
                 </p>
               </div>
               {contactNeeded > 0 ? (
-                <span className="rounded-sm border border-amber-200 bg-[#FFF3D8] px-2 py-1 text-[11px] font-bold text-amber-700">
+                <span className="shrink-0 rounded-sm border border-amber-200 bg-[#FFF3D8] px-2 py-1 text-[11px] font-bold text-amber-700">
                   연락 {contactNeeded}
                 </span>
               ) : null}
             </div>
-            <div className="mt-3 grid grid-cols-4 gap-1 text-center text-[11px]">
+            <div className="mt-3 grid grid-cols-4 gap-1.5 text-center text-[11px]">
               <MiniStat label="출석" value={summary.present} tone="success" />
               <MiniStat label="지각" value={summary.late} tone="warning" />
               <MiniStat label="결석" value={summary.absent} tone="danger" />
@@ -1865,7 +1870,7 @@ function MiniStat({
           : "text-[#60717B]";
 
   return (
-    <span className="rounded-sm bg-[#EEF4F3] px-1.5 py-1">
+    <span className="rounded-sm border border-[#E0EAEB] bg-[#EEF4F3] px-1.5 py-1">
       <span className="block font-medium text-[#78909A]">{label}</span>
       <b className={["tabular-nums", toneClass].join(" ")}>{value}</b>
     </span>
