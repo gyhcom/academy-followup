@@ -1,5 +1,6 @@
 -- Academy Follow-up 200-student pilot seed data
 -- 개인정보 없는 월간 파일럿 검증용 운영형 데이터입니다.
+-- 출석부 검수 기준은 주요 10개 반에 학생 20명씩 배정한 구조입니다.
 -- 실행 대상은 파일럿/시연용 DB입니다. 실제 학원 개인정보가 들어간 DB에서는 실행하지 마세요.
 -- 반복 실행하면 이 seed가 관리하는 고정 UUID 데이터만 정리한 뒤 다시 생성합니다.
 
@@ -153,7 +154,7 @@ insert into public.seed_pilot_200_students (
 select
   seq_value,
   md5('pilot-200-student-' || seq_value::text)::uuid,
-  ((seq_value - 1) / 10) + 1,
+  ((seq_value - 1) / 20) + 1,
   class_item.id,
   surname.name || given_a.name || given_b.name || lpad(seq_value::text, 3, '0'),
   case
@@ -169,7 +170,7 @@ select
   case when seq_value % 4 = 0 then '01078' || lpad(seq_value::text, 6, '0') else null end,
   seq_value % 3 = 0
 from generate_series(1, 200) as seqs(seq_value)
-join public.seed_pilot_200_classes class_item on class_item.seq = ((seq_value - 1) / 10) + 1
+join public.seed_pilot_200_classes class_item on class_item.seq = ((seq_value - 1) / 20) + 1
 join lateral (values
   (1, '김'), (2, '박'), (3, '이'), (4, '최'), (5, '정'),
   (6, '강'), (7, '조'), (8, '윤'), (9, '장'), (10, '임')

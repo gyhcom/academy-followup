@@ -4,6 +4,7 @@
 -- 주의: 실제 학원 개인정보가 들어간 운영 DB에서는 실행하지 마세요.
 --
 -- 운영형 패턴:
+-- - 주요 10개 반에 학생 20명씩 배정
 -- - 과거 날짜: 대부분 정상 출석
 -- - 지각: 수업별 0~2명 수준으로 날짜마다 분산
 -- - 결석: 가끔 0~1명 수준
@@ -43,6 +44,129 @@ do $$
 declare
   academy uuid := '11111111-1111-4111-8111-111111111111'::uuid;
 begin
+  -- 기존 20개 반 10명 배정은 출석부 검수 밀도가 낮으므로,
+  -- 주요 10개 반에 20명씩 재배정합니다. 반 레코드 20개 자체는 유지합니다.
+  update public.students student_item
+  set class_id = class_item.id,
+      grade_label = class_item.grade_label,
+      school_name = case
+        when class_item.grade_label like '고%' and pilot.seq % 2 = 0 then '온양고'
+        when class_item.grade_label like '고%' then '설화고'
+        when class_item.grade_label = '무학년제' then '탕정초중'
+        when pilot.seq % 4 = 0 then '한들중'
+        when pilot.seq % 3 = 0 then '설화중'
+        else '탕정중'
+      end
+  from (
+    select
+      seq_value as seq,
+      md5('pilot-200-student-' || seq_value::text)::uuid as id,
+      md5('pilot-200-class-' || (((seq_value - 1) / 20) + 1)::text)::uuid as class_id
+    from generate_series(1, 200) as seqs(seq_value)
+  ) pilot
+  join public.classes class_item on class_item.id = pilot.class_id
+  where student_item.id = pilot.id
+    and student_item.academy_id = academy;
+
+  delete from public.student_schedules
+  where academy_id = academy
+    and student_id in (
+      select md5('pilot-200-student-' || seq_value::text)::uuid
+      from generate_series(1, 200) as seqs(seq_value)
+    )
+    and schedule_type = 'regular_class'
+    and memo = '파일럿 200명: 반 공통 정규 수업';
+
+  insert into public.student_schedules (
+    id,
+    academy_id,
+    student_id,
+    class_id,
+    teacher_id,
+    schedule_type,
+    schedule_date,
+    day_of_week,
+    start_time,
+    end_time,
+    subject,
+    title,
+    memo,
+    is_active
+  )
+  with
+  pilot_students as (
+    select
+      seq_value as seq,
+      md5('pilot-200-student-' || seq_value::text)::uuid as id,
+      (((seq_value - 1) / 20) + 1) as class_seq
+    from generate_series(1, 200) as seqs(seq_value)
+  ),
+  pilot_classes as (
+    select seq_value as seq, md5('pilot-200-class-' || seq_value::text)::uuid as id
+    from generate_series(1, 10) as seqs(seq_value)
+  )
+  select
+    md5('pilot-200-regular-schedule-' || pilot_students.seq::text || '-' || day_value::text)::uuid,
+    academy,
+    student_item.id,
+    class_item.id,
+    class_item.teacher_id,
+    'regular_class',
+    null,
+    day_value,
+    case class_seq
+      when 1 then '16:00'::time
+      when 2 then '17:40'::time
+      when 3 then '18:00'::time
+      when 4 then '19:40'::time
+      when 5 then '16:30'::time
+      when 6 then '19:10'::time
+      when 7 then '17:00'::time
+      when 8 then '18:50'::time
+      when 9 then '19:30'::time
+      else '16:30'::time
+    end,
+    case class_seq
+      when 1 then '17:30'::time
+      when 2 then '19:10'::time
+      when 3 then '19:30'::time
+      when 4 then '21:10'::time
+      when 5 then '19:00'::time
+      when 6 then '21:10'::time
+      when 7 then '18:40'::time
+      when 8 then '20:30'::time
+      when 9 then '21:30'::time
+      else '18:30'::time
+    end,
+    class_item.subject,
+    class_item.name,
+    '파일럿 200명: 반 공통 정규 수업',
+    true
+  from pilot_students
+  join public.students student_item on student_item.id = pilot_students.id
+  join pilot_classes on pilot_classes.seq = pilot_students.class_seq
+  join public.classes class_item on class_item.id = pilot_classes.id
+  cross join lateral unnest(
+    case
+      when pilot_students.class_seq in (1, 3, 5, 7, 9) then array[1,3,5]::smallint[]
+      else array[2,4,6]::smallint[]
+    end
+  ) as day_value
+  where student_item.academy_id = academy
+  on conflict (id) do update set
+    teacher_id = excluded.teacher_id,
+    class_id = excluded.class_id,
+    schedule_type = excluded.schedule_type,
+    schedule_date = excluded.schedule_date,
+    day_of_week = excluded.day_of_week,
+    start_time = excluded.start_time,
+    end_time = excluded.end_time,
+    subject = excluded.subject,
+    title = excluded.title,
+    memo = excluded.memo,
+    is_active = excluded.is_active,
+    updated_at = now();
+
   delete from public.message_logs
   where academy_id = academy
     and (
@@ -302,3 +426,22 @@ where academy_id = '11111111-1111-4111-8111-111111111111'
       and (date_trunc('month', current_date) + interval '1 month - 1 day')::date
 group by attendance_date
 order by attendance_date;
+
+-- 4. Verify: 반별 학생 수 확인. 주요 10개 반은 각 20명이어야 합니다.
+with
+pilot_classes as (
+  select seq_value as seq, md5('pilot-200-class-' || seq_value::text)::uuid as id
+  from generate_series(1, 20) as seqs(seq_value)
+)
+select
+  pilot_classes.seq as class_seq,
+  class_item.name,
+  count(student_item.id) as student_count
+from pilot_classes
+join public.classes class_item on class_item.id = pilot_classes.id
+left join public.students student_item
+  on student_item.class_id = class_item.id
+ and student_item.academy_id = '11111111-1111-4111-8111-111111111111'
+ and student_item.status = 'active'
+group by pilot_classes.seq, class_item.name
+order by pilot_classes.seq;
