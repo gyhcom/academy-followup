@@ -1485,6 +1485,47 @@ function AttendanceCalendarDayCell({
   const hasClass = summary.totalSessions > 0;
   const hasUnchecked = summary.counts.pending > 0;
   const hasMakeup = summary.counts.makeup > 0;
+  const visibleStatusRows: Array<{
+    label: string;
+    value: number;
+    tone: "default" | "muted" | "warning" | "danger" | "info";
+  }> = [
+    summary.counts.pending > 0
+      ? {
+          label: "미체크",
+          value: summary.counts.pending,
+          tone: "warning" as const,
+        }
+      : undefined,
+    attentionCount > 0
+      ? {
+          label: "연락",
+          value: attentionCount,
+          tone: "danger" as const,
+        }
+      : undefined,
+    summary.counts.late > 0
+      ? {
+          label: "지각",
+          value: summary.counts.late,
+          tone: "warning" as const,
+        }
+      : undefined,
+    summary.counts.absent > 0
+      ? {
+          label: "결석",
+          value: summary.counts.absent,
+          tone: "danger" as const,
+        }
+      : undefined,
+    hasMakeup
+      ? {
+          label: "보강",
+          value: summary.counts.makeup,
+          tone: "info" as const,
+        }
+      : undefined,
+  ].filter((row): row is NonNullable<typeof row> => row !== undefined);
   const statusLabel = !hasClass
     ? "수업 없음"
     : attentionCount > 0
@@ -1513,16 +1554,16 @@ function AttendanceCalendarDayCell({
       onClick={() => onSelect(date)}
       aria-pressed={isSelected}
       className={[
-        "group relative min-h-[7.25rem] border-b border-r border-[#C9D8DD] p-2.5 text-left transition duration-150 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] sm:min-h-[8.5rem]",
+        "group relative min-h-[7rem] overflow-hidden border-b border-r border-[#C9D8DD] p-2 text-left transition duration-150 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] sm:min-h-[8.25rem] sm:p-2.5",
         !isCurrentMonth
           ? "bg-[#E3EAEC] text-[#9BAAB0] hover:bg-[#DDE6E8]"
           : selectedClassName,
       ].join(" ")}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex min-w-0 items-start justify-between gap-1.5">
         <div
           className={[
-            "flex min-w-[3.45rem] items-baseline gap-1.5 rounded-sm border px-2 py-1",
+            "flex min-w-0 max-w-[calc(100%-4.75rem)] items-baseline gap-1 rounded-sm border px-1.5 py-1 sm:gap-1.5 sm:px-2",
             isSelected
               ? "border-[#9FCFCA] bg-[#F6FBF9] text-[#063B3A]"
               : isToday
@@ -1535,16 +1576,16 @@ function AttendanceCalendarDayCell({
             {weekdayLabel}
           </span>
           {isToday ? (
-            <span className="ml-0.5 whitespace-nowrap rounded-sm bg-[#D7EDEA] px-1 py-0.5 text-[10px] font-bold text-[#0B4B56]">
+            <span className="ml-0.5 hidden whitespace-nowrap rounded-sm bg-[#D7EDEA] px-1 py-0.5 text-[10px] font-bold text-[#0B4B56] sm:inline">
               오늘
             </span>
           ) : null}
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
+        <div className="flex min-w-0 shrink-0 items-center gap-1">
           {!isSelected ? (
             <span
               className={[
-                "whitespace-nowrap rounded-sm border px-1.5 py-0.5 text-[10px] font-bold",
+                "max-w-[4.25rem] truncate rounded-sm border px-1.5 py-0.5 text-[10px] font-bold sm:max-w-[4.85rem]",
                 statusClass,
               ].join(" ")}
             >
@@ -1559,10 +1600,10 @@ function AttendanceCalendarDayCell({
         </div>
       </div>
       {isSelected ? (
-        <div className="mt-1.5 flex justify-end">
+        <div className="mt-1.5 flex min-w-0 justify-end">
           <span
             className={[
-              "whitespace-nowrap rounded-sm border px-1.5 py-0.5 text-[10px] font-bold",
+              "max-w-full truncate rounded-sm border px-1.5 py-0.5 text-[10px] font-bold",
               statusClass,
             ].join(" ")}
           >
@@ -1570,23 +1611,44 @@ function AttendanceCalendarDayCell({
           </span>
         </div>
       ) : null}
-      <div className="mt-3 space-y-1.5 text-[12px] leading-5 text-[#405763]">
-        <div className="grid grid-cols-2 gap-1.5">
-          <CalendarMetricTile label="수업" value={summary.totalSessions} emphasis={isSelected} />
-          <CalendarMetricTile label="학생" value={summary.totalStudents} emphasis={isSelected} />
+      <div className="mt-3 min-w-0 space-y-1.5 text-[12px] leading-5 text-[#405763]">
+        <div
+          className={[
+            "min-w-0 rounded-sm border px-1.5 py-1 text-[11px] font-semibold leading-4",
+            hasClass
+              ? isSelected
+                ? "border-[#A8D6D1] bg-[#F4FAF8] text-[#174D50]"
+                : "border-[#D2DEE2] bg-[#F6F9F8] text-[#3A505A]"
+              : "border-transparent bg-transparent text-[#96A6AD]",
+          ].join(" ")}
+        >
+          {hasClass ? (
+            <span className="block min-w-0 truncate">
+              수업 <b className="font-extrabold tabular-nums text-[#17232B]">{summary.totalSessions}</b>
+              <span className="mx-1 text-[#A3B0B6]">·</span>
+              학생 <b className="font-extrabold tabular-nums text-[#17232B]">{summary.totalStudents}</b>
+            </span>
+          ) : (
+            <span className="block truncate">등록 수업 없음</span>
+          )}
         </div>
-        <div className="grid grid-cols-1 gap-y-0.5 text-[11px] leading-4">
-          <MetricLine label="미체크" value={summary.counts.pending} tone={hasUnchecked ? "warning" : "muted"} icon="!" />
-          <MetricLine label="연락" value={attentionCount} tone={attentionCount > 0 ? "danger" : "muted"} icon="•" />
-          <MetricLine label="지각" value={summary.counts.late} tone={summary.counts.late > 0 ? "warning" : "muted"} icon="●" />
-          <MetricLine label="결석" value={summary.counts.absent} tone={summary.counts.absent > 0 ? "danger" : "muted"} icon="●" />
+        <div className="grid min-w-0 grid-cols-1 gap-y-0.5 text-[11px] leading-4">
+          {visibleStatusRows.length > 0 ? (
+            visibleStatusRows.map((row) => (
+              <MetricLine
+                key={row.label}
+                label={row.label}
+                value={row.value}
+                tone={row.tone}
+              />
+            ))
+          ) : hasClass ? (
+            <span className="truncate text-[11px] font-semibold text-[#78909A]">
+              처리 이슈 없음
+            </span>
+          ) : null}
         </div>
       </div>
-      {hasMakeup ? (
-        <div className="mt-2 inline-flex rounded-sm border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[11px] font-bold text-blue-700">
-          보강 {summary.counts.makeup}
-        </div>
-      ) : null}
     </button>
   );
 }
@@ -1595,20 +1657,18 @@ function MetricLine({
   label,
   value,
   tone = "default",
-  icon,
-  emphasis = false,
 }: {
   label: string;
   value: number;
-  tone?: "default" | "muted" | "warning" | "danger";
-  icon?: string;
-  emphasis?: boolean;
+  tone?: "default" | "muted" | "warning" | "danger" | "info";
 }) {
   const toneClass =
     tone === "warning"
       ? "text-amber-700"
       : tone === "danger"
         ? "text-red-700"
+        : tone === "info"
+          ? "text-blue-700"
         : tone === "muted"
           ? "text-[#8CA0A8]"
           : "text-[#17232B]";
@@ -1617,53 +1677,22 @@ function MetricLine({
       ? "bg-amber-400"
       : tone === "danger"
         ? "bg-red-500"
+        : tone === "info"
+          ? "bg-blue-500"
         : tone === "muted"
           ? "bg-[#B8C6CB]"
           : "bg-[#0F766E]";
 
   return (
-    <span className="flex min-w-0 items-center justify-between gap-1">
-      <span className="flex min-w-0 items-center gap-1 whitespace-nowrap text-[#78909A]">
-        {icon ? (
-          <span
-            className={[
-              "flex size-1.5 shrink-0 items-center justify-center rounded-full text-[0px]",
-              dotClass,
-            ].join(" ")}
-            aria-hidden="true"
-          >
-            {icon}
-          </span>
-        ) : null}
-        {label}
+    <span className="flex min-w-0 items-center justify-between gap-2">
+      <span className="flex min-w-0 items-center gap-1.5 truncate text-[#78909A]">
+        <span
+          className={["size-1.5 shrink-0 rounded-full", dotClass].join(" ")}
+          aria-hidden="true"
+        />
+        <span className="truncate">{label}</span>
       </span>
-      <b className={["shrink-0 tabular-nums", toneClass, emphasis ? "text-sm" : ""].join(" ")}>{value}</b>
-    </span>
-  );
-}
-
-function CalendarMetricTile({
-  label,
-  value,
-  emphasis = false,
-}: {
-  label: string;
-  value: number;
-  emphasis?: boolean;
-}) {
-  return (
-    <span
-      className={[
-        "flex items-center justify-between rounded-sm border px-1.5 py-1",
-        emphasis
-          ? "border-[#9FCFCA] bg-[#F2FAF8] text-[#063B3A]"
-          : "border-[#D2DEE2] bg-[#F5F8F7] text-[#263A45]",
-      ].join(" ")}
-    >
-      <span className="whitespace-nowrap text-[11px] font-semibold text-[#78909A]">
-        {label}
-      </span>
-      <b className="shrink-0 text-sm font-extrabold tabular-nums">{value}</b>
+      <b className={["shrink-0 tabular-nums", toneClass].join(" ")}>{value}</b>
     </span>
   );
 }
