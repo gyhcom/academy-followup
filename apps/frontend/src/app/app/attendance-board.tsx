@@ -1299,61 +1299,74 @@ function AttendanceCalendarView({
 }) {
   return (
     <section className="relative overflow-hidden rounded-md border border-[#B9CAD1] bg-[#E8EEF0] shadow-[0_10px_30px_rgba(13,38,48,0.07)]">
-      <div className="border-b border-[#C9D8DD] bg-[#F7F9F7] px-3 py-3 sm:px-4 lg:px-5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#007A7C]">
-              Attendance Calendar
-            </p>
-            <h2 className="mt-1 text-xl font-extrabold tracking-[-0.02em] text-[#14262D] sm:text-2xl">
-              {formatMonthTitle(selectedMonth)}
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-[#60717B]">
-              날짜를 선택하면 해당 날짜의 수업과 학생 목록을 확인할 수 있습니다.
-            </p>
+      <div className="border-b border-[#C9D8DD] bg-[#EEF4F3] px-3 py-3 sm:px-4 lg:px-5">
+        <div className="rounded-md border border-[#B9CAD1] bg-[#F8FAF8] shadow-[0_1px_2px_rgba(13,38,48,0.04)]">
+          <div className="flex flex-col gap-3 border-b border-[#D4E0E4] px-3 py-3 lg:flex-row lg:items-center lg:justify-between lg:px-4">
+            <div className="flex min-w-0 items-start gap-3">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-sm border border-[#A9C6C5] bg-[#E3F1EF] text-[#0F766E]">
+                <CalendarDays size={19} aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#007A7C]">
+                  Attendance Calendar
+                </p>
+                <h2 className="mt-0.5 text-xl font-extrabold tracking-[-0.02em] text-[#14262D] sm:text-2xl">
+                  {formatMonthTitle(selectedMonth)}
+                </h2>
+                <p className="mt-1 text-sm leading-5 text-[#60717B]">
+                  날짜를 선택하면 해당 날짜의 수업과 학생 목록을 확인할 수 있습니다.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="inline-flex min-h-9 items-center gap-2 rounded-sm border border-[#C3D2D7] bg-[#EEF5F4] px-3 text-sm text-[#526A75]">
+                <span className="text-xs font-bold text-[#78909A]">선택 날짜</span>
+                <b className="font-extrabold text-[#14262D]">{formatDateKoreanShort(selectedDate)}</b>
+              </div>
+              <div className="inline-flex rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] p-0.5 shadow-[0_1px_1px_rgba(13,38,48,0.04)]">
+                <button
+                  type="button"
+                  onClick={() => onMonthChange(shiftMonth(selectedMonth, -1))}
+                  className="inline-flex min-h-8 items-center gap-1 rounded-[3px] px-2.5 text-sm font-semibold text-[#334B58] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                >
+                  <ChevronLeft size={16} aria-hidden="true" />
+                  이전 달
+                </button>
+                <button
+                  type="button"
+                  onClick={onTodaySelect}
+                  className="inline-flex min-h-8 items-center rounded-[3px] border border-[#0F766E] bg-[#DDEEEB] px-3 text-sm font-bold text-[#0B625D] hover:bg-[#CFE7E2] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                >
+                  오늘
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onMonthChange(shiftMonth(selectedMonth, 1))}
+                  className="inline-flex min-h-8 items-center gap-1 rounded-[3px] px-2.5 text-sm font-semibold text-[#334B58] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                >
+                  다음 달
+                  <ChevronRight size={16} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onMonthChange(shiftMonth(selectedMonth, -1))}
-              className="inline-flex min-h-9 items-center gap-1 rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] px-3 text-sm font-semibold text-[#334B58] shadow-[0_1px_1px_rgba(13,38,48,0.04)] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
-            >
-              <ChevronLeft size={16} aria-hidden="true" />
-              이전 달
-            </button>
-            <button
-              type="button"
-              onClick={onTodaySelect}
-              className="inline-flex min-h-9 items-center rounded-sm border border-[#0F766E] bg-[#DDEEEB] px-3 text-sm font-bold text-[#0B625D] shadow-[0_1px_1px_rgba(15,118,110,0.16)] hover:bg-[#CFE7E2] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
-            >
-              오늘
-            </button>
-            <button
-              type="button"
-              onClick={() => onMonthChange(shiftMonth(selectedMonth, 1))}
-              className="inline-flex min-h-9 items-center gap-1 rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] px-3 text-sm font-semibold text-[#334B58] shadow-[0_1px_1px_rgba(13,38,48,0.04)] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
-            >
-              다음 달
-              <ChevronRight size={16} aria-hidden="true" />
-            </button>
+          <div className="grid gap-0 divide-y divide-[#D4E0E4] px-3 py-2 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-[0.8fr_0.8fr_0.9fr_1.5fr] lg:px-4">
+            <CompactFilterLabel label="반 필터" value="전체 반" />
+            <CompactFilterLabel label="선생님" value="전체" />
+            <CompactFilterLabel label="상태" value="전체 상태" />
+            <label className="flex min-h-10 items-center gap-2 px-0 py-1 text-sm text-[#526A75] sm:px-3">
+              <Search size={15} aria-hidden="true" />
+              <span className="sr-only">학생 또는 반 검색</span>
+              <input
+                type="search"
+                placeholder="학생/반 검색은 후속 보강"
+                disabled
+                className="min-w-0 flex-1 rounded-sm border border-transparent bg-transparent px-1 py-1 text-sm outline-none placeholder:text-[#8CA0A8] disabled:cursor-not-allowed focus:border-[#84C7CB]"
+              />
+            </label>
           </div>
-        </div>
-
-        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.2fr]">
-          <CompactFilterLabel label="반 필터" value="전체 반" />
-          <CompactFilterLabel label="선생님" value="전체" />
-          <CompactFilterLabel label="상태" value="전체 상태" />
-          <label className="flex min-h-10 items-center gap-2 rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] px-3 text-sm text-[#526A75] shadow-[0_1px_1px_rgba(13,38,48,0.04)]">
-            <Search size={15} aria-hidden="true" />
-            <span className="sr-only">학생 또는 반 검색</span>
-            <input
-              type="search"
-              placeholder="학생/반 검색은 후속 보강"
-              disabled
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#8CA0A8] disabled:cursor-not-allowed"
-            />
-          </label>
         </div>
       </div>
 
@@ -1396,9 +1409,9 @@ function AttendanceCalendarView({
 
 function CompactFilterLabel({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex min-h-10 items-center justify-between gap-3 rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] px-3 text-sm shadow-[0_1px_1px_rgba(13,38,48,0.04)]">
-      <span className="font-semibold text-[#60717B]">{label}</span>
-      <span className="font-bold text-[#263A45]">{value}</span>
+    <div className="flex min-h-10 items-center justify-between gap-3 px-0 py-1 text-sm sm:px-3">
+      <span className="font-semibold text-[#78909A]">{label}</span>
+      <span className="font-extrabold text-[#263A45]">{value}</span>
     </div>
   );
 }
@@ -4822,6 +4835,13 @@ function formatDateKoreanLong(dateString: string) {
   const dayLabel = weekdayShortLabel(getDayOfWeek(dateString));
 
   return `${year}.${month}.${day} ${dayLabel}요일`;
+}
+
+function formatDateKoreanShort(dateString: string) {
+  const [, month, day] = dateString.split("-");
+  const dayLabel = weekdayShortLabel(getDayOfWeek(dateString));
+
+  return `${Number(month)}.${Number(day)} ${dayLabel}`;
 }
 
 function getCalendarGridDays(monthValue: string) {
