@@ -1861,9 +1861,9 @@ function MobileSummaryButton({
   onClick: () => void;
 }) {
   const toneClass = {
-    default: "bg-[#EEF8F2] text-[#087A61]",
-    danger: "bg-[#FFF0E8] text-[#B64C1E]",
-    success: "bg-[#EEF1FF] text-[#555CD8]",
+    default: "border-l-[var(--clinic-primary)]",
+    danger: "border-l-[#B56A09]",
+    success: "border-l-[#2F7D5B]",
   }[tone];
 
   return (
@@ -1872,13 +1872,15 @@ function MobileSummaryButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "rounded-2xl border px-3 py-3 text-left transition active:scale-[0.98]",
-        isActive ? "border-stone-950 bg-stone-950 text-white" : `border-transparent ${toneClass}`,
+        "border border-l-[4px] px-3 py-3 text-left transition",
+        isActive
+          ? "border-[#08313F] border-l-[var(--clinic-accent)] bg-[#08313F] text-white"
+          : `border-[#B8C9D0] bg-[#F7FAFA] text-[var(--clinic-text)] ${toneClass} hover:bg-[#EDF3F5]`,
       ].join(" ")}
     >
-      <span className="block text-xs font-black">{label}</span>
+      <span className={["block text-xs font-black", isActive ? "text-white/75" : "text-[var(--clinic-muted)]"].join(" ")}>{label}</span>
       <span className="mt-1 block text-2xl font-black tabular-nums">{value}</span>
-      <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-black">
+      <span className={["mt-2 inline-flex items-center gap-1 text-[11px] font-black", isActive ? "text-white/80" : "text-[var(--clinic-primary)]"].join(" ")}>
         보기
         <ArrowRight size={12} />
       </span>
@@ -1916,7 +1918,7 @@ function MobileFollowupRow({
           <span className="truncate text-base font-black text-stone-950">
             {item.student.name}
           </span>
-          <span className={["shrink-0 rounded-full px-2 py-0.5 text-[11px] font-black", statusTone(item.status)].join(" ")}>
+          <span className={["shrink-0 border px-2 py-0.5 text-[11px] font-black", statusTone(item.status)].join(" ")}>
             {attendanceStatusLabels[item.status]}
           </span>
         </span>
@@ -1927,7 +1929,7 @@ function MobileFollowupRow({
           {isSent ? "연락 완료" : item.followupStatus === "draft" ? "기록 저장" : "연락 필요"}
         </span>
       </span>
-      <span className="mt-1 flex size-9 items-center justify-center rounded-full bg-[#F2F7F0] text-[#087A61]">
+      <span className="mt-1 flex size-9 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[var(--clinic-primary)]">
         <ArrowRight size={15} />
       </span>
     </button>
@@ -2467,7 +2469,7 @@ function statusTone(status: AttendanceStatus) {
     return "border-[#C9D7DC] bg-[#EEF4F6] text-stone-700";
   }
 
-  return "border-violet-300 bg-[#F1ECF8] text-violet-900";
+  return "border-[#AFC1C8] bg-[#E7EEF1] text-[#405763]";
 }
 
 function selectedChipTone(tone: "default" | "blue" | "green" | "amber" | "red" | "violet") {
@@ -2477,7 +2479,7 @@ function selectedChipTone(tone: "default" | "blue" | "green" | "amber" | "red" |
     green: "border-emerald-800 bg-emerald-800 text-white",
     amber: "border-amber-800 bg-amber-800 text-white",
     red: "border-red-800 bg-red-800 text-white",
-    violet: "border-violet-800 bg-violet-800 text-white",
+    violet: "border-[#334B58] bg-[#334B58] text-white",
   };
 
   return tones[tone];
