@@ -1285,7 +1285,7 @@ export function ManagementHome({
         actionIcon={<Plus size={14} />}
         onAction={openCreateStudentForm}
       >
-        <div className="mb-3 grid gap-2 rounded-md border border-[#E6E0D5] bg-white p-2.5 sm:mb-4 sm:bg-[#F7F5F0] sm:p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="mb-3 grid gap-2 border border-[#B8C9D0] bg-[#E7EEF1] p-2.5 sm:mb-4 sm:p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-stone-950">학생 등록 후 반 배정과 스케줄까지 확인합니다.</p>
             <p className="mt-1 hidden text-xs leading-5 text-stone-500 sm:block">
@@ -1296,7 +1296,7 @@ export function ManagementHome({
             <button
               type="button"
               onClick={openMissingScheduleStudents}
-              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] sm:min-h-10"
+              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 text-xs font-bold text-[#315C7C] transition hover:bg-[#EDF3F5] sm:min-h-10"
             >
               <CalendarDays size={14} />
               스케줄 미등록 보기
@@ -1304,7 +1304,7 @@ export function ManagementHome({
             <button
               type="button"
               onClick={openBulkStudentImport}
-              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-md bg-[#315C7C] px-3 text-xs font-semibold text-white transition hover:bg-[#244B67] sm:min-h-10"
+              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-sm border border-[var(--clinic-primary)] bg-[var(--clinic-primary)] px-3 text-xs font-bold text-white transition hover:bg-[var(--clinic-primary-dark)] sm:min-h-10"
             >
               <FileSpreadsheet size={14} />
               CSV 일괄 등록

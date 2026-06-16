@@ -172,7 +172,7 @@ export function StudentDirectory({
   }
 
   return (
-    <div className="min-w-0 overflow-hidden bg-transparent sm:rounded-lg sm:border sm:border-[#E6E0D5] sm:bg-white">
+    <div className="min-w-0 overflow-hidden bg-transparent sm:border sm:border-[#B8C9D0] sm:bg-[#F4F8F9]">
       <StudentDirectoryToolbar
         students={students}
         classes={classes}
@@ -198,7 +198,7 @@ export function StudentDirectory({
       </div>
       ) : (
         <div className="grid min-h-[620px] lg:grid-cols-[minmax(0,1fr)_420px]">
-          <div className="min-w-0 border-t border-[#E6E0D5] lg:border-r lg:border-[#E6E0D5]">
+          <div className="min-w-0 border-t border-[#B8C9D0] lg:border-r lg:border-[#B8C9D0]">
             <StudentResourceTable
               students={filteredStudents}
               selectedStudentId={selectedStudent?.id ?? null}
@@ -207,7 +207,7 @@ export function StudentDirectory({
             />
           </div>
 
-          <div className="hidden min-w-0 border-t border-[#E6E0D5] bg-[#F7F5F0]/70 lg:block">
+          <div className="hidden min-w-0 border-t border-[#B8C9D0] bg-[#EDF3F5] lg:block">
             <StudentDetailPanel
               student={selectedStudent}
               onEditStudent={onEditStudent}
@@ -269,22 +269,22 @@ export function StudentDirectoryToolbar({
   ].filter(Boolean).length;
 
   return (
-    <div className="space-y-2 bg-transparent pb-3 sm:bg-[#FFFCF7] sm:p-3">
-      <div className="grid gap-2 xl:grid-cols-[minmax(260px,1fr)_auto] xl:items-center">
+    <div className="border-b border-[#B8C9D0] bg-[#E7EEF1]">
+      <div className="grid gap-0 xl:grid-cols-[minmax(260px,1fr)_auto] xl:items-stretch">
         <label className="relative block">
           <Search
             size={16}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#60717B]"
           />
           <input
             value={searchQuery}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="학생명, 반, 학교, 학부모 검색"
-            className="min-h-10 w-full rounded-md border border-[#D8D0C4] bg-white pl-9 pr-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-11 w-full border-0 border-b border-[#B8C9D0] bg-[#F7FAFA] pl-9 pr-3 text-sm font-medium text-[var(--clinic-text)] outline-none placeholder:text-[#8799A1] focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] xl:border-b-0 xl:border-r"
           />
         </label>
 
-        <div className="flex items-center justify-between gap-2 rounded-md border border-[#E6E0D5] bg-white px-3 py-2 text-xs font-semibold text-stone-600 sm:bg-[#F7F5F0]">
+        <div className="flex items-center justify-between gap-2 border-b border-[#B8C9D0] bg-[#F4F8F9] px-3 py-2 text-xs font-bold text-[var(--clinic-muted)] xl:min-h-11 xl:border-b-0">
           <button
             type="button"
             onClick={() =>
@@ -293,10 +293,10 @@ export function StudentDirectoryToolbar({
               )
             }
             className={[
-              "flex min-h-8 min-w-0 items-center gap-2 rounded-md px-2 text-left transition",
+              "flex min-h-8 min-w-0 items-center gap-2 border px-2 text-left transition",
               scheduleFilter === "missing_schedule"
-                ? "bg-[#315C7C] text-white"
-                : "bg-white text-stone-700 hover:bg-[#EAF1F8]",
+                ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
+                : "border-[#C9D7DC] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#E1F0EF]",
             ].join(" ")}
           >
             <CalendarDays size={13} className="shrink-0" />
@@ -307,7 +307,7 @@ export function StudentDirectoryToolbar({
           <button
             type="button"
             onClick={() => setIsFilterOpen((current) => !current)}
-            className="flex min-h-8 shrink-0 items-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-2 text-xs font-semibold text-stone-700 lg:hidden"
+            className="flex min-h-8 shrink-0 items-center gap-1 border border-[#C9D7DC] bg-[#F7FAFA] px-2 text-xs font-bold text-[var(--clinic-text)] lg:hidden"
           >
             <SlidersHorizontal size={13} />
             필터{activeFilterCount > 0 ? ` ${activeFilterCount}` : ""}
@@ -316,7 +316,7 @@ export function StudentDirectoryToolbar({
       </div>
 
       {activeFilterCount > 0 ? (
-        <div className="flex flex-wrap gap-1.5 lg:hidden">
+        <div className="flex flex-wrap gap-1.5 border-b border-[#B8C9D0] bg-[#F4F8F9] px-3 py-2 lg:hidden">
           {classFilter !== "all" ? (
             <FilterChip label={classes.find((item) => item.id === classFilter)?.name ?? "반 필터"} />
           ) : null}
@@ -328,14 +328,14 @@ export function StudentDirectoryToolbar({
 
       <div
         className={[
-          "gap-2 sm:grid-cols-2 lg:grid lg:grid-cols-4",
+          "gap-0 border-b border-[#B8C9D0] bg-[#F4F8F9] sm:grid-cols-2 lg:grid lg:grid-cols-4",
           isFilterOpen ? "grid" : "hidden",
         ].join(" ")}
       >
         <select
           value={classFilter}
           onChange={(event) => onClassFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[var(--clinic-primary)]"
+          className="min-h-11 border-0 border-r border-[#B8C9D0] bg-[#F4F8F9] px-3 text-sm font-semibold text-[var(--clinic-text)] outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]"
         >
           <option value="all">전체 반</option>
           {classes.map((classItem) => (
@@ -348,7 +348,7 @@ export function StudentDirectoryToolbar({
         <select
           value={statusFilter}
           onChange={(event) => onStatusFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[var(--clinic-primary)]"
+          className="min-h-11 border-0 border-r border-[#B8C9D0] bg-[#F4F8F9] px-3 text-sm font-semibold text-[var(--clinic-text)] outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]"
         >
           <option value="all">전체 상태</option>
           <option value="active">재원</option>
@@ -359,7 +359,7 @@ export function StudentDirectoryToolbar({
         <select
           value={scheduleFilter}
           onChange={(event) => onScheduleFilterChange(event.target.value as StudentScheduleFilter)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[var(--clinic-primary)]"
+          className="min-h-11 border-0 border-r border-[#B8C9D0] bg-[#F4F8F9] px-3 text-sm font-semibold text-[var(--clinic-text)] outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]"
         >
           <option value="all">전체 스케줄</option>
           <option value="has_schedule">스케줄 있음</option>
@@ -370,7 +370,7 @@ export function StudentDirectoryToolbar({
         <select
           value={sortMode}
           onChange={(event) => onSortModeChange(event.target.value as StudentSortMode)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[var(--clinic-primary)]"
+          className="min-h-11 border-0 bg-[#F4F8F9] px-3 text-sm font-semibold text-[var(--clinic-text)] outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]"
         >
           <option value="time">요일·시간순</option>
           <option value="name">이름순</option>
@@ -405,7 +405,7 @@ function StudentResourceTable({
 
   return (
     <div className="min-w-0">
-      <div className="hidden grid-cols-[minmax(170px,1.15fr)_minmax(160px,0.95fr)_minmax(150px,0.9fr)_116px_88px] border-b border-[#E6E0D5] bg-[#FBFAF7] px-3 py-2.5 text-xs font-semibold text-stone-500 lg:grid">
+      <div className="hidden grid-cols-[minmax(170px,1.15fr)_minmax(160px,0.95fr)_minmax(150px,0.9fr)_116px_88px] border-b border-[#B8C9D0] bg-[#E7EEF1] px-3 py-2.5 text-xs font-black uppercase tracking-[0.08em] text-[#60717B] lg:grid">
         <span>학생</span>
         <span>반·학년</span>
         <span>대표 일정</span>
@@ -413,7 +413,7 @@ function StudentResourceTable({
         <span className="text-right">상태</span>
       </div>
       <div
-        className="overflow-hidden rounded-lg border border-[#DED8CE] bg-white sm:max-h-[680px] sm:overflow-y-auto sm:rounded-none sm:border-0 sm:bg-transparent"
+        className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA] sm:max-h-[680px] sm:overflow-y-auto sm:border-0 sm:bg-transparent"
         role="listbox"
         aria-label="학생 명단"
       >
@@ -451,8 +451,8 @@ function StudentResourceRow({
   return (
     <div
       className={[
-        "border-b border-[#EFE9DE] transition last:border-b-0",
-        isSelected ? "bg-[#EAF1F8]" : "bg-white hover:bg-[#FBFAF7]",
+        "border-b border-[#D6E0E5] transition last:border-b-0",
+        isSelected ? "bg-[#E1F0EF] shadow-[inset_4px_0_0_var(--clinic-primary)]" : "bg-[#F7FAFA] hover:bg-[#EDF3F5]",
       ].join(" ")}
     >
       <button
@@ -483,7 +483,7 @@ function StudentResourceRow({
         aria-selected={isSelected}
         aria-label={`${student.name} 학생 상세 보기, ${student.className ?? "미배정"}, ${student.gradeLabel ?? "학년 미지정"}, ${scheduleLabel}, 공유 동의 ${student.scheduleShareConsentConfirmed ? "완료" : "없음"}, 상태 ${studentStatusLabel(student.status)}`}
         onClick={onSelect}
-        className="hidden w-full grid-cols-[minmax(170px,1.15fr)_minmax(160px,0.95fr)_minmax(150px,0.9fr)_116px_88px] items-center gap-3 px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] lg:grid"
+        className="hidden w-full grid-cols-[minmax(170px,1.15fr)_minmax(160px,0.95fr)_minmax(150px,0.9fr)_116px_88px] items-center gap-3 px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] lg:grid"
       >
         <span className="min-w-0">
           <span className="block truncate text-sm font-semibold text-stone-950">{student.name}</span>
@@ -507,8 +507,8 @@ function StudentResourceRow({
           className={[
             "w-fit rounded-full px-2 py-1 text-[11px] font-semibold",
             student.scheduleShareConsentConfirmed
-              ? "bg-violet-50 text-violet-800"
-              : "bg-stone-100 text-stone-600",
+              ? "border border-violet-200 bg-violet-50 text-violet-800"
+              : "border border-[#C9D7DC] bg-[#EDF3F5] text-[#60717B]",
           ].join(" ")}
         >
           {student.scheduleShareConsentConfirmed ? "공유 동의" : "미동의"}
@@ -523,7 +523,7 @@ function StudentResourceRow({
 
 function FilterChip({ label }: { label: string }) {
   return (
-    <span className="rounded-md bg-[#EAF1F8] px-2 py-1 text-[11px] font-semibold text-[#315C7C]">
+    <span className="border border-[#B8D7D8] bg-[#E1F0EF] px-2 py-1 text-[11px] font-semibold text-[#006F73]">
       {label}
     </span>
   );
