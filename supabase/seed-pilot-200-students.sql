@@ -188,9 +188,9 @@ insert into public.seed_pilot_200_dates (
   date_offset
 )
 select
-  date_value,
+  date_value::date,
   extract(dow from date_value)::smallint,
-  (date_value - current_date)::integer
+  (date_value::date - current_date)::integer
 from generate_series(
   date_trunc('month', current_date)::date,
   (date_trunc('month', current_date) + interval '1 month - 1 day')::date,
