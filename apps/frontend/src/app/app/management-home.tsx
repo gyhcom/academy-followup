@@ -874,22 +874,32 @@ export function ManagementHome({
       status: auditLogItems.length > 0 ? "최근 변경 확인" : "기록 대기",
     },
   ];
+  const isStudentLedgerMode = activeSection === "students";
 
   return (
     <div className="text-[var(--clinic-text)]">
-      <div className="grid gap-4 xl:grid-cols-[20rem_minmax(0,1fr)] xl:items-start 2xl:grid-cols-[21rem_minmax(0,1fr)_21rem]">
-      <ManagementCommandCenter
-        academyName={academyName}
-        activeStudents={activeStudents.length}
-        missingScheduleCount={missingScheduleCount}
-        classCount={classes.length}
-        memberCount={members.length}
-        activeSection={activeSection}
-        sections={managementSections}
-        onSelectSection={setActiveSection}
-      />
+      <div
+        className={[
+          "grid gap-4 xl:items-start",
+          isStudentLedgerMode
+            ? "xl:grid-cols-[minmax(0,1fr)]"
+            : "xl:grid-cols-[20rem_minmax(0,1fr)] 2xl:grid-cols-[21rem_minmax(0,1fr)_21rem]",
+        ].join(" ")}
+      >
+      {!isStudentLedgerMode ? (
+        <ManagementCommandCenter
+          academyName={academyName}
+          activeStudents={activeStudents.length}
+          missingScheduleCount={missingScheduleCount}
+          classCount={classes.length}
+          memberCount={members.length}
+          activeSection={activeSection}
+          sections={managementSections}
+          onSelectSection={setActiveSection}
+        />
+      ) : null}
 
-      <main className="min-w-0 space-y-4 sm:space-y-5">
+      <main className={["min-w-0 space-y-4 sm:space-y-5", isStudentLedgerMode ? "max-w-none" : ""].join(" ")}>
       {activeSection === "setup" ? (
         <ManagementPanel
           title="원장 시작 순서"
@@ -1410,19 +1420,21 @@ export function ManagementHome({
 
       </main>
 
-      <ManagementStatusSidebar
-        activeStudents={activeStudents.length}
-        missingScheduleCount={missingScheduleCount}
-        unassignedStudentCount={unassignedStudentCount}
-        classCount={classes.length}
-        memberCount={members.length}
-        templateCount={templates.length}
-        smsDryRun={settings.smsDryRun}
-        allowAssistantSend={settings.allowAssistantSend}
-        auditLogs={auditLogItems}
-        activeSection={activeSection}
-        onSelectSection={setActiveSection}
-      />
+      {!isStudentLedgerMode ? (
+        <ManagementStatusSidebar
+          activeStudents={activeStudents.length}
+          missingScheduleCount={missingScheduleCount}
+          unassignedStudentCount={unassignedStudentCount}
+          classCount={classes.length}
+          memberCount={members.length}
+          templateCount={templates.length}
+          smsDryRun={settings.smsDryRun}
+          allowAssistantSend={settings.allowAssistantSend}
+          auditLogs={auditLogItems}
+          activeSection={activeSection}
+          onSelectSection={setActiveSection}
+        />
+      ) : null}
       </div>
     </div>
   );
@@ -1862,16 +1874,16 @@ function ManagementStatusSidebar({
 
   return (
     <aside className="xl:col-start-2 2xl:sticky 2xl:top-4 2xl:col-start-auto">
-      <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
-        <div className="border-b border-[#D6E0E5] bg-[#F7FAFB] px-4 py-3">
+      <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9]">
+        <div className="border-b border-[#C9D7DC] bg-[#E7EEF1] px-4 py-3">
           <h3 className="text-sm font-bold text-[var(--clinic-text)]">운영 상태 패널</h3>
           <p className="mt-0.5 text-xs leading-5 text-[var(--clinic-muted)]">
             설정, 누락 항목, 변경 이력을 row 단위로 확인합니다.
           </p>
         </div>
 
-        <div className="divide-y divide-[#EFE9DE]">
-          <div className="bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+        <div className="divide-y divide-[#C9D7DC]">
+          <div className="bg-[#EDF3F5] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
             기준 데이터
           </div>
           <ManagementStatusRow
@@ -1904,7 +1916,7 @@ function ManagementStatusSidebar({
             isActive={activeSection === "templates"}
             onClick={() => onSelectSection("templates")}
           />
-          <div className="bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+          <div className="bg-[#EDF3F5] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
             발송 정책
           </div>
           <PolicyPill
@@ -1917,14 +1929,14 @@ function ManagementStatusSidebar({
             detail={allowAssistantSend ? "보조 계정도 테스트 발송 가능" : "보조 계정은 기록 저장만 가능"}
             tone={allowAssistantSend ? "warning" : "safe"}
           />
-          <div className="flex items-center justify-between gap-2 bg-white px-4 py-2">
+          <div className="flex items-center justify-between gap-2 bg-[#EDF3F5] px-4 py-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-stone-500">
               최근 변경
             </span>
             <button
               type="button"
               onClick={() => onSelectSection("history")}
-              className="rounded-md px-2 py-1 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+              className="rounded-sm px-2 py-1 text-xs font-semibold text-[#315C7C] transition hover:bg-[#E1F0EF] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
             >
               이력 보기
             </button>
@@ -1935,7 +1947,7 @@ function ManagementStatusSidebar({
                 key={log.id}
                 type="button"
                 onClick={() => onSelectSection("history")}
-                className="block w-full px-4 py-3 text-left transition hover:bg-[#FBFAF7] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]"
+                className="block w-full bg-[#F7FAFA] px-4 py-3 text-left transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]"
               >
                 <p className="truncate text-xs font-semibold text-stone-900">
                   {log.summary}
@@ -1984,8 +1996,8 @@ function ManagementStatusRow({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2]",
-        isActive ? "bg-[#EAF1F8]" : "hover:bg-[#FBFAF7]",
+        "grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]",
+        isActive ? "bg-[#E1F0EF]" : "bg-[#F7FAFA] hover:bg-[#EDF3F5]",
       ].join(" ")}
     >
       <span className="min-w-0">
@@ -2009,7 +2021,7 @@ function PolicyPill({
   return (
     <div
       className={[
-        "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 py-3",
+        "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 bg-[#F7FAFA] px-4 py-3",
         tone === "safe"
           ? "text-emerald-900"
           : "text-amber-900",
@@ -2021,7 +2033,7 @@ function PolicyPill({
       </span>
       <span
         className={[
-          "h-2 w-2 rounded-full",
+          "h-2 w-2",
           tone === "safe" ? "bg-emerald-500" : "bg-amber-500",
         ].join(" ")}
         aria-hidden="true"
@@ -2360,12 +2372,12 @@ function ManagementCommandCenter({
   onSelectSection: (section: ManagementSection) => void;
 }) {
   return (
-    <section className="overflow-hidden rounded-md border border-[#C2D1D8] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)] xl:sticky xl:top-4">
+    <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9] xl:sticky xl:top-4">
       <div className="border-b border-[#0B3E49] bg-[var(--clinic-primary-dark)] px-3 py-3 text-white sm:px-4">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-100/70">
           Academy Admin
         </p>
-        <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between xl:block">
+        <div className="mt-2 flex flex-col gap-3">
           <div className="min-w-0">
             <h2 className="text-xl font-bold leading-tight text-white xl:text-lg">
               {academyName}
@@ -2374,7 +2386,7 @@ function ManagementCommandCenter({
               운영 세팅, 명단, 수업, 직원, 문자, 정책을 업무 단위로 관리합니다.
             </p>
           </div>
-          <div className="grid grid-cols-4 gap-1.5 rounded-md border border-white/15 bg-white/8 p-1.5 text-center xl:mt-3 xl:grid-cols-2">
+          <div className="grid grid-cols-4 border border-white/15 text-center text-[11px] xl:grid-cols-2">
             <Metric label="학생" value={`${activeStudents}명`} />
             <Metric label="미등록" value={`${missingScheduleCount}명`} />
             <Metric label="반" value={`${classCount}개`} />
@@ -2383,7 +2395,7 @@ function ManagementCommandCenter({
         </div>
       </div>
 
-      <div className="divide-y divide-[#E1EAEE] p-1.5">
+      <div className="divide-y divide-[#C9D7DC]">
         {sections.map((section) => {
           const isActive = activeSection === section.id;
 
@@ -2395,10 +2407,10 @@ function ManagementCommandCenter({
               aria-current={isActive ? "page" : undefined}
               onClick={() => onSelectSection(section.id)}
               className={[
-                "group grid min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-l-[3px] px-2.5 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
+                "group grid min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-l-[3px] px-3 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
                 isActive
-                  ? "border-l-[var(--clinic-primary)] bg-[#EAF6F5] text-[var(--clinic-text)]"
-                  : "border-l-transparent bg-white text-[var(--clinic-text)] hover:border-l-[#B8C9D0] hover:bg-[#F5FAFA]",
+                  ? "border-l-[var(--clinic-primary)] bg-[#E1F0EF] text-[var(--clinic-text)]"
+                  : "border-l-transparent bg-[#F7FAFA] text-[var(--clinic-text)] hover:border-l-[#B8C9D0] hover:bg-[#EDF3F5]",
               ].join(" ")}
             >
               <span className="min-w-0">
@@ -2406,8 +2418,10 @@ function ManagementCommandCenter({
                   <span className="truncate text-sm font-bold">{section.label}</span>
                   <span
                     className={[
-                      "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold",
-                      isActive ? "bg-[var(--clinic-primary)] text-white" : "bg-[#E8F0F2] text-[var(--clinic-muted)]",
+                      "shrink-0 border px-2 py-0.5 text-[11px] font-semibold",
+                      isActive
+                        ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
+                        : "border-[#C9D7DC] bg-[#EDF3F5] text-[var(--clinic-muted)]",
                     ].join(" ")}
                   >
                     {section.count}

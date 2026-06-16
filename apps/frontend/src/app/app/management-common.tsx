@@ -13,13 +13,13 @@ export function SummaryCard({
   detail: string;
 }) {
   return (
-    <article className="min-w-0 rounded-md border border-[#C7D6DD] bg-white p-3.5 shadow-[0_1px_2px_rgba(13,38,48,0.08)] sm:p-4">
+    <article className="min-w-0 border border-[#B8C9D0] bg-[#F4F8F9] p-3.5 sm:p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--clinic-muted)]">{label}</p>
           <p className="mt-2 text-xl font-bold text-[var(--clinic-text)] sm:text-2xl">{value}</p>
         </div>
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-[#EAF6F5] text-[var(--clinic-primary)] sm:size-10">
+        <div className="flex size-9 shrink-0 items-center justify-center border border-[#B8D7D8] bg-[#E1F0EF] text-[var(--clinic-primary)] sm:size-10">
           {icon}
         </div>
       </div>
@@ -44,7 +44,7 @@ export function ManagementPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="min-w-0 bg-transparent sm:rounded-md sm:border sm:border-[#C7D6DD] sm:bg-white sm:p-5 sm:shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+    <section className="min-w-0 bg-transparent sm:border sm:border-[#B8C9D0] sm:bg-[#F4F8F9] sm:p-5">
       <div className="flex items-center justify-between gap-3 pb-3 sm:border-b sm:border-[#D6E0E5] sm:pb-4">
         <div className="min-w-0">
           <h3 className="text-lg font-bold text-[var(--clinic-text)] sm:text-base">{title}</h3>
@@ -56,9 +56,9 @@ export function ManagementPanel({
             disabled={!onAction}
             onClick={onAction}
             className={[
-              "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-semibold sm:min-h-10",
+              "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-sm border px-3 text-xs font-semibold sm:min-h-10",
               onAction
-                ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white shadow-sm transition hover:border-[var(--clinic-primary-dark)] hover:bg-[var(--clinic-primary-dark)]"
+                ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white transition hover:border-[var(--clinic-primary-dark)] hover:bg-[var(--clinic-primary-dark)]"
                 : "cursor-not-allowed border-[#D6E0E5] bg-[#F4F8F9] text-[var(--clinic-muted)]",
             ].join(" ")}
           >
@@ -89,7 +89,7 @@ export function StatusBadge({ status }: { status: string }) {
   return (
     <span
       className={[
-        "shrink-0 rounded-md px-2 py-1 text-xs font-semibold",
+        "shrink-0 rounded-sm border px-2 py-1 text-xs font-semibold",
         styles[status] ?? "bg-stone-200 text-stone-700",
       ].join(" ")}
     >
