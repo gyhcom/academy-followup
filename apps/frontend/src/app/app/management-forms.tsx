@@ -38,13 +38,13 @@ export function MemberForm({
     status.status !== "saving";
 
   return (
-    <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50/70 p-3 min-w-0 overflow-hidden">
+    <div className="mb-4 rounded-sm border border-[#8FA6B0] bg-[#E7EEF1] p-3 min-w-0 overflow-hidden">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-stone-950">
+          <p className="text-sm font-semibold text-[var(--clinic-text)]">
             {form.mode === "create" ? "새 구성원 등록" : "구성원 정보 수정"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-stone-600">
+          <p className="mt-1 text-xs leading-5 text-[#405763]">
             신규 등록은 이름, 연락처, 직위, 임시 비밀번호만 입력합니다. 시스템 로그인 ID는 자동 생성됩니다.
           </p>
         </div>
@@ -52,51 +52,51 @@ export function MemberForm({
           type="button"
           aria-label="구성원 입력 닫기"
           onClick={onCancel}
-          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+          className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] text-[#405763]"
         >
           <X size={15} />
         </button>
       </div>
 
       <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2">
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           이름
           <input
             value={form.name}
             onChange={(event) => onChange({ ...form, name: event.target.value })}
             placeholder="예: 김선생"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
         {form.mode === "edit" ? (
-          <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+          <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
             시스템 로그인 ID
             <input
               type="email"
               value={form.email}
               readOnly
-              className="min-h-11 w-full min-w-0 rounded-md border border-stone-200 bg-stone-50 px-3 text-sm text-stone-500 outline-none"
+              className="min-h-11 w-full min-w-0 rounded-sm border border-stone-200 bg-[#EDF3F5] px-3 text-sm text-[var(--clinic-muted)] outline-none"
             />
           </label>
         ) : null}
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           전화번호
           <input
             value={form.phone}
             onChange={(event) => onChange({ ...form, phone: event.target.value })}
             placeholder="010-0000-0000"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           직위
           <select
             value={form.role}
             onChange={(event) => onChange({ ...form, role: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="manager">관리자</option>
             <option value="teacher">선생님</option>
@@ -105,12 +105,12 @@ export function MemberForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           상태
           <select
             value={form.status}
             onChange={(event) => onChange({ ...form, status: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="active">활성</option>
             <option value="inactive">비활성</option>
@@ -118,21 +118,21 @@ export function MemberForm({
         </label>
 
         {form.mode === "create" ? (
-          <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+          <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
             임시 비밀번호
             <input
               type="password"
               value={form.password}
               onChange={(event) => onChange({ ...form, password: event.target.value })}
               placeholder="8자 이상"
-              className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+              className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
             />
           </label>
         ) : null}
       </div>
 
       {status.status === "error" ? (
-        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+        <p className="mt-3 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
           {status.message}
         </p>
       ) : null}
@@ -141,7 +141,7 @@ export function MemberForm({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 sm:w-auto"
+          className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-4 text-sm font-semibold text-[#405763] sm:w-auto"
         >
           취소
         </button>
@@ -150,8 +150,8 @@ export function MemberForm({
           disabled={!canSave}
           onClick={onSave}
           className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
+            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold sm:w-auto",
+            canSave ? "bg-[var(--clinic-primary)] text-white" : "bg-[#C7D4DA] text-[#405763]",
           ].join(" ")}
         >
           <Save size={16} />
@@ -180,13 +180,13 @@ export function ClassForm({
   const canSave = form.name.trim().length > 0 && status.status !== "saving";
 
   return (
-    <div className="mb-4 min-w-0 overflow-hidden rounded-xl border border-[#C9D6E2] bg-[#EAF1F8] p-3">
+    <div className="mb-4 min-w-0 overflow-hidden rounded-sm border border-[#8FA6B0] bg-[#E7EEF1] p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-stone-950">
+          <p className="text-sm font-semibold text-[var(--clinic-text)]">
             {form.mode === "create" ? "새 반 등록" : "반 정보 수정"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-stone-600">
+          <p className="mt-1 text-xs leading-5 text-[#405763]">
             반 이름을 먼저 정하고, 주 담당 선생님을 연결하면 선생님 권한과 출석부 필터가 같이 정리됩니다.
           </p>
         </div>
@@ -194,29 +194,29 @@ export function ClassForm({
           type="button"
           aria-label="반 입력 닫기"
           onClick={onCancel}
-          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+          className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] text-[#405763]"
         >
           <X size={15} />
         </button>
       </div>
 
       <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2">
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
-          반 이름 <span className="text-xs font-normal text-stone-500">필수</span>
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
+          반 이름 <span className="text-xs font-normal text-[var(--clinic-muted)]">필수</span>
           <input
             value={form.name}
             onChange={(event) => onChange({ ...form, name: event.target.value })}
             placeholder="예: 중2 수학 A반"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           주 담당 선생님
           <select
             value={form.teacherId}
             onChange={(event) => onChange({ ...form, teacherId: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="">담당자 미지정</option>
             {teacherOptions.map((member) => (
@@ -227,22 +227,22 @@ export function ClassForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           과목
           <input
             value={form.subject}
             onChange={(event) => onChange({ ...form, subject: event.target.value })}
             placeholder="예: 수학"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           학년
           <select
             value={form.gradeLabel}
             onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="">학년 선택</option>
             {gradeOptions.map((grade) => (
@@ -255,7 +255,7 @@ export function ClassForm({
       </div>
 
       {status.status === "error" ? (
-        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+        <p className="mt-3 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
           {status.message}
         </p>
       ) : null}
@@ -264,7 +264,7 @@ export function ClassForm({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 sm:w-auto"
+          className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-4 text-sm font-semibold text-[#405763] sm:w-auto"
         >
           취소
         </button>
@@ -273,8 +273,8 @@ export function ClassForm({
           disabled={!canSave}
           onClick={onSave}
           className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
+            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold sm:w-auto",
+            canSave ? "bg-[var(--clinic-primary)] text-white" : "bg-[#C7D4DA] text-[#405763]",
           ].join(" ")}
         >
           <Save size={16} />
@@ -306,13 +306,13 @@ export function StudentForm({
     status.status !== "saving";
 
   return (
-    <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50/80 p-3 min-w-0 overflow-hidden">
+    <div className="mb-4 rounded-sm border border-[#8FA6B0] bg-[#E7EEF1] p-3 min-w-0 overflow-hidden">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-stone-950">
+          <p className="text-sm font-semibold text-[var(--clinic-text)]">
             {form.mode === "create" ? "새 학생 등록" : "학생 정보 수정"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-stone-600">
+          <p className="mt-1 text-xs leading-5 text-[#405763]">
             소속 반을 지정해야 출석, 문자, 선생님 권한 기준이 정확해집니다. 저장 후 주간 스케줄을 이어서 입력합니다.
           </p>
         </div>
@@ -320,29 +320,29 @@ export function StudentForm({
           type="button"
           aria-label="학생 입력 닫기"
           onClick={onCancel}
-          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+          className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] text-[#405763]"
         >
           <X size={15} />
         </button>
       </div>
 
       <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           학생 이름
           <input
             value={form.name}
             onChange={(event) => onChange({ ...form, name: event.target.value })}
             placeholder="예: 김민준"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
-          소속 반 <span className="text-xs font-normal text-stone-500">출석/권한 기준</span>
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
+          소속 반 <span className="text-xs font-normal text-[var(--clinic-muted)]">출석/권한 기준</span>
           <select
             value={form.classId}
             onChange={(event) => onChange({ ...form, classId: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="">미배정 - 나중에 배정</option>
             {classes.map((classItem) => (
@@ -353,12 +353,12 @@ export function StudentForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           상태
           <select
             value={form.status}
             onChange={(event) => onChange({ ...form, status: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="active">재원</option>
             <option value="paused">휴원</option>
@@ -366,22 +366,22 @@ export function StudentForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           학교
           <input
             value={form.schoolName}
             onChange={(event) => onChange({ ...form, schoolName: event.target.value })}
             placeholder="예: 한들중"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           학년
           <select
             value={form.gradeLabel}
             onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="">학년 선택</option>
             {gradeOptions.map((grade) => (
@@ -392,56 +392,56 @@ export function StudentForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           학부모명
           <input
             value={form.parentName}
             onChange={(event) => onChange({ ...form, parentName: event.target.value })}
             placeholder="예: 김민준 어머니"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2 lg:col-span-1">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2 lg:col-span-1">
           학부모 연락처
           <input
             value={form.parentPhone}
             onChange={(event) => onChange({ ...form, parentPhone: event.target.value })}
             inputMode="tel"
             placeholder="예: 010-1234-5678"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2 lg:col-span-1">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2 lg:col-span-1">
           학생 연락처
           <input
             value={form.studentPhone}
             onChange={(event) => onChange({ ...form, studentPhone: event.target.value })}
             inputMode="tel"
             placeholder="선택 입력"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
       </div>
 
-      <label className="mt-3 flex items-start gap-3 rounded-lg border border-sky-200 bg-white p-3 text-sm text-stone-700">
+      <label className="mt-3 flex items-start gap-3 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] p-3 text-sm text-[#405763]">
         <input
           type="checkbox"
           checked={form.scheduleShareConsentConfirmed}
           onChange={(event) =>
             onChange({ ...form, scheduleShareConsentConfirmed: event.target.checked })
           }
-          className="mt-1 size-4 shrink-0 accent-[#315C7C]"
+          className="mt-1 size-4 shrink-0 accent-[var(--clinic-primary)]"
         />
         <span className="min-w-0">
-          <span className="block font-semibold text-stone-950">
+          <span className="block font-semibold text-[var(--clinic-text)]">
             타 학원 스케줄 공유 동의 확인
           </span>
           <span className="mt-1 block leading-5">
             보호자에게 타 학원 스케줄 공유 목적과 범위를 안내했고 동의를 확인했습니다.
           </span>
-          <span className="mt-1 block text-xs leading-5 text-stone-500">
+          <span className="mt-1 block text-xs leading-5 text-[var(--clinic-muted)]">
             체크하면 같은 학생으로 확인되는 다른 학원 일정이 자동으로 연결됩니다. 전화번호는
             동일 학생 확인에만 사용되며 상대 학원에 노출되지 않습니다.
           </span>
@@ -449,7 +449,7 @@ export function StudentForm({
       </label>
 
       {status.status === "error" ? (
-        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+        <p className="mt-3 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
           {status.message}
         </p>
       ) : null}
@@ -458,7 +458,7 @@ export function StudentForm({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 sm:w-auto"
+          className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-4 text-sm font-semibold text-[#405763] sm:w-auto"
         >
           취소
         </button>
@@ -467,8 +467,8 @@ export function StudentForm({
           disabled={!canSave}
           onClick={onSave}
           className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
+            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold sm:w-auto",
+            canSave ? "bg-[var(--clinic-primary)] text-white" : "bg-[#C7D4DA] text-[#405763]",
           ].join(" ")}
         >
           <Save size={16} />
@@ -517,13 +517,13 @@ export function ScheduleForm({
   }
 
   return (
-    <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50/70 p-3 min-w-0 overflow-hidden">
+    <div className="mb-4 rounded-sm border border-[#8FA6B0] bg-[#E7EEF1] p-3 min-w-0 overflow-hidden">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-stone-950">
+          <p className="text-sm font-semibold text-[var(--clinic-text)]">
             {form.mode === "create" ? "스케줄 등록" : "스케줄 수정"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-stone-600">
+          <p className="mt-1 text-xs leading-5 text-[#405763]">
             {form.studentName} 학생의 반복 수업, 날짜 지정 보강, 개인/기타 일정을 관리합니다.
           </p>
         </div>
@@ -531,19 +531,19 @@ export function ScheduleForm({
           type="button"
           aria-label="스케줄 입력 닫기"
           onClick={onCancel}
-          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+          className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] text-[#405763]"
         >
           <X size={15} />
         </button>
       </div>
 
       <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           유형
           <select
             value={form.scheduleType}
             onChange={(event) => onChange({ ...form, scheduleType: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="regular_class">정규 수업</option>
             <option value="makeup">보강</option>
@@ -552,7 +552,7 @@ export function ScheduleForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           날짜
           <input
             type="date"
@@ -565,19 +565,19 @@ export function ScheduleForm({
                 dayOfWeek: value ? getDayOfWeek(value) : form.dayOfWeek,
               });
             }}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
-          <span className="text-xs font-normal leading-5 text-stone-500">
+          <span className="text-xs font-normal leading-5 text-[var(--clinic-muted)]">
             비워두면 주간 반복, 입력하면 해당 날짜 1회 일정입니다.
           </span>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           요일
           <select
             value={form.dayOfWeek}
             onChange={(event) => onChange({ ...form, dayOfWeek: Number(event.target.value) })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             {weekDayOptions.map((day) => (
               <option key={day.value} value={day.value}>
@@ -587,42 +587,42 @@ export function ScheduleForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           시작
           <input
             type="time"
             value={form.startTime}
             onChange={(event) => onChange({ ...form, startTime: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           종료
           <input
             type="time"
             value={form.endTime}
             onChange={(event) => onChange({ ...form, endTime: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2">
           제목
           <input
             value={form.title}
             onChange={(event) => onChange({ ...form, title: event.target.value })}
             placeholder="예: 월수금 수학 정규 수업"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           연결 반
           <select
             value={form.classId}
             onChange={(event) => changeClass(event.target.value)}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="">반 연결 없음</option>
             {classes.map((classItem) => (
@@ -633,12 +633,12 @@ export function ScheduleForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           담당
           <select
             value={form.teacherId}
             onChange={(event) => onChange({ ...form, teacherId: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="">담당자 미지정</option>
             {members.map((member) => (
@@ -649,27 +649,27 @@ export function ScheduleForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           과목
           <input
             value={form.subject}
             onChange={(event) => onChange({ ...form, subject: event.target.value })}
             placeholder="예: 수학"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2 xl:col-span-3">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2 xl:col-span-3">
           메모
           <input
             value={form.memo}
             onChange={(event) => onChange({ ...form, memo: event.target.value })}
             placeholder="예: 보강 후보에서 제외할 개인 일정"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="flex min-h-11 min-w-0 items-center gap-2 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-800">
+        <label className="flex min-h-11 min-w-0 items-center gap-2 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm font-medium text-[var(--clinic-text)]">
           <input
             type="checkbox"
             checked={form.isActive}
@@ -681,7 +681,7 @@ export function ScheduleForm({
       </div>
 
       {status.status === "error" ? (
-        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+        <p className="mt-3 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
           {status.message}
         </p>
       ) : null}
@@ -692,7 +692,7 @@ export function ScheduleForm({
             type="button"
             disabled={status.status === "saving"}
             onClick={onDelete}
-            className="flex min-h-11 w-full min-w-0 items-center justify-center gap-2 rounded-md border border-red-200 bg-white px-4 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+            className="flex min-h-11 w-full min-w-0 items-center justify-center gap-2 rounded-sm border border-red-200 bg-[#F7FAFA] px-4 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             <Trash2 size={16} />
             삭제
@@ -704,7 +704,7 @@ export function ScheduleForm({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 sm:w-auto"
+          className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-4 text-sm font-semibold text-[#405763] sm:w-auto"
         >
           취소
         </button>
@@ -713,8 +713,8 @@ export function ScheduleForm({
           disabled={!canSave}
           onClick={onSave}
           className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
+            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold sm:w-auto",
+            canSave ? "bg-[var(--clinic-primary)] text-white" : "bg-[#C7D4DA] text-[#405763]",
           ].join(" ")}
         >
           <Save size={16} />
@@ -765,11 +765,11 @@ export function BulkScheduleForm({
   };
 
   return (
-    <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50/70 p-3 min-w-0 overflow-hidden">
+    <div className="mb-4 rounded-sm border border-[#8FA6B0] bg-[#E7EEF1] p-3 min-w-0 overflow-hidden">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-stone-950">이 반 학생 전체 수업 시간 등록</p>
-          <p className="mt-1 text-xs leading-5 text-stone-600">
+          <p className="text-sm font-semibold text-[var(--clinic-text)]">이 반 학생 전체 수업 시간 등록</p>
+          <p className="mt-1 text-xs leading-5 text-[#405763]">
             {form.className} 재원 학생 전체에게 같은 요일·시간의 반복 수업을 등록합니다.
             이미 같은 시간의 활성 스케줄이 있는 학생은 자동으로 건너뜁니다.
           </p>
@@ -778,19 +778,19 @@ export function BulkScheduleForm({
           type="button"
           aria-label="일괄 스케줄 입력 닫기"
           onClick={onCancel}
-          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600"
+          className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] text-[#405763]"
         >
           <X size={15} />
         </button>
       </div>
 
       <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           유형
           <select
             value={form.scheduleType}
             onChange={(event) => onChange({ ...form, scheduleType: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="regular_class">정규 수업</option>
             <option value="makeup">보강</option>
@@ -799,10 +799,10 @@ export function BulkScheduleForm({
           </select>
         </label>
 
-        <div className="grid min-w-0 gap-2 text-sm font-medium text-stone-800 sm:col-span-2 xl:col-span-3">
+        <div className="grid min-w-0 gap-2 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2 xl:col-span-3">
           <div className="flex min-w-0 items-center justify-between gap-2">
             <span>요일</span>
-            <span className="truncate text-xs font-normal text-stone-500">
+            <span className="truncate text-xs font-normal text-[var(--clinic-muted)]">
               {selectedDayLabels || "요일을 선택해 주세요"}
             </span>
           </div>
@@ -818,10 +818,10 @@ export function BulkScheduleForm({
                   type="button"
                   onClick={() => setDayOfWeeks(group.values)}
                   className={[
-                    "min-h-9 rounded-full border px-3 text-xs font-semibold transition",
+                    "min-h-9 rounded-sm border px-3 text-xs font-semibold transition",
                     isSelected
-                      ? "border-violet-700 bg-violet-700 text-white"
-                      : "border-violet-200 bg-white text-violet-800",
+                      ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
+                      : "border-[#B8C9D0] bg-[#F7FAFA] text-[#244B67]",
                   ].join(" ")}
                 >
                   {group.label}
@@ -839,10 +839,10 @@ export function BulkScheduleForm({
                   type="button"
                   onClick={() => toggleDayOfWeek(day.value)}
                   className={[
-                    "min-h-10 rounded-md border text-sm font-semibold transition",
+                    "min-h-10 rounded-sm border text-sm font-semibold transition",
                     isSelected
-                      ? "border-violet-700 bg-violet-700 text-white"
-                      : "border-stone-300 bg-white text-stone-700",
+                      ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
+                      : "border-[#AFC1C8] bg-[#F7FAFA] text-[#405763]",
                   ].join(" ")}
                   aria-pressed={isSelected}
                 >
@@ -853,42 +853,42 @@ export function BulkScheduleForm({
           </div>
         </div>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           시작
           <input
             type="time"
             value={form.startTime}
             onChange={(event) => onChange({ ...form, startTime: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           종료
           <input
             type="time"
             value={form.endTime}
             onChange={(event) => onChange({ ...form, endTime: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2">
           제목
           <input
             value={form.title}
             onChange={(event) => onChange({ ...form, title: event.target.value })}
             placeholder="예: 월수금 수학 정규 수업"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           담당
           <select
             value={form.teacherId}
             onChange={(event) => onChange({ ...form, teacherId: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           >
             <option value="">반 담당자 사용</option>
             {teacherOptions.map((member) => (
@@ -899,29 +899,29 @@ export function BulkScheduleForm({
           </select>
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
           과목
           <input
             value={form.subject}
             onChange={(event) => onChange({ ...form, subject: event.target.value })}
             placeholder="예: 수학"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-stone-800 sm:col-span-2 xl:col-span-4">
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2 xl:col-span-4">
           메모
           <input
             value={form.memo}
             onChange={(event) => onChange({ ...form, memo: event.target.value })}
             placeholder="예: 반 전체 정규 스케줄"
-            className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-3 text-sm outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-100"
+            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
           />
         </label>
       </div>
 
       {status.status === "error" ? (
-        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+        <p className="mt-3 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
           {status.message}
         </p>
       ) : null}
@@ -930,7 +930,7 @@ export function BulkScheduleForm({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 w-full min-w-0 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 sm:w-auto"
+          className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-4 text-sm font-semibold text-[#405763] sm:w-auto"
         >
           취소
         </button>
@@ -939,8 +939,8 @@ export function BulkScheduleForm({
           disabled={!canSave}
           onClick={onSave}
           className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-[#315C7C] text-white" : "bg-stone-300 text-stone-600",
+            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold sm:w-auto",
+            canSave ? "bg-[var(--clinic-primary)] text-white" : "bg-[#C7D4DA] text-[#405763]",
           ].join(" ")}
         >
           <Save size={16} />
