@@ -2,6 +2,8 @@
 -- 목적: 이미 적용된 pilot seed를 학원 운영형 출석부 검수 데이터로 다시 맞춥니다.
 -- 실행 대상: 개인정보 없는 파일럿/시연 DB.
 -- 주의: 실제 학원 개인정보가 들어간 운영 DB에서는 실행하지 마세요.
+-- 선행 조건: supabase/seed-pilot-200-students.sql이 먼저 실행되어 있어야 합니다.
+--            이 파일은 학생/반 seed를 새로 만들지 않고, 기존 pilot 학생을 재배치합니다.
 --
 -- 운영형 패턴:
 -- - 주요 8개 반만 active 운영 대상으로 사용합니다.
@@ -59,6 +61,30 @@ do $$
 declare
   academy uuid := '11111111-1111-4111-8111-111111111111'::uuid;
 begin
+  if (
+    select count(*)
+    from public.students
+    where academy_id = academy
+      and id in (
+        select md5('pilot-200-student-' || seq_value::text)::uuid
+        from generate_series(1, 200) as seqs(seq_value)
+      )
+  ) = 0 then
+    raise exception 'pilot-200 학생이 없습니다. 먼저 supabase/seed-pilot-200-students.sql 전체를 실행한 뒤 이 reset SQL을 실행하세요.';
+  end if;
+
+  if (
+    select count(*)
+    from public.classes
+    where academy_id = academy
+      and id in (
+        select md5('pilot-200-class-' || seq_value::text)::uuid
+        from generate_series(1, 20) as seqs(seq_value)
+      )
+  ) = 0 then
+    raise exception 'pilot-200 반이 없습니다. 먼저 supabase/seed-pilot-200-students.sql 전체를 실행한 뒤 이 reset SQL을 실행하세요.';
+  end if;
+
   -- 기존 pilot 200명 중 앞 148명만 active 운영 대상으로 둡니다.
   -- 8개 반 학생 수: 20, 19, 18, 20, 17, 19, 18, 17
   with
