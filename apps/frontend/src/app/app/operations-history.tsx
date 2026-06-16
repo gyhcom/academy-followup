@@ -23,33 +23,39 @@ export type FollowupHistoryState = {
 type StudentFollowupHistoryProps = {
   selectedStudentName: string | undefined;
   history: FollowupHistoryState;
+  compact?: boolean;
 };
 
 export function StudentFollowupHistory({
   selectedStudentName,
   history,
+  compact = false,
 }: StudentFollowupHistoryProps) {
   return (
     <section
       aria-labelledby="student-followup-history-title"
-      className="rounded-lg border border-stone-200 bg-white"
+      className={[
+        compact
+          ? "border border-[#B8C9D0] bg-[#F4F8F9]"
+          : "rounded-lg border border-stone-200 bg-white",
+      ].join(" ")}
     >
-      <div className="border-b border-stone-200 px-4 py-3">
+      <div className={compact ? "border-b border-[#C9D7DC] px-3 py-2.5" : "border-b border-stone-200 px-4 py-3"}>
         <div className="flex items-center gap-2">
-          <History className="text-[#315C7C]" size={18} />
+          <History className="text-[#007A7C]" size={compact ? 16 : 18} />
           <h2
             id="student-followup-history-title"
-            className="text-sm font-semibold text-stone-950"
+            className="text-sm font-bold text-[var(--clinic-text)]"
           >
             최근 연락 기록
           </h2>
           {history.status === "ready" ? (
-            <span className="ml-auto rounded-md border border-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">
+            <span className="ml-auto border border-[#C9D7DC] bg-[#EDF3F5] px-2 py-0.5 text-xs font-bold text-[var(--clinic-muted)]">
               {history.items.length}건
             </span>
           ) : null}
         </div>
-        <p className="mt-1 text-xs text-stone-500">
+        <p className="mt-1 text-xs text-[var(--clinic-muted)]">
           {selectedStudentName
             ? `${selectedStudentName} 학생에게 남긴 최근 연락 기록입니다.`
             : "학생을 선택하면 연락 기록이 표시됩니다."}
@@ -58,13 +64,13 @@ export function StudentFollowupHistory({
 
       <div>
         {history.status === "loading" ? (
-          <div className="p-4">
+          <div className={compact ? "p-3" : "p-4"}>
             <HistoryMessage icon={<Clock3 size={17} />} message="최근 기록을 불러오는 중입니다." />
           </div>
         ) : null}
 
         {history.status === "error" ? (
-          <div className="p-4">
+          <div className={compact ? "p-3" : "p-4"}>
             <HistoryMessage
               icon={<AlertCircle size={17} />}
               message={history.error || "최근 기록을 불러오지 못했습니다."}
@@ -74,7 +80,7 @@ export function StudentFollowupHistory({
         ) : null}
 
         {history.status === "ready" && history.items.length === 0 ? (
-          <div className="p-4">
+          <div className={compact ? "p-3" : "p-4"}>
             <HistoryMessage
               icon={<History size={17} />}
               message="아직 저장된 연락 기록이 없습니다."
@@ -83,9 +89,9 @@ export function StudentFollowupHistory({
         ) : null}
 
         {history.status === "ready" && history.items.length > 0 ? (
-          <ol className="divide-y divide-stone-100">
+          <ol className={compact ? "divide-y divide-[#C9D7DC]" : "divide-y divide-stone-100"}>
             {history.items.map((item) => (
-              <li key={item.id} className="border-l-2 border-l-transparent px-4 py-3">
+              <li key={item.id} className={compact ? "border-l-2 border-l-transparent px-3 py-2.5" : "border-l-2 border-l-transparent px-4 py-3"}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">

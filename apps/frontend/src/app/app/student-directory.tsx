@@ -280,7 +280,7 @@ export function StudentDirectoryToolbar({
             value={searchQuery}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="학생명, 반, 학교, 학부모 검색"
-            className="min-h-10 w-full rounded-md border border-[#D8D0C4] bg-white pl-9 pr-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-10 w-full rounded-md border border-[#D8D0C4] bg-white pl-9 pr-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#EAF1F8]"
           />
         </label>
 
@@ -335,7 +335,7 @@ export function StudentDirectoryToolbar({
         <select
           value={classFilter}
           onChange={(event) => onClassFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#315C7C]"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[var(--clinic-primary)]"
         >
           <option value="all">전체 반</option>
           {classes.map((classItem) => (
@@ -348,7 +348,7 @@ export function StudentDirectoryToolbar({
         <select
           value={statusFilter}
           onChange={(event) => onStatusFilterChange(event.target.value)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#315C7C]"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[var(--clinic-primary)]"
         >
           <option value="all">전체 상태</option>
           <option value="active">재원</option>
@@ -359,7 +359,7 @@ export function StudentDirectoryToolbar({
         <select
           value={scheduleFilter}
           onChange={(event) => onScheduleFilterChange(event.target.value as StudentScheduleFilter)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#315C7C]"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[var(--clinic-primary)]"
         >
           <option value="all">전체 스케줄</option>
           <option value="has_schedule">스케줄 있음</option>
@@ -370,7 +370,7 @@ export function StudentDirectoryToolbar({
         <select
           value={sortMode}
           onChange={(event) => onSortModeChange(event.target.value as StudentSortMode)}
-          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[#315C7C]"
+          className="min-h-10 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm outline-none focus:border-[var(--clinic-primary)]"
         >
           <option value="time">요일·시간순</option>
           <option value="name">이름순</option>
@@ -656,115 +656,148 @@ function StudentDetailPanel({
   );
 
   return (
-    <aside className="bg-[#FFFCF7] p-4 lg:sticky lg:top-4 lg:bg-transparent">
-      <div className="rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
-          기본 정보
-        </p>
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="truncate text-lg font-semibold text-stone-950">{student.name}</p>
-            <p className="mt-1 truncate text-sm text-stone-500">
-              {student.className ?? "미배정"} · {student.gradeLabel ?? "학년 미지정"}
-            </p>
-            <p className="mt-1 truncate text-xs text-stone-500">
-              {student.parentName ?? "학부모"} · {student.maskedParentPhone}
-            </p>
+    <aside className="bg-[#F4F8F9] lg:sticky lg:top-4">
+      <section className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
+        <div className="border-b border-[#0B3E49] bg-[var(--clinic-primary-dark)] px-4 py-3 text-white">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-cyan-100/70">
+                Student File
+              </p>
+              <h3 className="mt-1 truncate text-lg font-black text-white">{student.name}</h3>
+              <p className="mt-1 truncate text-xs font-medium text-cyan-50/72">
+                {student.className ?? "미배정"} · {student.gradeLabel ?? "학년 미지정"} · {student.parentName ?? "학부모"}
+              </p>
+            </div>
+            <StatusBadge status={student.status} />
           </div>
-          <StatusBadge status={student.status} />
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => onEditStudent(student)}
-            className="flex min-h-10 items-center justify-center gap-1 rounded-md border border-[#E6E0D5] bg-white px-3 text-xs font-semibold text-stone-700 transition hover:bg-[#F7F5F0]"
-          >
-            <Pencil size={13} />
-            학생 수정
-          </button>
-          <button
-            type="button"
-            onClick={() => onCreateSchedule(student)}
-            className="flex min-h-10 items-center justify-center gap-1 rounded-md bg-[#315C7C] px-3 text-xs font-semibold text-white transition hover:bg-[#244B67]"
-          >
-            <CalendarDays size={13} />
-            스케줄 추가
-          </button>
-        </div>
-      </div>
+        <div className="border-b border-[#C9D7DC] bg-[#E1F0EF] px-4 py-3">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#40616B]">
+                보호자 연락처
+              </p>
+              <p className="mt-1 truncate text-sm font-bold text-[var(--clinic-text)]">
+                {student.maskedParentPhone}
+              </p>
+            </div>
+            <span
+              className={[
+                "h-fit border px-2 py-1 text-[11px] font-black",
+                student.scheduleShareConsentConfirmed
+                  ? "border-violet-200 bg-violet-50 text-violet-800"
+                  : "border-[#C9D7DC] bg-[#EDF3F5] text-[#60717B]",
+              ].join(" ")}
+            >
+              {student.scheduleShareConsentConfirmed ? "공유 동의" : "공유 미동의"}
+            </span>
+          </div>
 
-      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-stone-950">우리 학원 일정</p>
-          <p className="text-xs font-medium text-stone-500">활성 {activeScheduleCount(student)}개</p>
-        </div>
-
-        {groupedSchedules.length === 0 ? (
-          <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-4 text-sm text-stone-500">
-            <p className="font-semibold text-stone-900">등록된 스케줄이 없습니다.</p>
-            <p className="mt-1 leading-5">
-              이 학생은 출석부와 보강 후보에서 빠질 수 있습니다. 정규 수업 시간을 먼저 추가해 주세요.
-            </p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => onEditStudent(student)}
+              className="flex min-h-10 items-center justify-center gap-1 border border-[#8FA6B0] bg-[#F7FAFA] px-3 text-xs font-bold text-[var(--clinic-text)] transition hover:bg-[#EDF3F5]"
+            >
+              <Pencil size={13} />
+              학생 수정
+            </button>
             <button
               type="button"
               onClick={() => onCreateSchedule(student)}
-              className="mt-3 flex min-h-9 w-full items-center justify-center gap-1 rounded-md bg-[#315C7C] px-3 text-xs font-semibold text-white transition hover:bg-[#244B67]"
+              className="flex min-h-10 items-center justify-center gap-1 border border-[var(--clinic-primary)] bg-[var(--clinic-primary)] px-3 text-xs font-bold text-white transition hover:bg-[var(--clinic-primary-dark)]"
             >
               <CalendarDays size={13} />
-              스케줄 바로 추가
+              스케줄 추가
             </button>
           </div>
-        ) : (
-          <div className="mt-3 divide-y divide-stone-100">
-            {groupedSchedules.map(({ dayOfWeek, schedules }) => (
-              <div key={dayOfWeek} className="py-3 first:pt-0 last:pb-0">
-                <p className="mb-2 text-xs font-semibold text-stone-500">{weekDayLabel(dayOfWeek)}</p>
-                <div className="space-y-1.5">
+        </div>
+
+        <section className="border-b border-[#C9D7DC]">
+          <StudentFileSectionHeader
+            title="우리 학원 일정"
+            meta={`활성 ${activeScheduleCount(student)}개`}
+          />
+
+          {groupedSchedules.length === 0 ? (
+            <div className="border-t border-[#C9D7DC] bg-[#F7FAFA] px-4 py-4 text-sm text-[var(--clinic-muted)]">
+              <p className="font-bold text-[var(--clinic-text)]">등록된 스케줄이 없습니다.</p>
+              <p className="mt-1 leading-5">
+                출석부와 보강 후보에서 빠질 수 있습니다. 정규 수업 시간을 먼저 추가해 주세요.
+              </p>
+              <button
+                type="button"
+                onClick={() => onCreateSchedule(student)}
+                className="mt-3 flex min-h-9 w-full items-center justify-center gap-1 border border-[var(--clinic-primary)] bg-[var(--clinic-primary)] px-3 text-xs font-bold text-white transition hover:bg-[var(--clinic-primary-dark)]"
+              >
+                <CalendarDays size={13} />
+                스케줄 바로 추가
+              </button>
+            </div>
+          ) : (
+            <div className="divide-y divide-[#C9D7DC] border-t border-[#C9D7DC]">
+              {groupedSchedules.map(({ dayOfWeek, schedules }) => (
+                <div key={dayOfWeek} className="bg-[#F7FAFA]">
+                  <p className="border-b border-[#E1EAEE] bg-[#EDF3F5] px-4 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#60717B]">
+                    {weekDayLabel(dayOfWeek)}
+                  </p>
                   {schedules.map((schedule) => (
                     <button
                       key={schedule.id}
                       type="button"
                       onClick={() => onEditSchedule(student, schedule)}
-                      className="grid w-full grid-cols-[72px_minmax(0,1fr)_42px] items-center gap-3 rounded-md px-2 py-2 text-left transition hover:bg-[#F7F5F0]"
+                      className="grid w-full grid-cols-[72px_minmax(0,1fr)_42px] items-center gap-3 border-b border-[#E1EAEE] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[#E1F0EF]"
                     >
-                      <span className="text-sm font-semibold tabular-nums text-stone-950">{schedule.startTime}</span>
+                      <span className="text-sm font-black tabular-nums text-[var(--clinic-text)]">{schedule.startTime}</span>
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-medium text-stone-900">{schedule.title}</span>
-                        <span className="mt-0.5 block truncate text-xs text-stone-500">
+                        <span className="block truncate text-sm font-bold text-[var(--clinic-text)]">{schedule.title}</span>
+                        <span className="mt-0.5 block truncate text-xs text-[var(--clinic-muted)]">
                           {[schedule.subject, schedule.memo].filter(Boolean).join(" · ") || "메모 없음"}
                         </span>
                       </span>
-                      <span className="rounded bg-stone-100 px-1.5 py-0.5 text-center text-[11px] font-semibold text-stone-600">
+                      <span className="border border-[#C9D7DC] bg-[#EDF3F5] px-1.5 py-0.5 text-center text-[11px] font-bold text-[#60717B]">
                         {scheduleTypeLabel(schedule.scheduleType)}
                       </span>
                     </button>
                   ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </section>
 
-      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
-        <StudentFollowupHistory selectedStudentName={student.name} history={history} />
-      </div>
+        <section className="border-b border-[#C9D7DC] bg-[#F7FAFA] p-3">
+          <StudentFollowupHistory selectedStudentName={student.name} history={history} compact />
+        </section>
 
-      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
-        <ExternalClassPanel student={student} />
-      </div>
+        <section className="border-b border-[#C9D7DC] bg-[#F7FAFA] p-3">
+          <ExternalClassPanel student={student} />
+        </section>
 
-      <div className="mt-3 rounded-lg border border-[#E6E0D5] bg-white p-4 shadow-[0_8px_20px_rgba(28,25,23,0.04)]">
-        <SharedSchedulePanel
-          student={student}
-          state={sharedSchedules}
-          onCreateCode={sharedSchedules.createCode}
-          onConnect={sharedSchedules.connect}
-          onRevoke={sharedSchedules.revoke}
-        />
-      </div>
+        <section className="bg-[#F7FAFA] p-3">
+          <SharedSchedulePanel
+            student={student}
+            state={sharedSchedules}
+            onCreateCode={sharedSchedules.createCode}
+            onConnect={sharedSchedules.connect}
+            onRevoke={sharedSchedules.revoke}
+          />
+        </section>
+      </section>
     </aside>
+  );
+}
+
+function StudentFileSectionHeader({ title, meta }: { title: string; meta?: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 bg-[#F4F8F9] px-4 py-3">
+      <p className="text-sm font-black text-[var(--clinic-text)]">{title}</p>
+      {meta ? (
+        <p className="text-xs font-bold text-[var(--clinic-muted)]">{meta}</p>
+      ) : null}
+    </div>
   );
 }
 
@@ -886,7 +919,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
         <button
           type="button"
           onClick={() => setIsFormOpen((current) => !current)}
-          className="flex min-h-8 shrink-0 items-center gap-1 rounded-md bg-[#315C7C] px-2.5 text-[11px] font-semibold text-white"
+          className="flex min-h-8 shrink-0 items-center gap-1 rounded-sm bg-[var(--clinic-primary)] px-2.5 text-[11px] font-semibold text-white"
         >
           <Plus size={13} />
           등록
@@ -894,7 +927,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
       </div>
 
       {activeEnrollments.length === 0 ? (
-        <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-3 text-xs leading-5 text-stone-600">
+        <div className="mt-3 border border-dashed border-[#B8C9D0] bg-[#F4F8F9] p-3 text-xs leading-5 text-stone-600">
           등록된 타 학원 수업이 없습니다. 예: 논술학원 화/목 19:30-20:30.
         </div>
       ) : (
@@ -902,7 +935,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
           {activeEnrollments.map((enrollment) => (
             <div
               key={enrollment.id}
-              className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-stone-200 bg-stone-50 px-2 py-2"
+              className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 border border-[#C9D7DC] bg-[#EDF3F5] px-2 py-2"
             >
               <span className="text-xs font-semibold tabular-nums text-stone-950">
                 {enrollment.startTime}
@@ -921,7 +954,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                 type="button"
                 disabled={isSaving}
                 onClick={() => deactivateEnrollment(enrollment.id)}
-                className="flex size-8 shrink-0 items-center justify-center rounded-md border border-red-200 bg-white text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-red-200 bg-[#FFF7F7] text-red-600 transition hover:bg-red-50 disabled:opacity-50"
                 aria-label={`${enrollment.title} 연결 해제`}
               >
                 <Trash2 size={13} />
@@ -932,7 +965,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
       )}
 
       {isFormOpen ? (
-        <div className="mt-3 space-y-2 rounded-md border border-[#D8D0C4] bg-[#FBFAF7] p-3">
+        <div className="mt-3 space-y-2 border border-[#B8C9D0] bg-[#F4F8F9] p-3">
           <div className="grid gap-2 sm:grid-cols-2">
             <label className="grid gap-1 text-xs font-semibold text-stone-600">
               타 학원명
@@ -942,7 +975,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                   setForm((current) => ({ ...current, academyName: event.target.value }))
                 }
                 placeholder="예: 논술학원"
-                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+                className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm text-stone-950 outline-none focus:border-[var(--clinic-primary)]"
               />
             </label>
             <label className="grid gap-1 text-xs font-semibold text-stone-600">
@@ -953,7 +986,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                   setForm((current) => ({ ...current, classTitle: event.target.value }))
                 }
                 placeholder="예: 논술 정규반"
-                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+                className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm text-stone-950 outline-none focus:border-[var(--clinic-primary)]"
               />
             </label>
           </div>
@@ -968,7 +1001,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                     dayOfWeek: Number(event.target.value),
                   }))
                 }
-                className="min-h-10 rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+                className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-2 text-sm text-stone-950 outline-none focus:border-[var(--clinic-primary)]"
               >
                 {[1, 2, 3, 4, 5, 6, 0].map((dayOfWeek) => (
                   <option key={dayOfWeek} value={dayOfWeek}>
@@ -985,7 +1018,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                 onChange={(event) =>
                   setForm((current) => ({ ...current, startTime: event.target.value }))
                 }
-                className="min-h-10 rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+                className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-2 text-sm text-stone-950 outline-none focus:border-[var(--clinic-primary)]"
               />
             </label>
             <label className="grid gap-1 text-xs font-semibold text-stone-600">
@@ -996,7 +1029,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                 onChange={(event) =>
                   setForm((current) => ({ ...current, endTime: event.target.value }))
                 }
-                className="min-h-10 rounded-md border border-stone-300 bg-white px-2 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+                className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-2 text-sm text-stone-950 outline-none focus:border-[var(--clinic-primary)]"
               />
             </label>
           </div>
@@ -1009,7 +1042,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                   setForm((current) => ({ ...current, subject: event.target.value }))
                 }
                 placeholder="예: 논술"
-                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+                className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm text-stone-950 outline-none focus:border-[var(--clinic-primary)]"
               />
             </label>
             <label className="grid gap-1 text-xs font-semibold text-stone-600">
@@ -1020,7 +1053,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                   setForm((current) => ({ ...current, memo: event.target.value }))
                 }
                 placeholder="선택 입력"
-                className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm text-stone-950 outline-none focus:border-[#315C7C]"
+                className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm text-stone-950 outline-none focus:border-[var(--clinic-primary)]"
               />
             </label>
           </div>
@@ -1038,7 +1071,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
       {status.message ? (
         <p
           className={[
-            "mt-3 rounded-md px-3 py-2 text-xs font-semibold",
+            "mt-3 rounded-sm px-3 py-2 text-xs font-semibold",
             status.state === "error"
               ? "bg-red-50 text-red-800"
               : "bg-emerald-50 text-emerald-800",
@@ -1101,14 +1134,14 @@ function SharedSchedulePanel({
           `타 학원 스케줄 공유 동의 확인`을 체크해 주세요.
         </div>
       ) : (
-        <div className="mt-3 rounded-md border border-[#C9D6E2] bg-[#EAF1F8] px-3 py-2 text-xs leading-5 text-[#315C7C]">
+        <div className="mt-3 border border-[#B8D7D8] bg-[#E1F0EF] px-3 py-2 text-xs leading-5 text-[#315C7C]">
           같은 학생으로 확인되는 다른 학원 일정은 자동으로 연결됩니다. 연결 기준은
           이름·학교·학년·전화번호이며, 상대 학원명과 전화번호는 공개되지 않습니다.
         </div>
       )}
 
       {state.status === "loading" ? (
-        <p className="mt-3 rounded-md bg-stone-50 px-3 py-2 text-xs font-medium text-stone-500">
+        <p className="mt-3 border border-[#C9D7DC] bg-[#EDF3F5] px-3 py-2 text-xs font-medium text-stone-500">
           공유 스케줄을 불러오는 중입니다.
         </p>
       ) : null}
@@ -1120,7 +1153,7 @@ function SharedSchedulePanel({
       ) : null}
 
       {state.links.length === 0 && state.status !== "loading" ? (
-        <div className="mt-3 rounded-md border border-dashed border-[#D8D0C4] bg-[#FBFAF7] p-3 text-xs leading-5 text-stone-600">
+        <div className="mt-3 border border-dashed border-[#B8C9D0] bg-[#F4F8F9] p-3 text-xs leading-5 text-stone-600">
           {hasShareConsent
             ? "동의 확인된 같은 학생이 다른 학원에 등록되면 자동으로 바쁜 시간이 연결됩니다."
             : "동의 확인 전에는 공유 연결을 만들지 않습니다."}
@@ -1128,7 +1161,7 @@ function SharedSchedulePanel({
       ) : (
         <div className="mt-3 space-y-2">
           {state.links.map((link) => (
-            <div key={link.id} className="rounded-md border border-stone-200 bg-stone-50 p-3">
+            <div key={link.id} className="border border-[#C9D7DC] bg-[#EDF3F5] p-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-stone-950">
@@ -1143,7 +1176,7 @@ function SharedSchedulePanel({
                     type="button"
                     disabled={isSaving}
                     onClick={() => onRevoke(link.id)}
-                    className="shrink-0 rounded-md border border-red-200 bg-white px-2 py-1 text-[11px] font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50"
+                    className="shrink-0 rounded-sm border border-red-200 bg-[#FFF7F7] px-2 py-1 text-[11px] font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50"
                   >
                     공유 해제
                   </button>
@@ -1157,7 +1190,7 @@ function SharedSchedulePanel({
                 {["동의 확인", "이름·학교·학년·전화번호 기준", "상대 학원명 비공개"].map((label) => (
                   <span
                     key={label}
-                    className="rounded bg-white px-1.5 py-0.5 text-[11px] font-semibold text-stone-500"
+                    className="border border-[#D6E0E5] bg-[#F7FAFA] px-1.5 py-0.5 text-[11px] font-semibold text-stone-500"
                   >
                     {label}
                   </span>
@@ -1168,7 +1201,7 @@ function SharedSchedulePanel({
                   {link.schedules.slice(0, 4).map((schedule) => (
                     <div
                       key={`${link.id}:${schedule.id}`}
-                      className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 rounded bg-white px-2 py-1.5"
+                      className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 border border-[#D6E0E5] bg-[#F7FAFA] px-2 py-1.5"
                     >
                       <span className="text-xs font-semibold tabular-nums text-stone-900">
                         {schedule.startTime}
@@ -1178,7 +1211,7 @@ function SharedSchedulePanel({
                           ? `${schedule.scheduleDate} · ${schedule.title}`
                           : `${weekDayShortLabel(schedule.dayOfWeek)} · ${schedule.title}`}
                       </span>
-                      <span className="rounded bg-[#EAF1F8] px-1.5 py-0.5 text-[11px] font-semibold text-[#315C7C]">
+                      <span className="border border-[#B8D7D8] bg-[#E1F0EF] px-1.5 py-0.5 text-[11px] font-semibold text-[#315C7C]">
                         {scheduleTypeLabel(schedule.scheduleType)}
                       </span>
                     </div>
@@ -1190,7 +1223,7 @@ function SharedSchedulePanel({
                   ) : null}
                 </div>
               ) : (
-                <p className="mt-2 rounded bg-white px-2 py-1.5 text-xs text-stone-500">
+                <p className="mt-2 border border-[#D6E0E5] bg-[#F7FAFA] px-2 py-1.5 text-xs text-stone-500">
                   연결된 학생의 활성 스케줄이 없습니다.
                 </p>
               )}
@@ -1209,12 +1242,12 @@ function SharedSchedulePanel({
             type="button"
             disabled={isSaving || !hasShareConsent}
             onClick={onCreateCode}
-            className="flex min-h-9 w-full items-center justify-center rounded-md bg-[#315C7C] px-3 text-xs font-semibold text-white disabled:opacity-50"
+            className="flex min-h-9 w-full items-center justify-center rounded-sm bg-[var(--clinic-primary)] px-3 text-xs font-semibold text-white disabled:opacity-50"
           >
             공유 코드 만들기
           </button>
           {state.generatedCode ? (
-            <div className="rounded-md border border-[#C9D6E2] bg-[#EAF1F8] p-3">
+            <div className="border border-[#B8D7D8] bg-[#E1F0EF] p-3">
               <p className="text-xs font-semibold text-[#315C7C]">
                 {student.name} 학생 공유 코드
               </p>
@@ -1232,13 +1265,13 @@ function SharedSchedulePanel({
               onChange={(event) => setCodeInput(event.target.value)}
               disabled={!hasShareConsent}
               placeholder="상대 학원 공유 코드"
-              className="min-h-10 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#EAF1F8]"
             />
             <button
               type="button"
               disabled={isSaving || !hasShareConsent || !codeInput.trim()}
               onClick={handleConnect}
-              className="min-h-10 rounded-md border border-[#315C7C] px-3 text-xs font-semibold text-[#315C7C] disabled:border-stone-200 disabled:text-stone-400"
+              className="min-h-10 rounded-sm border border-[var(--clinic-primary)] px-3 text-xs font-semibold text-[#315C7C] disabled:border-stone-200 disabled:text-stone-400"
             >
               코드로 연결
             </button>
@@ -1252,7 +1285,7 @@ function SharedSchedulePanel({
           {state.actionMessage ? (
             <p
               className={[
-                "rounded-md px-3 py-2 text-xs font-semibold",
+                "rounded-sm px-3 py-2 text-xs font-semibold",
                 state.actionStatus === "error"
                   ? "bg-red-50 text-red-800"
                   : "bg-emerald-50 text-emerald-800",
@@ -1263,7 +1296,7 @@ function SharedSchedulePanel({
           ) : null}
         </div>
       ) : (
-        <p className="mt-3 rounded-md bg-stone-50 px-3 py-2 text-xs leading-5 text-stone-500">
+        <p className="mt-3 border border-[#C9D7DC] bg-[#EDF3F5] px-3 py-2 text-xs leading-5 text-stone-500">
           공유 코드 발급과 연결 해제는 원장/관리자만 가능합니다.
         </p>
       )}
