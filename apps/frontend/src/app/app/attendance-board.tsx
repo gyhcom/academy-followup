@@ -125,6 +125,13 @@ type AttendanceOverview = {
 type AttendanceFilter = "all" | "unchecked" | "attention";
 type AttendanceBoardView = "calendar" | "today" | "ledger";
 type AttendanceDayDetailTab = "classes" | "students" | "attention";
+type AttendanceDayStatusFilter =
+  | "all"
+  | "present"
+  | "late"
+  | "absent"
+  | "pending"
+  | "needs_check";
 
 type AttendanceDayStudentRow = {
   id: string;
@@ -1704,15 +1711,37 @@ function AttendanceDayDetailPanel({
   onOpenStudent: (row: AttendanceDayStudentRow) => void;
   onOpenToday: () => void;
 }) {
+  const [studentStatusFilter, setStudentStatusFilter] =
+    useState<AttendanceDayStatusFilter>("all");
   const attentionRows = studentRows.filter(
     (row) =>
       row.status === "late" || row.status === "absent" || row.status === "needs_check",
   );
+  const filteredStudentRows = filterDayStudentRows(studentRows, studentStatusFilter);
   const tabs: Array<{ id: AttendanceDayDetailTab; label: string; count: number }> = [
     { id: "classes", label: "수업별", count: sessions.length },
     { id: "students", label: "학생별", count: studentRows.length },
     { id: "attention", label: "연락 필요", count: attentionRows.length },
   ];
+  const activeStudentFilterLabel = dayStatusFilterLabel(studentStatusFilter);
+  const activeStudentFilterCount = filteredStudentRows.length;
+
+  function openClassesTab() {
+    onTabChange("classes");
+  }
+
+  function openStudentFilter(filter: AttendanceDayStatusFilter) {
+    setStudentStatusFilter(filter);
+    onTabChange("students");
+  }
+
+  function openTab(tab: AttendanceDayDetailTab) {
+    if (tab === "students") {
+      setStudentStatusFilter("all");
+    }
+
+    onTabChange(tab);
+  }
 
   return (
     <aside className="min-w-0 bg-[#E5ECEE] p-3 sm:p-4">
@@ -1732,12 +1761,52 @@ function AttendanceDayDetailPanel({
             </span>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-1.5 text-center text-xs">
-            <SummaryPill label="수업" value={overview.totalSessions} />
-            <SummaryPill label="학생" value={overview.totalStudents} />
-            <SummaryPill label="출석" value={overview.counts.present} tone="success" />
-            <SummaryPill label="지각" value={overview.counts.late} tone="warning" />
-            <SummaryPill label="결석" value={overview.counts.absent} tone="danger" />
-            <SummaryPill label="미체크" value={overview.counts.pending} />
+            <SummaryFilterButton
+              label="수업"
+              value={overview.totalSessions}
+              isActive={activeTab === "classes"}
+              onClick={openClassesTab}
+            />
+            <SummaryFilterButton
+              label="학생"
+              value={overview.totalStudents}
+              isActive={activeTab === "students" && studentStatusFilter === "all"}
+              onClick={() => openStudentFilter("all")}
+            />
+            <SummaryFilterButton
+              label="출석"
+              value={overview.counts.present}
+              tone="success"
+              isActive={activeTab === "students" && studentStatusFilter === "present"}
+              onClick={() => openStudentFilter("present")}
+            />
+            <SummaryFilterButton
+              label="지각"
+              value={overview.counts.late}
+              tone="warning"
+              isActive={activeTab === "students" && studentStatusFilter === "late"}
+              onClick={() => openStudentFilter("late")}
+            />
+            <SummaryFilterButton
+              label="결석"
+              value={overview.counts.absent}
+              tone="danger"
+              isActive={activeTab === "students" && studentStatusFilter === "absent"}
+              onClick={() => openStudentFilter("absent")}
+            />
+            <SummaryFilterButton
+              label="미체크"
+              value={overview.counts.pending}
+              isActive={activeTab === "students" && studentStatusFilter === "pending"}
+              onClick={() => openStudentFilter("pending")}
+            />
+            <SummaryFilterButton
+              label="확인 필요"
+              value={overview.counts.needs_check}
+              tone="warning"
+              isActive={activeTab === "students" && studentStatusFilter === "needs_check"}
+              onClick={() => openStudentFilter("needs_check")}
+            />
           </div>
           <button
             type="button"
@@ -1755,7 +1824,7 @@ function AttendanceDayDetailPanel({
               type="button"
               role="tab"
               aria-selected={activeTab === tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => openTab(tab.id)}
               className={[
                 "min-h-9 flex-1 rounded-sm px-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                 activeTab === tab.id
@@ -1773,7 +1842,27 @@ function AttendanceDayDetailPanel({
             <AttendanceClassSummaryList sessions={sessions} records={records} />
           ) : null}
           {activeTab === "students" ? (
-            <AttendanceDayStudentList rows={studentRows} onOpenStudent={onOpenStudent} />
+            <>
+              {studentStatusFilter !== "all" ? (
+                <div className="mb-2 flex items-center justify-between gap-2 border border-[#C4D5DA] bg-[#F7FAF8] px-3 py-2 text-xs font-bold text-[#405763]">
+                  <span>
+                    {activeStudentFilterLabel} {activeStudentFilterCount}명 표시 중
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setStudentStatusFilter("all")}
+                    className="text-[var(--clinic-primary)] underline-offset-2 hover:underline"
+                  >
+                    전체 보기
+                  </button>
+                </div>
+              ) : null}
+              <AttendanceDayStudentList
+                rows={filteredStudentRows}
+                onOpenStudent={onOpenStudent}
+                emptyMessage={`${activeStudentFilterLabel} 학생이 없습니다.`}
+              />
+            </>
           ) : null}
           {activeTab === "attention" ? (
             <AttendanceDayStudentList
@@ -1817,6 +1906,48 @@ function SummaryPill({
       <span className="block text-[10px] font-bold leading-4 opacity-75">{label}</span>
       <span className="text-lg leading-5 tabular-nums">{value}</span>
     </span>
+  );
+}
+
+function SummaryFilterButton({
+  label,
+  value,
+  tone = "default",
+  isActive,
+  onClick,
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "success" | "warning" | "danger";
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  const toneClass =
+    tone === "success"
+      ? "border-l-emerald-600 text-emerald-800"
+      : tone === "warning"
+        ? "border-l-amber-500 text-amber-800"
+        : tone === "danger"
+          ? "border-l-red-600 text-red-800"
+          : "border-l-[#60717B] text-[#334B58]";
+
+  return (
+    <button
+      type="button"
+      aria-pressed={isActive}
+      onClick={onClick}
+      className={[
+        "border border-l-[3px] px-2 py-1.5 text-left font-extrabold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+        isActive
+          ? "border-[#0F766E] border-l-[#0F766E] bg-[#0B3F46] text-white shadow-[inset_0_-2px_0_rgba(255,255,255,0.18)]"
+          : `border-[#C9D8DD] bg-[#F8FAF8] hover:bg-[#EEF5F3] ${toneClass}`,
+      ].join(" ")}
+    >
+      <span className={["block text-[10px] font-bold leading-4", isActive ? "text-white/75" : "opacity-75"].join(" ")}>
+        {label}
+      </span>
+      <span className="text-lg leading-5 tabular-nums">{value}</span>
+    </button>
   );
 }
 
@@ -4633,6 +4764,30 @@ function createEmptyAttendanceCounts(): Record<AttendanceStatus, number> {
     excused: 0,
     needs_check: 0,
   };
+}
+
+function filterDayStudentRows(
+  rows: AttendanceDayStudentRow[],
+  filter: AttendanceDayStatusFilter,
+) {
+  if (filter === "all") {
+    return rows;
+  }
+
+  return rows.filter((row) => row.status === filter);
+}
+
+function dayStatusFilterLabel(filter: AttendanceDayStatusFilter) {
+  const labels: Record<AttendanceDayStatusFilter, string> = {
+    all: "전체",
+    present: "출석",
+    late: "지각",
+    absent: "결석",
+    pending: "미체크",
+    needs_check: "확인 필요",
+  };
+
+  return labels[filter];
 }
 
 function normalizeAttendanceStatus(status: string | undefined): AttendanceStatus {
