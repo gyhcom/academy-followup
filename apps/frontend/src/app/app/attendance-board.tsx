@@ -1760,7 +1760,11 @@ function AttendanceDayDetailPanel({
               <CheckCircle2 size={18} aria-hidden="true" />
             </span>
           </div>
-          <div className="mt-3 grid grid-cols-3 gap-1.5 text-center text-xs">
+          <div className="mt-3 flex items-center justify-between gap-2 text-[11px] font-bold text-[#405763]">
+            <span>요약 숫자를 누르면 아래 목록이 바로 필터됩니다.</span>
+            <span className="shrink-0 text-[#0F766E]">필터 선택</span>
+          </div>
+          <div className="mt-1.5 grid grid-cols-3 gap-1.5 text-xs">
             <SummaryFilterButton
               label="수업"
               value={overview.totalSessions}
@@ -1924,12 +1928,12 @@ function SummaryFilterButton({
 }) {
   const toneClass =
     tone === "success"
-      ? "border-l-emerald-600 text-emerald-800"
+      ? "border-l-emerald-600 text-emerald-800 hover:border-emerald-500"
       : tone === "warning"
-        ? "border-l-amber-500 text-amber-800"
+        ? "border-l-amber-500 text-amber-800 hover:border-amber-500"
         : tone === "danger"
-          ? "border-l-red-600 text-red-800"
-          : "border-l-[#60717B] text-[#334B58]";
+          ? "border-l-red-600 text-red-800 hover:border-red-500"
+          : "border-l-[#60717B] text-[#334B58] hover:border-[#7D929B]";
 
   return (
     <button
@@ -1937,16 +1941,43 @@ function SummaryFilterButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "border border-l-[3px] px-2 py-1.5 text-left font-extrabold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+        "group relative border border-l-[3px] px-2 py-1.5 text-left font-extrabold transition hover:-translate-y-px hover:shadow-[0_3px_10px_rgba(13,38,48,0.08)] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
         isActive
           ? "border-[#0F766E] border-l-[#0F766E] bg-[#0B3F46] text-white shadow-[inset_0_-2px_0_rgba(255,255,255,0.18)]"
           : `border-[#C9D8DD] bg-[#F8FAF8] hover:bg-[#EEF5F3] ${toneClass}`,
       ].join(" ")}
     >
-      <span className={["block text-[10px] font-bold leading-4", isActive ? "text-white/75" : "opacity-75"].join(" ")}>
-        {label}
+      <span className="flex items-center justify-between gap-1">
+        <span
+          className={[
+            "block text-[10px] font-bold leading-4",
+            isActive ? "text-white/75" : "opacity-75",
+          ].join(" ")}
+        >
+          {label}
+        </span>
+        <span
+          className={[
+            "inline-flex h-4 items-center border px-1 text-[9px] font-extrabold leading-none",
+            isActive
+              ? "border-white/30 bg-white/10 text-white"
+              : "border-[#C9D8DD] bg-white/70 text-[#60717B] group-hover:border-[#9FB4BC]",
+          ].join(" ")}
+        >
+          필터
+        </span>
       </span>
-      <span className="text-lg leading-5 tabular-nums">{value}</span>
+      <span className="mt-0.5 flex items-center justify-between gap-2">
+        <span className="text-lg leading-5 tabular-nums">{value}</span>
+        <ChevronRight
+          size={14}
+          aria-hidden="true"
+          className={[
+            "transition-transform group-hover:translate-x-0.5",
+            isActive ? "text-white/80" : "text-[#879BA3]",
+          ].join(" ")}
+        />
+      </span>
     </button>
   );
 }
