@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  ArrowLeft,
   ArrowRight,
   CalendarDays,
   CheckCircle2,
@@ -875,6 +876,8 @@ export function ManagementHome({
     },
   ];
   const isStudentLedgerMode = activeSection === "students";
+  const activeManagementSection =
+    managementSections.find((section) => section.id === activeSection) ?? managementSections[0];
 
   return (
     <div className="text-[var(--clinic-text)]">
@@ -900,6 +903,15 @@ export function ManagementHome({
       ) : null}
 
       <main className={["min-w-0 space-y-4 sm:space-y-5", isStudentLedgerMode ? "max-w-none" : ""].join(" ")}>
+      {activeSection !== "setup" ? (
+        <ManagementSectionReturnBar
+          sectionLabel={activeManagementSection.label}
+          sectionGroup={activeManagementSection.group}
+          sectionStatus={activeManagementSection.status}
+          onBack={() => setActiveSection("setup")}
+        />
+      ) : null}
+
       {activeSection === "setup" ? (
         <ManagementPanel
           title="원장 시작 순서"
@@ -1846,10 +1858,51 @@ function MessageTemplateList({
                 수정
               </button>
             </div>
-          </div>
+      </div>
         );
       })}
     </div>
+  );
+}
+
+function ManagementSectionReturnBar({
+  sectionLabel,
+  sectionGroup,
+  sectionStatus,
+  onBack,
+}: {
+  sectionLabel: string;
+  sectionGroup: string;
+  sectionStatus: string;
+  onBack: () => void;
+}) {
+  return (
+    <section className="flex flex-col gap-2 border border-[#B8C9D0] bg-[#E7EEF1] p-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--clinic-muted)]">
+          Management Section
+        </p>
+        <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+          <h2 className="text-base font-black text-[var(--clinic-text)]">
+            {sectionLabel}
+          </h2>
+          <span className="border border-[#C9D7DC] bg-[#F7FAFA] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
+            {sectionGroup}
+          </span>
+          <span className="text-xs font-semibold text-[var(--clinic-muted)]">
+            {sectionStatus}
+          </span>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onBack}
+        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 text-sm font-bold text-[#315C7C] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] sm:w-auto"
+      >
+        <ArrowLeft size={15} aria-hidden="true" />
+        관리 홈
+      </button>
+    </section>
   );
 }
 
