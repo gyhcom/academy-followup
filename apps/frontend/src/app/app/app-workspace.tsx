@@ -6,7 +6,6 @@ import {
   BarChart3,
   BookOpen,
   CalendarDays,
-  CircleHelp,
   Home,
   MessageCircle,
   Settings,
@@ -405,14 +404,6 @@ function WorkspaceContextHeader({
         </div>
 
         <div className="flex shrink-0 items-center gap-4 text-sm text-[#334B58]">
-          <button
-            type="button"
-            className="inline-flex min-h-9 items-center gap-1.5 px-1.5 text-sm font-semibold text-[#334B58] transition hover:text-[#007A7C] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
-          >
-            <CircleHelp size={16} aria-hidden="true" />
-            도움말
-          </button>
-          <span className="h-6 w-px bg-[#D5E0E4]" aria-hidden="true" />
           <div className="flex items-center gap-2">
             <span className="flex size-9 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[#334B58]">
               <User size={17} aria-hidden="true" />
@@ -575,6 +566,8 @@ function WorkspaceNavigation({
                 shortLabel={item.shortLabel}
                 description={item.description}
                 isActive={activeView === item.view}
+                disabled={item.disabled}
+                statusLabel={item.statusLabel}
                 variant="desktop"
                 onClick={() => onChange(item.view)}
               />
@@ -600,6 +593,8 @@ function WorkspaceNavigation({
               shortLabel={item.shortLabel}
               description={item.description}
               isActive={activeView === item.view}
+              disabled={item.disabled}
+              statusLabel={item.statusLabel}
               variant="mobile"
               onClick={() => onChange(item.view)}
             />
@@ -618,6 +613,8 @@ function getWorkspaceNavItems(canManage: boolean) {
     shortLabel: string;
     description: string;
     showOnMobile: boolean;
+    disabled?: boolean;
+    statusLabel?: string;
   }> = [
     {
       view: "home",
@@ -661,8 +658,10 @@ function getWorkspaceNavItems(canManage: boolean) {
         icon: <BookOpen size={18} />,
         label: "교재/비용",
         shortLabel: "비용",
-        description: "월말 안내 준비",
+        description: "준비 중",
         showOnMobile: false,
+        disabled: true,
+        statusLabel: "준비",
       },
       {
         view: "reports" as const,
@@ -715,6 +714,7 @@ function WorkspaceNavButton({
   description,
   isActive,
   disabled = false,
+  statusLabel,
   variant,
   onClick,
 }: {
@@ -724,6 +724,7 @@ function WorkspaceNavButton({
   description: string;
   isActive: boolean;
   disabled?: boolean;
+  statusLabel?: string;
   variant: "desktop" | "mobile";
   onClick: () => void;
 }) {
@@ -769,10 +770,14 @@ function WorkspaceNavButton({
           aria-hidden="true"
           className={[
             "text-xs font-semibold",
-            isActive ? "text-cyan-100" : "text-cyan-50/30 group-hover:text-cyan-50/60",
+            disabled
+              ? "border border-cyan-50/20 px-1.5 py-0.5 text-[10px] text-cyan-50/50"
+              : isActive
+                ? "text-cyan-100"
+                : "text-cyan-50/30 group-hover:text-cyan-50/60",
           ].join(" ")}
         >
-          ›
+          {disabled ? (statusLabel ?? "준비") : "›"}
         </span>
       </button>
     );

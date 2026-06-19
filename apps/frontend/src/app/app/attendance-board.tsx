@@ -1219,6 +1219,7 @@ function AttendanceViewTabs({
     label: string;
     description: string;
     ownerOnly?: boolean;
+    disabled?: boolean;
   }> = [
     {
       id: "calendar",
@@ -1234,8 +1235,9 @@ function AttendanceViewTabs({
     {
       id: "ledger",
       label: "학생별 장부",
-      description: "월간 matrix 준비",
+      description: "준비 중",
       ownerOnly: true,
+      disabled: true,
     },
   ];
   const visibleTabs = tabs.filter((tab) => !tab.ownerOnly || canUseCalendarView);
@@ -1252,12 +1254,19 @@ function AttendanceViewTabs({
               type="button"
               role="tab"
               aria-selected={isActive}
-              onClick={() => onChange(tab.id)}
+              disabled={tab.disabled}
+              onClick={() => {
+                if (!tab.disabled) {
+                  onChange(tab.id);
+                }
+              }}
               className={[
                 "min-h-10 shrink-0 rounded-sm border px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
-                isActive
-                  ? "border-[#0F766E] bg-[#DDEEEB] text-[#0B3F46] shadow-[inset_3px_0_0_#0F766E]"
-                  : "border-transparent bg-[#F7F9F7] text-[#526A75] hover:bg-[#EDF4F2]",
+                tab.disabled
+                  ? "cursor-not-allowed border-transparent bg-[#EEF3F5] text-[#8CA0A8]"
+                  : isActive
+                    ? "border-[#0F766E] bg-[#DDEEEB] text-[#0B3F46] shadow-[inset_3px_0_0_#0F766E]"
+                    : "border-transparent bg-[#F7F9F7] text-[#526A75] hover:bg-[#EDF4F2]",
               ].join(" ")}
             >
               <span className="block text-sm font-bold">{tab.label}</span>
@@ -1913,6 +1922,7 @@ function SummaryFilterButton({
   isActive: boolean;
   onClick: () => void;
 }) {
+  const isDisabled = value === 0 && !isActive;
   const toneClass =
     tone === "success"
       ? "border-l-emerald-600 text-emerald-800 hover:border-emerald-500"
@@ -1926,10 +1936,13 @@ function SummaryFilterButton({
     <button
       type="button"
       aria-pressed={isActive}
+      disabled={isDisabled}
       onClick={onClick}
       className={[
         "group relative grid min-h-10 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-l-[3px] px-3 py-2 text-left font-extrabold transition last:border-b-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]",
-        isActive
+        isDisabled
+          ? "cursor-not-allowed border-l-transparent bg-[#EEF3F5] text-[#8CA0A8]"
+          : isActive
           ? "border-l-[#0F766E] bg-[#0B3F46] text-white"
           : `border-l-transparent bg-[#F8FAF8] hover:border-l-[#0F766E] hover:bg-[#EEF5F3] ${toneClass}`,
       ].join(" ")}
@@ -1948,7 +1961,7 @@ function SummaryFilterButton({
         aria-hidden="true"
         className={[
           "transition-transform group-hover:translate-x-0.5",
-          isActive ? "text-white/80" : "text-[#879BA3]",
+          isDisabled ? "text-[#B5C3C9]" : isActive ? "text-white/80" : "text-[#879BA3]",
         ].join(" ")}
       />
     </button>
