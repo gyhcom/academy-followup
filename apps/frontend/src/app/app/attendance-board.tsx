@@ -1316,9 +1316,9 @@ function AttendanceCalendarView({
   onOpenMessages: () => void;
 }) {
   return (
-    <section className="relative overflow-hidden rounded-md border border-[#B9CAD1] bg-[#E8EEF0] shadow-[0_10px_30px_rgba(13,38,48,0.07)]">
+    <section className="relative overflow-hidden border border-[#B9CAD1] bg-[#E8EEF0]">
       <div className="border-b border-[#C9D8DD] bg-[#EEF4F3] px-3 py-3 sm:px-4 lg:px-5">
-        <div className="rounded-md border border-[#B9CAD1] bg-[#F8FAF8] shadow-[0_1px_2px_rgba(13,38,48,0.04)]">
+        <div className="border border-[#B9CAD1] bg-[#F8FAF8]">
           <div className="flex flex-col gap-3 border-b border-[#D4E0E4] px-3 py-3 lg:flex-row lg:items-center lg:justify-between lg:px-4">
             <div className="flex min-w-0 items-start gap-3">
               <span className="flex size-10 shrink-0 items-center justify-center rounded-sm border border-[#A9C6C5] bg-[#E3F1EF] text-[#0F766E]">
@@ -1338,15 +1338,15 @@ function AttendanceCalendarView({
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <div className="inline-flex min-h-9 items-center gap-2 rounded-sm border border-[#C3D2D7] bg-[#EEF5F4] px-3 text-sm text-[#526A75]">
+              <div className="inline-flex min-h-9 items-center gap-2 border border-[#C3D2D7] bg-[#EEF5F4] px-3 text-sm text-[#526A75]">
                 <span className="text-xs font-bold text-[#78909A]">선택 날짜</span>
                 <b className="font-extrabold text-[#14262D]">{formatDateKoreanShort(selectedDate)}</b>
               </div>
-              <div className="inline-flex rounded-sm border border-[#B9CAD1] bg-[#FBFCFA] p-0.5 shadow-[0_1px_1px_rgba(13,38,48,0.04)]">
+              <div className="inline-flex border border-[#B9CAD1] bg-[#FBFCFA] p-0.5">
                 <button
                   type="button"
                   onClick={() => onMonthChange(shiftMonth(selectedMonth, -1))}
-                  className="inline-flex min-h-8 items-center gap-1 rounded-[3px] px-2.5 text-sm font-semibold text-[#334B58] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                  className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[#334B58] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
                 >
                   <ChevronLeft size={16} aria-hidden="true" />
                   이전 달
@@ -1354,14 +1354,14 @@ function AttendanceCalendarView({
                 <button
                   type="button"
                   onClick={onTodaySelect}
-                  className="inline-flex min-h-8 items-center rounded-[3px] border border-[#0F766E] bg-[#DDEEEB] px-3 text-sm font-bold text-[#0B625D] hover:bg-[#CFE7E2] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                  className="inline-flex min-h-8 items-center border border-[#0F766E] bg-[#DDEEEB] px-3 text-sm font-bold text-[#0B625D] hover:bg-[#CFE7E2] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
                 >
                   오늘
                 </button>
                 <button
                   type="button"
                   onClick={() => onMonthChange(shiftMonth(selectedMonth, 1))}
-                  className="inline-flex min-h-8 items-center gap-1 rounded-[3px] px-2.5 text-sm font-semibold text-[#334B58] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                  className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[#334B58] hover:bg-[#EEF5F3] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
                 >
                   다음 달
                   <ChevronRight size={16} aria-hidden="true" />
@@ -1453,14 +1453,14 @@ function AttendanceMonthCalendar({
 
   return (
     <div className="min-w-0 border-r border-[#C9D8DD] bg-[#EFF4F5] p-3 sm:p-4">
-      <div className="grid grid-cols-7 overflow-hidden rounded-t-sm border-b border-l border-[#C9D8DD] bg-[#E0EAED] text-center text-[12px] font-bold text-[#526A75]">
+      <div className="grid grid-cols-7 overflow-hidden border-b border-l border-[#C9D8DD] bg-[#E0EAED] text-center text-[12px] font-bold text-[#526A75]">
         {weekdays.map((weekday) => (
           <div key={weekday} className="border-r border-[#C9D8DD] px-2 py-2">
             {weekday}
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 overflow-hidden rounded-b-sm border-l border-[#C9D8DD] sm:grid-cols-7">
+      <div className="grid grid-cols-1 overflow-hidden border-l border-[#C9D8DD] sm:grid-cols-7">
         {days.map((date) => {
           const summary = buildDateSummary(classes, records, date);
           return (
@@ -1758,25 +1758,25 @@ function AttendanceDayDetailPanel({
   }
 
   return (
-    <aside className="min-w-0 bg-[#E5ECEE] p-3 sm:p-4">
-      <div className="overflow-hidden rounded-md border border-[#AFC3CA] bg-[#F6F8F6] shadow-[0_6px_18px_rgba(13,38,48,0.05)]">
-        <div className="border-b border-[#C4D5DA] bg-[#EAF5F2] p-4 shadow-[inset_4px_0_0_#0F766E]">
+    <aside className="min-w-0 border-l border-[#C9D8DD] bg-[#E5ECEE] p-3 sm:p-4">
+      <div className="console-work-panel overflow-hidden">
+        <div className="border-b border-[#0B3E49] bg-[#073342] p-4 text-white">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0F766E]">
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#7DD6D4]">
                 선택 날짜
               </p>
-              <h3 className="mt-1 text-xl font-extrabold tracking-[-0.01em] text-[#14262D]">
+              <h3 className="mt-1 text-xl font-extrabold tracking-[-0.01em] text-white">
                 {formatDateKoreanLong(selectedDate)}
               </h3>
             </div>
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-[#A6D4CD] bg-[#D7ECE8] text-[#0F766E]">
+            <span className="flex size-8 shrink-0 items-center justify-center border border-[#7DD6D4]/40 bg-white/8 text-[#7DD6D4]">
               <CheckCircle2 size={18} aria-hidden="true" />
             </span>
           </div>
-          <div className="mt-3 flex items-center justify-between gap-2 text-[11px] font-bold text-[#405763]">
+          <div className="mt-3 flex items-center justify-between gap-2 text-[11px] font-bold text-[#B8D0D6]">
             <span>요약 숫자를 누르면 아래 목록이 바로 필터됩니다.</span>
-            <span className="shrink-0 text-[#0F766E]">필터 선택</span>
+            <span className="shrink-0 text-[#7DD6D4]">필터 선택</span>
           </div>
           <div className="mt-2 overflow-hidden border border-[#C4D5DA] bg-[#F7FAF8] text-xs">
             <SummaryFilterButton
@@ -1829,7 +1829,7 @@ function AttendanceDayDetailPanel({
           <button
             type="button"
             onClick={onOpenToday}
-            className="mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-sm border border-[#0F766E] bg-[#0F766E] px-3 text-sm font-bold text-white shadow-[0_4px_14px_rgba(15,118,110,0.18)] hover:bg-[#0B625D] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            className="mt-3 inline-flex min-h-10 w-full items-center justify-center border border-[#7DD6D4]/50 bg-[#007A7C] px-3 text-sm font-bold text-white hover:bg-[#00686A] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
           >
             오늘 처리 화면에서 출석 체크
           </button>
@@ -1844,9 +1844,9 @@ function AttendanceDayDetailPanel({
               aria-selected={activeTab === tab.id}
               onClick={() => openTab(tab.id)}
               className={[
-                "min-h-9 flex-1 rounded-sm px-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                "min-h-9 flex-1 px-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                 activeTab === tab.id
-                  ? "bg-[#F7FAF8] text-[#0B3F46] shadow-[inset_0_-2px_0_#0F766E,0_1px_2px_rgba(13,38,48,0.06)]"
+                  ? "bg-[#F7FAF8] text-[#0B3F46] shadow-[inset_0_-2px_0_#0F766E]"
                   : "text-[#60717B] hover:bg-[#F7FAF8]/80",
               ].join(" ")}
             >
@@ -1897,37 +1897,6 @@ function AttendanceDayDetailPanel({
         </div>
       </div>
     </aside>
-  );
-}
-
-function SummaryPill({
-  label,
-  value,
-  tone = "default",
-}: {
-  label: string;
-  value: number;
-  tone?: "default" | "success" | "warning" | "danger";
-}) {
-  const toneClass =
-    tone === "success"
-      ? "border-emerald-200 bg-[#E6F5ED] text-emerald-700"
-      : tone === "warning"
-        ? "border-amber-200 bg-[#FFF3D8] text-amber-700"
-        : tone === "danger"
-          ? "border-red-200 bg-[#FDE8E6] text-red-700"
-          : "border-[#C9D8DD] bg-[#F8FAF8] text-[#334B58]";
-
-  return (
-    <span
-      className={[
-        "border-r border-[#DCE8EA] px-2 py-1.5 font-extrabold last:border-r-0",
-        toneClass,
-      ].join(" ")}
-    >
-      <span className="block text-[10px] font-bold leading-4 opacity-75">{label}</span>
-      <span className="text-lg leading-5 tabular-nums">{value}</span>
-    </span>
   );
 }
 
@@ -2080,7 +2049,7 @@ function MiniStat({
           : "text-[#60717B]";
 
   return (
-    <span className="rounded-sm border border-[#E0EAEB] bg-[#EEF4F3] px-1.5 py-1">
+    <span className="border-r border-[#DCE8EA] bg-[#EEF4F3] px-1.5 py-1 last:border-r-0">
       <span className="block font-medium text-[#78909A]">{label}</span>
       <b className={["tabular-nums", toneClass].join(" ")}>{value}</b>
     </span>
@@ -2107,7 +2076,7 @@ function AttendanceDayStudentList({
   }
 
   return (
-    <div className="overflow-hidden rounded-sm border border-[#C4D5DA] bg-[#F7FAF8]">
+    <div className="overflow-hidden border border-[#C4D5DA] bg-[#F7FAF8]">
       {rows.map((row) => (
         <button
           key={row.id}
@@ -2219,25 +2188,25 @@ function StudentScheduleDrawer({
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-[#0B2530]/30 backdrop-blur-[1px]">
       <aside className="h-full w-full max-w-[27rem] overflow-y-auto border-l border-[#C2D1D8] bg-[#F8FBFC] shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#D3E0E5] bg-white px-4 py-3">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#0B3E49] bg-[#073342] px-4 py-3 text-white">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#007A7C]">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#7DD6D4]">
               학생 스케줄
             </p>
-            <h3 className="text-lg font-bold text-[#17232B]">{row.student.name}</h3>
+            <h3 className="text-lg font-bold text-white">{row.student.name}</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex size-9 items-center justify-center rounded-sm border border-[#C6D4DA] bg-white text-[#526A75] hover:bg-[#F3F7F8] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            className="flex size-9 items-center justify-center border border-white/20 bg-white/8 text-[#D7E8ED] hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
             aria-label="학생 스케줄 drawer 닫기"
           >
             <X size={18} aria-hidden="true" />
           </button>
         </div>
 
-        <div className="space-y-3 p-4">
-          <section className="rounded-md border border-[#D3E0E5] bg-white p-4">
+        <div className="border-x border-[#C2D1D8] bg-[#F7FAFA]">
+          <section className="border-b border-[#C9D7DC] border-l-4 border-l-[#007A7C] bg-[#E1F0EF] px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-xl font-bold text-[#17232B]">{row.student.name}</p>
@@ -2289,11 +2258,11 @@ function StudentScheduleDrawer({
           </DrawerSection>
 
           <DrawerSection title="이번 달 출석 이력">
-            <div className="grid grid-cols-4 gap-2 text-center text-xs">
-              <SummaryPill label="출석" value={monthlySummary.present} tone="success" />
-              <SummaryPill label="지각" value={monthlySummary.late} tone="warning" />
-              <SummaryPill label="결석" value={monthlySummary.absent} tone="danger" />
-              <SummaryPill label="미체크" value={monthlySummary.pending} />
+            <div className="overflow-hidden border border-[#DCE8EA] bg-[#F7FAF8] text-xs">
+              <DrawerMetricRow label="출석" value={monthlySummary.present} tone="success" />
+              <DrawerMetricRow label="지각" value={monthlySummary.late} tone="warning" />
+              <DrawerMetricRow label="결석" value={monthlySummary.absent} tone="danger" />
+              <DrawerMetricRow label="미체크" value={monthlySummary.pending} />
             </div>
             <p className="mt-2 text-xs leading-5 text-[#78909A]">
               현재 로드된 출석 기록 기준입니다. 학생별 월간 matrix는 후속 단계에서 보강합니다.
@@ -2324,12 +2293,13 @@ function StudentScheduleDrawer({
             )}
           </DrawerSection>
 
-          <DrawerSection title="작업">
+          <section className="sticky bottom-0 border-t border-[#C9D7DC] bg-[#F4F8F9] p-3">
+            <h4 className="mb-2 text-sm font-bold text-[#17232B]">작업</h4>
             <div className="space-y-2">
               <button
                 type="button"
                 onClick={onOpenMessages}
-                className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-sm bg-[#007A7C] px-3 text-sm font-bold text-white hover:bg-[#00686A] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                className="inline-flex min-h-10 w-full items-center justify-center gap-2 bg-[#007A7C] px-3 text-sm font-bold text-white hover:bg-[#00686A] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
               >
                 <Send size={16} aria-hidden="true" />
                 문자 작성
@@ -2337,7 +2307,7 @@ function StudentScheduleDrawer({
               <button
                 type="button"
                 disabled
-                className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-bold text-[#8CA0A8]"
+                className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 border border-[#C6D4DA] bg-[#F7FAFA] px-3 text-sm font-bold text-[#8CA0A8]"
               >
                 <Pencil size={16} aria-hidden="true" />
                 메모 작성 준비 중
@@ -2345,13 +2315,13 @@ function StudentScheduleDrawer({
               <button
                 type="button"
                 disabled
-                className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 rounded-sm border border-[#C6D4DA] bg-white px-3 text-sm font-bold text-[#8CA0A8]"
+                className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 border border-[#C6D4DA] bg-[#F7FAFA] px-3 text-sm font-bold text-[#8CA0A8]"
               >
                 <List size={16} aria-hidden="true" />
                 연락 이력 전체 보기 준비 중
               </button>
             </div>
-          </DrawerSection>
+          </section>
         </div>
       </aside>
     </div>
@@ -2366,10 +2336,36 @@ function DrawerSection({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-md border border-[#D3E0E5] bg-white p-4">
-      <h4 className="mb-3 text-sm font-bold text-[#17232B]">{title}</h4>
+    <section className="border-b border-[#C9D7DC] bg-[#F7FAFA] px-4 py-3">
+      <h4 className="mb-2 text-sm font-bold text-[#17232B]">{title}</h4>
       {children}
     </section>
+  );
+}
+
+function DrawerMetricRow({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "success" | "warning" | "danger";
+}) {
+  const toneClass =
+    tone === "success"
+      ? "text-emerald-700"
+      : tone === "warning"
+        ? "text-amber-700"
+        : tone === "danger"
+          ? "text-red-700"
+          : "text-[#60717B]";
+
+  return (
+    <div className="grid min-h-9 grid-cols-[minmax(0,1fr)_auto] items-center border-b border-[#DCE8EA] px-3 py-1.5 last:border-b-0">
+      <span className="text-xs font-bold text-[#60717B]">{label}</span>
+      <b className={["text-sm font-black tabular-nums", toneClass].join(" ")}>{value}</b>
+    </div>
   );
 }
 
