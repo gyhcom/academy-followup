@@ -15,11 +15,14 @@
    - seed/demo 삭제는 Preview 결과가 예상과 맞을 때만 진행합니다.
 2. 실제 CSV 템플릿을 원장과 확인합니다.
    - 기준 파일: [operations-real-data-template-2026-06.csv](./operations-real-data-template-2026-06.csv)
+   - 앱 학생 CSV 일괄 등록용 파일: [operations-real-data-student-import-template-2026-06.csv](./operations-real-data-student-import-template-2026-06.csv)
    - 실제 개인정보가 부담되면 이름/전화번호만 테스트값으로 바꾼 동일 구조 CSV로 먼저 검증합니다.
 3. 반 1~2개, 학생 20~30명만 먼저 등록합니다.
 4. 학생 수, 반 수, 스케줄 미등록 수를 SQL과 앱에서 확인합니다.
 5. owner/teacher/assistant 계정으로 주요 흐름을 확인합니다.
 6. dry-run 기록까지 정상 확인한 뒤 SOLAPI 테스트 번호 제한 발송으로 넘어갑니다.
+
+실제 실행 순서는 [실제 구조 데이터 운영 전환 실행표](./operations-real-data-runbook-2026-06.md)를 따릅니다.
 
 ## 3. CSV 필드 기준
 
@@ -38,6 +41,8 @@
 | 담당 선생님 | 필수 | `profiles.name` 또는 원장이 식별 가능한 이름 |
 | 타 학원 스케줄 공유 동의 여부 | 필수 | `동의`, `미동의`, 빈 값 중 하나 |
 | 상태 | 필수 | 시작은 `재원` |
+
+주의: 위 필드 기준은 원장 확인용 전체 구조표 기준입니다. 앱의 `학생 CSV 일괄 등록`은 학생/반/연락처/공유동의/상태만 저장하고, 수업 요일/시간은 관리 > 수업에서 반 공통 스케줄로 별도 등록합니다.
 
 ## 4. 투입 후 확인 SQL
 
