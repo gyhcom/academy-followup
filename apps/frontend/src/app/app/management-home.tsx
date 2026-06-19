@@ -2137,9 +2137,9 @@ function PolicyPill({
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-w-0">
-      <p className="text-xs font-semibold text-cyan-50/62">{label}</p>
-      <p className="mt-1 truncate text-lg font-bold text-white">{value}</p>
+    <div className="grid min-h-8 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-1.5 py-1">
+      <p className="truncate text-[11px] font-semibold text-cyan-50/62">{label}</p>
+      <p className="shrink-0 text-xs font-bold tabular-nums text-white">{value}</p>
     </div>
   );
 }
@@ -2236,17 +2236,21 @@ function SetupWorkflow({
   return (
     <div className="grid gap-3">
       <div className="border border-[#B8C9D0] border-l-4 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
               Director Setup
             </p>
-            <h3 className="mt-1 text-lg font-semibold text-[var(--clinic-text)]">
-              {completedCount} / {setupSteps.length} 단계 완료
-            </h3>
+            <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+              <h3 className="text-lg font-semibold text-[var(--clinic-text)]">
+                {completedCount} / {setupSteps.length} 단계 완료
+              </h3>
+              <span className="border border-[#C9D7DC] bg-[#E7EEF1] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
+                다음: {nextStep.title}
+              </span>
+            </div>
             <p className="mt-1 text-sm leading-6 text-[var(--clinic-muted)]">
-              원장님이 처음 운영을 시작할 때는 <span className="font-semibold text-[var(--clinic-text)]">선생님 등록 → 반 만들기 → 학생 등록 → 수업 시간 등록 → 출석 확인</span>{" "}
-              순서로 진행하면 됩니다. 다음 작업은 <span className="font-semibold text-[var(--clinic-text)]">{nextStep.title}</span>입니다.
+              선생님 등록 → 반 만들기 → 학생 등록 → 수업 시간 등록 → 출석 확인 순서로 운영 기준을 고정합니다.
             </p>
           </div>
           <button
@@ -2300,7 +2304,7 @@ function SetupWorkflow({
             </div>
             <span
               className={[
-                "inline-flex min-h-10 items-center justify-center rounded-md px-3 text-sm font-semibold transition",
+                "inline-flex min-h-9 items-center justify-center rounded-sm px-3 text-sm font-semibold transition",
                 step.isDone
                   ? "border border-[#8FA6B0] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#EDF3F5]"
                   : "border border-[#8FA6B0] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#EDF3F5]",
@@ -2312,7 +2316,7 @@ function SetupWorkflow({
         ))}
       </div>
 
-      <aside className="overflow-hidden rounded-sm border border-[#C9D6E2] bg-[#F7FAFA]">
+      <aside className="overflow-hidden border border-[#C9D6E2] bg-[#F7FAFA]">
         <div className="border-b border-[#C9D6E2] bg-[#F8FBFD] px-4 py-3">
           <p className="text-sm font-semibold text-[#244B67]">현재 배정 모델</p>
         </div>
@@ -2481,7 +2485,7 @@ function ManagementCommandCenter({
               운영 세팅, 명단, 수업, 직원, 문자, 정책을 업무 단위로 관리합니다.
             </p>
           </div>
-          <div className="grid grid-cols-4 border border-white/15 text-center text-[11px] xl:grid-cols-2">
+          <div className="divide-y divide-white/10 border-y border-white/15 text-[11px]">
             <Metric label="학생" value={`${activeStudents}명`} />
             <Metric label="미등록" value={`${missingScheduleCount}명`} />
             <Metric label="반" value={`${classCount}개`} />
