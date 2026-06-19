@@ -852,6 +852,15 @@ export function AttendanceBoard({
           onOpenStudent={setDrawerStudentRow}
           onCloseDrawer={() => setDrawerStudentRow(null)}
           onOpenToday={() => setAttendanceView("today")}
+          onOpenTodaySession={(sessionKey) => {
+            setSelectedSessionKey(sessionKey);
+            setAttendanceFilter("all");
+            setExpandedExceptionKey("");
+            setBulkTarget(null);
+            setBulkSelectedStudentIds([]);
+            setSelectedWorkbenchStudentId("");
+            setAttendanceView("today");
+          }}
           onOpenMessages={() => onNavigate?.("operations")}
         />
       ) : null}
@@ -1282,6 +1291,7 @@ function AttendanceCalendarView({
   onOpenStudent,
   onCloseDrawer,
   onOpenToday,
+  onOpenTodaySession,
   onOpenMessages,
 }: {
   classes: AttendanceClass[];
@@ -1302,6 +1312,7 @@ function AttendanceCalendarView({
   onOpenStudent: (row: AttendanceDayStudentRow) => void;
   onCloseDrawer: () => void;
   onOpenToday: () => void;
+  onOpenTodaySession: (sessionKey: string) => void;
   onOpenMessages: () => void;
 }) {
   return (
@@ -1395,6 +1406,7 @@ function AttendanceCalendarView({
           onTabChange={onDayDetailTabChange}
           onOpenStudent={onOpenStudent}
           onOpenToday={onOpenToday}
+          onOpenTodaySession={onOpenTodaySession}
         />
       </div>
 
@@ -1700,6 +1712,7 @@ function AttendanceDayDetailPanel({
   onTabChange,
   onOpenStudent,
   onOpenToday,
+  onOpenTodaySession,
 }: {
   selectedDate: string;
   sessions: AttendanceSession[];
@@ -1710,6 +1723,7 @@ function AttendanceDayDetailPanel({
   onTabChange: (tab: AttendanceDayDetailTab) => void;
   onOpenStudent: (row: AttendanceDayStudentRow) => void;
   onOpenToday: () => void;
+  onOpenTodaySession: (sessionKey: string) => void;
 }) {
   const [studentStatusFilter, setStudentStatusFilter] =
     useState<AttendanceDayStatusFilter>("all");
@@ -1843,7 +1857,11 @@ function AttendanceDayDetailPanel({
 
         <div className="max-h-[43rem] overflow-y-auto bg-[#EEF4F4] p-3">
           {activeTab === "classes" ? (
-            <AttendanceClassSummaryList sessions={sessions} records={records} />
+            <AttendanceClassSummaryList
+              sessions={sessions}
+              records={records}
+              onOpenSession={onOpenTodaySession}
+            />
           ) : null}
           {activeTab === "students" ? (
             <>
@@ -1985,9 +2003,11 @@ function SummaryFilterButton({
 function AttendanceClassSummaryList({
   sessions,
   records,
+  onOpenSession,
 }: {
   sessions: AttendanceSession[];
   records: AttendanceRecordItem[];
+  onOpenSession: (sessionKey: string) => void;
 }) {
   if (sessions.length === 0) {
     return (
@@ -2004,9 +2024,12 @@ function AttendanceClassSummaryList({
         const contactNeeded = summary.late + summary.absent + summary.needs_check;
 
         return (
-          <div
+          <button
             key={session.key}
-            className="rounded-sm border border-[#C4D5DA] bg-[#F7FAF8] p-3 shadow-[inset_3px_0_0_#D4E4E2,0_1px_2px_rgba(13,38,48,0.04)] transition hover:border-[#8EB8B9] hover:bg-[#FBFCFA] hover:shadow-[inset_3px_0_0_#0F766E,0_6px_14px_rgba(13,38,48,0.07)]"
+            type="button"
+            onClick={() => onOpenSession(session.key)}
+            className="group w-full rounded-sm border border-[#C4D5DA] bg-[#F7FAF8] p-3 text-left shadow-[inset_3px_0_0_#D4E4E2,0_1px_2px_rgba(13,38,48,0.04)] transition hover:-translate-y-px hover:border-[#8EB8B9] hover:bg-[#FBFCFA] hover:shadow-[inset_3px_0_0_#0F766E,0_6px_14px_rgba(13,38,48,0.07)] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            aria-label={`${session.className} ${session.startTime} 수업 오늘 처리에서 열기`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -2034,7 +2057,18 @@ function AttendanceClassSummaryList({
               <MiniStat label="결석" value={summary.absent} tone="danger" />
               <MiniStat label="미체크" value={summary.pending} />
             </div>
-          </div>
+            <div className="mt-3 flex items-center justify-between border-t border-[#DCE8EA] pt-2 text-[11px] font-extrabold text-[#60717B]">
+              <span>수업별 출석 체크로 이동</span>
+              <span className="inline-flex items-center gap-1 text-[#0F766E]">
+                열기
+                <ChevronRight
+                  size={13}
+                  aria-hidden="true"
+                  className="transition group-hover:translate-x-0.5"
+                />
+              </span>
+            </div>
+          </button>
         );
       })}
     </div>
