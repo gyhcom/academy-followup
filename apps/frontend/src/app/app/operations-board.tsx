@@ -962,7 +962,7 @@ export function OperationsBoard({
   return (
     <div
       className={[
-        "mx-auto max-w-6xl space-y-4 sm:space-y-5",
+        "mx-auto max-w-none space-y-4 sm:space-y-5",
         shouldShowMobileSelectionBar
           ? "pb-[calc(13rem+env(safe-area-inset-bottom))] lg:pb-[max(1rem,env(safe-area-inset-bottom))]"
           : "pb-[max(1rem,env(safe-area-inset-bottom))]",
@@ -1072,7 +1072,7 @@ function MessageModeTabs({
   onChange: (mode: "individual" | "bulk") => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-1 border border-[#B8C9D0] bg-[#E7EEF1] p-1">
+    <div className="flex flex-wrap border border-[#B8C9D0] bg-[#E7EEF1]">
       {[
         { id: "individual" as const, label: "개별 연락", detail: "학생별 문자" },
         { id: "bulk" as const, label: "전체문자", detail: "중복 번호 제외" },
@@ -1086,7 +1086,7 @@ function MessageModeTabs({
             aria-pressed={isActive}
             onClick={() => onChange(item.id)}
             className={[
-              "min-h-11 rounded-sm border-l-[3px] px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+              "min-h-10 min-w-[10rem] border-r border-l-[3px] border-r-[#C9D7DC] px-3 text-left transition last:border-r-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]",
               isActive
                 ? "border-l-[#007A7C] bg-[#E1F0EF] text-[#17232B]"
                 : "border-l-transparent bg-[#F7FAFA] text-[#405763] hover:bg-[#EDF3F5]",
@@ -1673,18 +1673,18 @@ function MessageComposer({
           disabled={!canSaveFollowup}
           onClick={onSaveFollowup}
           className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-bold transition",
+            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border px-4 text-sm font-bold transition",
             canSaveFollowup
-              ? "bg-[#007A7C] text-white hover:bg-[#006266]"
-              : "bg-[#DCE6EA] text-[#78909A]",
+              ? "border-[#007A7C] bg-[#007A7C] text-white hover:bg-[#006266]"
+              : "border-[#C9D7DC] bg-[#DCE6EA] text-[#78909A]",
           ].join(" ")}
         >
           <Send size={17} aria-hidden="true" />
           {isFollowupSaving
-            ? "저장 중"
+            ? "1단계 저장 중"
             : isFollowupSaved
-              ? "저장 완료"
-              : "기록 저장"}
+              ? "1단계 저장 완료"
+              : "1단계 기록 저장"}
         </button>
 
         {isFollowupSaved ? (
@@ -1703,20 +1703,20 @@ function MessageComposer({
               disabled={!canSendMessage}
               onClick={onSendMessage}
               className={[
-                "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-bold transition",
+                "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border px-4 text-sm font-bold transition",
                 canSendMessage
-                  ? "bg-[#007A7C] text-white hover:bg-[#006266]"
-                  : "bg-[#DCE6EA] text-[#78909A]",
+                  ? "border-[#0B3F46] bg-[#0B3F46] text-white hover:bg-[#073342]"
+                  : "border-[#C9D7DC] bg-[#DCE6EA] text-[#78909A]",
               ].join(" ")}
             >
               <Send size={17} aria-hidden="true" />
               {isMessageSending
-                ? "발송 처리 중"
+                ? "2단계 발송 처리 중"
                 : isMessageSent
                   ? messageSend.dryRun
-                    ? "테스트 발송 완료"
-                    : "문자 발송 완료"
-                  : "테스트 발송"}
+                    ? "2단계 테스트 발송 완료"
+                    : "2단계 문자 발송 완료"
+                  : "2단계 테스트 발송"}
             </button>
 
             {messageSendError || isMessageSent ? (

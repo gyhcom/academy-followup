@@ -156,19 +156,26 @@ function OperationsHeader({
   totalStudents: number;
 }) {
   return (
-    <section className="mb-3 border border-[#B8C9D0] bg-[#F4F8F9] px-4 py-3 sm:mb-4">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <section className="mb-3 border border-[#B8C9D0] border-l-4 border-l-[#007A7C] bg-[#F4F8F9] px-4 py-3 sm:mb-4">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#007A7C]">{academyName}</p>
-          <h2 className="mt-1 text-2xl font-bold leading-tight tracking-[-0.02em] text-[#17232B]">
-            수업 후 연락
-          </h2>
-          <p className="mt-1 max-w-2xl text-sm leading-5 text-[#60717B]">
-            반과 학생을 선택하면 학부모 문자 초안이 준비됩니다.
+          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#315C7C]">
+            Message Workbench
+          </p>
+          <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+            <h2 className="text-lg font-black leading-tight text-[#17232B]">
+              수업 후 연락
+            </h2>
+            <span className="border border-[#C9D7DC] bg-[#E7EEF1] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
+              {academyName}
+            </span>
+          </div>
+          <p className="mt-1 max-w-2xl text-xs leading-5 text-[#60717B]">
+            학생 row를 선택하고 오른쪽 작업 패널에서 기록 저장과 테스트 발송을 분리해 처리합니다.
           </p>
         </div>
 
-        <dl className="flex gap-3 border-t border-[#D2DDE2] pt-3 text-sm lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
+        <dl className="grid min-w-[11rem] divide-y divide-[#C9D7DC] border-y border-[#C9D7DC] text-sm lg:min-w-[13rem]">
           <StatusItem label="반" value={`${classCount}개`} />
           <StatusItem label="학생" value={`${totalStudents}명`} />
         </dl>
@@ -450,9 +457,9 @@ function MobileSelectionBar({
 
 function StatusItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-w-14">
-      <dt className="text-xs text-stone-500">{label}</dt>
-      <dd className="mt-1 truncate font-semibold text-stone-950">{value}</dd>
+    <div className="grid min-h-8 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-1.5 py-1">
+      <dt className="truncate text-xs font-semibold text-[#60717B]">{label}</dt>
+      <dd className="shrink-0 text-sm font-black tabular-nums text-[#17232B]">{value}</dd>
     </div>
   );
 }
