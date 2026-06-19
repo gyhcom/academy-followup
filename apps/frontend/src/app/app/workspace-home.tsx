@@ -464,7 +464,7 @@ function PcOperationsDashboard({
           <HomeDateControl value={selectedDate} onChange={onDateChange} />
         </div>
 
-        <div className="mt-4 grid grid-cols-5 overflow-hidden border border-[#B8C9D0] bg-[#EAF1F3]">
+        <div className="mt-4 grid grid-cols-5 border-y border-[#B8C9D0] bg-[#EAF1F3]">
           <PcKpi label="오늘 수업" value={`${scheduleSummary.academyScheduleCount}개`} />
           <PcKpi label="학생 체크" value={`${studentRows.length}명`} />
           <PcKpi label="체크 필요" value={`${boardSummary.unchecked}명`} tone="warning" />
@@ -534,10 +534,10 @@ function PcOperationsDashboard({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h3 className="text-base font-bold text-[var(--clinic-text)]">
-                  {isStaffHome ? "담당 학생 현황" : "오늘 학생 체크 보드"}
+                  {isStaffHome ? "담당 학생 처리 목록" : "오늘 학생 처리 목록"}
                 </h3>
                 <p className="mt-1 text-xs text-[var(--clinic-muted)]">
-                  학생을 누르면 오른쪽에서 수업, 연락, 보강 제외 일정을 확인합니다.
+                  목록에서 학생을 선택하면 오른쪽 처리 패널에서 수업, 연락, 보강 제외 일정을 확인합니다.
                 </p>
               </div>
               {loadState.status === "loading" ? (
@@ -560,7 +560,7 @@ function PcOperationsDashboard({
             ) : null}
           </div>
 
-          <div className="max-h-[38rem] divide-y divide-[#D8E3E7] overflow-y-auto bg-[#F7FAFA]" role="listbox" aria-label="오늘 학생 상태 목록">
+          <div className="max-h-[38rem] divide-y divide-[#D8E3E7] overflow-y-auto bg-[#F7FAFA]" role="listbox" aria-label="오늘 학생 처리 목록">
             {filteredStudentRows.length > 0 ? (
               filteredStudentRows.map((row) => (
                 <PcStudentBoardRowItem
@@ -609,9 +609,9 @@ function PcKpi({
   }[tone];
 
   return (
-    <div className="border-r border-[#D2DDE2] px-4 py-3 last:border-r-0">
-      <p className="text-xs font-semibold text-[var(--clinic-muted)]">{label}</p>
-      <p className={`mt-1 text-xl font-bold tabular-nums ${toneClass}`}>{value}</p>
+    <div className="border-r border-[#C6D5DC] px-4 py-2.5 last:border-r-0">
+      <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--clinic-muted)]">{label}</p>
+      <p className={`mt-1 text-lg font-black tabular-nums ${toneClass}`}>{value}</p>
     </div>
   );
 }
@@ -829,9 +829,9 @@ function PcStudentDetailPanel({
 
   return (
     <aside className="sticky top-4 space-y-3">
-      <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
+      <section className="console-work-panel overflow-hidden">
         <div className="border-b border-[#0B3E49] bg-[var(--clinic-primary-dark)] px-4 py-3 text-white">
-          <h3 className="text-sm font-bold">학생 차트</h3>
+          <h3 className="text-sm font-bold">학생 처리 패널</h3>
           <p className="mt-0.5 text-xs text-cyan-50/72">
             오늘 처리할 출석, 연락, 보강 제외 시간을 확인합니다.
           </p>
@@ -888,11 +888,11 @@ function PcStudentDetailPanel({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 border-t border-[#E1EAEE] px-4 py-3">
+            <div className="console-action-dock grid grid-cols-2 gap-2 px-4 py-3">
               <button
                 type="button"
                 onClick={() => onNavigate("attendance")}
-                className="min-h-11 rounded-md border border-[#B8C9D0] bg-white px-3 text-sm font-bold text-[var(--clinic-text)] transition hover:bg-[#F4F8F9] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]"
+                className="min-h-11 border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm font-bold text-[var(--clinic-text)] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]"
               >
                 출석부로 이동
               </button>
@@ -907,7 +907,7 @@ function PcStudentDetailPanel({
                       })
                     : undefined
                 }
-                className="min-h-11 rounded-md bg-[var(--clinic-primary)] px-3 text-sm font-bold text-white transition hover:bg-[var(--clinic-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)] focus:ring-offset-2"
+                className="min-h-11 bg-[var(--clinic-primary)] px-3 text-sm font-bold text-white transition hover:bg-[var(--clinic-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)] focus:ring-offset-2"
               >
                 문자 화면
               </button>

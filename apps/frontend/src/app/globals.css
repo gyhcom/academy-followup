@@ -23,6 +23,12 @@
   --clinic-violet: #6d4ca0;
   --console-radius: 2px;
   --console-shadow: none;
+  --console-row: #f8fbfb;
+  --console-row-hover: #eef5f6;
+  --console-row-selected: #dceeed;
+  --console-line: #d6e2e6;
+  --console-line-strong: #9fb4bc;
+  --console-ink-soft: #405763;
 }
 
 @theme inline {
@@ -85,5 +91,61 @@ button:not(:disabled) {
     [class*="bg-[#F1F5"]
   ) {
     background-color: #e7eef1 !important;
+  }
+
+  .academy-console .console-surface {
+    border: 1px solid var(--clinic-border);
+    background: var(--clinic-panel);
+    box-shadow: none;
+  }
+
+  .academy-console .console-header-row {
+    border-bottom: 1px solid var(--console-line);
+    background: var(--clinic-panel-strong);
+    padding: 0.75rem 1rem;
+  }
+
+  .academy-console .console-row {
+    border-bottom: 1px solid var(--console-line);
+    background: var(--console-row);
+  }
+
+  .academy-console .console-row:last-child {
+    border-bottom: 0;
+  }
+
+  .academy-console .console-row:hover {
+    background: var(--console-row-hover);
+  }
+
+  .academy-console .console-row-selected {
+    background: var(--console-row-selected);
+    box-shadow: inset 4px 0 0 var(--clinic-primary);
+  }
+
+  .academy-console .console-work-panel {
+    border: 1px solid var(--clinic-border);
+    background: #f8fbfc;
+  }
+
+  .academy-console .console-section-rail {
+    border-left: 4px solid var(--clinic-primary);
+  }
+
+  .academy-console .console-lozenge {
+    display: inline-flex;
+    min-height: 1.35rem;
+    align-items: center;
+    border: 1px solid currentColor;
+    padding: 0 0.45rem;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .academy-console .console-action-dock {
+    border-top: 1px solid var(--console-line);
+    background: #f4f8f9;
   }
 }

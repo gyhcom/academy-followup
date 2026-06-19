@@ -2202,8 +2202,8 @@ function SetupWorkflow({
   const nextStep = setupSteps.find((step) => !step.isDone) ?? setupSteps[setupSteps.length - 1];
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,0.75fr)]">
-      <div className="border-l-2 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3 lg:col-span-2">
+    <div className="grid gap-3">
+      <div className="border border-[#B8C9D0] border-l-4 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
@@ -2234,12 +2234,14 @@ function SetupWorkflow({
             key={step.step}
             type="button"
             onClick={step.onAction}
-            className="grid w-full gap-3 border-b border-[#D6E0E5] border-l-2 border-l-transparent px-4 py-3 text-left transition last:border-b-0 hover:border-l-[#C9D6E2] hover:bg-[#F7FAFA] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
+            className="grid w-full gap-3 border-b border-[#D6E0E5] border-l-4 border-l-transparent px-4 py-3 text-left transition last:border-b-0 hover:border-l-[#C9D6E2] hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
           >
             <div
               className={[
-                "flex size-8 items-center justify-center rounded text-sm font-semibold",
-                step.isDone ? "bg-[#EAF1F8] text-[#244B67]" : "bg-[#111827] text-white",
+                "flex size-8 items-center justify-center border text-sm font-semibold",
+                step.isDone
+                  ? "border-[#B8D7D8] bg-[#E1F0EF] text-[#007A7C]"
+                  : "border-[#0B3F46] bg-[#0B3F46] text-white",
               ].join(" ")}
             >
               {step.isDone ? <CheckCircle2 size={17} /> : step.step}
@@ -2249,10 +2251,10 @@ function SetupWorkflow({
                 <p className="text-sm font-semibold text-[var(--clinic-text)]">{step.title}</p>
                 <span
                   className={[
-                    "rounded-sm px-2 py-0.5 text-xs font-semibold",
+                    "border px-2 py-0.5 text-xs font-semibold",
                     step.isDone
-                      ? "bg-[#EAF1F8] text-[#244B67]"
-                      : "bg-amber-50 text-amber-800",
+                      ? "border-[#B8D7D8] bg-[#E1F0EF] text-[#007A7C]"
+                      : "border-amber-200 bg-amber-50 text-amber-800",
                   ].join(" ")}
                 >
                   {step.metric}

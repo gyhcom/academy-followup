@@ -1166,7 +1166,7 @@ function BulkMessagePanel({
         <div className="space-y-4">
           <fieldset>
             <legend className="text-sm font-semibold text-stone-800">대상 범위</legend>
-            <div className="mt-2 grid grid-cols-3 gap-2">
+            <div className="mt-2 grid grid-cols-3 border border-[#B8C9D0] bg-[#F7FAFA]">
               {[
                 { id: "all" as const, label: "전체 학생" },
                 { id: "class" as const, label: "반 선택" },
@@ -1178,10 +1178,10 @@ function BulkMessagePanel({
                   aria-pressed={targetType === item.id}
                   onClick={() => onTargetTypeChange(item.id)}
                   className={[
-                    "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                    "min-h-10 border-r border-l-[3px] border-r-[#D6E0E5] px-2 text-xs font-bold transition last:border-r-0",
                     targetType === item.id
-                      ? "border-[#315C7C] bg-[#315C7C] text-white"
-                      : "border-[#B8C9D0] bg-[#F7FAFA] text-stone-700 hover:bg-[#EDF3F5]",
+                      ? "border-l-[#007A7C] bg-[#E1F0EF] text-[#0B3F46]"
+                      : "border-l-transparent bg-[#F7FAFA] text-stone-700 hover:border-l-[#8EB8B9] hover:bg-[#EDF3F5]",
                   ].join(" ")}
                 >
                   {item.label}
@@ -1227,7 +1227,7 @@ function BulkMessagePanel({
 
           <fieldset>
             <legend className="text-sm font-semibold text-stone-800">수신자</legend>
-            <div className="mt-2 grid grid-cols-3 gap-2">
+            <div className="mt-2 grid grid-cols-3 border border-[#B8C9D0] bg-[#F7FAFA]">
               {messageRecipientTypes.map((nextType) => (
                 <button
                   key={nextType}
@@ -1235,10 +1235,10 @@ function BulkMessagePanel({
                   aria-pressed={recipientType === nextType}
                   onClick={() => onRecipientTypeChange(nextType)}
                   className={[
-                    "min-h-10 rounded-md border px-2 text-xs font-semibold transition",
+                    "min-h-10 border-r border-l-[3px] border-r-[#D6E0E5] px-2 text-xs font-bold transition last:border-r-0",
                     recipientType === nextType
-                      ? "border-[#315C7C] bg-[#315C7C] text-white"
-                      : "border-[#B8C9D0] bg-[#F7FAFA] text-stone-700 hover:bg-[#EDF3F5]",
+                      ? "border-l-[#007A7C] bg-[#E1F0EF] text-[#0B3F46]"
+                      : "border-l-transparent bg-[#F7FAFA] text-stone-700 hover:border-l-[#8EB8B9] hover:bg-[#EDF3F5]",
                   ].join(" ")}
                 >
                   {messageRecipientLabels[nextType]}

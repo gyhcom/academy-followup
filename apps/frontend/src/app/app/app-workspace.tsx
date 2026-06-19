@@ -429,14 +429,17 @@ function WorkspaceContextHeader({
   }
 
   return (
-    <section className="hidden min-h-14 border border-[#B8C9D0] bg-[#F4F8F9] px-4 py-2.5 sm:flex sm:items-center sm:justify-between sm:gap-4">
-      <div className="min-w-0">
-        <p className="text-xs font-semibold text-[var(--clinic-primary)]">
+    <section className="hidden min-h-12 border border-[#B8C9D0] bg-[#F4F8F9] px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="h-6 w-1 bg-[var(--clinic-primary)]" aria-hidden="true" />
+        <div className="min-w-0">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--clinic-primary)]">
           {getWorkspaceViewLabel(activeView, canManage)}
         </p>
-        <h2 className="mt-0.5 truncate text-lg font-semibold text-[var(--clinic-text)]">
+        <h2 className="mt-0.5 truncate text-base font-extrabold text-[var(--clinic-text)]">
           {getContextViewTitle(activeView, canManage)} · {academyName}
         </h2>
+        </div>
       </div>
 
       <div className="flex shrink-0 items-center gap-2 text-xs text-[var(--clinic-muted)]">
@@ -547,9 +550,9 @@ function WorkspaceNavigation({
     <>
       <aside className="hidden sm:sticky sm:top-0 sm:block sm:h-screen sm:self-start">
         <section className="flex h-full flex-col overflow-hidden border-r border-[#0F4050] bg-[#062634] text-white">
-          <div className="border-b border-white/10 px-5 py-5">
+          <div className="border-b border-white/10 px-4 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex size-11 items-center justify-center border border-white/20 bg-white/8 text-white">
+              <div className="flex size-10 items-center justify-center border border-white/20 bg-white/8 text-white">
                 <ShieldCheck size={22} aria-hidden="true" />
               </div>
               <div>
@@ -557,12 +560,12 @@ function WorkspaceNavigation({
                 <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-cyan-100/60">ACADEMY OS</p>
               </div>
             </div>
-            <p className="mt-4 text-xs font-semibold text-cyan-50/80">{shellLabel}</p>
-            <p className="mt-1 text-xs leading-5 text-cyan-50/62">{shellDescription}</p>
+            <p className="mt-3 text-xs font-semibold text-cyan-50/80">{shellLabel}</p>
+            <p className="mt-1 text-xs leading-5 text-cyan-50/55">{shellDescription}</p>
           </div>
           <nav
             aria-label={shellLabel}
-            className="flex-1 space-y-1.5 p-3"
+            className="flex-1 space-y-0.5 p-2"
           >
             {navItems.map((item) => (
               <WorkspaceNavButton
@@ -577,7 +580,7 @@ function WorkspaceNavigation({
               />
             ))}
           </nav>
-          <div className="border-t border-white/10 px-5 py-4 text-xs text-cyan-50/55">
+          <div className="border-t border-white/10 px-4 py-3 text-xs text-cyan-50/55">
             <p className="font-semibold">{roleLabel}</p>
             <p className="mt-1">v1.0.0</p>
           </div>
@@ -733,7 +736,7 @@ function WorkspaceNavButton({
         aria-pressed={isActive}
         onClick={onClick}
         className={[
-          "group relative flex min-h-11 w-full items-center gap-3 border-l-[4px] px-5 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70",
+          "group relative grid min-h-10 w-full grid-cols-[1.7rem_minmax(0,1fr)_0.75rem] items-center gap-2 border-l-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70",
           isActive
             ? "border-l-[#22C7BD] bg-[#0D5262] text-white"
             : "border-l-transparent text-cyan-50/74 hover:border-l-cyan-200/45 hover:bg-white/6 hover:text-white",
@@ -743,10 +746,10 @@ function WorkspaceNavButton({
         <span
           aria-hidden="true"
           className={[
-            "flex size-8 shrink-0 items-center justify-center border",
+            "flex size-7 shrink-0 items-center justify-center",
             isActive
-              ? "border-cyan-200/30 bg-cyan-300/14 text-cyan-50"
-              : "border-white/10 bg-white/4 text-cyan-50/62 group-hover:text-cyan-100",
+              ? "text-cyan-50"
+              : "text-cyan-50/62 group-hover:text-cyan-100",
           ].join(" ")}
         >
           {icon}

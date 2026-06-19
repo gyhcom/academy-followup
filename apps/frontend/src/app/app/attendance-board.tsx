@@ -1778,7 +1778,7 @@ function AttendanceDayDetailPanel({
             <span>요약 숫자를 누르면 아래 목록이 바로 필터됩니다.</span>
             <span className="shrink-0 text-[#0F766E]">필터 선택</span>
           </div>
-          <div className="mt-1.5 grid grid-cols-3 gap-1.5 text-xs">
+          <div className="mt-2 overflow-hidden border border-[#C4D5DA] bg-[#F7FAF8] text-xs">
             <SummaryFilterButton
               label="수업"
               value={overview.totalSessions}
@@ -1921,7 +1921,7 @@ function SummaryPill({
   return (
     <span
       className={[
-        "rounded-sm border px-2 py-1.5 font-extrabold shadow-[0_1px_1px_rgba(13,38,48,0.03)]",
+        "border-r border-[#DCE8EA] px-2 py-1.5 font-extrabold last:border-r-0",
         toneClass,
       ].join(" ")}
     >
@@ -1959,43 +1959,29 @@ function SummaryFilterButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "group relative border border-l-[3px] px-2 py-1.5 text-left font-extrabold transition hover:-translate-y-px hover:shadow-[0_3px_10px_rgba(13,38,48,0.08)] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+        "group relative grid min-h-10 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-l-[3px] px-3 py-2 text-left font-extrabold transition last:border-b-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]",
         isActive
-          ? "border-[#0F766E] border-l-[#0F766E] bg-[#0B3F46] text-white shadow-[inset_0_-2px_0_rgba(255,255,255,0.18)]"
-          : `border-[#C9D8DD] bg-[#F8FAF8] hover:bg-[#EEF5F3] ${toneClass}`,
+          ? "border-l-[#0F766E] bg-[#0B3F46] text-white"
+          : `border-l-transparent bg-[#F8FAF8] hover:border-l-[#0F766E] hover:bg-[#EEF5F3] ${toneClass}`,
       ].join(" ")}
     >
-      <span className="flex items-center justify-between gap-1">
-        <span
-          className={[
-            "block text-[10px] font-bold leading-4",
-            isActive ? "text-white/75" : "opacity-75",
-          ].join(" ")}
-        >
-          {label}
-        </span>
-        <span
-          className={[
-            "inline-flex h-4 items-center border px-1 text-[9px] font-extrabold leading-none",
-            isActive
-              ? "border-white/30 bg-white/10 text-white"
-              : "border-[#C9D8DD] bg-white/70 text-[#60717B] group-hover:border-[#9FB4BC]",
-          ].join(" ")}
-        >
-          필터
-        </span>
+      <span
+        className={[
+          "block truncate text-[11px] font-black uppercase tracking-[0.08em]",
+          isActive ? "text-white/70" : "opacity-75",
+        ].join(" ")}
+      >
+        {label}
       </span>
-      <span className="mt-0.5 flex items-center justify-between gap-2">
-        <span className="text-lg leading-5 tabular-nums">{value}</span>
-        <ChevronRight
-          size={14}
-          aria-hidden="true"
-          className={[
-            "transition-transform group-hover:translate-x-0.5",
-            isActive ? "text-white/80" : "text-[#879BA3]",
-          ].join(" ")}
-        />
-      </span>
+      <span className="text-lg leading-5 tabular-nums">{value}</span>
+      <ChevronRight
+        size={14}
+        aria-hidden="true"
+        className={[
+          "transition-transform group-hover:translate-x-0.5",
+          isActive ? "text-white/80" : "text-[#879BA3]",
+        ].join(" ")}
+      />
     </button>
   );
 }
@@ -2018,7 +2004,7 @@ function AttendanceClassSummaryList({
   }
 
   return (
-    <div className="space-y-2.5">
+    <div className="overflow-hidden border border-[#C4D5DA] bg-[#F7FAF8]">
       {sessions.map((session) => {
         const summary = getSessionSummary(session, records);
         const contactNeeded = summary.late + summary.absent + summary.needs_check;
@@ -2028,7 +2014,7 @@ function AttendanceClassSummaryList({
             key={session.key}
             type="button"
             onClick={() => onOpenSession(session.key)}
-            className="group w-full rounded-sm border border-[#C4D5DA] bg-[#F7FAF8] p-3 text-left shadow-[inset_3px_0_0_#D4E4E2,0_1px_2px_rgba(13,38,48,0.04)] transition hover:-translate-y-px hover:border-[#8EB8B9] hover:bg-[#FBFCFA] hover:shadow-[inset_3px_0_0_#0F766E,0_6px_14px_rgba(13,38,48,0.07)] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            className="group w-full border-b border-[#DCE8EA] bg-[#F7FAF8] p-3 text-left transition last:border-b-0 hover:bg-[#EEF5F3] hover:shadow-[inset_3px_0_0_#0F766E] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]"
             aria-label={`${session.className} ${session.startTime} 수업 오늘 처리에서 열기`}
           >
             <div className="flex items-start justify-between gap-3">
@@ -2051,7 +2037,7 @@ function AttendanceClassSummaryList({
                 </span>
               ) : null}
             </div>
-            <div className="mt-3 grid grid-cols-4 gap-1.5 text-center text-[11px]">
+            <div className="mt-3 grid grid-cols-4 border border-[#DCE8EA] text-center text-[11px]">
               <MiniStat label="출석" value={summary.present} tone="success" />
               <MiniStat label="지각" value={summary.late} tone="warning" />
               <MiniStat label="결석" value={summary.absent} tone="danger" />
