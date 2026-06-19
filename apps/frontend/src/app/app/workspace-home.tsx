@@ -450,7 +450,7 @@ function PcOperationsDashboard({
 
   return (
     <div className="hidden xl:block">
-      <section className="border border-[#B8C9D0] bg-[#F4F8F9] px-5 py-4">
+      <section className="border border-[#B8C9D0] border-l-4 border-l-[var(--clinic-primary)] bg-[#F4F8F9] px-5 py-4">
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-end">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">{academyName}</p>
@@ -464,7 +464,7 @@ function PcOperationsDashboard({
           <HomeDateControl value={selectedDate} onChange={onDateChange} />
         </div>
 
-        <div className="mt-4 grid grid-cols-5 border-y border-[#B8C9D0] bg-[#EAF1F3]">
+        <div className="mt-4 grid grid-cols-5 divide-x divide-[#C6D5DC] border-y border-[#B8C9D0] bg-[#EDF3F5]">
           <PcKpi label="오늘 수업" value={`${scheduleSummary.academyScheduleCount}개`} />
           <PcKpi label="학생 체크" value={`${studentRows.length}명`} />
           <PcKpi label="체크 필요" value={`${boardSummary.unchecked}명`} tone="warning" />
@@ -609,9 +609,11 @@ function PcKpi({
   }[tone];
 
   return (
-    <div className="border-r border-[#C6D5DC] px-4 py-2.5 last:border-r-0">
-      <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--clinic-muted)]">{label}</p>
-      <p className={`mt-1 text-lg font-black tabular-nums ${toneClass}`}>{value}</p>
+    <div className="grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-2">
+      <p className="truncate text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--clinic-muted)]">
+        {label}
+      </p>
+      <p className={`shrink-0 text-sm font-black tabular-nums ${toneClass}`}>{value}</p>
     </div>
   );
 }
@@ -962,8 +964,8 @@ function PcStudentDetailPanel({
         )}
       </section>
 
-      <section className="overflow-hidden rounded-md border border-[#C7D6DD] bg-white shadow-[0_1px_2px_rgba(13,38,48,0.08)]">
-        <div className="border-b border-[#D6E0E5] bg-[#F7FAFB] px-4 py-3">
+      <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9]">
+        <div className="border-b border-[#B8C9D0] bg-[#EAF1F3] px-4 py-3">
           <h3 className="text-sm font-bold text-[var(--clinic-text)]">오늘 연락 큐</h3>
           <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">
             미발송 {unsentCount}명 · 발송 완료 {sentCount}명
@@ -982,7 +984,7 @@ function PcStudentDetailPanel({
                     reason: followupReasonForStatus(item.status),
                   })
                 }
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-[#F4F8F9] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]"
+                className="flex w-full items-center justify-between gap-3 border-l-[3px] border-l-transparent px-4 py-3 text-left transition hover:border-l-[var(--clinic-primary)] hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-bold text-[var(--clinic-text)]">
@@ -1992,18 +1994,18 @@ function HomeActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="group flex min-h-[4.75rem] w-full items-center gap-3 border-b border-stone-100 bg-white px-4 py-3 text-left transition last:border-b-0 hover:bg-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:px-5"
+      className="group grid min-h-[3.75rem] w-full grid-cols-[2rem_minmax(0,1fr)_1rem] items-center gap-3 border-b border-[#D6E0E5] border-l-[3px] border-l-transparent bg-[#F7FAFA] px-4 py-2.5 text-left transition last:border-b-0 hover:border-l-[var(--clinic-primary)] hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:px-4"
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-[#EAF1F8] text-[#315C7C]">
+      <span className="flex size-8 shrink-0 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[var(--clinic-primary)]">
         {icon}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-base font-semibold text-stone-950">{title}</span>
-        <span className="mt-1 block text-sm leading-6 text-stone-600">{description}</span>
+        <span className="block truncate text-sm font-bold text-[var(--clinic-text)]">{title}</span>
+        <span className="mt-0.5 block truncate text-xs leading-5 text-[var(--clinic-muted)]">{description}</span>
       </span>
       <ArrowRight
-        size={17}
-        className="shrink-0 text-stone-400 transition group-hover:translate-x-0.5 group-hover:text-[#315C7C]"
+        size={15}
+        className="shrink-0 text-[#A9BCC4] transition group-hover:translate-x-0.5 group-hover:text-[var(--clinic-primary)]"
       />
     </button>
   );
