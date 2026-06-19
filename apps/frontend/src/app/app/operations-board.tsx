@@ -1291,9 +1291,9 @@ function BulkMessagePanel({
                 : "SMS 예상"}
           </p>
 
-          <div className="border border-[#B8C9D0] bg-[#EAF1F3] p-3 text-sm text-[#244B67]">
-            <div className="flex items-center justify-between gap-3">
-              <p className="font-semibold text-[#1F3F58]">발송 전 확인</p>
+          <div className="border border-[#B8C9D0] border-l-4 border-l-[#007A7C] bg-[#F7FAFA] px-3 py-2.5 text-sm text-[#244B67]">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <p className="font-bold text-[#1F3F58]">발송 전 확인</p>
               {previewState.status === "loading" ? (
                 <span className="text-xs font-medium text-[#557A96]">확인 중</span>
               ) : null}
@@ -1314,7 +1314,7 @@ function BulkMessagePanel({
           </div>
 
           {state.status === "sent" ? (
-            <div className="border border-[#B8C9D0] bg-[#EAF1F3] p-3 text-sm leading-6 text-[#244B67]">
+            <div className="border border-[#B8C9D0] border-l-4 border-l-[#007A7C] bg-[#F7FAFA] px-3 py-2.5 text-sm leading-6 text-[#244B67]">
               <p className="font-semibold">{state.message}</p>
               <p className="mt-1">
                 대상 {state.targetStudentCount}명 · 발송 후보 {state.candidateRecipientCount}건 · 실제 발송 {state.recipientCount}건 · 중복 제외 {state.duplicateExcludedCount}건
@@ -1333,7 +1333,7 @@ function BulkMessagePanel({
             disabled={!canSend}
             onClick={onSend}
             className={[
-              "flex min-h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
+              "flex min-h-12 w-full items-center justify-center gap-2 px-4 text-sm font-bold transition",
               canSend
                 ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
                 : "bg-stone-300 text-stone-600",
@@ -1498,7 +1498,7 @@ function MessageComposer({
 
         <fieldset className="border border-[#B8C9D0] bg-[#F7FAFA] p-3">
           <legend className="px-1 text-sm font-bold text-[#17232B]">사유</legend>
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+          <div className="mt-2 grid border border-[#B8C9D0] bg-[#F7FAFA] sm:grid-cols-4">
             {followupReasons.map((reason) => {
               const isSelected = reason.id === selectedReason;
               return (
@@ -1508,10 +1508,10 @@ function MessageComposer({
                   aria-pressed={isSelected}
                   onClick={() => onReasonChange(reason.id)}
                   className={[
-                    "min-h-9 shrink-0 rounded-sm border px-3 text-sm font-bold transition",
+                    "min-h-9 border-r border-l-[3px] border-r-[#D6E0E5] px-3 text-sm font-bold transition last:border-r-0",
                     isSelected
-                      ? "border-[#007A7C] bg-[#007A7C] text-white"
-                      : "border-[#B8C9D0] bg-[#F7FAFA] text-[#405763] hover:border-[#839AA4] hover:bg-[#EDF3F5]",
+                      ? "border-l-[#007A7C] bg-[#E1F0EF] text-[#0B3F46]"
+                      : "border-l-transparent bg-[#F7FAFA] text-[#405763] hover:border-l-[#8EB8B9] hover:bg-[#EDF3F5]",
                   ].join(" ")}
                 >
                   {reason.label}
@@ -1523,7 +1523,7 @@ function MessageComposer({
 
         <fieldset className="border border-[#B8C9D0] bg-[#F7FAFA] p-3">
           <legend className="px-1 text-sm font-bold text-[#17232B]">수신자</legend>
-          <div className="mt-2 grid grid-cols-3 gap-2">
+          <div className="mt-2 grid grid-cols-3 border border-[#B8C9D0] bg-[#F7FAFA]">
             {messageRecipientTypes.map((recipientType) => {
               const needsStudentPhone = recipientType !== "parent";
               const isDisabled =
@@ -1538,10 +1538,10 @@ function MessageComposer({
                   aria-pressed={isSelected}
                   onClick={() => onRecipientTypeChange(recipientType)}
                   className={[
-                    "min-h-9 rounded-sm border px-2 text-xs font-bold transition",
+                    "min-h-9 border-r border-l-[3px] border-r-[#D6E0E5] px-2 text-xs font-bold transition last:border-r-0",
                     isSelected
-                      ? "border-[#007A7C] bg-[#007A7C] text-white"
-                      : "border-[#B8C9D0] bg-[#F7FAFA] text-[#405763] hover:border-[#839AA4] hover:bg-[#EDF3F5]",
+                      ? "border-l-[#007A7C] bg-[#E1F0EF] text-[#0B3F46]"
+                      : "border-l-transparent bg-[#F7FAFA] text-[#405763] hover:border-l-[#8EB8B9] hover:bg-[#EDF3F5]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
                 >
@@ -1612,10 +1612,10 @@ function MessageComposer({
 
         <div
           className={[
-            "rounded-md border p-3 text-sm leading-6",
+            "border border-l-4 px-3 py-2.5 text-sm leading-6",
             isPreviewError
-              ? "border-red-200 bg-red-50 text-red-900"
-              : "border-[#D5E0E4] bg-white text-[#405763]",
+              ? "border-red-200 border-l-red-600 bg-red-50 text-red-900"
+              : "border-[#D5E0E4] border-l-[#007A7C] bg-[#F7FAFA] text-[#405763]",
           ].join(" ")}
         >
           <div className="flex items-start gap-2">
@@ -1639,10 +1639,10 @@ function MessageComposer({
         {followupSaveError || isFollowupSaved ? (
           <div
             className={[
-              "rounded-md border p-3 text-sm leading-6",
+              "border border-l-4 px-3 py-2.5 text-sm leading-6",
               followupSaveError
-                ? "border-red-200 bg-red-50 text-red-900"
-                : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
+                ? "border-red-200 border-l-red-600 bg-red-50 text-red-900"
+                : "border-[#C9D6E2] border-l-[#007A7C] bg-[#F7FAFA] text-[#244B67]",
             ].join(" ")}
           >
             <div className="flex items-start gap-2">
@@ -1660,7 +1660,7 @@ function MessageComposer({
         ) : null}
 
         {duplicateDraftWarning && !isFollowupSaved ? (
-          <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900">
+          <div className="border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-900">
             <div className="flex items-start gap-2">
               <AlertCircle className="mt-0.5 shrink-0" size={17} />
               <p>{duplicateDraftWarning}</p>
@@ -1690,7 +1690,7 @@ function MessageComposer({
         {isFollowupSaved ? (
           <div className="space-y-2">
             {sendBlockedMessage ? (
-              <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-950">
+            <div className="border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-950">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="mt-0.5 shrink-0" size={17} />
                   <p>{sendBlockedMessage}</p>
@@ -1722,10 +1722,10 @@ function MessageComposer({
             {messageSendError || isMessageSent ? (
               <div
                 className={[
-                  "rounded-md border p-3 text-sm leading-6",
+                  "border border-l-4 px-3 py-2.5 text-sm leading-6",
                   messageSendError
-                    ? "border-red-200 bg-red-50 text-red-900"
-                    : "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]",
+                    ? "border-red-200 border-l-red-600 bg-red-50 text-red-900"
+                    : "border-[#C9D6E2] border-l-[#007A7C] bg-[#F7FAFA] text-[#244B67]",
                 ].join(" ")}
               >
                 <div className="flex items-start gap-2">
