@@ -203,6 +203,28 @@ export function ManagementHome({
     ["owner", "manager", "teacher", "assistant"].includes(member.role),
   );
 
+  function closeManagementWorkflows() {
+    setClassForm(null);
+    setClassFormStatus({ status: "idle", message: "" });
+    setStudentForm(null);
+    setStudentFormStatus({ status: "idle", message: "" });
+    setIsBulkStudentImportOpen(false);
+    setBulkStudentImportStatus({ status: "idle", message: "" });
+    setMemberForm(null);
+    setMemberFormStatus({ status: "idle", message: "" });
+    setScheduleForm(null);
+    setScheduleFormStatus({ status: "idle", message: "" });
+    setBulkScheduleForm(null);
+    setBulkScheduleFormStatus({ status: "idle", message: "" });
+    setTemplateForm(null);
+    setTemplateFormStatus({ status: "idle", message: "" });
+  }
+
+  function returnToManagementSetup() {
+    closeManagementWorkflows();
+    setActiveSection("setup");
+  }
+
   function openCreateClassForm() {
     setMemberForm(null);
     setMemberFormStatus({ status: "idle", message: "" });
@@ -908,7 +930,7 @@ export function ManagementHome({
           sectionLabel={activeManagementSection.label}
           sectionGroup={activeManagementSection.group}
           sectionStatus={activeManagementSection.status}
-          onBack={() => setActiveSection("setup")}
+          onBack={returnToManagementSetup}
         />
       ) : null}
 
@@ -1297,9 +1319,19 @@ export function ManagementHome({
         actionIcon={<Plus size={14} />}
         onAction={openCreateStudentForm}
       >
-        <div className="mb-3 grid gap-2 border border-[#B8C9D0] bg-[#E7EEF1] p-2.5 sm:mb-4 sm:p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="mb-3 grid gap-2 border border-[#B8C9D0] border-l-4 border-l-[var(--clinic-primary)] bg-[#E7EEF1] p-2.5 sm:mb-4 sm:p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-[var(--clinic-text)]">학생 등록 후 반 배정과 스케줄까지 확인합니다.</p>
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={returnToManagementSetup}
+                className="inline-flex min-h-8 shrink-0 items-center gap-1 border border-[#8FA6B0] bg-[#F7FAFA] px-2.5 text-xs font-bold text-[#315C7C] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+              >
+                <ArrowLeft size={13} aria-hidden="true" />
+                관리 메인
+              </button>
+              <p className="text-sm font-semibold text-[var(--clinic-text)]">학생 등록 후 반 배정과 스케줄까지 확인합니다.</p>
+            </div>
             <p className="mt-1 hidden text-xs leading-5 text-[var(--clinic-muted)] sm:block">
               반이 없는 학생은 권한과 출석 흐름이 애매해지고, 스케줄이 없는 학생은 출석부에 나타나지 않습니다.
             </p>
@@ -1877,16 +1909,16 @@ function ManagementSectionReturnBar({
   onBack: () => void;
 }) {
   return (
-    <section className="flex flex-col gap-2 border border-[#B8C9D0] bg-[#E7EEF1] p-3 sm:flex-row sm:items-center sm:justify-between">
+    <section className="flex flex-col gap-2 border border-[#B8C9D0] border-l-4 border-l-[var(--clinic-primary)] bg-[#F4F8F9] p-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
-        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--clinic-muted)]">
-          Management Section
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#315C7C]">
+          Management Work Area
         </p>
         <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
           <h2 className="text-base font-black text-[var(--clinic-text)]">
             {sectionLabel}
           </h2>
-          <span className="border border-[#C9D7DC] bg-[#F7FAFA] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
+          <span className="border border-[#C9D7DC] bg-[#E7EEF1] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
             {sectionGroup}
           </span>
           <span className="text-xs font-semibold text-[var(--clinic-muted)]">
@@ -1897,10 +1929,10 @@ function ManagementSectionReturnBar({
       <button
         type="button"
         onClick={onBack}
-        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 text-sm font-bold text-[#315C7C] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] sm:w-auto"
+        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 text-sm font-bold text-[#315C7C] transition hover:border-[var(--clinic-primary)] hover:bg-[#E1F0EF] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] sm:w-auto"
       >
         <ArrowLeft size={15} aria-hidden="true" />
-        관리 홈
+        관리 메인으로
       </button>
     </section>
   );
