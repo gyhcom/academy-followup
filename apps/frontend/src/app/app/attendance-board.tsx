@@ -1219,7 +1219,6 @@ function AttendanceViewTabs({
     label: string;
     description: string;
     ownerOnly?: boolean;
-    disabled?: boolean;
   }> = [
     {
       id: "calendar",
@@ -1237,15 +1236,17 @@ function AttendanceViewTabs({
       label: "학생별 장부",
       description: "준비 중",
       ownerOnly: true,
-      disabled: true,
     },
   ];
-  const visibleTabs = tabs.filter((tab) => !tab.ownerOnly || canUseCalendarView);
+  const actionableTabs = tabs.filter(
+    (tab) => (!tab.ownerOnly || canUseCalendarView) && tab.id !== "ledger",
+  );
+  const showLedgerNotice = canUseCalendarView;
 
   return (
     <div className="rounded-md border border-[#B9CAD1] bg-[#F7F9F7] px-2 py-2 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
       <div className="flex gap-1 overflow-x-auto" role="tablist" aria-label="출석부 보기 전환">
-        {visibleTabs.map((tab) => {
+        {actionableTabs.map((tab) => {
           const isActive = value === tab.id;
 
           return (
@@ -1254,17 +1255,12 @@ function AttendanceViewTabs({
               type="button"
               role="tab"
               aria-selected={isActive}
-              disabled={tab.disabled}
               onClick={() => {
-                if (!tab.disabled) {
-                  onChange(tab.id);
-                }
+                onChange(tab.id);
               }}
               className={[
                 "min-h-10 shrink-0 rounded-sm border px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
-                tab.disabled
-                  ? "cursor-not-allowed border-transparent bg-[#EEF3F5] text-[#8CA0A8]"
-                  : isActive
+                isActive
                     ? "border-[#0F766E] bg-[#DDEEEB] text-[#0B3F46] shadow-[inset_3px_0_0_#0F766E]"
                     : "border-transparent bg-[#F7F9F7] text-[#526A75] hover:bg-[#EDF4F2]",
               ].join(" ")}
@@ -1276,6 +1272,11 @@ function AttendanceViewTabs({
             </button>
           );
         })}
+        {showLedgerNotice ? (
+          <div className="ml-auto hidden min-h-10 shrink-0 items-center border border-dashed border-[#C7D7DC] bg-[#EEF3F5] px-3 text-xs font-semibold text-[#6D818A] sm:flex">
+            학생별 장부는 월간 matrix로 후속 구현
+          </div>
+        ) : null}
       </div>
     </div>
   );

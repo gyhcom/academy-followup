@@ -104,6 +104,17 @@ type OperationsSelection = {
   reason: FollowupReason;
 };
 
+type WorkspaceNavItem = {
+  view: WorkspaceView;
+  icon: ReactNode;
+  label: string;
+  shortLabel: string;
+  description: string;
+  showOnMobile: boolean;
+  disabled?: boolean;
+  statusLabel?: string;
+};
+
 export function AppWorkspace({
   academyName,
   teacherName,
@@ -573,6 +584,20 @@ function WorkspaceNavigation({
               />
             ))}
           </nav>
+          {canManage ? (
+            <div
+              className="mx-3 mb-3 border border-white/10 bg-white/[0.035] px-3 py-2 text-cyan-50/62"
+              aria-label="준비 중인 운영 영역"
+            >
+              <div className="flex items-center gap-2">
+                <BookOpen size={15} aria-hidden="true" />
+                <p className="text-xs font-semibold text-cyan-50/76">교재/비용</p>
+              </div>
+              <p className="mt-1 text-[11px] leading-4 text-cyan-50/46">
+                비용 기록과 월말 안내 문자는 후속 단계에서 연결합니다.
+              </p>
+            </div>
+          ) : null}
           <div className="border-t border-white/10 px-4 py-3 text-xs text-cyan-50/55">
             <p className="font-semibold">{roleLabel}</p>
             <p className="mt-1">v1.0.0</p>
@@ -605,17 +630,8 @@ function WorkspaceNavigation({
   );
 }
 
-function getWorkspaceNavItems(canManage: boolean) {
-  const baseItems: Array<{
-    view: WorkspaceView;
-    icon: ReactNode;
-    label: string;
-    shortLabel: string;
-    description: string;
-    showOnMobile: boolean;
-    disabled?: boolean;
-    statusLabel?: string;
-  }> = [
+function getWorkspaceNavItems(canManage: boolean): WorkspaceNavItem[] {
+  const baseItems: WorkspaceNavItem[] = [
     {
       view: "home",
       icon: <Home size={17} />,
@@ -652,16 +668,6 @@ function getWorkspaceNavItems(canManage: boolean) {
         shortLabel: "문자",
         description: "연락 기록·발송",
         showOnMobile: true,
-      },
-      {
-        view: "fees" as const,
-        icon: <BookOpen size={18} />,
-        label: "교재/비용",
-        shortLabel: "비용",
-        description: "준비 중",
-        showOnMobile: false,
-        disabled: true,
-        statusLabel: "준비",
       },
       {
         view: "reports" as const,
