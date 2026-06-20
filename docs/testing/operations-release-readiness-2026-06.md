@@ -7,6 +7,8 @@
 
 실제 운영 데이터는 [실제 구조 데이터 운영 전환 검증](./operations-real-data-transition-2026-06.md)과 [실제 구조 데이터 운영 전환 실행표](./operations-real-data-runbook-2026-06.md) 기준으로 20~30명만 먼저 투입합니다. 실제 문자 발송은 [SOLAPI 테스트 번호 제한 발송 준비](./solapi-test-number-readiness-2026-06.md)를 통과한 뒤 별도 승인으로 진행합니다.
 
+2026-06-20 기준으로 출석부/문자 화면의 표시 전용 요약, 비활성 버튼, 준비 중 CTA는 실제 동작 또는 명확한 안내 문구로 정리했습니다. 운영 전환 전에는 버튼이 보이면 사용자가 실행 가능한지, 실행 불가하면 왜 불가한지 화면에서 설명되는지 다시 확인합니다.
+
 ## 1. 운영 전환 원칙
 
 - Production 앱은 Vercel + 기존 Next.js API 기준으로 안정 운영합니다.
@@ -51,6 +53,7 @@
 - `auth.users`, `profiles`, `academies`, `academy_settings`, `message_templates`, `platform_admins`는 보존 대상으로 확정합니다.
 - 운영 데이터 cleanup은 `Preview -> Cleanup -> Verify` 순서로만 진행합니다.
 - Cleanup SQL은 자동 실행하지 않고 Supabase SQL Editor에서 사람이 직접 실행합니다.
+- 200명 seed 외에 CSV 테스트/수동 등록/리허설 학생이 섞여 있으면 seed-only 정리가 아니라 [reset-thebaeum-pilot-workspace.sql](../../supabase/reset-thebaeum-pilot-workspace.sql) 기준 전체 운영 데이터 리셋 모드를 사용합니다.
 
 권장 범위:
 

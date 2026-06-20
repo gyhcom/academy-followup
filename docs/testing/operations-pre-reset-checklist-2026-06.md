@@ -2,6 +2,32 @@
 
 이 문서는 200명 seed/demo 데이터를 실제 운영 데이터로 전환하기 전에 확인할 안전 점검 기준입니다. 아래 SQL은 사람이 Supabase SQL Editor에서 직접 실행하는 용도이며, 반드시 `Preview -> Cleanup -> Verify` 순서로 진행합니다.
 
+## 0. 2026-06-20 실행 기준
+
+현재 운영 전환 전에는 정리 목적에 따라 아래 두 가지 모드 중 하나를 먼저 선택합니다.
+
+| 모드 | 사용 시점 | 삭제 범위 | 사용할 SQL |
+| --- | --- | --- | --- |
+| A. 200명 seed만 정리 | DB에 200명 pilot seed만 있고, 추가 리허설/실제 데이터가 없을 때 | `pilot-200-*` UUID 기준 seed 학생/반/스케줄/출석/연락만 삭제 | 이 문서의 6~8번 SQL |
+| B. 더배움 운영 데이터 전체 비우기 | 200명 seed 실행 후 12명/30명 리허설 데이터, CSV 테스트 데이터, 수동 등록 데이터가 섞였을 때 | 더배움 학원 소속 학생/반/스케줄/출석/연락/공유/타학원 demo 데이터 전체 삭제 | [reset-thebaeum-pilot-workspace.sql](../../supabase/reset-thebaeum-pilot-workspace.sql) |
+
+실제 운영 데이터 투입 직전에는 보통 **B 모드**가 더 안전합니다. A 모드는 pilot seed UUID만 삭제하므로, CSV 테스트로 추가된 학생/반이 남을 수 있습니다.
+
+두 모드 모두 보존 대상은 같습니다.
+
+- `auth.users`
+- `profiles`
+- 더배움 `academies` row
+- 더배움 `academy_settings`
+- 더배움 `message_templates`
+- `platform_admins`
+
+중단 기준:
+
+- 현재 DB에 보존해야 할 실제 개인정보가 이미 들어가 있으면 B 모드를 실행하지 않습니다.
+- Preview에서 삭제 대상 학생/반 수가 사람이 예상한 값과 다르면 Cleanup을 실행하지 않습니다.
+- Cleanup SQL은 Supabase SQL Editor에서 사람이 직접 실행합니다.
+
 ## 1. 점검 목적
 
 - 200명 seed/demo 데이터를 지우더라도 계정, 학원 설정, 문자 템플릿, 권한 정책은 보존합니다.
@@ -125,9 +151,11 @@ order by role, email;
 - 스케줄 미등록 학생 0명 목표
 - 실제 발송은 계속 `sms_dry_run=true` 상태에서 화면/기록 먼저 검증
 
-## 6. Preview SQL
+## 6. A 모드 Preview SQL
 
-먼저 삭제 대상 숫자만 확인합니다. 이 SQL은 데이터를 변경하지 않습니다.
+먼저 200명 seed 기준 삭제 대상 숫자만 확인합니다. 이 SQL은 데이터를 변경하지 않습니다.
+
+주의: 이 SQL은 `pilot-200-*` seed만 대상으로 합니다. 리허설용으로 직접 등록한 학생/반까지 모두 비워야 한다면 이 섹션 대신 [reset-thebaeum-pilot-workspace.sql](../../supabase/reset-thebaeum-pilot-workspace.sql)의 Preview SQL을 사용합니다.
 
 ```sql
 with
@@ -206,7 +234,7 @@ Preview 기대 방향:
 - `keep_profiles`, `keep_message_templates`는 0이 아니어야 함
 - 실제 개인정보가 섞인 DB라면 Preview 결과 확인 후 Cleanup을 중단합니다.
 
-## 7. Cleanup SQL
+## 7. A 모드 Cleanup SQL
 
 Preview 결과가 예상과 맞을 때만 실행합니다. 이 SQL은 200명 seed/demo 운영 데이터만 정리하고, 로그인 계정/프로필/더배움 학원/설정/문자 템플릿은 삭제하지 않습니다.
 
@@ -328,7 +356,7 @@ end $$;
 - 실제 개인정보가 이미 들어간 DB에는 실행하지 않습니다.
 - Preview 결과가 기대와 다르면 Cleanup을 실행하지 않습니다.
 
-## 8. Verify SQL
+## 8. A 모드 Verify SQL
 
 Cleanup 후 기준값을 확인합니다.
 
@@ -406,7 +434,58 @@ select
      and student_item.id is null) as followups_with_missing_student;
 ```
 
-## 9. 중단 기준
+## 9. B 모드 전체 운영 데이터 리셋
+
+리허설 데이터가 섞였거나, 실제 운영 CSV를 넣기 전에 더배움 워크스페이스의 학생/반/출석/연락 데이터를 완전히 비워야 하면 아래 파일을 사용합니다.
+
+- SQL 파일: [reset-thebaeum-pilot-workspace.sql](../../supabase/reset-thebaeum-pilot-workspace.sql)
+
+이 파일은 세 구역으로 나뉩니다.
+
+1. Preview SQL
+2. Cleanup SQL
+3. Verify SQL
+
+B 모드 삭제 대상:
+
+| 대상 | 설명 |
+| --- | --- |
+| `students` | 더배움 학원 소속 전체 학생 |
+| `classes` | 더배움 학원 소속 전체 반 |
+| `student_schedules` | 더배움 학원/학생/반 기준 전체 스케줄 |
+| `attendance_records` | 더배움 학원/학생/반 기준 출석 기록 |
+| `followups` | 더배움 학원/학생/반 기준 연락 기록 |
+| `message_logs` | 더배움 학원 문자 로그와 관련 followup 로그 |
+| `student_share_tokens` | 더배움 학생 공유 토큰 |
+| `student_schedule_links` | 더배움 학생/학원과 seed 공유 학원 관련 링크 |
+| `student_external_class_enrollments` | 더배움 학생의 타 학원 수업 연결 |
+| `external_academies`, `external_academy_classes` | 더배움 학원 기준 수동 타 학원/demo 데이터 |
+| `audit_logs` | 더배움 학원 기준 기존 테스트 이력 |
+
+B 모드 Verify 기대값:
+
+| 항목 | 기대값 |
+| --- | ---: |
+| `students_after_reset` | 0 |
+| `classes_after_reset` | 0 |
+| `schedules_after_reset` | 0 |
+| `attendance_after_reset` | 0 |
+| `followups_after_reset` | 0 |
+| `message_logs_after_reset` | 0 |
+| `keep_profiles` | 1 이상 |
+| `keep_academy_settings` | 1 |
+| `keep_message_templates` | 1 이상 |
+
+실제 운영 CSV 투입 전 권장 흐름:
+
+1. B 모드 Preview SQL 실행
+2. 삭제 대상 학생/반 수가 현재 화면에서 보이는 수와 맞는지 확인
+3. 예상과 맞으면 B 모드 Cleanup SQL 실행
+4. B 모드 Verify SQL로 학생/반/스케줄/출석/연락이 0인지 확인
+5. 원장/선생님/보조 계정 로그인과 설정/템플릿 유지 확인
+6. 실제 CSV 20~30명 투입
+
+## 10. 중단 기준
 
 아래 중 하나라도 발생하면 운영 전환을 중단하고 원인을 먼저 확인합니다.
 
@@ -419,7 +498,7 @@ select
 - 실제 개인정보가 들어간 학생이 삭제 대상에 포함됨
 - Verify 후 orphan count가 0이 아님
 
-## 10. 정리 후 앱 확인
+## 11. 정리 후 앱 확인
 
 정리 후 실제 데이터 투입 전에는 빈 상태가 정상입니다.
 
@@ -439,7 +518,7 @@ select
 - 문자: 개별 문자, 전체문자, 중복 제외 count 확인
 - assistant: 연락 기록 저장 가능, 테스트 발송 권한 안내/비활성 유지
 
-## 11. 최종 결론
+## 12. 최종 결론
 
 운영 전환 전에는 **검토 후 수정**으로 진행합니다.
 

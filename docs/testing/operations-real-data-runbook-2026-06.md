@@ -66,8 +66,17 @@ order by role, email;
 
 ## 4. DB 정리 순서
 
-1. [operations-pre-reset-checklist-2026-06.md](./operations-pre-reset-checklist-2026-06.md)의 Preview SQL만 실행합니다.
-2. 삭제 대상이 200명 seed/demo 기준과 맞는지 확인합니다.
+먼저 [운영 데이터 정리 전 선행 점검](./operations-pre-reset-checklist-2026-06.md)의 `0. 2026-06-20 실행 기준`에서 정리 모드를 선택합니다.
+
+| 모드 | 선택 기준 |
+| --- | --- |
+| A. 200명 seed만 정리 | DB에 `pilot-200-*` seed 외 추가 리허설 데이터가 없을 때 |
+| B. 더배움 운영 데이터 전체 비우기 | CSV 테스트/수동 등록/12명 또는 30명 리허설 데이터가 섞여 있고, 실제 운영 데이터 투입 전에 완전히 비울 때 |
+
+실제 운영 CSV 투입 직전에는 보통 B 모드를 사용합니다. B 모드는 [reset-thebaeum-pilot-workspace.sql](../../supabase/reset-thebaeum-pilot-workspace.sql)의 `Preview -> Cleanup -> Verify` 순서로 실행합니다.
+
+1. 선택한 모드의 Preview SQL만 실행합니다.
+2. 삭제 대상 학생/반/스케줄/출석/연락 수가 현재 화면에서 보이는 값과 맞는지 확인합니다.
 3. 예상과 다르면 Cleanup을 실행하지 않습니다.
 4. 예상과 맞으면 사람이 Supabase SQL Editor에서 Cleanup SQL을 실행합니다.
 5. Verify SQL로 아래 기준을 확인합니다.
@@ -76,9 +85,11 @@ order by role, email;
 
 | 항목 | 기대값 |
 | --- | ---: |
-| seed/demo 학생 | 0 |
-| seed/demo 반 | 0 |
-| active 학생 중 스케줄 미등록 | 0 또는 실제 데이터 투입 전이면 0 |
+| 학생 | B 모드면 0, A 모드면 seed/demo 학생 0 |
+| 반 | B 모드면 0, A 모드면 seed/demo 반 0 |
+| active 스케줄 | B 모드면 0 |
+| 출석 기록 | B 모드면 0 |
+| 연락 기록/message logs | B 모드면 0 |
 | profiles | 유지 |
 | academy_settings | 유지 |
 | message_templates | 유지 |
