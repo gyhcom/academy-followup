@@ -696,17 +696,21 @@ function PcStudentFilterBar({
     <div className="mt-3 flex flex-wrap gap-1.5" aria-label="학생 상태 필터">
       {options.map((option) => {
         const isSelected = value === option.value;
+        const isUnavailable = option.count === 0 && !isSelected;
 
         return (
           <button
             key={option.value}
             type="button"
             aria-pressed={isSelected}
+            disabled={isUnavailable}
             onClick={() => onChange(option.value)}
             className={[
               "inline-flex min-h-8 items-center gap-1.5 border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
               isSelected
                 ? selectedChipTone(option.tone)
+                : isUnavailable
+                  ? "cursor-not-allowed border-[#C9D7DC] bg-[#EDF3F5] text-[#91A2AA] opacity-70"
                 : "border-[#B8C9D0] bg-[#F7FAFA] text-[var(--clinic-muted)] hover:border-[#839AA4] hover:bg-[#EDF3F5]",
             ].join(" ")}
           >
@@ -714,7 +718,11 @@ function PcStudentFilterBar({
             <span
               className={[
                 "border px-1.5 py-0.5 tabular-nums",
-                isSelected ? "border-white/20 bg-white/15 text-white" : "border-[#C9D7DC] bg-[#E8F0F2] text-[var(--clinic-muted)]",
+                isSelected
+                  ? "border-white/20 bg-white/15 text-white"
+                  : isUnavailable
+                    ? "border-[#D6E1E6] bg-[#E7EEF1] text-[#91A2AA]"
+                    : "border-[#C9D7DC] bg-[#E8F0F2] text-[var(--clinic-muted)]",
               ].join(" ")}
             >
               {option.count}

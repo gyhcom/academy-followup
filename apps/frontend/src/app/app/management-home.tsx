@@ -2097,7 +2097,19 @@ function ManagementStatusRow({
         <span className="block text-xs font-semibold text-[var(--clinic-muted)]">{label}</span>
         <span className="mt-1 block truncate text-xs text-[var(--clinic-muted)]">{detail}</span>
       </span>
-      <span className={`text-sm font-semibold tabular-nums ${toneClass}`}>{value}</span>
+      <span className="flex shrink-0 items-center gap-2">
+        <span className={`text-sm font-semibold tabular-nums ${toneClass}`}>{value}</span>
+        <span
+          className={[
+            "border px-1.5 py-0.5 text-[10px] font-bold",
+            isActive
+              ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
+              : "border-[#C9D7DC] bg-[#EDF3F5] text-[#60717B]",
+          ].join(" ")}
+        >
+          열기
+        </span>
+      </span>
     </button>
   );
 }

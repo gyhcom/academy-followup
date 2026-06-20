@@ -293,7 +293,7 @@ export function StudentDirectoryToolbar({
               )
             }
             className={[
-              "flex min-h-8 min-w-0 items-center gap-2 border px-2 text-left transition",
+              "flex min-h-8 min-w-0 items-center gap-2 border px-2 text-left transition lg:hidden",
               scheduleFilter === "missing_schedule"
                 ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
                 : "border-[#C9D7DC] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#E1F0EF]",
@@ -304,6 +304,12 @@ export function StudentDirectoryToolbar({
               {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
             </span>
           </button>
+          <div className="hidden min-h-8 min-w-0 items-center gap-2 border border-[#C9D7DC] bg-[#EDF3F5] px-2 text-left text-[var(--clinic-text)] lg:flex">
+            <CalendarDays size={13} className="shrink-0 text-[#60717B]" aria-hidden="true" />
+            <span className="truncate">
+              {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
+            </span>
+          </div>
           <button
             type="button"
             onClick={() => setIsFilterOpen((current) => !current)}
