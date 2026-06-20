@@ -19,7 +19,6 @@ import {
   RefreshCw,
   RotateCcw,
   Send,
-  Search,
   UserCheck,
   X,
 } from "lucide-react";
@@ -1380,16 +1379,10 @@ function AttendanceCalendarView({
             </div>
           </div>
 
-          <div className="grid gap-0 divide-y divide-[#D4E0E4] px-3 py-2 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-[0.8fr_0.8fr_0.9fr_1.5fr] lg:px-4">
-            <CompactFilterLabel label="반 필터" value="전체 반" />
-            <CompactFilterLabel label="선생님" value="전체" />
-            <CompactFilterLabel label="상태" value="전체 상태" />
-            <div className="flex min-h-10 items-center gap-2 px-0 py-1 text-sm text-[#526A75] sm:px-3">
-              <Search size={15} aria-hidden="true" />
-              <span className="truncate text-xs font-semibold text-[#78909A]">
-                학생/반 검색 필터는 다음 단계에서 연결합니다.
-              </span>
-            </div>
+          <div className="grid gap-0 divide-y divide-[#D4E0E4] px-3 py-2 sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:px-4">
+            <CompactScopeLabel label="조회 반" value="전체 반" />
+            <CompactScopeLabel label="담당" value="전체 선생님" />
+            <CompactScopeLabel label="상태" value="전체 상태" />
           </div>
         </div>
       </div>
@@ -1432,7 +1425,7 @@ function AttendanceCalendarView({
   );
 }
 
-function CompactFilterLabel({ label, value }: { label: string; value: string }) {
+function CompactScopeLabel({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex min-h-10 items-center justify-between gap-3 px-0 py-1 text-sm sm:px-3">
       <span className="font-semibold text-[#78909A]">{label}</span>
