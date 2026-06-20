@@ -112,121 +112,133 @@ export function MakeupCalendarPanel({
       </div>
 
       <div className="space-y-3 p-4">
-        <div className="border border-stone-200 bg-stone-50 px-3 py-3">
-          <div className="flex items-center justify-between gap-2">
-            <button
-              type="button"
-              aria-label="이전 달"
-              title="이전 달"
-              onClick={() => moveMonth(-1)}
-              className="flex size-9 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-700"
-            >
-              <ChevronLeft size={17} />
-            </button>
-            <p className="text-sm font-semibold text-stone-950">
-              {MakeupSchedulePlanner.getMonthLabel(displayMonth)}
-            </p>
-            <button
-              type="button"
-              aria-label="다음 달"
-              title="다음 달"
-              onClick={() => moveMonth(1)}
-              className="flex size-9 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-700"
-            >
-              <ChevronRight size={17} />
-            </button>
-          </div>
-
-          <div className="mt-3 grid grid-cols-7 gap-1 text-center">
-            {weekDayHeaders.map((dayOfWeek) => (
-              <div
-                key={dayOfWeek}
-                className="py-1 text-[11px] font-semibold text-stone-500"
-              >
-                {weekDayShortLabel(dayOfWeek)}
-              </div>
-            ))}
-            {days.map((day) => {
-              const isActive = day.date === selectedDate;
-              return (
+        <div className="grid gap-3 xl:grid-cols-[minmax(18rem,21rem)_minmax(0,1fr)]">
+          <div className="border border-stone-200 bg-stone-50 px-3 py-3">
+            <div className="mx-auto w-full max-w-[20rem]">
+              <div className="flex items-center justify-between gap-2">
                 <button
-                  key={day.date}
                   type="button"
-                  aria-pressed={isActive}
-                  onClick={() => selectDate(day.date)}
-                  className={[
-                    "relative min-h-12 rounded-md border px-1 py-1 text-left transition",
-                    isActive
-                      ? "border-[#315C7C] bg-[#315C7C] text-white"
-                      : day.isCurrentMonth
-                        ? "border-stone-200 bg-white text-stone-900 hover:border-[#315C7C]"
-                        : "border-stone-100 bg-stone-100 text-stone-400",
-                  ].join(" ")}
+                  aria-label="이전 달"
+                  title="이전 달"
+                  onClick={() => moveMonth(-1)}
+                  className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-stone-200 bg-white text-stone-700 transition hover:border-[#315C7C] hover:text-[#315C7C]"
                 >
-                  <span className="block text-xs font-semibold leading-none">
-                    {day.dayOfMonth}
-                  </span>
-                  <span className="mt-1 flex items-center gap-0.5">
-                    {day.scheduleCount > 0 ? (
-                      <span
-                        className={[
-                          "h-1.5 w-4 rounded-full",
-                          day.hasExternalSchedule ? "bg-amber-400" : "bg-[#315C7C]",
-                        ].join(" ")}
-                      />
-                    ) : null}
-                    {day.isToday ? (
-                      <span
-                        className={[
-                          "h-1.5 w-1.5 rounded-full",
-                          isActive ? "bg-white" : "bg-[#315C7C]",
-                        ].join(" ")}
-                      />
-                    ) : null}
-                  </span>
+                  <ChevronLeft size={16} />
                 </button>
-              );
-            })}
-          </div>
-        </div>
+                <p className="text-sm font-semibold text-stone-950">
+                  {MakeupSchedulePlanner.getMonthLabel(displayMonth)}
+                </p>
+                <button
+                  type="button"
+                  aria-label="다음 달"
+                  title="다음 달"
+                  onClick={() => moveMonth(1)}
+                  className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-stone-200 bg-white text-stone-700 transition hover:border-[#315C7C] hover:text-[#315C7C]"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
 
-        {selectedStudent ? (
-          <SelectedDateSchedule
-            date={selectedDate}
-            schedules={selectedSummary.schedules}
-            isSharedLoading={sharedSchedules.status === "loading"}
-            sharedError={sharedSchedules.error}
-          />
-        ) : (
-          <div className="rounded-md border border-dashed border-stone-300 bg-stone-50 p-3 text-sm leading-6 text-stone-600">
-            학생을 선택하면 날짜별 스케줄이 표시됩니다.
+              <div className="mt-3 grid grid-cols-7 gap-1 text-center">
+                {weekDayHeaders.map((dayOfWeek) => (
+                  <div
+                    key={dayOfWeek}
+                    className="py-1 text-[11px] font-semibold text-stone-500"
+                  >
+                    {weekDayShortLabel(dayOfWeek)}
+                  </div>
+                ))}
+                {days.map((day) => {
+                  const isActive = day.date === selectedDate;
+                  return (
+                    <button
+                      key={day.date}
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => selectDate(day.date)}
+                      className={[
+                        "relative flex aspect-square min-h-0 items-center justify-center rounded-sm border px-1 text-center transition focus:outline-none focus:ring-2 focus:ring-[#B8D5E8]",
+                        isActive
+                          ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm"
+                          : day.isCurrentMonth
+                            ? "border-stone-200 bg-white text-stone-900 hover:border-[#315C7C] hover:bg-[#F2F7FA]"
+                            : "border-stone-100 bg-stone-100 text-stone-400",
+                      ].join(" ")}
+                    >
+                      <span className="text-xs font-bold leading-none tabular-nums">
+                        {day.dayOfMonth}
+                      </span>
+                      <span className="absolute bottom-1 left-1/2 flex -translate-x-1/2 items-center gap-0.5">
+                        {day.scheduleCount > 0 ? (
+                          <span
+                            aria-label="일정 있음"
+                            className={[
+                              "h-1 w-3 rounded-full",
+                              day.hasExternalSchedule
+                                ? "bg-amber-400"
+                                : isActive
+                                  ? "bg-white"
+                                  : "bg-[#315C7C]",
+                            ].join(" ")}
+                          />
+                        ) : null}
+                        {day.isToday ? (
+                          <span
+                            aria-label="오늘"
+                            className={[
+                              "h-1.5 w-1.5 rounded-full",
+                              isActive ? "bg-white" : "bg-[#007A7C]",
+                            ].join(" ")}
+                          />
+                        ) : null}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        )}
 
-        <div className="border-y border-stone-100 px-3 py-3">
-          <p className="text-xs font-semibold text-stone-500">선택 날짜</p>
-          <p className="mt-1 text-sm font-semibold text-stone-950">
-            {formatDateForCandidate(selectedDate)}
-          </p>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
-              시작 시간
-              <input
-                type="time"
-                value={startTime}
-                onChange={(event) => setStartTime(event.target.value)}
-                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+          <div className="grid min-w-0 gap-3">
+            {selectedStudent ? (
+              <SelectedDateSchedule
+                date={selectedDate}
+                schedules={selectedSummary.schedules}
+                isSharedLoading={sharedSchedules.status === "loading"}
+                sharedError={sharedSchedules.error}
               />
-            </label>
-            <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
-              종료 시간
-              <input
-                type="time"
-                value={endTime}
-                onChange={(event) => setEndTime(event.target.value)}
-                className="min-h-11 rounded-md border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
-              />
-            </label>
+            ) : (
+              <div className="border border-dashed border-stone-300 bg-stone-50 p-3 text-sm leading-6 text-stone-600">
+                학생을 선택하면 날짜별 스케줄이 표시됩니다.
+              </div>
+            )}
+
+            <div className="border border-stone-200 bg-stone-50 px-3 py-3">
+              <p className="text-xs font-semibold text-stone-500">선택 날짜</p>
+              <p className="mt-1 text-sm font-semibold text-stone-950">
+                {formatDateForCandidate(selectedDate)}
+              </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
+                  시작 시간
+                  <input
+                    type="time"
+                    value={startTime}
+                    onChange={(event) => setStartTime(event.target.value)}
+                    className="min-h-11 rounded-sm border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+                  />
+                </label>
+                <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
+                  종료 시간
+                  <input
+                    type="time"
+                    value={endTime}
+                    onChange={(event) => setEndTime(event.target.value)}
+                    className="min-h-11 rounded-sm border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+                  />
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 

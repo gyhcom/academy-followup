@@ -1431,7 +1431,7 @@ function MessageComposer({
       id={composerId}
       aria-labelledby={`${composerId}-title`}
       className={[
-        "border-[#D5E0E4] bg-[#F8FBFC] lg:sticky lg:top-4 lg:h-[calc(100vh-9rem)] lg:overflow-y-auto lg:border-l",
+        "border-[#D5E0E4] bg-[#F8FBFC] lg:sticky lg:top-4 lg:self-start lg:border-l",
         className,
       ].join(" ")}
     >
@@ -1589,7 +1589,7 @@ function MessageComposer({
                 : "학생과 사유를 선택하면 문자 초안이 표시됩니다."
             }
             rows={8}
-            className="mt-2 min-h-36 w-full resize-none border border-[#AEBFC7] bg-[#F7FAFA] px-3 py-3 text-sm leading-6 text-[#334B58] outline-none transition disabled:bg-[#EDF3F5] disabled:text-[#78909A] focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB] sm:min-h-44"
+            className="mt-2 h-40 w-full resize-none border border-[#AEBFC7] bg-[#F7FAFA] px-3 py-3 text-sm leading-6 text-[#334B58] outline-none transition disabled:bg-[#EDF3F5] disabled:text-[#78909A] focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB] sm:h-44"
           />
           <p
             className={[
@@ -1693,7 +1693,7 @@ function MessageComposer({
         {isFollowupSaved ? (
           <div className="space-y-2">
             {sendBlockedMessage ? (
-            <div className="border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-950">
+              <div className="border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-950">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="mt-0.5 shrink-0" size={17} />
                   <p>{sendBlockedMessage}</p>
