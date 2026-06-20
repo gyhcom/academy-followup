@@ -1273,7 +1273,7 @@ function AttendanceViewTabs({
         })}
         {showLedgerNotice ? (
           <div className="ml-auto hidden min-h-10 shrink-0 items-center border border-dashed border-[#C7D7DC] bg-[#EEF3F5] px-3 text-xs font-semibold text-[#6D818A] sm:flex">
-            학생별 장부는 월간 matrix로 후속 구현
+            학생별 장부는 후속 범위
           </div>
         ) : null}
       </div>
@@ -1544,6 +1544,8 @@ function AttendanceCalendarDayCell({
         }
       : undefined,
   ].filter((row): row is NonNullable<typeof row> => row !== undefined);
+  const displayedStatusRows = visibleStatusRows.slice(0, 3);
+  const hiddenStatusCount = visibleStatusRows.length - displayedStatusRows.length;
   const statusLabel = !hasClass
     ? "수업 없음"
     : attentionCount > 0
@@ -1593,10 +1595,10 @@ function AttendanceCalendarDayCell({
           {statusLabel}
         </span>
       ) : null}
-      <div className="flex min-w-0 items-start">
+      <div className="flex min-w-0 items-start pr-7">
         <div
           className={[
-            "inline-flex min-w-[3.9rem] shrink-0 items-baseline gap-1 rounded-sm border px-1.5 py-1 sm:min-w-[4.25rem] sm:gap-1.5 sm:px-2",
+            "inline-flex max-w-full min-w-[3.9rem] shrink-0 items-baseline gap-1 overflow-hidden rounded-sm border px-1.5 py-1 sm:min-w-[4.25rem] sm:gap-1.5 sm:px-2",
             isSelected
               ? "border-[#9FCFCA] bg-[#F6FBF9] text-[#063B3A]"
               : isToday
@@ -1638,7 +1640,7 @@ function AttendanceCalendarDayCell({
         </div>
         <div className="grid min-w-0 grid-cols-1 gap-y-0.5 text-[11px] leading-4">
           {visibleStatusRows.length > 0 ? (
-            visibleStatusRows.map((row) => (
+            displayedStatusRows.map((row) => (
               <MetricLine
                 key={row.label}
                 label={row.label}
@@ -1646,9 +1648,10 @@ function AttendanceCalendarDayCell({
                 tone={row.tone}
               />
             ))
-          ) : hasClass ? (
-            <span className="truncate text-[11px] font-semibold text-[#78909A]">
-              처리 이슈 없음
+          ) : null}
+          {hiddenStatusCount > 0 ? (
+            <span className="truncate text-[11px] font-bold text-[#60717B]">
+              외 {hiddenStatusCount}개 상태
             </span>
           ) : null}
         </div>
@@ -1928,13 +1931,14 @@ function SummaryFilterButton({
       aria-pressed={isActive}
       disabled={isDisabled}
       onClick={onClick}
+      title={`${label} 목록 보기`}
       className={[
         "group relative grid min-h-10 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-l-[3px] px-3 py-2 text-left font-extrabold transition last:border-b-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB]",
         isDisabled
           ? "cursor-not-allowed border-l-transparent bg-[#EEF3F5] text-[#8CA0A8]"
           : isActive
           ? "border-l-[#0F766E] bg-[#0B3F46] text-white"
-          : `border-l-transparent bg-[#F8FAF8] hover:border-l-[#0F766E] hover:bg-[#EEF5F3] ${toneClass}`,
+          : `cursor-pointer border-l-transparent bg-[#F8FAF8] hover:border-l-[#0F766E] hover:bg-[#EEF5F3] ${toneClass}`,
       ].join(" ")}
     >
       <span
@@ -1946,14 +1950,15 @@ function SummaryFilterButton({
         {label}
       </span>
       <span className="text-lg leading-5 tabular-nums">{value}</span>
-      <ChevronRight
-        size={14}
-        aria-hidden="true"
+      <span
         className={[
-          "transition-transform group-hover:translate-x-0.5",
-          isDisabled ? "text-[#B5C3C9]" : isActive ? "text-white/80" : "text-[#879BA3]",
+          "inline-flex items-center gap-0.5 text-[10px] font-black uppercase tracking-[0.08em] transition-transform group-hover:translate-x-0.5",
+          isDisabled ? "text-[#B5C3C9]" : isActive ? "text-white/75" : "text-[#60717B]",
         ].join(" ")}
-      />
+      >
+        보기
+        <ChevronRight size={13} aria-hidden="true" />
+      </span>
     </button>
   );
 }
@@ -2268,7 +2273,7 @@ function StudentScheduleDrawer({
               <DrawerMetricRow label="미체크" value={monthlySummary.pending} />
             </div>
             <p className="mt-2 text-xs leading-5 text-[#78909A]">
-              현재 로드된 출석 기록 기준입니다. 학생별 월간 matrix는 후속 단계에서 보강합니다.
+              데모에서는 선택 월에 불러온 출석 기록만 요약합니다.
             </p>
           </DrawerSection>
 
@@ -2311,13 +2316,13 @@ function StudentScheduleDrawer({
                 <div className="flex items-start gap-2">
                   <Pencil className="mt-0.5 shrink-0 text-[#8CA0A8]" size={15} aria-hidden="true" />
                   <span>
-                    메모 전용 기능은 준비 중입니다. 지금은 문자 작성에서 연락 기록을 저장해 주세요.
+                    메모가 필요하면 문자 작성 화면에서 연락 기록으로 남겨 주세요.
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
                   <List className="mt-0.5 shrink-0 text-[#8CA0A8]" size={15} aria-hidden="true" />
                   <span>
-                    전체 이력 화면은 문자 화면에서 학생을 선택해 확인합니다.
+                    전체 이력은 문자 화면에서 학생을 선택해 확인합니다.
                   </span>
                 </div>
               </div>
@@ -2736,149 +2741,134 @@ function AttendanceLedgerTable({
     );
   }
 
+  const footerSummaryItems = [
+    { label: "출석", value: summary?.present ?? 0, className: "text-[#007A7C]" },
+    { label: "지각", value: summary?.late ?? 0, className: "text-[#B26A00]" },
+    { label: "결석", value: summary?.absent ?? 0, className: "text-[#B42318]" },
+    { label: "미체크", value: summary?.pending ?? 0, className: "text-[#334B58]" },
+  ].filter((item) => item.value > 0);
+
   return (
     <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
       <div className="overflow-x-auto">
-      <table className="w-full min-w-full table-fixed border-separate border-spacing-0 text-left">
-        <thead className="bg-[#E7EEF1] text-[12px] font-bold text-[#405763]">
-          <tr>
-            <th className="w-8 border-b border-r border-[#D6E0E4] px-2 py-3">
-              <span className="sr-only">선택</span>
-            </th>
-            <th className="w-[23%] border-b border-r border-[#D6E0E4] px-2 py-3">학생명</th>
-            <th className="w-[16%] border-b border-r border-[#D6E0E4] px-2 py-3">학교 / 학년</th>
-            <th className="w-[13%] border-b border-r border-[#D6E0E4] px-2 py-3">휴대폰</th>
-            <th className="w-[13%] border-b border-r border-[#D6E0E4] px-2 py-3">수업시간</th>
-            <th className="w-[12%] border-b border-r border-[#D6E0E4] px-2 py-3">출석 상태</th>
-            <th className="w-[12%] border-b border-r border-[#D6E0E4] px-2 py-3">연락 상태</th>
-            <th className="w-[8%] border-b border-[#D6E0E4] px-2 py-3">메모</th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student) => {
-            const record = recordsByStudent.get(student.id);
-            const status = normalizeAttendanceStatus(record?.status);
-            const updateKey = getAttendanceUpdateKey({
-              studentId: student.id,
-              classId: session.classId,
-              attendanceDate: selectedDate,
-              scheduledStartTime: session.startTime,
-              scheduledEndTime: session.endTime,
-            });
-            const isSaving = saveState.key === updateKey && saveState.status === "saving";
-            const isSelected = selectedStudentId === student.id;
-            const isBulkSelectable =
-              bulkTarget !== null &&
-              status === attendanceStatusForBulkReason(bulkTarget.reason);
-            const isBulkSelected = selectedBulkStudentIds.includes(student.id);
+        <table className="w-full min-w-[47rem] table-fixed border-separate border-spacing-0 text-left">
+          <thead className="bg-[#E7EEF1] text-[12px] font-bold text-[#405763]">
+            <tr>
+              <th className="w-8 border-b border-r border-[#D6E0E4] px-2 py-3">
+                <span className="sr-only">선택</span>
+              </th>
+              <th className="w-[23%] border-b border-r border-[#D6E0E4] px-2 py-3">학생명</th>
+              <th className="w-[16%] border-b border-r border-[#D6E0E4] px-2 py-3">학교 / 학년</th>
+              <th className="w-[13%] border-b border-r border-[#D6E0E4] px-2 py-3">휴대폰</th>
+              <th className="w-[13%] border-b border-r border-[#D6E0E4] px-2 py-3">수업시간</th>
+              <th className="w-[12%] border-b border-r border-[#D6E0E4] px-2 py-3">출석 상태</th>
+              <th className="w-[12%] border-b border-r border-[#D6E0E4] px-2 py-3">연락 상태</th>
+              <th className="w-[8%] border-b border-[#D6E0E4] px-2 py-3">메모</th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.map((student) => {
+              const record = recordsByStudent.get(student.id);
+              const status = normalizeAttendanceStatus(record?.status);
+              const updateKey = getAttendanceUpdateKey({
+                studentId: student.id,
+                classId: session.classId,
+                attendanceDate: selectedDate,
+                scheduledStartTime: session.startTime,
+                scheduledEndTime: session.endTime,
+              });
+              const isSaving = saveState.key === updateKey && saveState.status === "saving";
+              const isSelected = selectedStudentId === student.id;
+              const isBulkSelectable =
+                bulkTarget !== null &&
+                status === attendanceStatusForBulkReason(bulkTarget.reason);
+              const isBulkSelected = selectedBulkStudentIds.includes(student.id);
 
-            return (
-              <tr
-                key={student.id}
-                tabIndex={0}
-                aria-selected={isSelected}
-                onClick={() => onSelectStudent(student.id)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onSelectStudent(student.id);
-                  }
-                }}
-                className={[
-                  "group cursor-pointer border-b border-[var(--clinic-border)] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
-                  isSelected
-                    ? "bg-[#E1F0EF] shadow-[inset_4px_0_0_var(--clinic-primary)]"
-                    : "bg-[#F7FAFA] hover:bg-[#EDF3F5]",
-                  isSaving ? "opacity-70" : "",
-                ].join(" ")}
-              >
-                <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
-                  <input
-                    type="checkbox"
-                    checked={isBulkSelected}
-                    disabled={!isBulkSelectable}
-                    onClick={(event) => event.stopPropagation()}
-                    onChange={() => onToggleBulkStudent(student.id)}
-                    className="size-4 accent-[var(--clinic-primary)] disabled:opacity-30"
-                    aria-label={`${student.name} 일괄 문자 대상 선택`}
-                  />
-                </td>
-                <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
-                  <div className="flex items-center gap-2">
-                    <span className="flex size-7 shrink-0 items-center justify-center border border-[#AFC3CA] bg-[#E3EEF0] text-xs font-bold text-[#005F62]">
-                      {getStudentInitial(student.name)}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold leading-5 text-[var(--clinic-text)]">
-                        {student.name}
-                      </p>
-                      <p className="truncate text-[11px] leading-4 text-[#78909A]">
-                        학생 차트
-                      </p>
+              return (
+                <tr
+                  key={student.id}
+                  tabIndex={0}
+                  aria-selected={isSelected}
+                  onClick={() => onSelectStudent(student.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onSelectStudent(student.id);
+                    }
+                  }}
+                  className={[
+                    "group cursor-pointer border-b border-[var(--clinic-border)] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
+                    isSelected
+                      ? "bg-[#E1F0EF] shadow-[inset_4px_0_0_var(--clinic-primary)]"
+                      : "bg-[#F7FAFA] hover:bg-[#EDF3F5]",
+                    isSaving ? "opacity-70" : "",
+                  ].join(" ")}
+                >
+                  <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
+                    <input
+                      type="checkbox"
+                      checked={isBulkSelected}
+                      disabled={!isBulkSelectable}
+                      onClick={(event) => event.stopPropagation()}
+                      onChange={() => onToggleBulkStudent(student.id)}
+                      className="size-4 accent-[var(--clinic-primary)] disabled:opacity-30"
+                      aria-label={`${student.name} 일괄 문자 대상 선택`}
+                    />
+                  </td>
+                  <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
+                    <div className="flex items-center gap-2">
+                      <span className="flex size-7 shrink-0 items-center justify-center border border-[#AFC3CA] bg-[#E3EEF0] text-xs font-bold text-[#005F62]">
+                        {getStudentInitial(student.name)}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold leading-5 text-[var(--clinic-text)]">
+                          {student.name}
+                        </p>
+                        <p className="truncate text-[11px] leading-4 text-[#78909A]">
+                          학생 처리 패널
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs text-[#435864]">
-                  {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
-                    "학교/학년 미등록"}
-                </td>
-                <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs tabular-nums text-[#435864]">
-                  {student.maskedStudentPhone ?? student.maskedParentPhone}
-                </td>
-                <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs tabular-nums text-[#334B58]">
-                  {session.startTime}-{session.endTime}
-                </td>
-                <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
-                  <StatusLozenge status={status} />
-                </td>
-                <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
-                  <ContactLozenge record={record} status={status} />
-                </td>
-                <td className="border-b border-[#E0E8EB] px-2 py-2.5 align-middle">
-                  <span className="rounded-sm border border-[#d5e1e5] bg-[#f5f9fa] px-1.5 py-1 text-[11px] font-semibold text-[var(--clinic-muted)]">
-                    {record?.note ? "있음" : "-"}
-                  </span>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                  </td>
+                  <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs text-[#435864]">
+                    {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
+                      "학교/학년 미등록"}
+                  </td>
+                  <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs tabular-nums text-[#435864]">
+                    {student.maskedStudentPhone ?? student.maskedParentPhone}
+                  </td>
+                  <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs tabular-nums text-[#334B58]">
+                    {session.startTime}-{session.endTime}
+                  </td>
+                  <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
+                    <StatusLozenge status={status} />
+                  </td>
+                  <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
+                    <ContactLozenge record={record} status={status} />
+                  </td>
+                  <td className="border-b border-[#E0E8EB] px-2 py-2.5 align-middle">
+                    <span className="rounded-sm border border-[#d5e1e5] bg-[#f5f9fa] px-1.5 py-1 text-[11px] font-semibold text-[var(--clinic-muted)]">
+                      {record?.note ? "있음" : "-"}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
       <div className="flex items-center justify-between gap-3 border-t border-[#B8C9D0] bg-[#F4F8F9] px-4 py-3 text-sm text-[#405763]">
         <div className="flex flex-wrap items-center gap-4">
           <span className="font-semibold">전체 {students.length}명</span>
-          <span>출석 <b className="text-[#007A7C]">{summary?.present ?? 0}</b></span>
-          <span>지각 <b className="text-[#B26A00]">{summary?.late ?? 0}</b></span>
-          <span>결석 <b className="text-[#B42318]">{summary?.absent ?? 0}</b></span>
-          <span>미체크 <b className="text-[#334B58]">{summary?.pending ?? 0}</b></span>
+          {footerSummaryItems.map((item) => (
+            <span key={item.label}>
+              {item.label} <b className={item.className}>{item.value}</b>
+            </span>
+          ))}
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="flex size-8 items-center justify-center rounded-sm border border-[#C6D4DA] bg-white text-[#405763]"
-            aria-label="이전 페이지"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <span className="flex size-8 items-center justify-center rounded-sm bg-[#007A7C] text-sm font-semibold text-white">
-            1
-          </span>
-          <button
-            type="button"
-            className="flex size-8 items-center justify-center rounded-sm border border-[#C6D4DA] bg-white text-[#405763]"
-            aria-label="다음 페이지"
-          >
-            <ChevronRight size={16} />
-          </button>
-          <select
-            aria-label="페이지당 학생 수"
-            className="h-8 rounded-sm border border-[#C6D4DA] bg-white px-2 text-sm font-medium text-[#405763]"
-            defaultValue="50"
-          >
-            <option value="50">50개씩</option>
-          </select>
-        </div>
+        <p className="shrink-0 text-xs font-semibold text-[#78909A]">
+          현재 수업 학생 전체 표시
+        </p>
       </div>
     </div>
   );
@@ -3567,11 +3557,17 @@ function SessionList({
       <div className="border-t border-[#D5E0E4] bg-white p-3">
         <button
           type="button"
+          disabled={sessions.length === 0}
           onClick={onOpenMessages}
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-[#007A7C] bg-white px-3 text-sm font-bold text-[#007A7C] transition hover:bg-[#F0FAF9] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+          className={[
+            "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border px-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+            sessions.length === 0
+              ? "cursor-not-allowed border-[#C6D4DA] bg-[#F2F6F7] text-[#8CA0A8]"
+              : "border-[#007A7C] bg-white text-[#007A7C] hover:bg-[#F0FAF9]",
+          ].join(" ")}
         >
           <Send size={16} aria-hidden="true" />
-          총 수업 일괄 문자
+          {sessions.length === 0 ? "수업 선택 후 일괄 문자" : "총 수업 일괄 문자"}
         </button>
       </div>
     </section>
@@ -4021,7 +4017,7 @@ function BulkAttendanceFollowupPanel({
           </button>
         </div>
         <p className="mt-1 text-xs leading-5 text-white/65">
-          선택 학생마다 이름 변수를 치환해 개별 연락 기록을 저장합니다.
+          선택 학생 → 이름 치환 → 연락 기록 저장 → 테스트 발송 순서로 확인합니다.
         </p>
       </div>
 
@@ -4138,8 +4134,8 @@ function BulkAttendanceFollowupPanel({
           <div className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 shrink-0 text-[var(--clinic-primary)]" size={17} />
             <p>
-              `{"{{studentName}}"}` 변수는 학생별 이름으로 바뀝니다. 예:{" "}
-              {selectedStudents[0]?.name ?? "학생명"}
+              본문의 `{"{{studentName}}"}` 자리에는 저장/발송 시 학생 이름이 각각 들어갑니다.
+              예: {selectedStudents[0]?.name ?? "학생명"}
             </p>
           </div>
         </div>
