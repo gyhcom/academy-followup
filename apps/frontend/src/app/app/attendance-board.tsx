@@ -1383,16 +1383,12 @@ function AttendanceCalendarView({
             <CompactFilterLabel label="반 필터" value="전체 반" />
             <CompactFilterLabel label="선생님" value="전체" />
             <CompactFilterLabel label="상태" value="전체 상태" />
-            <label className="flex min-h-10 items-center gap-2 px-0 py-1 text-sm text-[#526A75] sm:px-3">
+            <div className="flex min-h-10 items-center gap-2 px-0 py-1 text-sm text-[#526A75] sm:px-3">
               <Search size={15} aria-hidden="true" />
-              <span className="sr-only">학생 또는 반 검색</span>
-              <input
-                type="search"
-                placeholder="학생/반 검색은 후속 보강"
-                disabled
-                className="min-w-0 flex-1 rounded-sm border border-transparent bg-transparent px-1 py-1 text-sm outline-none placeholder:text-[#8CA0A8] disabled:cursor-not-allowed focus:border-[#84C7CB]"
-              />
-            </label>
+              <span className="truncate text-xs font-semibold text-[#78909A]">
+                학생/반 검색 필터는 다음 단계에서 연결합니다.
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -2317,22 +2313,20 @@ function StudentScheduleDrawer({
                 <Send size={16} aria-hidden="true" />
                 문자 작성
               </button>
-              <button
-                type="button"
-                disabled
-                className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 border border-[#C6D4DA] bg-[#F7FAFA] px-3 text-sm font-bold text-[#8CA0A8]"
-              >
-                <Pencil size={16} aria-hidden="true" />
-                메모 작성 준비 중
-              </button>
-              <button
-                type="button"
-                disabled
-                className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 border border-[#C6D4DA] bg-[#F7FAFA] px-3 text-sm font-bold text-[#8CA0A8]"
-              >
-                <List size={16} aria-hidden="true" />
-                연락 이력 전체 보기 준비 중
-              </button>
+              <div className="grid gap-2 border border-[#C6D4DA] bg-[#F7FAFA] p-3 text-xs leading-5 text-[#60717B]">
+                <div className="flex items-start gap-2">
+                  <Pencil className="mt-0.5 shrink-0 text-[#8CA0A8]" size={15} aria-hidden="true" />
+                  <span>
+                    메모 전용 기능은 준비 중입니다. 지금은 문자 작성에서 연락 기록을 저장해 주세요.
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <List className="mt-0.5 shrink-0 text-[#8CA0A8]" size={15} aria-hidden="true" />
+                  <span>
+                    전체 이력 화면은 문자 화면에서 학생을 선택해 확인합니다.
+                  </span>
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -3175,7 +3169,7 @@ function WorkbenchStudentPanel({
                 className="flex min-h-10 items-center justify-center gap-2 border border-[#AEBFC7] bg-[#F7FAFA] px-3 text-sm font-bold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] disabled:cursor-not-allowed disabled:bg-[#EEF3F5] disabled:text-[#93A3AA]"
               >
                 <Pencil size={16} aria-hidden="true" />
-                메모
+                기록 작성
               </button>
               <button
                 type="button"

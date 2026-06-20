@@ -327,7 +327,7 @@ function StudentSelectionList({
                   ) : null}
                 </div>
 
-                <div className="mt-2 flex gap-1.5 overflow-x-auto pb-0.5">
+                <div className="mt-2 flex flex-wrap gap-1.5">
                   <button
                     type="button"
                     onClick={() => onStudentSelect(student.id)}
@@ -341,6 +341,9 @@ function StudentSelectionList({
                     문자 작성
                     <ArrowRight size={13} aria-hidden="true" />
                   </button>
+                  <span className="inline-flex min-h-8 shrink-0 items-center px-1 text-[11px] font-bold text-[#78909A]">
+                    사유:
+                  </span>
                   {quickReasonIds.map((reasonId) => {
                     const isReasonSelected = isSelected && selectedReason === reasonId;
                     return (
@@ -356,6 +359,7 @@ function StudentSelectionList({
                             : "border-[#B8C9D0] bg-[#F4F8F9] text-[#405763] hover:border-[#839AA4] hover:bg-[#EDF3F5]",
                         ].join(" ")}
                       >
+                        {isReasonSelected ? "선택됨 · " : ""}
                         {reasonLabel(reasonId)}
                       </button>
                     );

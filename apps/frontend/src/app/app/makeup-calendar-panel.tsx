@@ -251,9 +251,12 @@ export function MakeupCalendarPanel({
           {hasConflicts
             ? "기존 일정과 겹쳐 선택 불가"
             : isSelected
-              ? "보강 후보 선택됨"
-              : "이 날짜/시간으로 보강 문자"}
+              ? "보강 후보 적용됨"
+              : "보강 문자 초안에 적용"}
         </button>
+        <p className="text-xs leading-5 text-stone-500">
+          선택하면 오른쪽 문자 초안의 사유와 보강 시간이 바뀝니다. 실제 발송은 초안 저장 후 따로 진행합니다.
+        </p>
 
         {!isTimeRangeValid ? (
           <p className="rounded-md bg-red-50 px-3 py-2 text-xs font-semibold text-red-800">

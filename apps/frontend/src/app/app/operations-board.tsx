@@ -1497,7 +1497,10 @@ function MessageComposer({
         ) : null}
 
         <fieldset className="border border-[#B8C9D0] bg-[#F7FAFA] p-3">
-          <legend className="px-1 text-sm font-bold text-[#17232B]">사유</legend>
+          <legend className="px-1 text-sm font-bold text-[#17232B]">사유 선택</legend>
+          <p className="mt-1 text-xs leading-5 text-[#60717B]">
+            사유를 바꾸면 아래 문자 초안만 다시 준비됩니다. 기록 저장과 테스트 발송은 하단 버튼에서 따로 실행합니다.
+          </p>
           <div className="mt-2 grid border border-[#B8C9D0] bg-[#F7FAFA] sm:grid-cols-4">
             {followupReasons.map((reason) => {
               const isSelected = reason.id === selectedReason;
