@@ -3990,11 +3990,13 @@ function BulkAttendanceFollowupPanel({
   const messageMetrics = getMessageLengthMetrics(messageTemplate);
   const isMessageBlank = messageTemplate.trim().length === 0;
   const isBusy = submitState.status === "saving" || submitState.status === "sending";
+  const hasCompletedSubmit = submitState.status === "saved" || submitState.status === "sent";
   const canSave =
     selectedStudents.length > 0 &&
     !isMessageBlank &&
     !messageMetrics.isOverLimit &&
-    !isBusy;
+    !isBusy &&
+    !hasCompletedSubmit;
   const canSend = canSave && !sendBlockedMessage;
   const selectedStudentPhoneMissing = selectedStudents.some(
     (student) => !student.maskedStudentPhone,
@@ -4017,7 +4019,7 @@ function BulkAttendanceFollowupPanel({
           </button>
         </div>
         <p className="mt-1 text-xs leading-5 text-white/65">
-          선택 학생 → 이름 치환 → 연락 기록 저장 → 테스트 발송 순서로 확인합니다.
+          선택 학생 → 이름 치환 → 기록 저장 또는 테스트 발송 중 하나를 선택합니다.
         </p>
       </div>
 
@@ -4166,14 +4168,21 @@ function BulkAttendanceFollowupPanel({
               ) : (
                 <CheckCircle2 className="mt-0.5 shrink-0" size={17} />
               )}
-              <p>
-                {submitState.error ||
-                  `${submitState.message} 연락 기록 ${submitState.savedFollowupCount}건${
-                    submitState.messageLogCount > 0
-                      ? ` · 발송 로그 ${submitState.messageLogCount}건`
-                      : ""
-                  }`}
-              </p>
+              <div>
+                <p>
+                  {submitState.error ||
+                    `${submitState.message} 연락 기록 ${submitState.savedFollowupCount}건${
+                      submitState.messageLogCount > 0
+                        ? ` · 발송 로그 ${submitState.messageLogCount}건`
+                        : ""
+                    }`}
+                </p>
+                {hasCompletedSubmit ? (
+                  <p className="mt-1 text-xs text-[var(--clinic-muted)]">
+                    같은 선택 묶음에서는 추가 저장/발송을 막아 중복 기록을 방지합니다.
+                  </p>
+                ) : null}
+              </div>
             </div>
           </div>
         ) : null}
@@ -4191,7 +4200,11 @@ function BulkAttendanceFollowupPanel({
             ].join(" ")}
           >
             <Send size={17} />
-            {submitState.status === "saving" ? "저장 중" : "기록 저장"}
+            {submitState.status === "saving"
+              ? "저장 중"
+              : submitState.status === "saved"
+                ? "저장 완료"
+                : "기록 저장"}
           </button>
           <button
             type="button"
@@ -4211,6 +4224,8 @@ function BulkAttendanceFollowupPanel({
                 ? submitState.dryRun
                   ? "테스트 발송 완료"
                   : "문자 발송 완료"
+                : submitState.status === "saved"
+                  ? "저장 완료"
                 : "테스트 발송"}
           </button>
         </div>
