@@ -58,6 +58,53 @@ button:not(:disabled) {
   outline-offset: 2px;
 }
 
+.academy-console .message-workbench {
+  --message-select-surface: #eaf1f6;
+  --message-select-panel: #f6f9fc;
+  --message-select-line: #afc0cd;
+  --message-select-accent: #2f5f7e;
+  --message-plan-surface: #f0f1f7;
+  --message-plan-panel: #f8f8fc;
+  --message-plan-line: #b8bfd3;
+  --message-plan-accent: #485a83;
+  --message-compose-surface: #f8f0e3;
+  --message-compose-panel: #fff9f0;
+  --message-compose-line: #d7c0a3;
+  --message-compose-accent: #8a4f12;
+  --message-compose-ink: #2c2118;
+}
+
+.academy-console .message-zone-select {
+  border-color: var(--message-select-line, #afc0cd);
+  background: var(--message-select-surface, #eaf1f6);
+}
+
+.academy-console .message-zone-plan {
+  border-color: var(--message-plan-line, #b8bfd3);
+  background: var(--message-plan-surface, #f0f1f7);
+}
+
+.academy-console .message-zone-compose {
+  border-color: var(--message-compose-line, #d7c0a3);
+  background: var(--message-compose-surface, #f8f0e3);
+  color: var(--message-compose-ink, #2c2118);
+}
+
+.academy-console .message-zone-select-panel {
+  border-color: var(--message-select-line, #afc0cd);
+  background: var(--message-select-panel, #f6f9fc);
+}
+
+.academy-console .message-zone-plan-panel {
+  border-color: var(--message-plan-line, #b8bfd3);
+  background: var(--message-plan-panel, #f8f8fc);
+}
+
+.academy-console .message-zone-compose-panel {
+  border-color: var(--message-compose-line, #d7c0a3);
+  background: var(--message-compose-panel, #fff9f0);
+}
+
 @media (min-width: 640px) {
   .academy-console :where(button, input, select, textarea, section, aside, [class*="rounded"]) {
     border-radius: var(--console-radius) !important;
@@ -147,5 +194,52 @@ button:not(:disabled) {
   .academy-console .console-action-dock {
     border-top: 1px solid var(--console-line);
     background: #f4f8f9;
+  }
+
+  .academy-console .message-workbench {
+    --message-select-surface: #eaf1f6;
+    --message-select-panel: #f6f9fc;
+    --message-select-line: #afc0cd;
+    --message-select-accent: #2f5f7e;
+    --message-plan-surface: #f0f1f7;
+    --message-plan-panel: #f8f8fc;
+    --message-plan-line: #b8bfd3;
+    --message-plan-accent: #485a83;
+    --message-compose-surface: #f8f0e3;
+    --message-compose-panel: #fff9f0;
+    --message-compose-line: #d7c0a3;
+    --message-compose-accent: #8a4f12;
+    --message-compose-ink: #2c2118;
+  }
+
+  .academy-console .message-zone-select {
+    border-color: var(--message-select-line);
+    background: var(--message-select-surface);
+  }
+
+  .academy-console .message-zone-plan {
+    border-color: var(--message-plan-line);
+    background: var(--message-plan-surface);
+  }
+
+  .academy-console .message-zone-compose {
+    border-color: var(--message-compose-line);
+    background: var(--message-compose-surface);
+    color: var(--message-compose-ink);
+  }
+
+  .academy-console .message-zone-select-panel {
+    border-color: var(--message-select-line);
+    background: var(--message-select-panel);
+  }
+
+  .academy-console .message-zone-plan-panel {
+    border-color: var(--message-plan-line);
+    background: var(--message-plan-panel);
+  }
+
+  .academy-console .message-zone-compose-panel {
+    border-color: var(--message-compose-line);
+    background: var(--message-compose-panel);
   }
 }

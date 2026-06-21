@@ -97,23 +97,23 @@ export function MakeupCalendarPanel({
   return (
     <section
       aria-labelledby="makeup-calendar-title"
-      className="overflow-hidden rounded-lg border border-stone-200 bg-white"
+      className="message-zone-plan overflow-hidden border"
     >
-      <div className="border-b border-stone-200 px-4 py-3">
+      <div className="border-b border-[#B8BFD3] bg-[#E4E7F0] px-4 py-3">
         <div className="flex items-center gap-2">
-          <CalendarDays className="text-[#315C7C]" size={18} />
+          <CalendarDays className="text-[#485A83]" size={18} />
           <h2 id="makeup-calendar-title" className="text-sm font-semibold text-stone-950">
             보강 달력
           </h2>
         </div>
-        <p className="mt-1 text-xs leading-5 text-stone-500">
+        <p className="mt-1 text-xs leading-5 text-[#5A637D]">
           날짜를 누르고 그날의 수업·보강 불가 시간을 보면서 보강 시간을 정합니다.
         </p>
       </div>
 
       <div className="space-y-3 p-4">
         <div className="grid gap-3 xl:grid-cols-[minmax(18rem,21rem)_minmax(0,1fr)]">
-          <div className="border border-stone-200 bg-stone-50 px-3 py-3">
+          <div className="message-zone-plan-panel border px-3 py-3">
             <div className="mx-auto w-full max-w-[20rem]">
               <div className="flex items-center justify-between gap-2">
                 <button
@@ -121,7 +121,7 @@ export function MakeupCalendarPanel({
                   aria-label="이전 달"
                   title="이전 달"
                   onClick={() => moveMonth(-1)}
-                  className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-stone-200 bg-white text-stone-700 transition hover:border-[#315C7C] hover:text-[#315C7C]"
+                  className="flex size-8 shrink-0 items-center justify-center border border-[#B8BFD3] bg-[#FCFCFE] text-[#4E5872] transition hover:border-[#485A83] hover:text-[#334163]"
                 >
                   <ChevronLeft size={16} />
                 </button>
@@ -133,7 +133,7 @@ export function MakeupCalendarPanel({
                   aria-label="다음 달"
                   title="다음 달"
                   onClick={() => moveMonth(1)}
-                  className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-stone-200 bg-white text-stone-700 transition hover:border-[#315C7C] hover:text-[#315C7C]"
+                  className="flex size-8 shrink-0 items-center justify-center border border-[#B8BFD3] bg-[#FCFCFE] text-[#4E5872] transition hover:border-[#485A83] hover:text-[#334163]"
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -159,10 +159,10 @@ export function MakeupCalendarPanel({
                       className={[
                         "relative flex aspect-square min-h-0 items-center justify-center rounded-sm border px-1 text-center transition focus:outline-none focus:ring-2 focus:ring-[#B8D5E8]",
                         isActive
-                          ? "border-[#315C7C] bg-[#315C7C] text-white shadow-sm"
+                            ? "border-[#485A83] bg-[#485A83] text-white shadow-sm"
                           : day.isCurrentMonth
-                            ? "border-stone-200 bg-white text-stone-900 hover:border-[#315C7C] hover:bg-[#F2F7FA]"
-                            : "border-stone-100 bg-stone-100 text-stone-400",
+                            ? "border-[#C9CEDD] bg-[#FCFCFE] text-stone-900 hover:border-[#485A83] hover:bg-[#EEF1F8]"
+                            : "border-[#DDE1EA] bg-[#EAEDF4] text-stone-400",
                       ].join(" ")}
                     >
                       <span className="text-xs font-bold leading-none tabular-nums">
@@ -178,7 +178,7 @@ export function MakeupCalendarPanel({
                                 ? "bg-amber-400"
                                 : isActive
                                   ? "bg-white"
-                                  : "bg-[#315C7C]",
+                                  : "bg-[#485A83]",
                             ].join(" ")}
                           />
                         ) : null}
@@ -187,7 +187,7 @@ export function MakeupCalendarPanel({
                             aria-label="오늘"
                             className={[
                               "h-1.5 w-1.5 rounded-full",
-                              isActive ? "bg-white" : "bg-[#007A7C]",
+                              isActive ? "bg-white" : "bg-[#7A5FA8]",
                             ].join(" ")}
                           />
                         ) : null}
@@ -208,13 +208,13 @@ export function MakeupCalendarPanel({
                 sharedError={sharedSchedules.error}
               />
             ) : (
-              <div className="border border-dashed border-stone-300 bg-stone-50 p-3 text-sm leading-6 text-stone-600">
+              <div className="border border-dashed border-[#B8BFD3] bg-[#F8F8FC] p-3 text-sm leading-6 text-[#5A637D]">
                 학생을 선택하면 날짜별 스케줄이 표시됩니다.
               </div>
             )}
 
-            <div className="border border-stone-200 bg-stone-50 px-3 py-3">
-              <p className="text-xs font-semibold text-stone-500">선택 날짜</p>
+            <div className="message-zone-plan-panel border px-3 py-3">
+              <p className="text-xs font-semibold text-[#5A637D]">선택 날짜</p>
               <p className="mt-1 text-sm font-semibold text-stone-950">
                 {formatDateForCandidate(selectedDate)}
               </p>
@@ -225,7 +225,7 @@ export function MakeupCalendarPanel({
                     type="time"
                     value={startTime}
                     onChange={(event) => setStartTime(event.target.value)}
-                    className="min-h-11 rounded-sm border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+                    className="min-h-11 border border-[#B8BFD3] bg-[#FCFCFE] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#485A83] focus:ring-2 focus:ring-[#DDE3F5]"
                   />
                 </label>
                 <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
@@ -234,7 +234,7 @@ export function MakeupCalendarPanel({
                     type="time"
                     value={endTime}
                     onChange={(event) => setEndTime(event.target.value)}
-                    className="min-h-11 rounded-sm border border-stone-300 bg-white px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+                    className="min-h-11 border border-[#B8BFD3] bg-[#FCFCFE] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#485A83] focus:ring-2 focus:ring-[#DDE3F5]"
                   />
                 </label>
               </div>
@@ -254,9 +254,9 @@ export function MakeupCalendarPanel({
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition",
             selectedStudent && isTimeRangeValid && !hasConflicts
               ? isSelected
-                ? "bg-[#244B67] text-white"
-                : "bg-[#315C7C] text-white hover:bg-[#244B67]"
-              : "bg-stone-300 text-stone-600",
+                ? "bg-[#334163] text-white"
+                : "bg-[#485A83] text-white hover:bg-[#334163]"
+              : "bg-[#D8DDE8] text-[#6B7280]",
           ].join(" ")}
         >
           <Clock3 size={16} />
@@ -266,7 +266,7 @@ export function MakeupCalendarPanel({
               ? "보강 후보 적용됨"
               : "보강 문자 초안에 적용"}
         </button>
-        <p className="text-xs leading-5 text-stone-500">
+        <p className="text-xs leading-5 text-[#5A637D]">
           선택하면 오른쪽 문자 초안의 사유와 보강 시간이 바뀝니다. 실제 발송은 초안 저장 후 따로 진행합니다.
         </p>
 
@@ -348,28 +348,28 @@ function SelectedDateSchedule({
   sharedError: string;
 }) {
   return (
-    <div className="border-y border-stone-100 bg-stone-50 px-3 py-3">
+    <div className="border-y border-[#D9DEEA] bg-[#F8F8FC] px-3 py-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-semibold text-stone-600">
+        <p className="text-xs font-semibold text-[#5A637D]">
           {formatDateForCandidate(date)} 일정
         </p>
-        <span className="rounded-md bg-white px-2 py-0.5 text-xs font-semibold text-stone-500">
+        <span className="border border-[#C9CEDD] bg-[#FCFCFE] px-2 py-0.5 text-xs font-semibold text-[#5A637D]">
           {schedules.length}개
         </span>
       </div>
 
       {schedules.length > 0 ? (
-        <div className="mt-2 divide-y divide-stone-100 overflow-hidden rounded-md border border-stone-200 bg-white">
+        <div className="mt-2 divide-y divide-[#E3E6EF] overflow-hidden border border-[#C9CEDD] bg-[#FCFCFE]">
           {schedules.map((schedule) => (
             <div
               key={`${schedule.id}:${schedule.scheduleDate ?? "weekly"}`}
-              className="grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-2 px-2 py-2"
+                className="grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-2 px-2 py-2"
             >
               <span className="flex items-center gap-1 text-xs font-semibold tabular-nums text-stone-900">
-                <Clock3 size={13} className="text-stone-400" />
+                <Clock3 size={13} className="text-[#8A92A8]" />
                 {schedule.startTime}
               </span>
-              <span className="min-w-0 truncate text-xs font-medium text-stone-600">
+              <span className="min-w-0 truncate text-xs font-medium text-[#4E5872]">
                 {schedule.isShared && schedule.sharedAcademyName
                   ? `${schedule.sharedAcademyName} · ${schedule.title}`
                   : schedule.title}
@@ -386,12 +386,12 @@ function SelectedDateSchedule({
           ))}
         </div>
       ) : (
-        <p className="mt-2 border border-dashed border-stone-200 bg-white px-3 py-2 text-xs leading-5 text-stone-500">
+        <p className="mt-2 border border-dashed border-[#C9CEDD] bg-[#FCFCFE] px-3 py-2 text-xs leading-5 text-[#5A637D]">
           이 날짜에 겹치는 등록 일정이 없습니다.
         </p>
       )}
       {isSharedLoading ? (
-        <p className="mt-2 border border-stone-200 bg-white px-3 py-2 text-[11px] font-medium text-stone-500">
+        <p className="mt-2 border border-[#C9CEDD] bg-[#FCFCFE] px-3 py-2 text-[11px] font-medium text-[#5A637D]">
           연결 학원 일정을 불러오는 중입니다.
         </p>
       ) : null}

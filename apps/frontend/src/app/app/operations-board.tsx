@@ -1431,18 +1431,18 @@ function MessageComposer({
       id={composerId}
       aria-labelledby={`${composerId}-title`}
       className={[
-        "border-[#D5E0E4] bg-[#F8FBFC] lg:sticky lg:top-4 lg:self-start lg:border-l",
+        "message-zone-compose border lg:sticky lg:top-4 lg:self-start",
         className,
       ].join(" ")}
     >
-      <div className="border-b border-[#B8C9D0] bg-[#073342] px-4 py-4 text-white">
+      <div className="border-b border-[#D7C0A3] bg-[#1E2E3C] px-4 py-4 text-white">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[#7DD6D4]" size={18} aria-hidden="true" />
+          <MessageSquareText className="text-[#F2B166]" size={18} aria-hidden="true" />
           <h2 id={`${composerId}-title`} className="text-base font-bold text-white">
             문자 초안
           </h2>
           {isPreviewReady ? (
-            <span className="ml-auto border border-[#7DD6D4]/40 bg-white/8 px-2 py-0.5 text-xs font-bold text-[#B8F0EA]">
+            <span className="ml-auto border border-[#F2B166]/50 bg-[#F2B166]/10 px-2 py-0.5 text-xs font-bold text-[#FFD8A3]">
               수정 가능
             </span>
           ) : null}
@@ -1452,13 +1452,13 @@ function MessageComposer({
               aria-label="문자 작성 닫기"
               title="닫기"
               onClick={onClose}
-              className="ml-1 flex size-8 shrink-0 items-center justify-center border border-white/20 bg-white/8 text-[#D7E8ED]"
+              className="ml-1 flex size-8 shrink-0 items-center justify-center border border-white/20 bg-white/8 text-[#F5E8D7]"
             >
               <X size={16} aria-hidden="true" />
             </button>
           ) : null}
         </div>
-        <p className="mt-1 text-xs text-[#B8D0D6]">
+        <p className="mt-1 text-xs text-[#DCCEBB]">
           {selectedStudent
             ? `현재 선택: ${selectedStudent.name} · ${followupReasons.find((reason) => reason.id === selectedReason)?.label ?? selectedReason}`
             : "학생을 선택하면 문자 초안이 표시됩니다."}
@@ -1467,13 +1467,13 @@ function MessageComposer({
 
       <div className="space-y-3 p-3">
         {selectedStudent ? (
-          <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
-            <div className="border-l-4 border-l-[#007A7C] bg-[#E1F0EF] px-4 py-3">
-              <p className="text-xs font-bold text-[#60717B]">선택 학생</p>
+          <div className="message-zone-compose-panel overflow-hidden border">
+            <div className="border-l-4 border-l-[#8A4F12] bg-[#F2E4D1] px-4 py-3">
+              <p className="text-xs font-bold text-[#7A5C3A]">선택 학생</p>
               <p className="mt-1 truncate text-lg font-bold tracking-[-0.01em] text-[#17232B]">
                 {selectedStudent.name}
               </p>
-              <p className="mt-1 truncate text-xs text-[#60717B]">
+              <p className="mt-1 truncate text-xs text-[#6F5A43]">
                 {selectedStudent.parentName ?? "학부모"} · {selectedStudent.maskedParentPhone}
               </p>
             </div>
@@ -1489,19 +1489,19 @@ function MessageComposer({
               <ComposerSummaryRow label="보강 후보" value={makeupCandidateTime} tone="blue" />
             ) : null}
             {selectedReason === "makeup" && !selectedMakeupCandidate && makeupCandidateTime ? (
-              <p className="border-t border-stone-100 px-4 py-2 text-xs font-semibold text-amber-900">
+              <p className="border-t border-[#E8D7BF] px-4 py-2 text-xs font-semibold text-amber-900">
                 주간 반복 시간 기준입니다. 날짜별 보강 등록은 달력에서 날짜를 선택해야 합니다.
               </p>
             ) : null}
           </div>
         ) : null}
 
-        <fieldset className="border border-[#B8C9D0] bg-[#F7FAFA] p-3">
-          <legend className="px-1 text-sm font-bold text-[#17232B]">사유 선택</legend>
-          <p className="mt-1 text-xs leading-5 text-[#60717B]">
+        <fieldset className="message-zone-compose-panel border p-3">
+          <legend className="px-1 text-sm font-bold text-[#2C2118]">사유 선택</legend>
+          <p className="mt-1 text-xs leading-5 text-[#7A5C3A]">
             사유를 바꾸면 아래 문자 초안만 다시 준비됩니다. 기록 저장과 테스트 발송은 하단 버튼에서 따로 실행합니다.
           </p>
-          <div className="mt-2 grid border border-[#B8C9D0] bg-[#F7FAFA] sm:grid-cols-4">
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {followupReasons.map((reason) => {
               const isSelected = reason.id === selectedReason;
               return (
@@ -1511,10 +1511,10 @@ function MessageComposer({
                   aria-pressed={isSelected}
                   onClick={() => onReasonChange(reason.id)}
                   className={[
-                    "min-h-9 border-r border-l-[3px] border-r-[#D6E0E5] px-3 text-sm font-bold transition last:border-r-0",
+                    "min-h-10 border border-l-[4px] px-3 text-left text-sm font-bold transition",
                     isSelected
-                      ? "border-l-[#007A7C] bg-[#E1F0EF] text-[#0B3F46]"
-                      : "border-l-transparent bg-[#F7FAFA] text-[#405763] hover:border-l-[#8EB8B9] hover:bg-[#EDF3F5]",
+                      ? "border-[#8A4F12] border-l-[#8A4F12] bg-[#F2D7B3] text-[#3A2511]"
+                      : "border-[#D7C0A3] border-l-[#C8AA83] bg-[#FFF9F0] text-[#5C4630] hover:border-[#B9874C] hover:bg-[#F8EBD9]",
                   ].join(" ")}
                 >
                   {reason.label}
@@ -1524,9 +1524,9 @@ function MessageComposer({
           </div>
         </fieldset>
 
-        <fieldset className="border border-[#B8C9D0] bg-[#F7FAFA] p-3">
-          <legend className="px-1 text-sm font-bold text-[#17232B]">수신자</legend>
-          <div className="mt-2 grid grid-cols-3 border border-[#B8C9D0] bg-[#F7FAFA]">
+        <fieldset className="message-zone-compose-panel border p-3">
+          <legend className="px-1 text-sm font-bold text-[#2C2118]">수신자</legend>
+          <div className="mt-3 grid grid-cols-3 gap-2">
             {messageRecipientTypes.map((recipientType) => {
               const needsStudentPhone = recipientType !== "parent";
               const isDisabled =
@@ -1541,10 +1541,10 @@ function MessageComposer({
                   aria-pressed={isSelected}
                   onClick={() => onRecipientTypeChange(recipientType)}
                   className={[
-                    "min-h-9 border-r border-l-[3px] border-r-[#D6E0E5] px-2 text-xs font-bold transition last:border-r-0",
+                    "min-h-10 border border-l-[4px] px-2 text-xs font-bold transition",
                     isSelected
-                      ? "border-l-[#007A7C] bg-[#E1F0EF] text-[#0B3F46]"
-                      : "border-l-transparent bg-[#F7FAFA] text-[#405763] hover:border-l-[#8EB8B9] hover:bg-[#EDF3F5]",
+                      ? "border-[#8A4F12] border-l-[#8A4F12] bg-[#F2D7B3] text-[#3A2511]"
+                      : "border-[#D7C0A3] border-l-[#C8AA83] bg-[#FFF9F0] text-[#5C4630] hover:border-[#B9874C] hover:bg-[#F8EBD9]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
                 >
@@ -1553,12 +1553,12 @@ function MessageComposer({
               );
             })}
           </div>
-          <p className="mt-2 text-xs leading-5 text-[#60717B]">
+          <p className="mt-2 text-xs leading-5 text-[#7A5C3A]">
             학생 연락처: {selectedStudent?.maskedStudentPhone ?? "미등록"}
           </p>
         </fieldset>
 
-        <div className="border border-[#B8C9D0] bg-[#F7FAFA] p-3">
+        <div className="message-zone-compose-panel border p-3">
           <div className="flex items-center justify-between gap-2">
             <label
               htmlFor={`${composerId}-message-body`}
@@ -1572,7 +1572,7 @@ function MessageComposer({
               title="원문으로 되돌리기"
               disabled={!isDraftEdited}
               onClick={onRestorePreview}
-              className="flex size-8 shrink-0 items-center justify-center border border-[#B8C9D0] bg-[#F7FAFA] text-[#60717B] transition hover:border-[#839AA4] hover:bg-[#EDF3F5] disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex size-8 shrink-0 items-center justify-center border border-[#D7C0A3] bg-[#FFF9F0] text-[#7A5C3A] transition hover:border-[#B9874C] hover:bg-[#F8EBD9] disabled:cursor-not-allowed disabled:opacity-40"
             >
               <RotateCcw size={15} aria-hidden="true" />
             </button>
@@ -1589,7 +1589,7 @@ function MessageComposer({
                 : "학생과 사유를 선택하면 문자 초안이 표시됩니다."
             }
             rows={8}
-            className="mt-2 h-40 w-full resize-none border border-[#AEBFC7] bg-[#F7FAFA] px-3 py-3 text-sm leading-6 text-[#334B58] outline-none transition disabled:bg-[#EDF3F5] disabled:text-[#78909A] focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB] sm:h-44"
+            className="mt-2 h-40 w-full resize-none border border-[#C9B596] bg-[#FFFDF8] px-3 py-3 text-sm leading-6 text-[#3E3328] outline-none transition disabled:bg-[#F2E8DA] disabled:text-[#9C8569] focus:border-[#8A4F12] focus:ring-2 focus:ring-[#F2D7B3] sm:h-44"
           />
           <p
             className={[
@@ -1618,12 +1618,12 @@ function MessageComposer({
             "border border-l-4 px-3 py-2.5 text-sm leading-6",
             isPreviewError
               ? "border-red-200 border-l-red-600 bg-red-50 text-red-900"
-              : "border-[#D5E0E4] border-l-[#007A7C] bg-[#F7FAFA] text-[#405763]",
+              : "border-[#D7C0A3] border-l-[#8A4F12] bg-[#FFF9F0] text-[#5C4630]",
           ].join(" ")}
         >
           <div className="flex items-start gap-2">
             {isPreviewReady && !isPreviewError ? (
-              <CheckCircle2 className="mt-0.5 shrink-0 text-[#007A7C]" size={17} aria-hidden="true" />
+              <CheckCircle2 className="mt-0.5 shrink-0 text-[#8A4F12]" size={17} aria-hidden="true" />
             ) : (
               <AlertCircle className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
             )}
@@ -1645,7 +1645,7 @@ function MessageComposer({
               "border border-l-4 px-3 py-2.5 text-sm leading-6",
               followupSaveError
                 ? "border-red-200 border-l-red-600 bg-red-50 text-red-900"
-                : "border-[#C9D6E2] border-l-[#007A7C] bg-[#F7FAFA] text-[#244B67]",
+                : "border-[#D7C0A3] border-l-[#8A4F12] bg-[#FFF9F0] text-[#5C4630]",
             ].join(" ")}
           >
             <div className="flex items-start gap-2">
@@ -1671,27 +1671,36 @@ function MessageComposer({
           </div>
         ) : null}
 
-        <button
-          type="button"
-          disabled={!canSaveFollowup}
-          onClick={onSaveFollowup}
-          className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border px-4 text-sm font-bold transition",
-            canSaveFollowup
-              ? "border-[#007A7C] bg-[#007A7C] text-white hover:bg-[#006266]"
-              : "border-[#C9D7DC] bg-[#DCE6EA] text-[#78909A]",
-          ].join(" ")}
-        >
-          <Send size={17} aria-hidden="true" />
-          {isFollowupSaving
-            ? "1단계 저장 중"
-            : isFollowupSaved
-              ? "1단계 저장 완료"
-              : "1단계 기록 저장"}
-        </button>
+        <div className="border border-[#D7C0A3] bg-[#F2E4D1] p-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-xs font-black uppercase tracking-[0.12em] text-[#8A4F12]">
+              실행 단계
+            </p>
+            <span className="text-[11px] font-bold text-[#7A5C3A]">
+              저장 후 테스트 발송
+            </span>
+          </div>
+          <button
+            type="button"
+            disabled={!canSaveFollowup}
+            onClick={onSaveFollowup}
+            className={[
+              "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border px-4 text-sm font-bold transition",
+              canSaveFollowup
+                ? "border-[#8A4F12] bg-[#8A4F12] text-white hover:bg-[#6F3D0D]"
+                : "border-[#D7C0A3] bg-[#E8D8C4] text-[#9C8569]",
+            ].join(" ")}
+          >
+            <Send size={17} aria-hidden="true" />
+            {isFollowupSaving
+              ? "1단계 저장 중"
+              : isFollowupSaved
+                ? "1단계 저장 완료"
+                : "1단계 기록 저장"}
+          </button>
 
-        {isFollowupSaved ? (
-          <div className="space-y-2">
+          {isFollowupSaved ? (
+            <div className="mt-2 space-y-2">
             {sendBlockedMessage ? (
               <div className="border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-950">
                 <div className="flex items-start gap-2">
@@ -1708,8 +1717,8 @@ function MessageComposer({
               className={[
                 "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border px-4 text-sm font-bold transition",
                 canSendMessage
-                  ? "border-[#0B3F46] bg-[#0B3F46] text-white hover:bg-[#073342]"
-                  : "border-[#C9D7DC] bg-[#DCE6EA] text-[#78909A]",
+                  ? "border-[#1E2E3C] bg-[#1E2E3C] text-white hover:bg-[#111D28]"
+                  : "border-[#D7C0A3] bg-[#E8D8C4] text-[#9C8569]",
               ].join(" ")}
             >
               <Send size={17} aria-hidden="true" />
@@ -1728,7 +1737,7 @@ function MessageComposer({
                   "border border-l-4 px-3 py-2.5 text-sm leading-6",
                   messageSendError
                     ? "border-red-200 border-l-red-600 bg-red-50 text-red-900"
-                    : "border-[#C9D6E2] border-l-[#007A7C] bg-[#F7FAFA] text-[#244B67]",
+                    : "border-[#D7C0A3] border-l-[#8A4F12] bg-[#FFF9F0] text-[#5C4630]",
                 ].join(" ")}
               >
                 <div className="flex items-start gap-2">
@@ -1748,18 +1757,18 @@ function MessageComposer({
             ) : null}
 
             {selectedReason === "makeup" && selectedMakeupCandidate ? (
-              <div className="rounded-md border border-[#C9D6E2] bg-[#EAF1F8] p-3">
-                <p className="text-sm font-semibold text-[#244B67]">
+              <div className="border border-[#C9B596] bg-[#FFF9F0] p-3">
+                <p className="text-sm font-semibold text-[#5C4630]">
                   보강 스케줄 등록
                 </p>
-                <p className="mt-1 text-xs leading-5 text-[#244B67]">
+                <p className="mt-1 text-xs leading-5 text-[#7A5C3A]">
                   {selectedMakeupCandidate.label} 일정으로 학생 스케줄에 1회성 보강을
                   등록합니다.
                 </p>
                 {!canRegisterMakeupSchedule &&
                 makeupScheduleSave.status !== "saving" &&
                 makeupScheduleSave.status !== "saved" ? (
-                  <p className="mt-2 rounded-md bg-white px-2 py-2 text-xs font-semibold text-[#244B67]">
+                  <p className="mt-2 bg-[#F2E4D1] px-2 py-2 text-xs font-semibold text-[#7A5C3A]">
                     보강 스케줄은 테스트 발송이 완료된 뒤 등록할 수 있습니다.
                   </p>
                 ) : null}
@@ -1776,8 +1785,8 @@ function MessageComposer({
                     canRegisterMakeupSchedule &&
                     makeupScheduleSave.status !== "saving" &&
                     makeupScheduleSave.status !== "saved"
-                      ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
-                      : "bg-[#C9D6E2] text-[#244B67]",
+                      ? "bg-[#485A83] text-white hover:bg-[#334163]"
+                      : "bg-[#E8D8C4] text-[#7A5C3A]",
                   ].join(" ")}
                 >
                   <CalendarDays size={16} aria-hidden="true" />
@@ -1793,7 +1802,7 @@ function MessageComposer({
                       "mt-2 rounded-md px-2 py-2 text-xs font-semibold",
                       makeupScheduleSave.status === "error"
                         ? "bg-red-50 text-red-900"
-                        : "bg-white text-[#244B67]",
+                        : "bg-[#F2E4D1] text-[#5C4630]",
                     ].join(" ")}
                   >
                     {makeupScheduleSave.message}
@@ -1801,8 +1810,9 @@ function MessageComposer({
                 ) : null}
               </div>
             ) : null}
-          </div>
-        ) : null}
+            </div>
+          ) : null}
+        </div>
       </div>
     </section>
   );
@@ -1818,12 +1828,12 @@ function ComposerSummaryRow({
   tone?: "default" | "blue";
 }) {
   return (
-    <div className="grid min-h-9 grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 border-t border-stone-100 px-4 py-2">
-      <span className="text-xs font-semibold text-stone-500">{label}</span>
+    <div className="grid min-h-9 grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 border-t border-[#E8D7BF] px-4 py-2">
+      <span className="text-xs font-semibold text-[#7A5C3A]">{label}</span>
       <span
         className={[
           "truncate text-sm font-semibold",
-          tone === "blue" ? "text-[#315C7C]" : "text-stone-900",
+          tone === "blue" ? "text-[#485A83]" : "text-[#2C2118]",
         ].join(" ")}
       >
         {value}
