@@ -3567,7 +3567,7 @@ function SessionList({
           ].join(" ")}
         >
           <Send size={16} aria-hidden="true" />
-          {sessions.length === 0 ? "수업 선택 후 일괄 문자" : "총 수업 일괄 문자"}
+          {sessions.length === 0 ? "수업 선택 후 문자 화면" : "문자 화면 열기"}
         </button>
       </div>
     </section>
@@ -3688,14 +3688,13 @@ function AttendanceBulkActionBar({
             <span className="ml-auto hidden text-xs font-semibold text-[#60717B] xl:inline">
               우측 패널에서 선택 학생 문자 내용을 확인합니다.
             </span>
-            <button
-              type="button"
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#006F73] bg-[#007A7C] px-4 text-sm font-bold text-white shadow-[0_1px_2px_rgba(0,95,98,0.18)]"
-              aria-label="선택 학생 문자 보내기 패널 보기"
+            <span
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#9FCBCD] bg-[#E7F5F4] px-4 text-sm font-bold text-[#005F62]"
+              aria-label="선택 학생 문자 패널이 우측에 열려 있습니다"
             >
               <Send size={15} aria-hidden="true" />
-              문자 보내기
-            </button>
+              우측 패널에서 작성
+            </span>
             <button
               type="button"
               onClick={onClear}
