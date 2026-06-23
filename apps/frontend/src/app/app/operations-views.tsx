@@ -52,33 +52,38 @@ export function OperationsDesktopView(props: OperationsViewProps) {
         totalStudents={props.totalStudents}
       />
 
-      <section className="grid min-h-[42rem] min-w-0 overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9] lg:grid-cols-[18.5rem_minmax(0,1fr)_21rem] xl:grid-cols-[19.5rem_minmax(0,1fr)_22rem] 2xl:grid-cols-[20rem_minmax(0,1fr)_23rem]">
-        <aside className="message-zone-select flex min-h-0 min-w-0 flex-col border-r">
+      <section className="grid min-h-[42rem] min-w-0 overflow-hidden border border-[#B8C9D0] bg-[#F7F6F1] lg:grid-cols-[minmax(0,1fr)_18.5rem] xl:grid-cols-[minmax(0,1fr)_19rem]">
+        <div className="flex min-h-0 min-w-0 flex-col">
           <ClassPicker
             classes={props.classes}
             selectedClass={props.selectedClass}
             onClassSelect={props.onClassSelect}
           />
-          <StudentSelectionList
-            selectedClass={props.selectedClass}
-            selectedStudent={props.selectedStudent}
-            selectedReason={props.selectedReason}
-            onStudentSelect={props.onStudentSelect}
-            onStudentReasonSelect={props.onStudentReasonSelect}
-          />
-        </aside>
 
-        <section className="message-zone-plan min-w-0 border-r p-4">
-          <ScheduleAndHistoryPanel
-            selectedClassName={props.selectedClass?.name}
-            selectedStudent={props.selectedStudent}
-            selectedMakeupCandidate={props.selectedMakeupCandidate}
-            visibleFollowupHistory={props.visibleFollowupHistory}
-            onDateMakeupCandidateSelect={props.onDateMakeupCandidateSelect}
-            onMakeupCandidateSelect={props.onMakeupCandidateSelect}
-            className="min-w-0"
-          />
-        </section>
+          <div className="grid min-h-0 min-w-0 flex-1 lg:grid-cols-[12rem_minmax(0,1fr)] 2xl:grid-cols-[14rem_minmax(0,1fr)]">
+            <div className="min-h-0 min-w-0 border-r border-[#D9DCE8]">
+              <StudentSelectionList
+                selectedClass={props.selectedClass}
+                selectedStudent={props.selectedStudent}
+                selectedReason={props.selectedReason}
+                onStudentSelect={props.onStudentSelect}
+                onStudentReasonSelect={props.onStudentReasonSelect}
+              />
+            </div>
+
+            <section className="message-zone-plan min-w-0 border-r p-4">
+              <ScheduleAndHistoryPanel
+                selectedClassName={props.selectedClass?.name}
+                selectedStudent={props.selectedStudent}
+                selectedMakeupCandidate={props.selectedMakeupCandidate}
+                visibleFollowupHistory={props.visibleFollowupHistory}
+                onDateMakeupCandidateSelect={props.onDateMakeupCandidateSelect}
+                onMakeupCandidateSelect={props.onMakeupCandidateSelect}
+                className="min-w-0"
+              />
+            </section>
+          </div>
+        </div>
 
         {props.desktopComposer}
       </section>
@@ -194,8 +199,8 @@ function ClassPicker({
   onClassSelect: (classId: string) => void;
 }) {
   return (
-    <section aria-label="반 선택" className="message-zone-select shrink-0 border-b px-3 py-3">
-      <div className="flex items-center justify-between gap-2 px-1">
+    <section aria-label="반 선택" className="message-zone-select shrink-0 border-b px-4 py-3">
+      <div className="flex items-center justify-between gap-2">
         <p className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.12em] text-[#2F5F7E]">
           <UsersRound size={14} aria-hidden="true" />
           반 선택
@@ -206,7 +211,7 @@ function ClassPicker({
           </p>
         ) : null}
       </div>
-      <div className="message-zone-select-panel mt-2 max-h-[11rem] divide-y divide-[#D5E0E8] overflow-y-auto border">
+      <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
         {classes.map((classItem) => {
           const isSelected = classItem.id === selectedClass?.id;
           return (
@@ -216,16 +221,16 @@ function ClassPicker({
               aria-pressed={isSelected}
               onClick={() => onClassSelect(classItem.id)}
               className={[
-                "min-h-11 w-full border-l-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
+                "min-h-11 w-[13.5rem] shrink-0 border border-b-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
                 isSelected
-                  ? "border-l-[#2F5F7E] bg-[#DDEAF4] text-[#142A38]"
-                  : "border-l-transparent bg-[#F6F9FC] text-[#142A38] hover:border-l-[#6E8BA0] hover:bg-[#E7EFF6]",
+                  ? "border-[#9DA9D6] border-b-[#4F5BE7] bg-[#EEEFFD] text-[#142A38]"
+                  : "border-[#D9DCE8] border-b-[#C9CEDD] bg-[#FFFEFA] text-[#142A38] hover:border-[#B9BEE0] hover:border-b-[#6B72C9] hover:bg-[#F7F7FF]",
               ].join(" ")}
             >
-              <span className="block text-sm font-bold">{classItem.name}</span>
+              <span className="block truncate text-sm font-bold">{classItem.name}</span>
               <span
                 className={[
-                  "mt-0.5 block text-xs",
+                  "mt-0.5 block truncate text-xs",
                 isSelected ? "text-[#2F5F7E]" : "text-[#52697A]",
                 ].join(" ")}
               >

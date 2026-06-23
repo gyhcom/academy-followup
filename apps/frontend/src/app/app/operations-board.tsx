@@ -1431,18 +1431,18 @@ function MessageComposer({
       id={composerId}
       aria-labelledby={`${composerId}-title`}
       className={[
-        "message-zone-compose border lg:sticky lg:top-4 lg:self-start",
+        "message-zone-compose border border-l-4 border-l-[#996014] lg:sticky lg:top-4 lg:self-start",
         className,
       ].join(" ")}
     >
-      <div className="border-b border-[#D7C0A3] bg-[#1E2E3C] px-4 py-4 text-white">
+      <div className="border-b border-[#D7C0A3] bg-[#FFF1D8] px-4 py-4">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[#F2B166]" size={18} aria-hidden="true" />
-          <h2 id={`${composerId}-title`} className="text-base font-bold text-white">
+          <MessageSquareText className="text-[#8A4F12]" size={18} aria-hidden="true" />
+          <h2 id={`${composerId}-title`} className="text-base font-bold text-[#2C2118]">
             문자 초안
           </h2>
           {isPreviewReady ? (
-            <span className="ml-auto border border-[#F2B166]/50 bg-[#F2B166]/10 px-2 py-0.5 text-xs font-bold text-[#FFD8A3]">
+            <span className="ml-auto border border-[#D7B780] bg-[#FFF8EA] px-2 py-0.5 text-xs font-bold text-[#7A4B11]">
               수정 가능
             </span>
           ) : null}
@@ -1452,13 +1452,13 @@ function MessageComposer({
               aria-label="문자 작성 닫기"
               title="닫기"
               onClick={onClose}
-              className="ml-1 flex size-8 shrink-0 items-center justify-center border border-white/20 bg-white/8 text-[#F5E8D7]"
+              className="ml-1 flex size-8 shrink-0 items-center justify-center border border-[#D7B780] bg-[#FFF8EA] text-[#7A4B11]"
             >
               <X size={16} aria-hidden="true" />
             </button>
           ) : null}
         </div>
-        <p className="mt-1 text-xs text-[#DCCEBB]">
+        <p className="mt-1 text-xs text-[#7A5C3A]">
           {selectedStudent
             ? `현재 선택: ${selectedStudent.name} · ${followupReasons.find((reason) => reason.id === selectedReason)?.label ?? selectedReason}`
             : "학생을 선택하면 문자 초안이 표시됩니다."}

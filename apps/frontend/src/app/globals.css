@@ -74,17 +74,17 @@ button:not(:disabled) {
 }
 
 .academy-console .message-workbench {
-  --message-select-surface: #f4f5fb;
+  --message-select-surface: #eef1fb;
   --message-select-panel: #fffefa;
-  --message-select-line: #d9dce8;
+  --message-select-line: #d3d7eb;
   --message-select-accent: #4f5be7;
-  --message-plan-surface: #f3f1ec;
+  --message-plan-surface: #f1eee6;
   --message-plan-panel: #fffefa;
-  --message-plan-line: #ddd8cc;
+  --message-plan-line: #d7d0c3;
   --message-plan-accent: #6a5f4b;
-  --message-compose-surface: #f6f1e8;
-  --message-compose-panel: #fffaf2;
-  --message-compose-line: #dfcba9;
+  --message-compose-surface: #f3eadc;
+  --message-compose-panel: #fff7ea;
+  --message-compose-line: #d7bd95;
   --message-compose-accent: #996014;
   --message-compose-ink: #2c2118;
 }
@@ -118,6 +118,11 @@ button:not(:disabled) {
 .academy-console .message-zone-compose-panel {
   border-color: var(--message-compose-line, #d7c0a3);
   background: var(--message-compose-panel, #fff9f0);
+}
+
+.academy-console .message-workbench input[type="time"] {
+  min-width: 0;
+  width: 100%;
 }
 
 @media (min-width: 640px) {
@@ -263,17 +268,17 @@ button:not(:disabled) {
   }
 
   .academy-console .message-workbench {
-    --message-select-surface: #f4f5fb;
+    --message-select-surface: #eef1fb;
     --message-select-panel: #fffefa;
-    --message-select-line: #d9dce8;
+    --message-select-line: #d3d7eb;
     --message-select-accent: #4f5be7;
-    --message-plan-surface: #f3f1ec;
+    --message-plan-surface: #f1eee6;
     --message-plan-panel: #fffefa;
-    --message-plan-line: #ddd8cc;
+    --message-plan-line: #d7d0c3;
     --message-plan-accent: #6a5f4b;
-    --message-compose-surface: #f6f1e8;
-    --message-compose-panel: #fffaf2;
-    --message-compose-line: #dfcba9;
+    --message-compose-surface: #f3eadc;
+    --message-compose-panel: #fff7ea;
+    --message-compose-line: #d7bd95;
     --message-compose-accent: #996014;
     --message-compose-ink: #2c2118;
   }
