@@ -92,6 +92,7 @@ type WorkspaceView =
   | "operations"
   | "attendance"
   | "students"
+  | "classes"
   | "fees"
   | "reports"
   | "management";
@@ -109,6 +110,7 @@ type WorkspaceNavItem = {
   shortLabel: string;
   description: string;
   showOnMobile: boolean;
+  showOnDesktop?: boolean;
   disabled?: boolean;
   statusLabel?: string;
 };
@@ -341,7 +343,7 @@ export function AppWorkspace({
 }
 
 function normalizeWorkspaceView(view: WorkspaceView, canManage: boolean): WorkspaceView {
-  if (!canManage && ["students", "fees", "reports", "management"].includes(view)) {
+  if (!canManage && ["students", "classes", "fees", "reports", "management"].includes(view)) {
     return "home";
   }
 
@@ -351,6 +353,10 @@ function normalizeWorkspaceView(view: WorkspaceView, canManage: boolean): Worksp
 function getManagementInitialSection(view: WorkspaceView) {
   if (view === "students") {
     return "students";
+  }
+
+  if (view === "classes") {
+    return "classes";
   }
 
   if (view === "reports") {
@@ -369,6 +375,7 @@ function getWorkspaceViewLabel(view: WorkspaceView, canManage: boolean) {
 
   if (view === "attendance") return "출석부";
   if (view === "students") return "학생";
+  if (view === "classes") return "클래스";
   if (view === "operations") return "문자";
   if (view === "fees") return "교재/비용";
   if (view === "reports") return "리포트";
@@ -380,6 +387,7 @@ function getContextViewTitle(view: WorkspaceView, canManage: boolean) {
   if (view === "attendance") return "출석부";
   if (view === "operations") return "문자";
   if (view === "students") return "학생";
+  if (view === "classes") return "클래스 관리";
   if (view === "fees") return "교재/비용";
   if (view === "reports") return "리포트";
   if (view === "management") return "관리";
@@ -539,8 +547,10 @@ function WorkspaceNavigation({
   onChange: (view: WorkspaceView) => void;
 }) {
   const navItems = getWorkspaceNavItems(canManage);
+  const desktopItems = navItems.filter((item) => item.showOnDesktop !== false);
   const mobileItems = navItems.filter((item) => item.showOnMobile);
   const shellLabel = canManage ? "학원 운영 콘솔" : "수업 처리 도구";
+  const isManagementGroupOpen = canManage && isManagementGroupView(activeView);
 
   return (
     <>
@@ -556,20 +566,46 @@ function WorkspaceNavigation({
             aria-label={shellLabel}
             className="flex-1 space-y-0.5 p-2.5"
           >
-            {navItems.map((item) => (
-              <WorkspaceNavButton
-                key={item.view}
-                icon={item.icon}
-                label={item.label}
-                shortLabel={item.shortLabel}
-                description={item.description}
-                isActive={activeView === item.view}
-                disabled={item.disabled}
-                statusLabel={item.statusLabel}
-                variant="desktop"
-                onClick={() => onChange(item.view)}
-              />
-            ))}
+            {desktopItems.map((item) => {
+              const isManagementItem = item.view === "management";
+
+              return (
+                <div key={item.view}>
+                  <WorkspaceNavButton
+                    icon={item.icon}
+                    label={item.label}
+                    shortLabel={item.shortLabel}
+                    description={item.description}
+                    isActive={
+                      isManagementItem
+                        ? isManagementGroupView(activeView)
+                        : activeView === item.view
+                    }
+                    disabled={item.disabled}
+                    statusLabel={item.statusLabel}
+                    variant="desktop"
+                    onClick={() => onChange(item.view)}
+                  />
+
+                  {isManagementItem && isManagementGroupOpen ? (
+                    <div className="ml-9 mt-1 space-y-0.5 border-l border-[var(--console-line)] pl-2">
+                      <WorkspaceManagementSubButton
+                        label="학생 관리"
+                        description="명단·스케줄"
+                        isActive={activeView === "students"}
+                        onClick={() => onChange("students")}
+                      />
+                      <WorkspaceManagementSubButton
+                        label="클래스 관리"
+                        description="반·시간표"
+                        isActive={activeView === "classes"}
+                        onClick={() => onChange("classes")}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
           </nav>
           <div className="border-t border-[var(--console-line)] px-4 py-3">
             <p className="truncate text-xs font-medium text-[var(--clinic-muted)]">{roleLabel}</p>
@@ -632,6 +668,7 @@ function getWorkspaceNavItems(canManage: boolean): WorkspaceNavItem[] {
         shortLabel: "학생",
         description: "학생·반·스케줄",
         showOnMobile: true,
+        showOnDesktop: false,
       },
       {
         view: "operations" as const,
@@ -683,6 +720,50 @@ function getMobileGridClass(itemCount: number) {
   }
 
   return "grid-cols-3";
+}
+
+function isManagementGroupView(view: WorkspaceView) {
+  return view === "management" || view === "students" || view === "classes";
+}
+
+function WorkspaceManagementSubButton({
+  label,
+  description,
+  isActive,
+  onClick,
+}: {
+  label: string;
+  description: string;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={`${label} · ${description}`}
+      aria-pressed={isActive}
+      onClick={onClick}
+      className={[
+        "grid min-h-8 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 py-1.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
+        isActive
+          ? "border border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
+          : "border border-transparent text-[var(--clinic-muted)] hover:bg-[#f8f9fa] hover:text-[var(--clinic-text)]",
+      ].join(" ")}
+    >
+      <span className="min-w-0">
+        <span className="block truncate text-xs font-semibold">{label}</span>
+        <span className="mt-0.5 block truncate text-[10px] font-medium text-[#858895]">
+          {description}
+        </span>
+      </span>
+      <span
+        aria-hidden="true"
+        className={isActive ? "text-[#2f3437]" : "text-[#b6b3aa]"}
+      >
+        ›
+      </span>
+    </button>
+  );
 }
 
 function WorkspaceNavButton({
