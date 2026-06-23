@@ -14,7 +14,6 @@ import {
   MessageSquareText,
   Search,
   Settings,
-  Sparkles,
   Users,
   X,
 } from "lucide-react";
@@ -200,7 +199,6 @@ export function WorkspaceHome({
     <section className="mx-auto max-w-6xl space-y-4 sm:space-y-5 xl:max-w-[82rem] 2xl:max-w-[88rem]">
       <MobileHomeExperience
         academyName={academyName}
-        copy={copy}
         canManage={canManage}
         selectedDate={selectedDate}
         records={records}
@@ -222,7 +220,6 @@ export function WorkspaceHome({
 
       <PcOperationsDashboard
         academyName={academyName}
-        copy={copy}
         canManage={canManage}
         selectedDate={selectedDate}
         loadState={loadState}
@@ -394,7 +391,6 @@ export function WorkspaceHome({
 
 function PcOperationsDashboard({
   academyName,
-  copy,
   canManage,
   selectedDate,
   loadState,
@@ -416,7 +412,6 @@ function PcOperationsDashboard({
   onPcStudentSelect,
 }: {
   academyName: string;
-  copy: { title: string; description: string };
   canManage: boolean;
   selectedDate: string;
   loadState: {
@@ -447,32 +442,52 @@ function PcOperationsDashboard({
   const academyItems = scheduleItems.filter(isAcademyScheduleItem);
   const blockedItems = scheduleItems.filter(isBlockedScheduleItem);
   const recentAttentionItems = followupItems.slice(0, 4);
+  const hasOperationalData =
+    academyItems.length > 0 ||
+    studentRows.length > 0 ||
+    recentAttentionItems.length > 0 ||
+    blockedItems.length > 0;
 
   return (
     <div className="hidden xl:block">
       <section className="border border-[var(--console-line)] bg-[#fffefa]">
         <div className="grid gap-4 px-4 py-3 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-center">
           <div className="min-w-0">
-            <p className="text-[11px] font-medium text-[var(--clinic-muted)]">{academyName}</p>
-            <h2 className="mt-0.5 text-lg font-semibold leading-tight text-[var(--clinic-text)]">
-              {copy.title}
+            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#6f737c]">
+              오늘 운영
+            </p>
+            <h2 className="mt-0.5 text-lg font-black leading-tight text-[var(--clinic-text)]">
+              {formatHomeDate(selectedDate)} 처리 현황
             </h2>
             <p className="mt-1 max-w-3xl text-xs leading-5 text-[var(--clinic-muted)]">
-              {copy.description}
+              {academyName}의 수업, 학생 체크, 연락 큐를 기준 날짜별로 확인합니다.
             </p>
           </div>
           <HomeDateControl value={selectedDate} onChange={onDateChange} />
         </div>
 
-        <div className="grid grid-cols-5 divide-x divide-[var(--console-line)] border-t border-[var(--console-line)] bg-[#f8f7f2]">
-          <PcKpi label="오늘 수업" value={`${scheduleSummary.academyScheduleCount}개`} />
-          <PcKpi label="학생 체크" value={`${studentRows.length}명`} />
-          <PcKpi label="체크 필요" value={`${boardSummary.unchecked}명`} tone="warning" />
-          <PcKpi label="연락 필요" value={`${boardSummary.attention}명`} tone="danger" />
-          <PcKpi label="보강 제외" value={`${scheduleSummary.blockedScheduleCount}건`} tone="muted" />
+        <div className="flex min-w-0 flex-wrap gap-1.5 border-t border-[var(--console-line)] bg-[#f8f7f2] px-4 py-2.5">
+          <PcStatusChip label="수업" value={`${scheduleSummary.academyScheduleCount}개`} />
+          <PcStatusChip label="학생 체크" value={`${studentRows.length}명`} />
+          <PcStatusChip label="체크 필요" value={`${boardSummary.unchecked}명`} tone="warning" />
+          <PcStatusChip label="연락 필요" value={`${boardSummary.attention}명`} tone="danger" />
+          <PcStatusChip label="보강 제외" value={`${scheduleSummary.blockedScheduleCount}건`} tone="muted" />
+          {loadState.status === "loading" ? (
+            <span className="inline-flex min-h-8 items-center gap-1.5 border border-[var(--console-line)] bg-[#fffefa] px-2.5 text-xs font-bold text-[var(--clinic-muted)]">
+              <Loader2 size={13} className="animate-spin" aria-hidden="true" />
+              불러오는 중
+            </span>
+          ) : null}
         </div>
       </section>
 
+      {!hasOperationalData ? (
+        <PcEmptyOperationState
+          selectedDate={selectedDate}
+          canManage={canManage}
+          onNavigate={onNavigate}
+        />
+      ) : (
       <section className="mt-5 grid gap-4 xl:grid-cols-[20rem_minmax(0,1fr)_24rem] 2xl:grid-cols-[21rem_minmax(0,1fr)_26rem] xl:items-start">
         <aside className="space-y-4">
           <section className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
@@ -588,11 +603,12 @@ function PcOperationsDashboard({
           onStudentSelect={onStudentSelect}
         />
       </section>
+      )}
     </div>
   );
 }
 
-function PcKpi({
+function PcStatusChip({
   label,
   value,
   tone = "default",
@@ -609,12 +625,96 @@ function PcKpi({
   }[tone];
 
   return (
-    <div className="grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-2">
-      <p className="truncate text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--clinic-muted)]">
+    <span className="inline-flex min-h-8 items-center gap-2 border border-[var(--console-line)] bg-[#fffefa] px-2.5 text-xs font-bold text-[#494d5a]">
+      <span className="truncate">
         {label}
-      </p>
-      <p className={`shrink-0 text-sm font-black tabular-nums ${toneClass}`}>{value}</p>
-    </div>
+      </span>
+      <span className={`shrink-0 tabular-nums ${toneClass}`}>{value}</span>
+    </span>
+  );
+}
+
+function PcEmptyOperationState({
+  selectedDate,
+  canManage,
+  onNavigate,
+}: {
+  selectedDate: string;
+  canManage: boolean;
+  onNavigate: (view: WorkspaceView) => void;
+}) {
+  return (
+    <section className="mt-5 overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
+      <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="px-5 py-6">
+          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#6f737c]">
+            운영 상태
+          </p>
+          <h3 className="mt-2 text-xl font-black text-[var(--clinic-text)]">
+            {formatHomeDate(selectedDate)}에는 처리할 수업이 없습니다.
+          </h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--clinic-muted)]">
+            수업 일정이 있는 날짜를 선택하거나, 관리에서 반과 수업 시간을 확인하세요.
+            실제 운영 데이터가 들어오면 이 영역은 수업 목록과 학생 처리 목록으로 바뀝니다.
+          </p>
+
+          <div className="mt-5 divide-y divide-[var(--console-line)] border border-[var(--console-line)]">
+            <button
+              type="button"
+              onClick={() => onNavigate("attendance")}
+              className="grid min-h-14 w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 bg-[#fffefa] px-3 text-left transition hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+            >
+              <CalendarDays size={17} className="text-[#6f737c]" aria-hidden="true" />
+              <span className="min-w-0">
+                <span className="block text-sm font-bold text-[var(--clinic-text)]">
+                  출석부에서 다른 날짜 확인
+                </span>
+                <span className="mt-0.5 block text-xs text-[var(--clinic-muted)]">
+                  월간 달력에서 수업이 있는 날짜를 바로 확인합니다.
+                </span>
+              </span>
+              <ArrowRight size={15} className="text-[#b6b3aa]" aria-hidden="true" />
+            </button>
+            {canManage ? (
+              <button
+                type="button"
+                onClick={() => onNavigate("management")}
+                className="grid min-h-14 w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 bg-[#fffefa] px-3 text-left transition hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+              >
+                <Settings size={17} className="text-[#6f737c]" aria-hidden="true" />
+                <span className="min-w-0">
+                  <span className="block text-sm font-bold text-[var(--clinic-text)]">
+                    반/수업 시간 관리
+                  </span>
+                  <span className="mt-0.5 block text-xs text-[var(--clinic-muted)]">
+                    학생 배정과 주간 수업 시간이 빠져 있는지 확인합니다.
+                  </span>
+                </span>
+                <ArrowRight size={15} className="text-[#b6b3aa]" aria-hidden="true" />
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <aside className="border-t border-[var(--console-line)] bg-[#f8f7f2] px-4 py-4 xl:border-l xl:border-t-0">
+          <h4 className="text-sm font-black text-[var(--clinic-text)]">데모 확인 순서</h4>
+          <ol className="mt-3 space-y-2 text-sm text-[var(--clinic-muted)]">
+            <li className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2">
+              <span className="text-xs font-black tabular-nums text-[#6f737c]">1</span>
+              <span>수업이 있는 날짜 선택</span>
+            </li>
+            <li className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2">
+              <span className="text-xs font-black tabular-nums text-[#6f737c]">2</span>
+              <span>학생 상태와 연락 필요 여부 확인</span>
+            </li>
+            <li className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2">
+              <span className="text-xs font-black tabular-nums text-[#6f737c]">3</span>
+              <span>문자 화면에서 기록 저장 또는 테스트 발송</span>
+            </li>
+          </ol>
+        </aside>
+      </div>
+    </section>
   );
 }
 
@@ -1063,7 +1163,6 @@ function ConsoleDetailRow({
 
 function MobileHomeExperience({
   academyName,
-  copy,
   canManage,
   selectedDate,
   records,
@@ -1083,7 +1182,6 @@ function MobileHomeExperience({
   onStudentSelect,
 }: {
   academyName: string;
-  copy: { title: string; description: string };
   canManage: boolean;
   selectedDate: string;
   records: AttendanceRecordItem[];
@@ -1113,23 +1211,22 @@ function MobileHomeExperience({
 
   return (
     <div className="space-y-4 sm:hidden">
-      <section className="overflow-hidden border border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]">
-        <div className="border-b border-[#B8C9D0] bg-[#DCE8EB] px-4 py-3">
+      <section className="overflow-hidden border border-[#d7dbe0] bg-[#fffefa] text-[var(--clinic-text)]">
+        <div className="border-b border-[#d7dbe0] bg-[#f8f7f2] px-4 py-3">
           <div className="flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">
-              <Sparkles size={13} aria-hidden="true" />
-              Operations
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-[#6f737c]">
+              오늘 운영
             </span>
             {loadState.status === "loading" ? (
               <Loader2 size={18} className="animate-spin text-[var(--clinic-primary)]" />
             ) : null}
           </div>
           <p className="mt-3 text-xs font-semibold text-[var(--clinic-muted)]">{academyName}</p>
-          <h2 className="mt-1 text-[1.65rem] font-black leading-[1.12] tracking-tight">
-            {copy.title}
+          <h2 className="mt-1 text-[1.45rem] font-black leading-[1.15] tracking-tight">
+            {formatHomeDate(selectedDate)} 처리 현황
           </h2>
           <p className="mt-2 text-sm leading-6 text-[#405763]">
-            {copy.description}
+            출석 체크, 미발송 연락, 보강 제외 일정을 기준 날짜별로 확인합니다.
           </p>
         </div>
 
