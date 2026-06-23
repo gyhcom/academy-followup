@@ -92,7 +92,8 @@ export function StudentBulkImportForm({
           <p className="mt-1 text-xs leading-5 text-stone-600">
             엑셀에서 열 때 한글이 깨지지 않는 CSV 템플릿을 내려받을 수 있습니다. 반 이름은 현재
             등록된 반 이름과 정확히 일치해야 하며, 이미 등록된 학생은 미리보기에서 제외됩니다.
-            타 학원 공유 동의는 `동의`, `Y`, `true` 중 하나로 입력하면 반영됩니다.
+            `010` 앞자리 0이 엑셀에서 사라진 휴대폰 번호는 등록 전에 자동으로 보정합니다. 타 학원
+            공유 동의는 `동의`, `Y`, `true` 중 하나로 입력하면 반영됩니다.
           </p>
         </div>
         <button

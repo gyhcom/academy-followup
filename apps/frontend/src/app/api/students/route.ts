@@ -387,10 +387,18 @@ function normalizePhone(value: unknown) {
     return null;
   }
 
-  const digits = value.replace(/\D/g, "");
+  const digits = restoreMissingKoreanMobileLeadingZero(value.replace(/\D/g, ""));
 
   if (digits.length < 8 || digits.length > 11) {
     return null;
+  }
+
+  return digits;
+}
+
+function restoreMissingKoreanMobileLeadingZero(digits: string) {
+  if (/^(10|11|16|17|18|19)\d{7,8}$/.test(digits)) {
+    return `0${digits}`;
   }
 
   return digits;

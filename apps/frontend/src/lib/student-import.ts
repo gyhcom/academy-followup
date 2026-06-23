@@ -129,8 +129,16 @@ export function validateStudentImportDrafts(
 }
 
 export function normalizePhone(value: string) {
-  const digits = value.replace(/\D/g, "");
+  const digits = restoreMissingKoreanMobileLeadingZero(value.replace(/\D/g, ""));
   return digits.length >= 8 && digits.length <= 11 ? digits : null;
+}
+
+function restoreMissingKoreanMobileLeadingZero(digits: string) {
+  if (/^(10|11|16|17|18|19)\d{7,8}$/.test(digits)) {
+    return `0${digits}`;
+  }
+
+  return digits;
 }
 
 export function formatPhoneForDisplay(value: string | null) {
