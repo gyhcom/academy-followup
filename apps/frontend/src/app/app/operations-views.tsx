@@ -161,7 +161,7 @@ function OperationsHeader({
   totalStudents: number;
 }) {
   return (
-    <section className="mb-3 border border-[#B8C9D0] border-l-4 border-l-[#007A7C] bg-[#F4F8F9] px-4 py-3 sm:mb-4">
+    <section className="mb-3 border border-[#D8D6DE] bg-[#F7F7F4] px-4 py-3 sm:mb-4">
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div className="min-w-0">
           <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#315C7C]">
@@ -221,10 +221,10 @@ function ClassPicker({
               aria-pressed={isSelected}
               onClick={() => onClassSelect(classItem.id)}
               className={[
-                "min-h-11 w-[13.5rem] shrink-0 border border-b-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
+                "min-h-11 w-[13.5rem] shrink-0 border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
                 isSelected
-                  ? "border-[#9DA9D6] border-b-[#4F5BE7] bg-[#EEEFFD] text-[#142A38]"
-                  : "border-[#D9DCE8] border-b-[#C9CEDD] bg-[#FFFEFA] text-[#142A38] hover:border-[#B9BEE0] hover:border-b-[#6B72C9] hover:bg-[#F7F7FF]",
+                  ? "border-[#C9C7D2] bg-[#F4F4F8] text-[#142A38]"
+                  : "border-[#DEDDE5] bg-[#FFFEFA] text-[#142A38] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
               ].join(" ")}
             >
               <span className="block truncate text-sm font-bold">{classItem.name}</span>
@@ -283,8 +283,10 @@ function StudentSelectionList({
               <article
                 key={student.id}
                 className={[
-                  "border-b border-[#E3EAED] border-l-4 px-3 py-2.5 last:border-b-0",
-                  isSelected ? "border-l-[#2F5F7E] bg-[#DDEAF4]" : "border-l-transparent bg-[#F6F9FC] hover:bg-[#E7EFF6]",
+                  "border-b px-3 py-2.5 outline outline-1 outline-offset-[-1px] last:border-b-0",
+                  isSelected
+                    ? "border-[#DEDEE4] bg-[#F4F4F7] outline-[#D3D2DD]"
+                    : "border-[#E4E3E8] bg-[#FFFEFA] outline-transparent hover:bg-[#F7F7FA]",
                 ].join(" ")}
               >
                 <div className="grid gap-2">
@@ -295,7 +297,7 @@ function StudentSelectionList({
                           {student.name}
                         </p>
                         {isSelected ? (
-                          <span className="inline-flex shrink-0 items-center gap-1 border border-[#264F68] bg-[#2F5F7E] px-2 py-0.5 text-xs font-bold text-white">
+                          <span className="inline-flex shrink-0 items-center gap-1 border border-[#D3D2DD] bg-[#FFFEFA] px-2 py-0.5 text-xs font-bold text-[#4B4F58]">
                             <CheckCircle2 size={12} aria-hidden="true" />
                             선택됨
                           </span>
@@ -313,8 +315,8 @@ function StudentSelectionList({
                       className={[
                         "shrink-0 rounded-sm border px-2 py-1 text-xs font-bold",
                         primarySchedule
-                          ? "border-[#9DB9CC] bg-[#E5EFF7] text-[#2F5F7E]"
-                          : "border-[#C9D7DC] bg-[#EEF4F6] text-[#60717B]",
+                          ? "border-[#D3D2DD] bg-[#F7F7FA] text-[#4B4F58]"
+                          : "border-[#DEDEE4] bg-[#F2F1EE] text-[#6F737C]",
                       ].join(" ")}
                     >
                       {primarySchedule
@@ -339,8 +341,8 @@ function StudentSelectionList({
                     className={[
                       "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                       isSelected
-                        ? "border-[#2F5F7E] bg-[#DDEAF4] text-[#234C66]"
-                        : "border-[#AFC0CD] bg-[#F6F9FC] text-[#334B58] hover:bg-[#E7EFF6]",
+                        ? "border-[#C9C7D2] bg-[#F4F4F8] text-[#30343B]"
+                        : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:bg-[#F7F7FA]",
                     ].join(" ")}
                   >
                     문자 작성
@@ -360,8 +362,8 @@ function StudentSelectionList({
                         className={[
                           "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
                           isReasonSelected
-                            ? "border-[#264F68] bg-[#2F5F7E] text-white"
-                            : "border-[#AFC0CD] bg-[#F6F9FC] text-[#405763] hover:border-[#6E8BA0] hover:bg-[#E7EFF6]",
+                            ? "border-[#B9B8F0] bg-[#F6F6FF] text-[#34396F]"
+                            : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
                         ].join(" ")}
                       >
                         {isReasonSelected ? "선택됨 · " : ""}
