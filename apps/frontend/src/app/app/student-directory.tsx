@@ -296,7 +296,7 @@ export function StudentDirectoryToolbar({
               "flex min-h-8 min-w-0 items-center gap-2 border px-2 text-left transition lg:hidden",
               scheduleFilter === "missing_schedule"
                 ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
-                : "border-[#C9D7DC] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#E1F0EF]",
+                : "border-[#C9D7DC] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#f8f9fa]",
             ].join(" ")}
           >
             <CalendarDays size={13} className="shrink-0" />
@@ -458,7 +458,7 @@ function StudentResourceRow({
     <div
       className={[
         "border-b border-[#D6E0E5] transition last:border-b-0",
-        isSelected ? "bg-[#E1F0EF] shadow-[inset_4px_0_0_var(--clinic-primary)]" : "bg-[#F7FAFA] hover:bg-[#EDF3F5]",
+        isSelected ? "bg-[#f6f7f8] ring-1 ring-inset ring-[#d7dbe0]" : "bg-[#F7FAFA] hover:bg-[#f8f9fa]",
       ].join(" ")}
     >
       <button
@@ -529,7 +529,7 @@ function StudentResourceRow({
 
 function FilterChip({ label }: { label: string }) {
   return (
-    <span className="border border-[#B8D7D8] bg-[#E1F0EF] px-2 py-1 text-[11px] font-semibold text-[#006F73]">
+    <span className="border border-[#d7dbe0] bg-[#f6f7f8] px-2 py-1 text-[11px] font-semibold text-[#494d5a]">
       {label}
     </span>
   );
@@ -679,7 +679,7 @@ function StudentDetailPanel({
           </div>
         </div>
 
-        <div className="border-b border-[#C9D7DC] bg-[#E1F0EF] px-4 py-3">
+        <div className="border-b border-[#C9D7DC] bg-[#f6f7f8] px-4 py-3">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
             <div className="min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#40616B]">
@@ -754,7 +754,7 @@ function StudentDetailPanel({
                       key={schedule.id}
                       type="button"
                       onClick={() => onEditSchedule(student, schedule)}
-                      className="grid w-full grid-cols-[72px_minmax(0,1fr)_42px] items-center gap-3 border-b border-[#E1EAEE] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[#E1F0EF]"
+                      className="grid w-full grid-cols-[72px_minmax(0,1fr)_42px] items-center gap-3 border-b border-[#E1EAEE] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[#f8f9fa]"
                     >
                       <span className="text-sm font-black tabular-nums text-[var(--clinic-text)]">{schedule.startTime}</span>
                       <span className="min-w-0">
@@ -1140,7 +1140,7 @@ function SharedSchedulePanel({
           `타 학원 스케줄 공유 동의 확인`을 체크해 주세요.
         </div>
       ) : (
-        <div className="mt-3 border border-[#B8D7D8] bg-[#E1F0EF] px-3 py-2 text-xs leading-5 text-[#315C7C]">
+        <div className="mt-3 border border-[#d7dbe0] bg-[#f6f7f8] px-3 py-2 text-xs leading-5 text-[#494d5a]">
           같은 학생으로 확인되는 다른 학원 일정은 자동으로 연결됩니다. 연결 기준은
           이름·학교·학년·전화번호이며, 상대 학원명과 전화번호는 공개되지 않습니다.
         </div>
@@ -1217,7 +1217,7 @@ function SharedSchedulePanel({
                           ? `${schedule.scheduleDate} · ${schedule.title}`
                           : `${weekDayShortLabel(schedule.dayOfWeek)} · ${schedule.title}`}
                       </span>
-                      <span className="border border-[#B8D7D8] bg-[#E1F0EF] px-1.5 py-0.5 text-[11px] font-semibold text-[#315C7C]">
+                      <span className="border border-[#d7dbe0] bg-[#f6f7f8] px-1.5 py-0.5 text-[11px] font-semibold text-[#494d5a]">
                         {scheduleTypeLabel(schedule.scheduleType)}
                       </span>
                     </div>
@@ -1253,8 +1253,8 @@ function SharedSchedulePanel({
             공유 코드 만들기
           </button>
           {state.generatedCode ? (
-            <div className="border border-[#B8D7D8] bg-[#E1F0EF] p-3">
-              <p className="text-xs font-semibold text-[#315C7C]">
+            <div className="border border-[#d7dbe0] bg-[#f6f7f8] p-3">
+              <p className="text-xs font-semibold text-[#494d5a]">
                 {student.name} 학생 공유 코드
               </p>
               <p className="mt-1 break-all font-mono text-lg font-bold tracking-wide text-stone-950">

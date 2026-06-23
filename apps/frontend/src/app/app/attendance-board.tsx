@@ -1243,7 +1243,7 @@ function AttendanceViewTabs({
   const showLedgerNotice = canUseCalendarView;
 
   return (
-    <div className="rounded-md border border-[#B9CAD1] bg-[#F7F9F7] px-2 py-2 shadow-[0_1px_2px_rgba(13,38,48,0.05)]">
+    <div className="border border-[#d8dde2] bg-[#fafafa] px-2 py-2">
       <div className="flex gap-1 overflow-x-auto" role="tablist" aria-label="출석부 보기 전환">
         {actionableTabs.map((tab) => {
           const isActive = value === tab.id;
@@ -1258,10 +1258,10 @@ function AttendanceViewTabs({
                 onChange(tab.id);
               }}
               className={[
-                "min-h-10 shrink-0 rounded-sm border px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                "min-h-10 shrink-0 rounded-sm border px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
                 isActive
-                    ? "border-[#0F766E] bg-[#DDEEEB] text-[#0B3F46] shadow-[inset_3px_0_0_#0F766E]"
-                    : "border-transparent bg-[#F7F9F7] text-[#526A75] hover:bg-[#EDF4F2]",
+                    ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
+                    : "border-transparent bg-[#fafafa] text-[#62656f] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
               ].join(" ")}
             >
               <span className="block text-sm font-bold">{tab.label}</span>
@@ -1272,7 +1272,7 @@ function AttendanceViewTabs({
           );
         })}
         {showLedgerNotice ? (
-          <div className="ml-auto hidden min-h-10 shrink-0 items-center border border-dashed border-[#C7D7DC] bg-[#EEF3F5] px-3 text-xs font-semibold text-[#6D818A] sm:flex">
+          <div className="ml-auto hidden min-h-10 shrink-0 items-center border border-dashed border-[#d7dbe0] bg-[#f6f7f8] px-3 text-xs font-semibold text-[#62656f] sm:flex">
             학생별 장부는 후속 범위
           </div>
         ) : null}
@@ -1363,7 +1363,7 @@ function AttendanceCalendarView({
                 <button
                   type="button"
                   onClick={onTodaySelect}
-                  className="inline-flex min-h-8 items-center border border-[#b8bdf4] bg-[#ececff] px-3 text-sm font-bold text-[var(--clinic-primary)] hover:bg-[#e4e5ff] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+                  className="inline-flex min-h-8 items-center border border-[#d7dbe0] bg-[#f6f7f8] px-3 text-sm font-bold text-[#2f3437] hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
                 >
                   오늘
                 </button>
@@ -1561,7 +1561,7 @@ function AttendanceCalendarDayCell({
         ? "border-amber-200 bg-amber-50 text-amber-700"
         : "border-emerald-200 bg-emerald-50 text-emerald-700";
   const selectedClassName = isSelected
-    ? "border-[#b8bdf4] bg-[#ececff] shadow-[inset_3px_0_0_#4f5be7,0_1px_2px_rgba(25,27,34,0.05)] ring-1 ring-inset ring-[#4f5be7]/30"
+    ? "border-[#b8bdc6] bg-[#f6f7f8] ring-1 ring-inset ring-[#aeb5bf]/40"
     : attentionCount > 0 && hasClass
       ? "bg-[#fff7f0] hover:bg-[#fff1e5]"
       : hasUnchecked && hasClass
@@ -1581,7 +1581,7 @@ function AttendanceCalendarDayCell({
       ].join(" ")}
     >
       {isSelected ? (
-        <span className="absolute right-2 top-2 flex size-5 shrink-0 items-center justify-center bg-[var(--clinic-primary)] text-white shadow-[0_1px_2px_rgba(25,27,34,0.08)]">
+        <span className="absolute right-2 top-2 flex size-5 shrink-0 items-center justify-center border border-[#b8bdc6] bg-white text-[#2f3437]">
           <Check size={13} strokeWidth={3} aria-hidden="true" />
         </span>
       ) : null}
@@ -1600,9 +1600,9 @@ function AttendanceCalendarDayCell({
           className={[
             "inline-flex max-w-full min-w-[3.9rem] shrink-0 items-baseline gap-1 overflow-hidden rounded-sm border px-1.5 py-1 sm:min-w-[4.25rem] sm:gap-1.5 sm:px-2",
             isSelected
-              ? "border-[#c2c5f4] bg-[#fbfbff] text-[var(--clinic-primary-dark)]"
+              ? "border-[#d7dbe0] bg-white text-[#2f3437]"
               : isToday
-                ? "border-[#c4c7ef] bg-[#f0f0ff] text-[var(--clinic-primary-dark)]"
+                ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
                 : "border-transparent bg-transparent text-[#17232B]",
           ].join(" ")}
         >
@@ -1624,7 +1624,7 @@ function AttendanceCalendarDayCell({
             "min-w-0 rounded-sm px-1.5 py-1 text-[11px] font-semibold leading-4",
             hasClass
               ? isSelected
-                ? "bg-[#fbfbff] text-[var(--clinic-primary-dark)]"
+                ? "bg-white text-[#2f3437]"
                 : "bg-[#f7f6f1] text-[#494d5a]"
               : "bg-transparent text-[#96A6AD]",
           ].join(" ")}
@@ -1773,7 +1773,7 @@ function AttendanceDayDetailPanel({
                 {formatDateKoreanLong(selectedDate)}
               </h3>
             </div>
-            <span className="flex size-8 shrink-0 items-center justify-center border border-[#c2c5f4] bg-[#ececff] text-[var(--clinic-primary)]">
+            <span className="flex size-8 shrink-0 items-center justify-center border border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]">
               <CheckCircle2 size={18} aria-hidden="true" />
             </span>
           </div>
@@ -1919,12 +1919,12 @@ function SummaryFilterButton({
   const isDisabled = value === 0 && !isActive;
   const toneClass =
     tone === "success"
-      ? "border-l-emerald-600 text-emerald-800 hover:border-emerald-500"
+      ? "text-emerald-800"
       : tone === "warning"
-        ? "border-l-amber-500 text-amber-800 hover:border-amber-500"
+        ? "text-amber-800"
         : tone === "danger"
-          ? "border-l-red-600 text-red-800 hover:border-red-500"
-          : "border-l-[#858895] text-[#494d5a] hover:border-[#b8bdf4]";
+          ? "text-red-800"
+          : "text-[#494d5a]";
 
   return (
     <button
@@ -1934,18 +1934,18 @@ function SummaryFilterButton({
       onClick={onClick}
       title={`${label} 목록 보기`}
       className={[
-        "group relative grid min-h-10 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-l-[3px] px-3 py-2 text-left font-extrabold transition last:border-b-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
+        "group relative grid min-h-10 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-l border-l-transparent px-3 py-2 text-left font-extrabold transition last:border-b-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
         isDisabled
-          ? "cursor-not-allowed border-l-transparent bg-[#f1f0ea] text-[#aaa8a0]"
+          ? "cursor-not-allowed bg-[#f1f0ea] text-[#aaa8a0]"
           : isActive
-          ? "border-l-[var(--clinic-primary)] bg-[#ececff] text-[var(--clinic-primary-dark)]"
-          : `cursor-pointer border-l-transparent bg-[#fffefa] hover:border-l-[var(--clinic-primary)] hover:bg-[#f2f1fb] ${toneClass}`,
+          ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
+          : `cursor-pointer bg-[#fffefa] hover:bg-[#f8f9fa] ${toneClass}`,
       ].join(" ")}
     >
       <span
         className={[
           "block truncate text-[11px] font-black uppercase tracking-[0.08em]",
-          isActive ? "text-[var(--clinic-primary)]" : "opacity-75",
+          isActive ? "text-[#2f3437]" : "opacity-75",
         ].join(" ")}
       >
         {label}
@@ -1992,7 +1992,7 @@ function AttendanceClassSummaryList({
             key={session.key}
             type="button"
             onClick={() => onOpenSession(session.key)}
-            className="group w-full border-b border-[var(--console-line)] bg-[#fffefa] p-3 text-left transition last:border-b-0 hover:bg-[#f2f1fb] hover:shadow-[inset_3px_0_0_var(--clinic-primary)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+            className="group w-full border-b border-[var(--console-line)] bg-[#fffefa] p-3 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
             aria-label={`${session.className} ${session.startTime} 수업 오늘 처리에서 열기`}
           >
             <div className="flex items-start justify-between gap-3">
@@ -2023,7 +2023,7 @@ function AttendanceClassSummaryList({
             </div>
             <div className="mt-3 flex items-center justify-between border-t border-[var(--console-line)] pt-2 text-[11px] font-extrabold text-[var(--clinic-muted)]">
               <span>수업별 출석 체크로 이동</span>
-              <span className="inline-flex items-center gap-1 text-[var(--clinic-primary)]">
+              <span className="inline-flex items-center gap-1 text-[#494d5a]">
                 열기
                 <ChevronRight
                   size={13}
@@ -2091,7 +2091,7 @@ function AttendanceDayStudentList({
           key={row.id}
           type="button"
           onClick={() => onOpenStudent(row)}
-          className="group w-full border-b border-[var(--console-line)] bg-[#fffefa] px-3 py-2.5 text-left shadow-[inset_3px_0_0_transparent] transition last:border-b-0 hover:bg-[#f2f1fb] hover:shadow-[inset_3px_0_0_var(--clinic-primary)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+          className="group w-full border-b border-[var(--console-line)] bg-[#fffefa] px-3 py-2.5 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
         >
           <div className="flex items-start gap-2.5">
             {selectable ? (
@@ -2215,7 +2215,7 @@ function StudentScheduleDrawer({
         </div>
 
         <div className="border-x border-[#C2D1D8] bg-[#F7FAFA]">
-          <section className="border-b border-[#C9D7DC] border-l-4 border-l-[#007A7C] bg-[#E1F0EF] px-4 py-4">
+          <section className="border-b border-[#d7dbe0] bg-[#f6f7f8] px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-xl font-bold text-[#17232B]">{row.student.name}</p>
@@ -2800,8 +2800,8 @@ function AttendanceLedgerTable({
                   className={[
                     "group cursor-pointer border-b border-[var(--clinic-border)] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
                     isSelected
-                      ? "bg-[#E1F0EF] shadow-[inset_4px_0_0_var(--clinic-primary)]"
-                      : "bg-[#F7FAFA] hover:bg-[#EDF3F5]",
+                      ? "bg-[#f6f7f8] ring-1 ring-inset ring-[#d7dbe0]"
+                      : "bg-[#F7FAFA] hover:bg-[#f8f9fa]",
                     isSaving ? "opacity-70" : "",
                   ].join(" ")}
                 >
@@ -2989,15 +2989,15 @@ function WorkbenchStudentPanel({
     .join(" · ");
 
   return (
-    <section className="sticky top-4 flex h-[calc(100vh-9rem)] flex-col overflow-hidden border-l border-[#C9D7DC] bg-[#EDF4F5]">
-      <div className="flex items-center justify-between border-b border-[#0F4050] bg-[#082A3A] px-4 py-3 text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)]">
+    <section className="sticky top-4 flex h-[calc(100vh-9rem)] flex-col overflow-hidden border-l border-[#d7dbe0] bg-[#f7f8f9]">
+      <div className="flex items-center justify-between border-b border-[#d7dbe0] bg-[#fafafa] px-4 py-3 text-[#2f3437]">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#7DD6D4]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#858895]">
             student case
           </p>
           <h3 className="mt-1 text-base font-bold">학생 처리 패널</h3>
         </div>
-        <ChevronRight size={17} className="rotate-90 text-[#B8D0D6]" aria-hidden="true" />
+        <ChevronRight size={17} className="rotate-90 text-[#858895]" aria-hidden="true" />
       </div>
 
       {!student ? (
@@ -3041,8 +3041,8 @@ function WorkbenchStudentPanel({
               </div>
             </section>
 
-            <section className="border-b border-[#C9D7DC] bg-[#E3F3F2] px-4 py-3 shadow-[inset_4px_0_0_#007A7C]">
-              <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#006266]">
+            <section className="border-b border-[#d7dbe0] bg-[#f6f7f8] px-4 py-3">
+              <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#62656f]">
                 <CheckCircle2 size={14} aria-hidden="true" />
                 오늘 처리
               </div>
@@ -3413,16 +3413,16 @@ function SessionList({
                   aria-pressed={isSelected}
                   onClick={() => onSelect(session.key)}
                   className={[
-                    "grid min-h-[3.55rem] w-full grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2 border-l-4 px-2.5 py-2 text-left transition sm:min-h-[4.25rem] sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:gap-3 sm:px-4 sm:py-3",
+                    "grid min-h-[3.55rem] w-full grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2 border border-transparent px-2.5 py-2 text-left transition sm:min-h-[4.25rem] sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:gap-3 sm:px-4 sm:py-3",
                     isSelected
-                      ? "border-l-[var(--clinic-accent)] bg-[#e8f5f4] text-[var(--clinic-text)]"
-                      : "border-l-transparent bg-[var(--clinic-panel)] text-[var(--clinic-text)] hover:bg-[#f3f9fa]",
+                      ? "border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
+                      : "bg-[var(--clinic-panel)] text-[var(--clinic-text)] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
                   ].join(" ")}
                 >
                   <span
                     className={[
                       "flex size-8 items-center justify-center rounded-md text-xs font-semibold sm:size-9 sm:text-sm",
-                      isSelected ? "bg-[var(--clinic-primary)] text-white" : "bg-[#e6eef1] text-[var(--clinic-muted)]",
+                      isSelected ? "border border-[#d7dbe0] bg-white text-[#2f3437]" : "bg-[#e6eef1] text-[var(--clinic-muted)]",
                     ].join(" ")}
                   >
                     {getClassInitial(session.className)}
@@ -3517,10 +3517,10 @@ function SessionList({
                 aria-pressed={isSelected}
                 onClick={() => onSelect(session.key)}
                 className={[
-                  "w-full rounded-md border border-l-4 px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                  "w-full rounded-md border px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
                   isSelected
-                    ? "border-[#007A7C] border-l-[#007A7C] bg-[#F0FAF9] shadow-[0_0_0_1px_rgba(0,122,124,0.10)]"
-                    : "border-[#D5E0E4] border-l-transparent bg-white hover:border-[#B8C8CF] hover:bg-[#FDFEFE]",
+                    ? "border-[#d7dbe0] bg-[#f6f7f8]"
+                    : "border-[#D5E0E4] bg-white hover:border-[#B8C8CF] hover:bg-[#F8F9FA]",
                 ].join(" ")}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -4024,7 +4024,7 @@ function BulkAttendanceFollowupPanel({
       </div>
 
       <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-        <div className="border-l-4 border-l-[var(--clinic-accent)] bg-[#edf9f7] px-3 py-3">
+        <div className="border border-[#d7dbe0] bg-[#f6f7f8] px-3 py-3">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-[var(--clinic-text)]">
               선택 학생 {selectedStudents.length}명
@@ -4345,7 +4345,7 @@ function AttendanceFollowupPanel({
         </div>
       ) : (
         <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-          <div className="border-l-4 border-l-[var(--clinic-accent)] bg-[#edf9f7] px-3 py-3">
+          <div className="border border-[#d7dbe0] bg-[#f6f7f8] px-3 py-3">
             <p className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--clinic-primary)]">선택 학생</p>
             <p className="mt-1 text-base font-semibold text-[var(--clinic-text)]">
               {followupTarget.student.name}

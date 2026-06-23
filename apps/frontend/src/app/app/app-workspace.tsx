@@ -743,10 +743,10 @@ function WorkspaceNavButton({
         aria-pressed={isActive}
         onClick={onClick}
         className={[
-          "group relative grid min-h-10 w-full grid-cols-[1.7rem_minmax(0,1fr)_0.75rem] items-center gap-2 border-l-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+          "group relative grid min-h-10 w-full grid-cols-[1.7rem_minmax(0,1fr)_0.75rem] items-center gap-2 border px-3 py-2 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
           isActive
-            ? "border-l-[var(--clinic-primary)] bg-[#ececff] text-[var(--clinic-text)]"
-            : "border-l-transparent text-[var(--clinic-muted)] hover:border-l-[#c4c7ef] hover:bg-[#f2f1fb] hover:text-[var(--clinic-text)]",
+            ? "border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
+            : "border-transparent text-[var(--clinic-muted)] hover:border-[#e1e4e8] hover:bg-[#f8f9fa] hover:text-[var(--clinic-text)]",
           disabled ? "cursor-not-allowed opacity-55" : "",
         ].join(" ")}
       >
@@ -755,8 +755,8 @@ function WorkspaceNavButton({
           className={[
             "flex size-7 shrink-0 items-center justify-center",
             isActive
-              ? "text-[var(--clinic-primary)]"
-              : "text-[#858895] group-hover:text-[var(--clinic-primary)]",
+              ? "text-[#2f3437]"
+              : "text-[#858895] group-hover:text-[#2f3437]",
           ].join(" ")}
         >
           {icon}
@@ -779,8 +779,8 @@ function WorkspaceNavButton({
             disabled
               ? "border border-[var(--clinic-border)] px-1.5 py-0.5 text-[10px] text-[var(--clinic-muted)]"
               : isActive
-                ? "text-[var(--clinic-primary)]"
-                : "text-[#a3a5ad] group-hover:text-[var(--clinic-primary)]",
+                ? "text-[#2f3437]"
+                : "text-[#a3a5ad] group-hover:text-[#2f3437]",
           ].join(" ")}
         >
           {disabled ? (statusLabel ?? "준비") : "›"}
@@ -797,10 +797,10 @@ function WorkspaceNavButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "flex min-h-12 flex-col items-center justify-center gap-1 border px-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+        "flex min-h-12 flex-col items-center justify-center gap-1 border px-1.5 text-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
         isActive
-          ? "border-[#b8bdf4] bg-[#ececff] text-[var(--clinic-primary-dark)]"
-          : "border-transparent bg-transparent text-stone-700 hover:bg-[#f2f1fb]",
+          ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
+          : "border-transparent bg-transparent text-stone-700 hover:bg-[#f8f9fa]",
         disabled ? "cursor-not-allowed opacity-55" : "",
       ].join(" ")}
     >
@@ -808,7 +808,7 @@ function WorkspaceNavButton({
         aria-hidden="true"
         className={[
           "flex size-6 shrink-0 items-center justify-center",
-          isActive ? "text-[var(--clinic-primary)]" : "text-stone-500",
+          isActive ? "text-[#2f3437]" : "text-stone-500",
         ].join(" ")}
       >
         {icon}

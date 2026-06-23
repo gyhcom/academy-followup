@@ -1311,7 +1311,7 @@ export function ManagementHome({
         actionIcon={<Plus size={14} />}
         onAction={openCreateStudentForm}
       >
-        <div className="mb-3 grid gap-2 border border-[#B8C9D0] border-l-4 border-l-[var(--clinic-primary)] bg-[#E7EEF1] p-2.5 sm:mb-4 sm:p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="mb-3 grid gap-2 border border-[#d7dbe0] bg-[#f6f7f8] p-2.5 sm:mb-4 sm:p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="min-w-0">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
               <button
@@ -1577,8 +1577,8 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
                 className={[
                   "min-h-9 border-r border-[#B8C9D0] px-3 text-xs font-black transition last:border-r-0",
                   range === rangeValue
-                    ? "bg-[var(--clinic-primary)] text-white"
-                    : "text-[var(--clinic-muted)] hover:bg-[#E1F0EF]",
+                    ? "bg-[#f6f7f8] text-[#2f3437]"
+                    : "text-[var(--clinic-muted)] hover:bg-[#f8f9fa]",
                 ].join(" ")}
               >
                 {label}
@@ -1662,12 +1662,12 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
               onClick={() => void downloadReport(type as ReportExportType)}
               className={`flex min-h-14 w-full items-center justify-between gap-3 px-3 text-left transition disabled:cursor-wait disabled:opacity-70 ${
                 includePrivate
-                  ? "bg-amber-50 hover:bg-amber-100/70"
-                  : "bg-[#F7FAFA] hover:bg-[#E1F0EF]"
+                    ? "bg-amber-50 hover:bg-amber-100/70"
+                    : "bg-[#F7FAFA] hover:bg-[#f8f9fa]"
               }`}
             >
               <span className="flex min-w-0 items-center gap-3">
-                <span className="flex size-8 shrink-0 items-center justify-center border border-[#B8D7D8] bg-[#E1F0EF] text-[#007A7C]">
+                <span className="flex size-8 shrink-0 items-center justify-center border border-[#d7dbe0] bg-[#f6f7f8] text-[#494d5a]">
                   <FileText size={17} />
                 </span>
                 <span className="min-w-0">
@@ -1685,7 +1685,7 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
         </div>
 
         {status.status === "saved" ? (
-          <p className="m-3 border border-[#B8D7D8] bg-[#E1F0EF] px-3 py-2 text-sm text-[#244B67]">
+          <p className="m-3 border border-[#d7dbe0] bg-[#f6f7f8] px-3 py-2 text-sm text-[#494d5a]">
             {status.message}
           </p>
         ) : null}
@@ -1885,7 +1885,7 @@ function ManagementSectionReturnBar({
   onBack: () => void;
 }) {
   return (
-    <section className="flex flex-col gap-2 border border-[#B8C9D0] border-l-4 border-l-[var(--clinic-primary)] bg-[#F7FAFA] px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+    <section className="flex flex-col gap-2 border border-[#d7dbe0] bg-[#f8f9fa] px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#526873]">
           선택 작업 영역
@@ -1905,7 +1905,7 @@ function ManagementSectionReturnBar({
       <button
         type="button"
         onClick={onBack}
-        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 text-sm font-bold text-[#315C7C] transition hover:border-[var(--clinic-primary)] hover:bg-[#E1F0EF] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] sm:w-auto"
+        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-sm border border-[#d7dbe0] bg-[#F7FAFA] px-3 text-sm font-bold text-[#494d5a] transition hover:border-[#c7ccd2] hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:w-auto"
       >
         <ArrowLeft size={15} aria-hidden="true" />
         관리 메인으로
@@ -2005,10 +2005,10 @@ function SetupWorkflow({
 
   return (
     <div className="grid gap-3">
-      <div className="border border-[#B8C9D0] border-l-4 border-l-[#315C7C] bg-[#F8FBFD] px-4 py-3">
+      <div className="border border-[#d7dbe0] bg-[#f8f9fa] px-4 py-3">
         <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#62656f]">
               Director Setup
             </p>
             <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
@@ -2040,14 +2040,14 @@ function SetupWorkflow({
             key={step.step}
             type="button"
             onClick={step.onAction}
-            className="grid w-full gap-3 border-b border-[#D6E0E5] border-l-4 border-l-transparent px-4 py-3 text-left transition last:border-b-0 hover:border-l-[#C9D6E2] hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
+            className="grid w-full gap-3 border-b border-[#D6E0E5] px-4 py-3 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
           >
             <div
               className={[
                 "flex size-8 items-center justify-center border text-sm font-semibold",
                 step.isDone
-                  ? "border-[#B8D7D8] bg-[#E1F0EF] text-[#007A7C]"
-                  : "border-[#0B3F46] bg-[#0B3F46] text-white",
+                  ? "border-[#d7dbe0] bg-white text-[#2f3437]"
+                  : "border-[#d7dbe0] bg-[#f6f7f8] text-[#62656f]",
               ].join(" ")}
             >
               {step.isDone ? <CheckCircle2 size={17} /> : step.step}
@@ -2059,7 +2059,7 @@ function SetupWorkflow({
                   className={[
                     "border px-2 py-0.5 text-xs font-semibold",
                     step.isDone
-                      ? "border-[#B8D7D8] bg-[#E1F0EF] text-[#007A7C]"
+                      ? "border-[#d7dbe0] bg-white text-[#2f3437]"
                       : "border-amber-200 bg-amber-50 text-amber-800",
                   ].join(" ")}
                 >
@@ -2337,10 +2337,10 @@ function ManagementCommandCenter({
                   aria-current={isActive ? "page" : undefined}
                   onClick={() => onSelectSection(section.id)}
                   className={[
-                    "group min-h-[4.25rem] w-[10.75rem] shrink-0 border-b-[3px] border-r border-[var(--console-line)] px-3 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
+                    "group min-h-[4.25rem] w-[10.75rem] shrink-0 border-b border-r border-[var(--console-line)] px-3 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
                     isActive
-                      ? "border-b-[var(--clinic-primary)] bg-[#ececff] text-[var(--clinic-text)]"
-                      : "border-b-transparent bg-[#fffefa] text-[var(--clinic-text)] hover:border-b-[#c4c7ef] hover:bg-[#f2f1fb]",
+                      ? "border-b-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
+                      : "border-b-transparent bg-[#fffefa] text-[var(--clinic-text)] hover:bg-[#f8f9fa]",
                   ].join(" ")}
                 >
                   <span className="flex min-w-0 items-center gap-2">

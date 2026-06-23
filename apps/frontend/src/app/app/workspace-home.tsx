@@ -450,7 +450,7 @@ function PcOperationsDashboard({
 
   return (
     <div className="hidden xl:block">
-      <section className="border border-[#B8C9D0] border-l-4 border-l-[var(--clinic-primary)] bg-[#F4F8F9] px-5 py-4">
+      <section className="border border-[#d7dbe0] bg-[#f8f9fa] px-5 py-4">
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-end">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">{academyName}</p>
@@ -755,10 +755,10 @@ function PcStudentBoardRowItem({
       aria-label={`${row.student.name} 학생 상세 보기, ${row.className}, ${row.startTime}-${row.endTime}, 출석 ${attendanceDisplayLabel(row.status)}, 연락 ${contactLabel}`}
       onClick={onClick}
       className={[
-        "flex min-h-[4.35rem] w-full items-center gap-3 border-l-[3px] px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
+        "flex min-h-[4.35rem] w-full items-center gap-3 border px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
         isSelected
-          ? "border-l-[var(--clinic-primary)] bg-[#E1F0EF]"
-          : "border-l-transparent bg-[#F7FAFA] hover:border-l-[#839AA4] hover:bg-[#EDF3F5]",
+          ? "border-[#d7dbe0] bg-[#f6f7f8]"
+          : "border-transparent bg-[#F7FAFA] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
       ].join(" ")}
     >
       <span className="min-w-0 flex-[1.25]">
@@ -849,7 +849,7 @@ function PcStudentDetailPanel({
 
         {row ? (
           <div>
-            <div className="border-l-[3px] border-l-[var(--clinic-accent)] bg-[#EAF6F5] px-4 py-3">
+            <div className="border border-[#d7dbe0] bg-[#f6f7f8] px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-lg font-bold text-[var(--clinic-text)]">
@@ -992,7 +992,7 @@ function PcStudentDetailPanel({
                     reason: followupReasonForStatus(item.status),
                   })
                 }
-                className="flex w-full items-center justify-between gap-3 border-l-[3px] border-l-transparent px-4 py-3 text-left transition hover:border-l-[var(--clinic-primary)] hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]"
+                className="flex w-full items-center justify-between gap-3 border border-transparent px-4 py-3 text-left transition hover:border-[#e1e4e8] hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-bold text-[var(--clinic-text)]">
@@ -1113,7 +1113,7 @@ function MobileHomeExperience({
 
   return (
     <div className="space-y-4 sm:hidden">
-      <section className="overflow-hidden border border-[#9FB6BE] bg-[#E5EEF1] text-[var(--clinic-text)] shadow-[inset_4px_0_0_var(--clinic-primary)]">
+      <section className="overflow-hidden border border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]">
         <div className="border-b border-[#B8C9D0] bg-[#DCE8EB] px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">
@@ -1221,7 +1221,7 @@ function MobileHomeExperience({
         </div>
       </section>
 
-      <section className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA] shadow-[inset_4px_0_0_#D4E4E2]">
+      <section className="overflow-hidden border border-[#d7dbe0] bg-[#F7FAFA]">
         <div className="border-b border-[#D6E0E5] bg-[#E7EEF1] px-4 py-4">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -1403,10 +1403,10 @@ function MobileActionCard({
   onClick: () => void;
 }) {
   const toneClass = {
-    coral: "border-l-[#A8532F]",
-    violet: "border-l-[#6E6094]",
-    mint: "border-l-[var(--clinic-primary)]",
-    amber: "border-l-[#B56A09]",
+    coral: "border-[#d7dbe0]",
+    violet: "border-[#d7dbe0]",
+    mint: "border-[#d7dbe0]",
+    amber: "border-[#d7dbe0]",
   }[tone];
 
   return (
@@ -1414,7 +1414,7 @@ function MobileActionCard({
       type="button"
       onClick={onClick}
       className={[
-        "group min-h-[5.75rem] border border-l-[4px] border-[#B8C9D0] bg-[#F7FAFA] p-3 text-left text-[var(--clinic-text)] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
+        "group min-h-[5.75rem] border bg-[#F7FAFA] p-3 text-left text-[var(--clinic-text)] transition hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
         toneClass,
       ].join(" ")}
     >
@@ -1464,7 +1464,7 @@ function TodayScheduleSection({
     <section
       aria-label="오늘 일정"
       className={[
-        "overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA] shadow-[inset_4px_0_0_#D4E4E2]",
+        "overflow-hidden border border-[#d7dbe0] bg-[#F7FAFA]",
         className,
       ].join(" ")}
     >
@@ -1871,9 +1871,9 @@ function MobileSummaryButton({
   onClick: () => void;
 }) {
   const toneClass = {
-    default: "border-l-[var(--clinic-primary)]",
-    danger: "border-l-[#B56A09]",
-    success: "border-l-[#2F7D5B]",
+    default: "border-[#d7dbe0]",
+    danger: "border-[#d7dbe0]",
+    success: "border-[#d7dbe0]",
   }[tone];
 
   return (
@@ -1882,15 +1882,15 @@ function MobileSummaryButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "border border-l-[4px] px-3 py-3 text-left transition",
+        "border px-3 py-3 text-left transition",
         isActive
-          ? "border-[#08313F] border-l-[var(--clinic-accent)] bg-[#08313F] text-white"
-          : `border-[#B8C9D0] bg-[#F7FAFA] text-[var(--clinic-text)] ${toneClass} hover:bg-[#EDF3F5]`,
+          ? "border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
+          : `bg-[#F7FAFA] text-[var(--clinic-text)] ${toneClass} hover:bg-[#f8f9fa]`,
       ].join(" ")}
     >
-      <span className={["block text-xs font-black", isActive ? "text-white/75" : "text-[var(--clinic-muted)]"].join(" ")}>{label}</span>
+      <span className={["block text-xs font-black", isActive ? "text-[#62656f]" : "text-[var(--clinic-muted)]"].join(" ")}>{label}</span>
       <span className="mt-1 block text-2xl font-black tabular-nums">{value}</span>
-      <span className={["mt-2 inline-flex items-center gap-1 text-[11px] font-black", isActive ? "text-white/80" : "text-[var(--clinic-primary)]"].join(" ")}>
+      <span className={["mt-2 inline-flex items-center gap-1 text-[11px] font-black", isActive ? "text-[#494d5a]" : "text-[#62656f]"].join(" ")}>
         보기
         <ArrowRight size={12} />
       </span>
@@ -2002,7 +2002,7 @@ function HomeActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="group grid min-h-[3.75rem] w-full grid-cols-[2rem_minmax(0,1fr)_1rem] items-center gap-3 border-b border-[#D6E0E5] border-l-[3px] border-l-transparent bg-[#F7FAFA] px-4 py-2.5 text-left transition last:border-b-0 hover:border-l-[var(--clinic-primary)] hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:px-4"
+      className="group grid min-h-[3.75rem] w-full grid-cols-[2rem_minmax(0,1fr)_1rem] items-center gap-3 border-b border-[#D6E0E5] bg-[#F7FAFA] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:px-4"
     >
       <span className="flex size-8 shrink-0 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[var(--clinic-primary)]">
         {icon}
