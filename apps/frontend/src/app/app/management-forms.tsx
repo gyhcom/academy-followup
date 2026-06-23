@@ -326,9 +326,9 @@ export function StudentForm({
         </button>
       </div>
 
-      <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 grid min-w-0 gap-x-3 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          학생 이름
+          <span className="flex min-h-5 items-center">학생 이름</span>
           <input
             value={form.name}
             onChange={(event) => onChange({ ...form, name: event.target.value })}
@@ -338,7 +338,10 @@ export function StudentForm({
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          소속 반 <span className="text-xs font-normal text-[var(--clinic-muted)]">출석/권한 기준</span>
+          <span className="flex min-h-5 items-center justify-between gap-2">
+            소속 반
+            <span className="truncate text-xs font-normal text-[var(--clinic-muted)]">출석/권한 기준</span>
+          </span>
           <select
             value={form.classId}
             onChange={(event) => onChange({ ...form, classId: event.target.value })}
@@ -354,7 +357,7 @@ export function StudentForm({
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          상태
+          <span className="flex min-h-5 items-center">상태</span>
           <select
             value={form.status}
             onChange={(event) => onChange({ ...form, status: event.target.value })}
@@ -364,14 +367,10 @@ export function StudentForm({
             <option value="paused">휴원</option>
             <option value="left">퇴원</option>
           </select>
-          <span className="text-xs leading-5 text-[#5C717A]">
-            학생 삭제는 제공하지 않습니다. 운영 기록 보존을 위해 다니지 않는 학생은 `퇴원`
-            상태로 관리합니다.
-          </span>
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          학교
+          <span className="flex min-h-5 items-center">학교</span>
           <input
             value={form.schoolName}
             onChange={(event) => onChange({ ...form, schoolName: event.target.value })}
@@ -381,7 +380,7 @@ export function StudentForm({
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          학년
+          <span className="flex min-h-5 items-center">학년</span>
           <select
             value={form.gradeLabel}
             onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
@@ -397,7 +396,7 @@ export function StudentForm({
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          학부모명
+          <span className="flex min-h-5 items-center">학부모명</span>
           <input
             value={form.parentName}
             onChange={(event) => onChange({ ...form, parentName: event.target.value })}
@@ -407,7 +406,7 @@ export function StudentForm({
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2 lg:col-span-1">
-          학부모 연락처
+          <span className="flex min-h-5 items-center">학부모 연락처</span>
           <input
             value={form.parentPhone}
             onChange={(event) => onChange({ ...form, parentPhone: event.target.value })}
@@ -418,7 +417,7 @@ export function StudentForm({
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2 lg:col-span-1">
-          학생 연락처
+          <span className="flex min-h-5 items-center">학생 연락처</span>
           <input
             value={form.studentPhone}
             onChange={(event) => onChange({ ...form, studentPhone: event.target.value })}
@@ -428,6 +427,11 @@ export function StudentForm({
           />
         </label>
       </div>
+
+      <p className="mt-3 border border-[#B8C9D0] bg-[#F7FAFA] px-3 py-2 text-xs leading-5 text-[#5C717A]">
+        학생 삭제는 제공하지 않습니다. 운영 기록 보존을 위해 다니지 않는 학생은 `퇴원`
+        상태로 관리합니다.
+      </p>
 
       <label className="mt-3 flex items-start gap-3 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] p-3 text-sm text-[#405763]">
         <input
