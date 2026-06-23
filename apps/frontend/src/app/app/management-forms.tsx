@@ -304,169 +304,198 @@ export function StudentForm({
     form.name.trim().length > 0 &&
     form.parentPhone.trim().length > 0 &&
     status.status !== "saving";
+  const fieldClass = "grid min-w-0 gap-1.5 text-sm font-medium text-[#2f3437]";
+  const inputClass =
+    "min-h-10 w-full min-w-0 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm text-[#17232B] outline-none transition placeholder:text-[#9A9CA3] focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#E1E4E8]";
+  const sectionClass = "border border-[#D8D6DE] bg-[#FFFEFA]";
+  const sectionHeaderClass =
+    "border-b border-[#E3E2E8] bg-[#FBFAF7] px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] text-[#62656f]";
 
   return (
-    <div className="mb-4 rounded-sm border border-[#8FA6B0] bg-[#E7EEF1] p-3 min-w-0 overflow-hidden">
-      <div className="flex items-start justify-between gap-3">
+    <div className="mb-4 min-w-0 overflow-hidden rounded-sm border border-[#D8D6DE] bg-[#F4F4F1]">
+      <div className="flex items-start justify-between gap-3 border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-[var(--clinic-text)]">
+          <p className="text-sm font-bold text-[#17232B]">
             {form.mode === "create" ? "새 학생 등록" : "학생 정보 수정"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-[#405763]">
-            소속 반을 지정해야 출석, 문자, 선생님 권한 기준이 정확해집니다. 저장 후 주간 스케줄을 이어서 입력합니다.
+          <p className="mt-1 text-xs leading-5 text-[#62656f]">
+            반 배정, 연락처, 재원 상태를 먼저 정리합니다. 주간 스케줄은 저장 후 이어서 입력합니다.
           </p>
         </div>
         <button
           type="button"
           aria-label="학생 입력 닫기"
           onClick={onCancel}
-          className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] text-[#405763]"
+          className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] text-[#62656f] transition hover:border-[#BFC2C8] hover:bg-[#F7F7FA]"
         >
           <X size={15} />
         </button>
       </div>
 
-      <div className="mt-3 grid min-w-0 gap-x-3 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          <span className="flex min-h-5 items-center">학생 이름</span>
-          <input
-            value={form.name}
-            onChange={(event) => onChange({ ...form, name: event.target.value })}
-            placeholder="예: 김민준"
-            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
-          />
-        </label>
+      <div className="grid min-w-0 gap-4 p-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="grid min-w-0 gap-4">
+          <section className={sectionClass}>
+            <p className={sectionHeaderClass}>기본 정보</p>
+            <div className="grid min-w-0 gap-3 p-3 sm:grid-cols-2">
+              <label className={fieldClass}>
+                학생 이름
+                <input
+                  value={form.name}
+                  onChange={(event) => onChange({ ...form, name: event.target.value })}
+                  placeholder="예: 김민준"
+                  className={inputClass}
+                />
+              </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          <span className="flex min-h-5 items-center justify-between gap-2">
-            소속 반
-            <span className="truncate text-xs font-normal text-[var(--clinic-muted)]">출석/권한 기준</span>
-          </span>
-          <select
-            value={form.classId}
-            onChange={(event) => onChange({ ...form, classId: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
-          >
-            <option value="">미배정 - 나중에 배정</option>
-            {classes.map((classItem) => (
-              <option key={classItem.id} value={classItem.id}>
-                {classItem.name}
-              </option>
-            ))}
-          </select>
-        </label>
+              <label className={fieldClass}>
+                학부모명
+                <input
+                  value={form.parentName}
+                  onChange={(event) => onChange({ ...form, parentName: event.target.value })}
+                  placeholder="예: 김민준 어머니"
+                  className={inputClass}
+                />
+              </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          <span className="flex min-h-5 items-center">상태</span>
-          <select
-            value={form.status}
-            onChange={(event) => onChange({ ...form, status: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
-          >
-            <option value="active">재원</option>
-            <option value="paused">휴원</option>
-            <option value="left">퇴원</option>
-          </select>
-        </label>
+              <label className={fieldClass}>
+                학교
+                <input
+                  value={form.schoolName}
+                  onChange={(event) => onChange({ ...form, schoolName: event.target.value })}
+                  placeholder="예: 한들중"
+                  className={inputClass}
+                />
+              </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          <span className="flex min-h-5 items-center">학교</span>
-          <input
-            value={form.schoolName}
-            onChange={(event) => onChange({ ...form, schoolName: event.target.value })}
-            placeholder="예: 한들중"
-            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
-          />
-        </label>
+              <label className={fieldClass}>
+                학년
+                <select
+                  value={form.gradeLabel}
+                  onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
+                  className={inputClass}
+                >
+                  <option value="">학년 선택</option>
+                  {gradeOptions.map((grade) => (
+                    <option key={grade} value={grade}>
+                      {grade}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </section>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          <span className="flex min-h-5 items-center">학년</span>
-          <select
-            value={form.gradeLabel}
-            onChange={(event) => onChange({ ...form, gradeLabel: event.target.value })}
-            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
-          >
-            <option value="">학년 선택</option>
-            {gradeOptions.map((grade) => (
-              <option key={grade} value={grade}>
-                {grade}
-              </option>
-            ))}
-          </select>
-        </label>
+          <section className={sectionClass}>
+            <p className={sectionHeaderClass}>반 배정 / 연락처</p>
+            <div className="grid min-w-0 gap-3 p-3 sm:grid-cols-2">
+              <label className={fieldClass}>
+                <span className="flex min-h-5 items-center justify-between gap-2">
+                  소속 반
+                  <span className="truncate text-xs font-normal text-[#858895]">출석/권한 기준</span>
+                </span>
+                <select
+                  value={form.classId}
+                  onChange={(event) => onChange({ ...form, classId: event.target.value })}
+                  className={inputClass}
+                >
+                  <option value="">미배정 - 나중에 배정</option>
+                  {classes.map((classItem) => (
+                    <option key={classItem.id} value={classItem.id}>
+                      {classItem.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
-          <span className="flex min-h-5 items-center">학부모명</span>
-          <input
-            value={form.parentName}
-            onChange={(event) => onChange({ ...form, parentName: event.target.value })}
-            placeholder="예: 김민준 어머니"
-            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
-          />
-        </label>
+              <label className={fieldClass}>
+                학부모 연락처
+                <input
+                  value={form.parentPhone}
+                  onChange={(event) => onChange({ ...form, parentPhone: event.target.value })}
+                  inputMode="tel"
+                  placeholder="예: 010-1234-5678"
+                  className={inputClass}
+                />
+              </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2 lg:col-span-1">
-          <span className="flex min-h-5 items-center">학부모 연락처</span>
-          <input
-            value={form.parentPhone}
-            onChange={(event) => onChange({ ...form, parentPhone: event.target.value })}
-            inputMode="tel"
-            placeholder="예: 010-1234-5678"
-            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
-          />
-        </label>
+              <label className={fieldClass}>
+                학생 연락처
+                <input
+                  value={form.studentPhone}
+                  onChange={(event) => onChange({ ...form, studentPhone: event.target.value })}
+                  inputMode="tel"
+                  placeholder="선택 입력"
+                  className={inputClass}
+                />
+              </label>
 
-        <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)] sm:col-span-2 lg:col-span-1">
-          <span className="flex min-h-5 items-center">학생 연락처</span>
-          <input
-            value={form.studentPhone}
-            onChange={(event) => onChange({ ...form, studentPhone: event.target.value })}
-            inputMode="tel"
-            placeholder="선택 입력"
-            className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#BFE3E1]"
-          />
-        </label>
+              <div className="border border-[#E3E2E8] bg-[#FBFAF7] px-3 py-2 text-xs leading-5 text-[#62656f]">
+                엑셀에서 앞자리 0이 사라진 경우에도 이 입력칸에는 010으로 시작하는 번호를 그대로 입력해 저장할 수 있습니다.
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside className="grid min-w-0 gap-4 xl:content-start">
+          <section className={sectionClass}>
+            <p className={sectionHeaderClass}>운영 상태</p>
+            <div className="grid gap-3 p-3">
+              <label className={fieldClass}>
+                상태
+                <select
+                  value={form.status}
+                  onChange={(event) => onChange({ ...form, status: event.target.value })}
+                  className={inputClass}
+                >
+                  <option value="active">재원</option>
+                  <option value="paused">휴원</option>
+                  <option value="left">퇴원</option>
+                </select>
+              </label>
+
+              <p className="border border-[#E3E2E8] bg-[#FBFAF7] px-3 py-2 text-xs leading-5 text-[#62656f]">
+                학생 삭제는 제공하지 않습니다. 운영 기록 보존을 위해 다니지 않는 학생은 퇴원
+                상태로 관리합니다.
+              </p>
+            </div>
+          </section>
+
+          <label className="flex items-start gap-3 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] p-3 text-sm text-[#4B4F58]">
+            <input
+              type="checkbox"
+              checked={form.scheduleShareConsentConfirmed}
+              onChange={(event) =>
+                onChange({ ...form, scheduleShareConsentConfirmed: event.target.checked })
+              }
+              className="mt-1 size-4 shrink-0 accent-[#17232B]"
+            />
+            <span className="min-w-0">
+              <span className="block font-semibold text-[#17232B]">
+                타 학원 스케줄 공유 동의 확인
+              </span>
+              <span className="mt-1 block leading-5">
+                보호자에게 타 학원 스케줄 공유 목적과 범위를 안내했고 동의를 확인했습니다.
+              </span>
+              <span className="mt-1 block text-xs leading-5 text-[#73777F]">
+                체크하면 같은 학생으로 확인되는 다른 학원 일정이 자동으로 연결됩니다. 전화번호는
+                동일 학생 확인에만 사용되며 상대 학원에 노출되지 않습니다.
+              </span>
+            </span>
+          </label>
+        </aside>
       </div>
 
-      <p className="mt-3 border border-[#B8C9D0] bg-[#F7FAFA] px-3 py-2 text-xs leading-5 text-[#5C717A]">
-        학생 삭제는 제공하지 않습니다. 운영 기록 보존을 위해 다니지 않는 학생은 `퇴원`
-        상태로 관리합니다.
-      </p>
-
-      <label className="mt-3 flex items-start gap-3 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] p-3 text-sm text-[#405763]">
-        <input
-          type="checkbox"
-          checked={form.scheduleShareConsentConfirmed}
-          onChange={(event) =>
-            onChange({ ...form, scheduleShareConsentConfirmed: event.target.checked })
-          }
-          className="mt-1 size-4 shrink-0 accent-[var(--clinic-primary)]"
-        />
-        <span className="min-w-0">
-          <span className="block font-semibold text-[var(--clinic-text)]">
-            타 학원 스케줄 공유 동의 확인
-          </span>
-          <span className="mt-1 block leading-5">
-            보호자에게 타 학원 스케줄 공유 목적과 범위를 안내했고 동의를 확인했습니다.
-          </span>
-          <span className="mt-1 block text-xs leading-5 text-[var(--clinic-muted)]">
-            체크하면 같은 학생으로 확인되는 다른 학원 일정이 자동으로 연결됩니다. 전화번호는
-            동일 학생 확인에만 사용되며 상대 학원에 노출되지 않습니다.
-          </span>
-        </span>
-      </label>
-
       {status.status === "error" ? (
-        <p className="mt-3 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
+        <p className="mx-4 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900">
           {status.message}
         </p>
       ) : null}
 
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
+      <div className="mt-0 flex flex-col gap-2 border-t border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3 sm:flex-row sm:justify-end">
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 w-full min-w-0 rounded-sm border border-[#AFC1C8] bg-[#F7FAFA] px-4 text-sm font-semibold text-[#405763] sm:w-auto"
+          className="min-h-10 w-full min-w-0 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-4 text-sm font-semibold text-[#4B4F58] transition hover:border-[#BFC2C8] hover:bg-[#F7F7FA] sm:w-auto"
         >
           취소
         </button>
@@ -475,8 +504,8 @@ export function StudentForm({
           disabled={!canSave}
           onClick={onSave}
           className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold sm:w-auto",
-            canSave ? "bg-[var(--clinic-primary)] text-white" : "bg-[#C7D4DA] text-[#405763]",
+            "flex min-h-10 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold sm:w-auto",
+            canSave ? "bg-[#17232B] text-white hover:bg-[#0F171D]" : "bg-[#D8D6DE] text-[#62656f]",
           ].join(" ")}
         >
           <Save size={16} />
