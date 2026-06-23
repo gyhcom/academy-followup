@@ -2279,21 +2279,21 @@ function ManagementCommandCenter({
 
   return (
     <section className="overflow-hidden border border-[var(--clinic-border)] bg-[#fffefa] shadow-[var(--console-shadow)]">
-      <div className="grid gap-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
-        <div className="border-b border-[var(--console-line)] px-4 py-3 xl:border-b-0 xl:border-r">
-          <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[var(--clinic-primary)]">
-            관리 콘솔
-          </p>
-          <h2 className="mt-1 truncate text-base font-black leading-tight text-[var(--clinic-text)]">
-            {academyName}
-          </h2>
-          <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
-            명단, 수업, 직원, 문자, 정책을 업무 단위로 관리합니다.
-          </p>
-        </div>
+      <div className="border-b border-[var(--console-line)] px-4 py-3">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#6f737c]">
+              관리 콘솔
+            </p>
+            <h2 className="mt-1 truncate text-base font-black leading-tight text-[var(--clinic-text)]">
+              {academyName}
+            </h2>
+            <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
+              명단, 수업, 직원, 문자, 정책을 업무 단위로 관리합니다.
+            </p>
+          </div>
 
-        <div className="min-w-0">
-          <div className="grid border-b border-[var(--console-line)] bg-[#f8f7f2] sm:grid-cols-2 xl:grid-cols-4">
+          <div className="flex min-w-0 flex-wrap gap-1.5">
             {summaryRows.map((row) => {
               const valueClass =
                 row.tone === "warning"
@@ -2307,77 +2307,80 @@ function ManagementCommandCenter({
                   key={row.label}
                   type="button"
                   onClick={() => onSelectSection(row.section)}
-                  className="grid min-h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-r border-[var(--console-line)] px-3 py-2 text-left transition hover:bg-[#f2f1fb] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa] sm:border-b-0"
+                  className="inline-flex min-h-8 items-center gap-2 border border-[var(--console-line)] bg-[#f8f7f2] px-2.5 text-xs font-bold text-[#494d5a] transition hover:bg-[#f2f1fb] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
                 >
-                  <span className="min-w-0">
-                    <span className="block truncate text-xs font-bold text-[#494d5a]">
-                      {row.label}
-                    </span>
-                    <span className="mt-0.5 block truncate text-[11px] font-semibold text-[var(--clinic-muted)]">
-                      {row.detail}
-                    </span>
-                  </span>
-                  <span className={`shrink-0 text-sm font-black tabular-nums ${valueClass}`}>
-                    {row.value}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex min-w-0 gap-0 overflow-x-auto bg-[#fffefa]">
-            {sections.map((section) => {
-              const isActive = activeSection === section.id;
-
-              return (
-                <button
-                  key={section.id}
-                  type="button"
-                  aria-pressed={isActive}
-                  aria-current={isActive ? "page" : undefined}
-                  onClick={() => onSelectSection(section.id)}
-                  className={[
-                    "group min-h-[4.25rem] w-[10.75rem] shrink-0 border-b border-r border-[var(--console-line)] px-3 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
-                    isActive
-                      ? "border-b-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
-                      : "border-b-transparent bg-[#fffefa] text-[var(--clinic-text)] hover:bg-[#f8f9fa]",
-                  ].join(" ")}
-                >
-                  <span className="flex min-w-0 items-center gap-2">
-                    <span className="truncate text-sm font-bold">{section.label}</span>
-                    <span
-                      className={[
-                        "shrink-0 border px-1.5 py-0.5 text-[10px] font-black tabular-nums",
-                        isActive
-                          ? "border-[#b8bdf4] bg-[#f4f4ff] text-[var(--clinic-primary)]"
-                          : "border-[var(--console-line)] bg-[#f3f1ec] text-[var(--clinic-muted)]",
-                      ].join(" ")}
-                    >
-                      {section.count}
-                    </span>
-                  </span>
-                  <span className="mt-1 block truncate text-xs font-semibold text-[var(--clinic-muted)]">
-                    {section.group}
-                  </span>
-                  <span className="mt-1 flex min-w-0 items-center justify-between gap-2">
-                    <span className="truncate text-[11px] font-semibold text-[#858895]">
-                      {section.status}
-                    </span>
-                    <ArrowRight
-                      size={13}
-                      className={[
-                        "shrink-0 transition",
-                        isActive
-                          ? "text-[var(--clinic-primary)]"
-                          : "text-[#b6b3aa] group-hover:text-[var(--clinic-muted)]",
-                      ].join(" ")}
-                    />
-                  </span>
+                  <span>{row.label}</span>
+                  <span className={`tabular-nums ${valueClass}`}>{row.value}</span>
                 </button>
               );
             })}
           </div>
         </div>
+      </div>
+
+      <div className="divide-y divide-[var(--console-line)]">
+        {sections.map((section) => {
+          const isActive = activeSection === section.id;
+
+          return (
+            <button
+              key={section.id}
+              type="button"
+              aria-pressed={isActive}
+              aria-current={isActive ? "page" : undefined}
+              onClick={() => onSelectSection(section.id)}
+              className={[
+                "group grid min-h-14 w-full grid-cols-[7rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa] sm:grid-cols-[8rem_minmax(0,1fr)_7rem_auto]",
+                isActive
+                  ? "bg-[#f6f7f8] text-[var(--clinic-text)]"
+                  : "bg-[#fffefa] text-[var(--clinic-text)] hover:bg-[#f8f9fa]",
+              ].join(" ")}
+            >
+              <span className="min-w-0">
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className="truncate text-sm font-black">{section.label}</span>
+                  <span
+                    className={[
+                      "inline-flex shrink-0 border px-1.5 py-0.5 text-[10px] font-black tabular-nums sm:hidden",
+                      isActive
+                        ? "border-[#d7dbe0] bg-[#fffefa] text-[#2f3437]"
+                        : "border-[var(--console-line)] bg-[#f3f1ec] text-[var(--clinic-muted)]",
+                    ].join(" ")}
+                  >
+                    {section.count}
+                  </span>
+                </span>
+                <span className="mt-0.5 block truncate text-[11px] font-semibold text-[var(--clinic-muted)]">
+                  {section.group}
+                </span>
+              </span>
+
+              <span className="min-w-0">
+                <span className="block truncate text-xs font-semibold text-[#405763]">
+                  {section.detail}
+                </span>
+                <span className="mt-0.5 block truncate text-[11px] font-semibold text-[#858895]">
+                  {section.status}
+                </span>
+              </span>
+
+              <span className="hidden justify-self-end border border-[var(--console-line)] bg-[#f8f7f2] px-2 py-1 text-[11px] font-black text-[var(--clinic-muted)] sm:inline-flex">
+                {section.count}
+              </span>
+
+              <ArrowRight
+                size={14}
+                className={[
+                  "justify-self-end transition",
+                  isActive
+                    ? "text-[#2f3437]"
+                    : "text-[#b6b3aa] group-hover:text-[var(--clinic-muted)]",
+                ].join(" ")}
+                aria-hidden="true"
+              />
+            </button>
+          );
+        })}
       </div>
     </section>
   );
