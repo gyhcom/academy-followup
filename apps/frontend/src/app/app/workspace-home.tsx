@@ -450,21 +450,21 @@ function PcOperationsDashboard({
 
   return (
     <div className="hidden xl:block">
-      <section className="border border-[#d7dbe0] bg-[#f8f9fa] px-5 py-4">
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-end">
+      <section className="border border-[var(--console-line)] bg-[#fffefa]">
+        <div className="grid gap-4 px-4 py-3 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-center">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">{academyName}</p>
-            <h2 className="mt-2 text-2xl font-bold leading-tight text-[var(--clinic-text)]">
+            <p className="text-[11px] font-medium text-[var(--clinic-muted)]">{academyName}</p>
+            <h2 className="mt-0.5 text-lg font-semibold leading-tight text-[var(--clinic-text)]">
               {copy.title}
             </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--clinic-muted)]">
+            <p className="mt-1 max-w-3xl text-xs leading-5 text-[var(--clinic-muted)]">
               {copy.description}
             </p>
           </div>
           <HomeDateControl value={selectedDate} onChange={onDateChange} />
         </div>
 
-        <div className="mt-4 grid grid-cols-5 divide-x divide-[#C6D5DC] border-y border-[#B8C9D0] bg-[#EDF3F5]">
+        <div className="grid grid-cols-5 divide-x divide-[var(--console-line)] border-t border-[var(--console-line)] bg-[#f8f7f2]">
           <PcKpi label="오늘 수업" value={`${scheduleSummary.academyScheduleCount}개`} />
           <PcKpi label="학생 체크" value={`${studentRows.length}명`} />
           <PcKpi label="체크 필요" value={`${boardSummary.unchecked}명`} tone="warning" />
@@ -475,8 +475,8 @@ function PcOperationsDashboard({
 
       <section className="mt-5 grid gap-4 xl:grid-cols-[20rem_minmax(0,1fr)_24rem] 2xl:grid-cols-[21rem_minmax(0,1fr)_26rem] xl:items-start">
         <aside className="space-y-4">
-          <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9]">
-            <div className="border-b border-[#B8C9D0] bg-[#EAF1F3] px-4 py-3">
+          <section className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
+            <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <h3 className="text-sm font-bold text-[var(--clinic-text)]">
@@ -484,12 +484,12 @@ function PcOperationsDashboard({
                   </h3>
                   <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">수업을 누르면 출석부로 이동합니다.</p>
                 </div>
-                <span className="border border-[#B8C9D0] bg-[#DCEBEC] px-2 py-1 text-xs font-bold text-[var(--clinic-primary-dark)]">
+                <span className="border border-[var(--console-line)] bg-[#f3f1ec] px-2 py-1 text-xs font-semibold text-[var(--clinic-muted)]">
                   {academyItems.length}개
                 </span>
               </div>
             </div>
-            <div className="max-h-[31rem] divide-y divide-[#E1EAEE] overflow-y-auto">
+            <div className="max-h-[31rem] divide-y divide-[var(--console-line)] overflow-y-auto">
               {academyItems.length > 0 ? (
                 academyItems.map((item) => (
                   <PcScheduleButton key={item.id} item={item} onNavigate={onNavigate} />
@@ -502,8 +502,8 @@ function PcOperationsDashboard({
             </div>
           </section>
 
-          <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9]">
-            <div className="border-b border-[#B8C9D0] bg-[#EAF1F3] px-4 py-3">
+          <section className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
+            <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
               <h3 className="text-sm font-bold text-[var(--clinic-text)]">작업</h3>
             </div>
             <HomeActionButton
@@ -529,8 +529,8 @@ function PcOperationsDashboard({
           </section>
         </aside>
 
-        <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9]">
-          <div className="border-b border-[#B8C9D0] bg-[#EAF1F3] px-4 py-3">
+        <section className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
+          <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h3 className="text-base font-bold text-[var(--clinic-text)]">
@@ -560,7 +560,7 @@ function PcOperationsDashboard({
             ) : null}
           </div>
 
-          <div className="max-h-[38rem] divide-y divide-[#D8E3E7] overflow-y-auto bg-[#F7FAFA]" role="listbox" aria-label="오늘 학생 처리 목록">
+          <div className="max-h-[38rem] divide-y divide-[var(--console-line)] overflow-y-auto bg-[#fffefa]" role="listbox" aria-label="오늘 학생 처리 목록">
             {filteredStudentRows.length > 0 ? (
               filteredStudentRows.map((row) => (
                 <PcStudentBoardRowItem
@@ -644,8 +644,8 @@ function PcScheduleButton({
           {item.studentCount ? ` · ${item.studentCount}명` : ""}
         </span>
       </span>
-      <span className="border border-[#073342] bg-[var(--clinic-primary-dark)] px-2.5 py-1 text-[11px] font-bold text-white">
-        출석
+      <span className="border border-[var(--console-line)] bg-[#fffefa] px-2.5 py-1 text-[11px] font-semibold text-[var(--clinic-muted)]">
+        출석부
       </span>
     </>
   );
@@ -758,7 +758,7 @@ function PcStudentBoardRowItem({
         "flex min-h-[4.35rem] w-full items-center gap-3 border px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
         isSelected
           ? "border-[#d7dbe0] bg-[#f6f7f8]"
-          : "border-transparent bg-[#F7FAFA] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
+          : "border-transparent bg-[#fffefa] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
       ].join(" ")}
     >
       <span className="min-w-0 flex-[1.25]">
@@ -778,7 +778,7 @@ function PcStudentBoardRowItem({
         </span>
       </span>
       <span className="min-w-0 flex flex-[1.15] items-center gap-2">
-        <span className="shrink-0 border border-[#C9D7DC] bg-[#EAF1F3] px-2 py-1 text-xs font-bold tabular-nums text-[var(--clinic-text)]">
+        <span className="shrink-0 border border-[var(--console-line)] bg-[#f8f7f2] px-2 py-1 text-xs font-semibold tabular-nums text-[var(--clinic-text)]">
           {row.startTime}-{row.endTime}
         </span>
         <span className="min-w-0 truncate text-xs font-semibold text-[var(--clinic-muted)]">
@@ -840,16 +840,16 @@ function PcStudentDetailPanel({
   return (
     <aside className="sticky top-4 space-y-3">
       <section className="console-work-panel overflow-hidden">
-        <div className="border-b border-[#0B3E49] bg-[var(--clinic-primary-dark)] px-4 py-3 text-white">
-          <h3 className="text-sm font-bold">학생 처리 패널</h3>
-          <p className="mt-0.5 text-xs text-cyan-50/72">
+        <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
+          <h3 className="text-sm font-semibold text-[var(--clinic-text)]">학생 처리 패널</h3>
+          <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">
             오늘 처리할 출석, 연락, 보강 제외 시간을 확인합니다.
           </p>
         </div>
 
         {row ? (
           <div>
-            <div className="border border-[#d7dbe0] bg-[#f6f7f8] px-4 py-3">
+            <div className="border-b border-[var(--console-line)] bg-[#fffefa] px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-lg font-bold text-[var(--clinic-text)]">
@@ -902,7 +902,7 @@ function PcStudentDetailPanel({
               <button
                 type="button"
                 onClick={() => onNavigate("attendance")}
-                className="min-h-11 border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm font-bold text-[var(--clinic-text)] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]"
+                className="min-h-11 border border-[var(--console-line)] bg-[#fffefa] px-3 text-sm font-semibold text-[var(--clinic-text)] transition hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]"
               >
                 출석부로 이동
               </button>
@@ -972,8 +972,8 @@ function PcStudentDetailPanel({
         )}
       </section>
 
-      <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9]">
-        <div className="border-b border-[#B8C9D0] bg-[#EAF1F3] px-4 py-3">
+      <section className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
+        <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
           <h3 className="text-sm font-bold text-[var(--clinic-text)]">오늘 연락 큐</h3>
           <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">
             미발송 {unsentCount}명 · 발송 완료 {sentCount}명
@@ -2002,9 +2002,9 @@ function HomeActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="group grid min-h-[3.75rem] w-full grid-cols-[2rem_minmax(0,1fr)_1rem] items-center gap-3 border-b border-[#D6E0E5] bg-[#F7FAFA] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:px-4"
+      className="group grid min-h-[3.5rem] w-full grid-cols-[1.4rem_minmax(0,1fr)_1rem] items-center gap-3 border-b border-[var(--console-line)] bg-[#fffefa] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:px-4"
     >
-      <span className="flex size-8 shrink-0 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[var(--clinic-primary)]">
+      <span className="flex size-5 shrink-0 items-center justify-center text-[var(--clinic-muted)]">
         {icon}
       </span>
       <span className="min-w-0 flex-1">
