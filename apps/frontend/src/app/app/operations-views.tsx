@@ -52,7 +52,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
         totalStudents={props.totalStudents}
       />
 
-      <section className="grid min-h-[42rem] min-w-0 overflow-hidden border border-[#B8C9D0] bg-[#F7F6F1] lg:grid-cols-[minmax(0,1fr)_18.5rem] xl:grid-cols-[minmax(0,1fr)_19rem]">
+      <section className="grid min-h-[42rem] min-w-0 overflow-hidden border border-[#D8D6DE] bg-[#F4F4F1] lg:grid-cols-[minmax(0,1fr)_18.5rem] xl:grid-cols-[minmax(0,1fr)_19rem]">
         <div className="flex min-h-0 min-w-0 flex-col">
           <ClassPicker
             classes={props.classes}
@@ -61,7 +61,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
           />
 
           <div className="grid min-h-0 min-w-0 flex-1 lg:grid-cols-[12rem_minmax(0,1fr)] 2xl:grid-cols-[14rem_minmax(0,1fr)]">
-            <div className="min-h-0 min-w-0 border-r border-[#D9DCE8]">
+            <div className="min-h-0 min-w-0 border-r border-[#D8D6DE]">
               <StudentSelectionList
                 selectedClass={props.selectedClass}
                 selectedStudent={props.selectedStudent}
@@ -161,26 +161,23 @@ function OperationsHeader({
   totalStudents: number;
 }) {
   return (
-    <section className="mb-3 border border-[#D8D6DE] bg-[#F7F7F4] px-4 py-3 sm:mb-4">
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+    <section className="mb-3 border border-[#D8D6DE] bg-[#FBFAF7] px-4 py-2.5 sm:mb-4">
+      <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#62656f]">
-            Message Workbench
-          </p>
-          <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
             <h2 className="text-lg font-black leading-tight text-[#17232B]">
               수업 후 연락
             </h2>
-            <span className="border border-[#C9D7DC] bg-[#E7EEF1] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
+            <span className="truncate text-sm font-semibold text-[#62656f]">
               {academyName}
             </span>
           </div>
-          <p className="mt-1 max-w-2xl text-xs leading-5 text-[#60717B]">
-            학생 row를 선택하고 오른쪽 작업 패널에서 기록 저장과 테스트 발송을 분리해 처리합니다.
+          <p className="mt-1 text-xs leading-5 text-[#73777F]">
+            학생 row를 선택한 뒤 기록 저장과 테스트 발송을 단계별로 처리합니다.
           </p>
         </div>
 
-        <dl className="grid min-w-[11rem] divide-y divide-[#C9D7DC] border-y border-[#C9D7DC] text-sm lg:min-w-[13rem]">
+        <dl className="flex flex-wrap items-center gap-3 text-xs font-semibold text-[#62656f]">
           <StatusItem label="반" value={`${classCount}개`} />
           <StatusItem label="학생" value={`${totalStudents}명`} />
         </dl>
@@ -201,7 +198,7 @@ function ClassPicker({
   return (
     <section aria-label="반 선택" className="message-zone-select shrink-0 border-b px-4 py-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.12em] text-[#2F5F7E]">
+        <p className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.1em] text-[#62656f]">
           <UsersRound size={14} aria-hidden="true" />
           반 선택
         </p>
@@ -211,7 +208,7 @@ function ClassPicker({
           </p>
         ) : null}
       </div>
-      <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
+      <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:thin]">
         {classes.map((classItem) => {
           const isSelected = classItem.id === selectedClass?.id;
           return (
@@ -221,17 +218,17 @@ function ClassPicker({
               aria-pressed={isSelected}
               onClick={() => onClassSelect(classItem.id)}
               className={[
-                "min-h-11 w-[13.5rem] shrink-0 border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
+                "min-h-10 w-[13rem] shrink-0 border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#D8DAFA]",
                 isSelected
-                  ? "border-[#C9C7D2] bg-[#F4F4F8] text-[#142A38]"
-                  : "border-[#DEDDE5] bg-[#FFFEFA] text-[#142A38] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
+                  ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B]"
+                  : "border-[#DEDDE5] bg-[#F7F7F4] text-[#30343B] hover:border-[#C9C7D2] hover:bg-[#FFFFFF]",
               ].join(" ")}
             >
               <span className="block truncate text-sm font-bold">{classItem.name}</span>
               <span
                 className={[
                   "mt-0.5 block truncate text-xs",
-                isSelected ? "text-[#2F5F7E]" : "text-[#52697A]",
+                isSelected ? "text-[#4B4F58]" : "text-[#73777F]",
                 ].join(" ")}
               >
                 {classItem.subject ?? "과목 미지정"} · {classItem.students.length}명
@@ -262,10 +259,10 @@ function StudentSelectionList({
       <div className="message-zone-select flex items-end justify-between gap-3 border-b px-4 py-3">
         <div>
           <h2 id="student-flow-title" className="inline-flex items-center gap-2 text-sm font-bold text-[#17232B]">
-            <MessageCircle size={15} className="text-[#2F5F7E]" aria-hidden="true" />
+            <MessageCircle size={15} className="text-[#62656f]" aria-hidden="true" />
             학생 확인 목록
           </h2>
-          <p className="mt-1 text-xs text-[#52697A]">
+          <p className="mt-1 text-xs text-[#73777F]">
             학생을 확인하고 필요한 연락 사유를 바로 선택합니다.
           </p>
         </div>
@@ -363,8 +360,8 @@ function StudentSelectionList({
                             onClick={() => onStudentReasonSelect(student.id, reasonId)}
                             className={[
                               "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
-                              isReasonSelected
-                                ? "border-[#B9B8F0] bg-[#F6F6FF] text-[#34396F]"
+                            isReasonSelected
+                                ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B] shadow-[inset_0_0_0_1px_rgba(23,35,43,0.06)]"
                                 : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
                             ].join(" ")}
                           >
@@ -380,7 +377,7 @@ function StudentSelectionList({
             );
           })
         ) : (
-          <div className="p-5 text-sm text-stone-600">
+          <div className="p-5 text-sm text-[#62656f]">
             이 반에 등록된 학생이 없습니다.
           </div>
         )}
@@ -472,9 +469,9 @@ function MobileSelectionBar({
 
 function StatusItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid min-h-8 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-1.5 py-1">
-      <dt className="truncate text-xs font-semibold text-[#60717B]">{label}</dt>
-      <dd className="shrink-0 text-sm font-black tabular-nums text-[#17232B]">{value}</dd>
+    <div className="inline-flex items-center gap-1.5">
+      <dt className="truncate text-[#858895]">{label}</dt>
+      <dd className="shrink-0 font-black tabular-nums text-[#2f3437]">{value}</dd>
     </div>
   );
 }

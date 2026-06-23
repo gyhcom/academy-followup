@@ -1272,7 +1272,7 @@ function AttendanceViewTabs({
           );
         })}
         {showLedgerNotice ? (
-          <div className="ml-auto hidden min-h-10 shrink-0 items-center border border-dashed border-[#d7dbe0] bg-[#f6f7f8] px-3 text-xs font-semibold text-[#62656f] sm:flex">
+          <div className="ml-auto hidden min-h-10 shrink-0 items-center px-2 text-xs font-semibold text-[#858895] sm:flex">
             학생별 장부는 후속 범위
           </div>
         ) : null}
@@ -1326,63 +1326,56 @@ function AttendanceCalendarView({
 }) {
   return (
     <section className="relative overflow-hidden border border-[var(--clinic-border)] bg-[#f5f4ef]">
-      <div className="border-b border-[var(--console-line)] bg-[#f5f4ef] px-3 py-3 sm:px-4 lg:px-5">
-        <div className="border border-[var(--clinic-border)] bg-[#fffefa] shadow-[var(--console-shadow)]">
-          <div className="flex flex-col gap-3 border-b border-[var(--console-line)] px-3 py-3 lg:flex-row lg:items-center lg:justify-between lg:px-4">
-            <div className="flex min-w-0 items-start gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center border border-[#dadcf1] bg-[#f0f0ff] text-[var(--clinic-primary)]">
-                <CalendarDays size={19} aria-hidden="true" />
+      <div className="border-b border-[var(--console-line)] bg-[#fbfaf7] px-3 py-2.5 sm:px-4 lg:px-5">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
+              <h2 className="text-lg font-extrabold tracking-[-0.02em] text-[#17232B] sm:text-xl">
+                출석부
+              </h2>
+              <span className="text-sm font-bold text-[#4B4F58]">{formatMonthTitle(selectedMonth)}</span>
+              <span className="hidden text-xs font-medium text-[#73777F] sm:inline">
+                날짜 선택 후 수업과 학생 목록을 확인합니다.
               </span>
-              <div className="min-w-0">
-                <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[var(--clinic-primary)]">
-                  Attendance records
-                </p>
-                <h2 className="mt-0.5 text-xl font-extrabold tracking-[-0.02em] text-[#14262D] sm:text-2xl">
-                  {formatMonthTitle(selectedMonth)}
-                </h2>
-                <p className="mt-1 text-sm leading-5 text-[var(--clinic-muted)]">
-                  날짜를 선택하면 해당 날짜의 수업과 학생 목록을 확인할 수 있습니다.
-                </p>
-              </div>
             </div>
-
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <div className="inline-flex min-h-9 items-center gap-2 border border-[var(--clinic-border)] bg-[#f7f6f1] px-3 text-sm text-[var(--clinic-muted)]">
-                <span className="text-xs font-bold text-[#858895]">선택 날짜</span>
-                <b className="font-extrabold text-[#14262D]">{formatDateKoreanShort(selectedDate)}</b>
-              </div>
-              <div className="inline-flex border border-[var(--clinic-border)] bg-[#fffefa] p-0.5">
-                <button
-                  type="button"
-                  onClick={() => onMonthChange(shiftMonth(selectedMonth, -1))}
-                  className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[var(--clinic-muted)] hover:bg-[#f2f1fb] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
-                >
-                  <ChevronLeft size={16} aria-hidden="true" />
-                  이전 달
-                </button>
-                <button
-                  type="button"
-                  onClick={onTodaySelect}
-                  className="inline-flex min-h-8 items-center border border-[#d7dbe0] bg-[#f6f7f8] px-3 text-sm font-bold text-[#2f3437] hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
-                >
-                  오늘
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onMonthChange(shiftMonth(selectedMonth, 1))}
-                  className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[var(--clinic-muted)] hover:bg-[#f2f1fb] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
-                >
-                  다음 달
-                  <ChevronRight size={16} aria-hidden="true" />
-                </button>
-              </div>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-[#62656f]">
+              <CompactScopeLabel label="조회 반" value="전체 반" />
+              <CompactScopeLabel label="담당" value="전체 선생님" />
+              <CompactScopeLabel label="상태" value="전체 상태" />
             </div>
           </div>
 
-          <div className="grid gap-0 divide-y divide-[var(--console-line)] px-3 py-2 sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:px-4">
-            <CompactScopeLabel label="조회 반" value="전체 반" />
-            <CompactScopeLabel label="담당" value="전체 선생님" />
-            <CompactScopeLabel label="상태" value="전체 상태" />
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="inline-flex min-h-9 items-center gap-2 border border-[#D8D6DE] bg-[#F4F4F1] px-3 text-sm text-[#62656f]">
+              <CalendarDays size={15} aria-hidden="true" />
+              <span className="text-xs font-bold text-[#73777F]">선택</span>
+              <b className="font-extrabold text-[#17232B]">{formatDateKoreanShort(selectedDate)}</b>
+            </div>
+            <div className="inline-flex border border-[#D8D6DE] bg-[#FFFEFA] p-0.5">
+              <button
+                type="button"
+                onClick={() => onMonthChange(shiftMonth(selectedMonth, -1))}
+                className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[#62656f] hover:bg-[#F6F6F3] focus:outline-none focus:ring-2 focus:ring-[#d7dbe0]"
+              >
+                <ChevronLeft size={16} aria-hidden="true" />
+                이전 달
+              </button>
+              <button
+                type="button"
+                onClick={onTodaySelect}
+                className="inline-flex min-h-8 items-center border border-[#D8D6DE] bg-[#F4F4F1] px-3 text-sm font-bold text-[#2f3437] hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-[#d7dbe0]"
+              >
+                오늘
+              </button>
+              <button
+                type="button"
+                onClick={() => onMonthChange(shiftMonth(selectedMonth, 1))}
+                className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[#62656f] hover:bg-[#F6F6F3] focus:outline-none focus:ring-2 focus:ring-[#d7dbe0]"
+              >
+                다음 달
+                <ChevronRight size={16} aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1427,9 +1420,9 @@ function AttendanceCalendarView({
 
 function CompactScopeLabel({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex min-h-10 items-center justify-between gap-3 px-0 py-1 text-sm sm:px-3">
-      <span className="font-semibold text-[#78909A]">{label}</span>
-      <span className="font-extrabold text-[#263A45]">{value}</span>
+    <div className="inline-flex items-center gap-1.5">
+      <span className="text-[#858895]">{label}</span>
+      <span className="text-[#2f3437]">{value}</span>
     </div>
   );
 }

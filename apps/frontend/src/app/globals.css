@@ -74,18 +74,18 @@ button:not(:disabled) {
 }
 
 .academy-console .message-workbench {
-  --message-select-surface: #f5f5f8;
+  --message-select-surface: #f4f4f1;
   --message-select-panel: #fffefa;
-  --message-select-line: #dedde5;
-  --message-select-accent: #4f5be7;
-  --message-plan-surface: #f5f3ef;
+  --message-select-line: #d8d6de;
+  --message-select-accent: #62656f;
+  --message-plan-surface: #f7f6f2;
   --message-plan-panel: #fffefa;
   --message-plan-line: #ded8cf;
-  --message-plan-accent: #6a5f4b;
-  --message-compose-surface: #f7f6f2;
+  --message-plan-accent: #62656f;
+  --message-compose-surface: #f4f4f1;
   --message-compose-panel: #fffefa;
-  --message-compose-line: #ded8cf;
-  --message-compose-accent: #4f5be7;
+  --message-compose-line: #d8d6de;
+  --message-compose-accent: #17232b;
   --message-compose-ink: #1f2328;
 }
 
@@ -278,18 +278,18 @@ button:not(:disabled) {
   }
 
   .academy-console .message-workbench {
-    --message-select-surface: #f5f5f8;
+    --message-select-surface: #f4f4f1;
     --message-select-panel: #fffefa;
-    --message-select-line: #dedde5;
-    --message-select-accent: #4f5be7;
-    --message-plan-surface: #f5f3ef;
+    --message-select-line: #d8d6de;
+    --message-select-accent: #62656f;
+    --message-plan-surface: #f7f6f2;
     --message-plan-panel: #fffefa;
     --message-plan-line: #ded8cf;
-    --message-plan-accent: #6a5f4b;
-    --message-compose-surface: #f7f6f2;
+    --message-plan-accent: #62656f;
+    --message-compose-surface: #f4f4f1;
     --message-compose-panel: #fffefa;
-    --message-compose-line: #ded8cf;
-    --message-compose-accent: #4f5be7;
+    --message-compose-line: #d8d6de;
+    --message-compose-accent: #17232b;
     --message-compose-ink: #1f2328;
   }
 

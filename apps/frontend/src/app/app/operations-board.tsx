@@ -1435,14 +1435,14 @@ function MessageComposer({
         className,
       ].join(" ")}
     >
-      <div className="border-b border-[#DED8CF] bg-[#F7F6F2] px-4 py-4">
+      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3">
         <div className="flex items-center gap-2">
           <MessageSquareText className="text-[#62656f]" size={18} aria-hidden="true" />
           <h2 id={`${composerId}-title`} className="text-base font-bold text-[#1F2328]">
             문자 초안
           </h2>
           {isPreviewReady ? (
-            <span className="ml-auto border border-[#d7dbe0] bg-[#f6f7f8] px-2 py-0.5 text-xs font-bold text-[#62656f]">
+            <span className="ml-auto border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-0.5 text-xs font-bold text-[#62656f]">
               수정 가능
             </span>
           ) : null}
@@ -1452,13 +1452,13 @@ function MessageComposer({
               aria-label="문자 작성 닫기"
               title="닫기"
               onClick={onClose}
-              className="ml-1 flex size-8 shrink-0 items-center justify-center border border-[#d7dbe0] bg-[#f6f7f8] text-[#62656f]"
+              className="ml-1 flex size-8 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-[#62656f]"
             >
               <X size={16} aria-hidden="true" />
             </button>
           ) : null}
         </div>
-        <p className="mt-1 text-xs text-[#5F6368]">
+        <p className="mt-1 text-xs text-[#62656f]">
           {selectedStudent
             ? `현재 선택: ${selectedStudent.name} · ${followupReasons.find((reason) => reason.id === selectedReason)?.label ?? selectedReason}`
             : "학생을 선택하면 문자 초안이 표시됩니다."}
@@ -1468,7 +1468,7 @@ function MessageComposer({
       <div className="space-y-3 p-3">
         {selectedStudent ? (
           <div className="message-zone-compose-panel overflow-hidden border">
-            <div className="border-b border-[#DEDEE4] bg-[#F7F7FA] px-4 py-3">
+            <div className="border-b border-[#DEDEE4] bg-[#FBFAF7] px-4 py-3">
               <p className="text-xs font-bold text-[#6A6F7D]">선택 학생</p>
               <p className="mt-1 truncate text-lg font-bold tracking-[-0.01em] text-[#17232B]">
                 {selectedStudent.name}
@@ -1513,7 +1513,7 @@ function MessageComposer({
                   className={[
                     "min-h-10 border px-3 text-left text-sm font-bold transition",
                     isSelected
-                      ? "border-[#B9B8F0] bg-[#F6F6FF] text-[#34396F]"
+                      ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B] shadow-[inset_0_0_0_1px_rgba(23,35,43,0.06)]"
                       : "border-[#DEDEE4] bg-[#FFFEFA] text-[#3F434A] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
                   ].join(" ")}
                 >
@@ -1543,7 +1543,7 @@ function MessageComposer({
                   className={[
                     "min-h-10 border px-2 text-xs font-bold transition",
                     isSelected
-                      ? "border-[#B9B8F0] bg-[#F6F6FF] text-[#34396F]"
+                      ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B] shadow-[inset_0_0_0_1px_rgba(23,35,43,0.06)]"
                       : "border-[#DEDEE4] bg-[#FFFEFA] text-[#3F434A] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
@@ -1572,7 +1572,7 @@ function MessageComposer({
               title="원문으로 되돌리기"
               disabled={!isDraftEdited}
               onClick={onRestorePreview}
-              className="flex size-8 shrink-0 items-center justify-center border border-[#DED8CF] bg-[#FFFEFA] text-[#5F6368] transition hover:border-[#C9CDF5] hover:bg-[#F7F7FF] disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex size-8 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#FFFEFA] text-[#5F6368] transition hover:border-[#BFC2C8] hover:bg-[#F7F7FA] disabled:cursor-not-allowed disabled:opacity-40"
             >
               <RotateCcw size={15} aria-hidden="true" />
             </button>
@@ -1671,7 +1671,7 @@ function MessageComposer({
           </div>
         ) : null}
 
-        <div className="border border-[#DED8CF] bg-[#F7F6F2] p-3">
+        <div className="border border-[#D8D6DE] bg-[#FBFAF7] p-3">
           <div className="mb-2 flex items-center justify-between gap-2">
             <p className="text-xs font-black uppercase tracking-[0.12em] text-[#62656f]">
               실행 단계
