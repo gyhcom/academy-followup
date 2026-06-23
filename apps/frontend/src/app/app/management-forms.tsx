@@ -364,6 +364,10 @@ export function StudentForm({
             <option value="paused">휴원</option>
             <option value="left">퇴원</option>
           </select>
+          <span className="text-xs leading-5 text-[#5C717A]">
+            학생 삭제는 제공하지 않습니다. 운영 기록 보존을 위해 다니지 않는 학생은 `퇴원`
+            상태로 관리합니다.
+          </span>
         </label>
 
         <label className="grid min-w-0 gap-1.5 text-sm font-medium text-[var(--clinic-text)]">
