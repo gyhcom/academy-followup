@@ -21,8 +21,8 @@
   --clinic-danger: #b92b2b;
   --clinic-success: #147154;
   --clinic-violet: #6458b7;
-  --console-radius: 8px;
-  --console-shadow: 0 1px 2px rgba(25, 27, 34, 0.05);
+  --console-radius: 4px;
+  --console-shadow: none;
   --console-row: #fffefa;
   --console-row-hover: #f7f7f5;
   --console-row-selected: #f1f2f2;
@@ -131,7 +131,7 @@ button:not(:disabled) {
   }
 
   .academy-console :where([class*="shadow"]) {
-    box-shadow: none !important;
+    box-shadow: var(--console-shadow) !important;
   }
 
   .academy-console :where([class*="rounded-full"]) {
@@ -140,6 +140,16 @@ button:not(:disabled) {
 
   .academy-console .bg-white {
     background-color: #fffefa !important;
+  }
+
+  .academy-console :where(button, a, input, select, textarea) {
+    transition-property: color, background-color, border-color, opacity;
+    transition-duration: 120ms;
+    transition-timing-function: ease-out;
+  }
+
+  .academy-console :where(button:hover:not(:disabled), a:hover) {
+    box-shadow: none !important;
   }
 
   .academy-console :where(
