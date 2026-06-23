@@ -334,7 +334,7 @@ function StudentSelectionList({
                   ) : null}
                 </div>
 
-                <div className="mt-2 flex flex-wrap gap-1.5">
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => onStudentSelect(student.id)}
@@ -348,29 +348,33 @@ function StudentSelectionList({
                     문자 작성
                     <ArrowRight size={13} aria-hidden="true" />
                   </button>
-                  <span className="inline-flex min-h-8 shrink-0 items-center px-1 text-[11px] font-bold text-[#78909A]">
-                    사유:
-                  </span>
-                  {quickReasonIds.map((reasonId) => {
-                    const isReasonSelected = isSelected && selectedReason === reasonId;
-                    return (
-                      <button
-                        key={reasonId}
-                        type="button"
-                        aria-pressed={isReasonSelected}
-                        onClick={() => onStudentReasonSelect(student.id, reasonId)}
-                        className={[
-                          "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
-                          isReasonSelected
-                            ? "border-[#B9B8F0] bg-[#F6F6FF] text-[#34396F]"
-                            : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
-                        ].join(" ")}
-                      >
-                        {isReasonSelected ? "선택됨 · " : ""}
-                        {reasonLabel(reasonId)}
-                      </button>
-                    );
-                  })}
+                  {isSelected ? (
+                    <>
+                      <span className="inline-flex min-h-8 shrink-0 items-center px-1 text-[11px] font-bold text-[#78909A]">
+                        사유:
+                      </span>
+                      {quickReasonIds.map((reasonId) => {
+                        const isReasonSelected = selectedReason === reasonId;
+                        return (
+                          <button
+                            key={reasonId}
+                            type="button"
+                            aria-pressed={isReasonSelected}
+                            onClick={() => onStudentReasonSelect(student.id, reasonId)}
+                            className={[
+                              "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                              isReasonSelected
+                                ? "border-[#B9B8F0] bg-[#F6F6FF] text-[#34396F]"
+                                : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
+                            ].join(" ")}
+                          >
+                            {isReasonSelected ? "선택됨 · " : ""}
+                            {reasonLabel(reasonId)}
+                          </button>
+                        );
+                      })}
+                    </>
+                  ) : null}
                 </div>
               </article>
             );

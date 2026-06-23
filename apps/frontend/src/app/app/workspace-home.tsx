@@ -967,7 +967,7 @@ function PcStudentDetailPanel({
           </div>
         ) : (
           <div className="px-4 py-8 text-center text-sm text-stone-500">
-            왼쪽 학생 보드에서 학생을 선택해 주세요.
+            가운데 학생 목록에서 학생을 선택해 주세요.
           </div>
         )}
       </section>

@@ -1546,9 +1546,7 @@ function AttendanceCalendarDayCell({
   ].filter((row): row is NonNullable<typeof row> => row !== undefined);
   const displayedStatusRows = visibleStatusRows.slice(0, 3);
   const hiddenStatusCount = visibleStatusRows.length - displayedStatusRows.length;
-  const statusLabel = !hasClass
-    ? "수업 없음"
-    : attentionCount > 0
+  const statusLabel = attentionCount > 0
       ? "연락"
       : hasUnchecked
         ? "미체크"
@@ -1585,7 +1583,7 @@ function AttendanceCalendarDayCell({
           <Check size={13} strokeWidth={3} aria-hidden="true" />
         </span>
       ) : null}
-      {!isSelected ? (
+      {!isSelected && hasClass ? (
         <span
           className={[
             "absolute right-2 top-2 max-w-[4.85rem] truncate rounded-sm border px-1.5 py-0.5 text-[10px] font-bold",
@@ -1636,7 +1634,7 @@ function AttendanceCalendarDayCell({
               <b className="font-extrabold tabular-nums text-[#17232B]">{summary.totalStudents}</b>명
             </span>
           ) : (
-            <span className="block truncate">등록 수업 없음</span>
+            <span className="block truncate">수업 없음</span>
           )}
         </div>
         <div className="grid min-w-0 grid-cols-1 gap-y-0.5 text-[11px] leading-4">
