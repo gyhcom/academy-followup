@@ -99,9 +99,9 @@ export function MakeupCalendarPanel({
       aria-labelledby="makeup-calendar-title"
       className="message-zone-plan overflow-hidden border"
     >
-      <div className="border-b border-[#B8BFD3] bg-[#E4E7F0] px-4 py-3">
+      <div className="border-b border-[#d7dbe0] bg-[#E4E7F0] px-4 py-3">
         <div className="flex items-center gap-2">
-          <CalendarDays className="text-[#485A83]" size={18} />
+          <CalendarDays className="text-[#62656f]" size={18} />
           <h2 id="makeup-calendar-title" className="text-sm font-semibold text-stone-950">
             보강 달력
           </h2>
@@ -121,7 +121,7 @@ export function MakeupCalendarPanel({
                   aria-label="이전 달"
                   title="이전 달"
                   onClick={() => moveMonth(-1)}
-                  className="flex size-8 shrink-0 items-center justify-center border border-[#B8BFD3] bg-[#FCFCFE] text-[#4E5872] transition hover:border-[#485A83] hover:text-[#334163]"
+                  className="flex size-8 shrink-0 items-center justify-center border border-[#d7dbe0] bg-[#FCFCFE] text-[#62656f] transition hover:border-[#aeb5bf] hover:text-[#2f3437]"
                 >
                   <ChevronLeft size={16} />
                 </button>
@@ -133,7 +133,7 @@ export function MakeupCalendarPanel({
                   aria-label="다음 달"
                   title="다음 달"
                   onClick={() => moveMonth(1)}
-                  className="flex size-8 shrink-0 items-center justify-center border border-[#B8BFD3] bg-[#FCFCFE] text-[#4E5872] transition hover:border-[#485A83] hover:text-[#334163]"
+                  className="flex size-8 shrink-0 items-center justify-center border border-[#d7dbe0] bg-[#FCFCFE] text-[#62656f] transition hover:border-[#aeb5bf] hover:text-[#2f3437]"
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -159,9 +159,9 @@ export function MakeupCalendarPanel({
                       className={[
                         "relative flex aspect-square min-h-0 items-center justify-center rounded-sm border px-1 text-center transition focus:outline-none focus:ring-2 focus:ring-[#B8D5E8]",
                         isActive
-                            ? "border-[#485A83] bg-[#485A83] text-white shadow-sm"
+                            ? "border-[#2f3437] bg-[#2f3437] text-white"
                           : day.isCurrentMonth
-                            ? "border-[#C9CEDD] bg-[#FCFCFE] text-stone-900 hover:border-[#485A83] hover:bg-[#EEF1F8]"
+                            ? "border-[#d7dbe0] bg-[#FCFCFE] text-stone-900 hover:border-[#aeb5bf] hover:bg-[#f6f7f8]"
                             : "border-[#DDE1EA] bg-[#EAEDF4] text-stone-400",
                       ].join(" ")}
                     >
@@ -178,7 +178,7 @@ export function MakeupCalendarPanel({
                                 ? "bg-amber-400"
                                 : isActive
                                   ? "bg-white"
-                                  : "bg-[#485A83]",
+                                  : "bg-[#2f3437]",
                             ].join(" ")}
                           />
                         ) : null}
@@ -208,7 +208,7 @@ export function MakeupCalendarPanel({
                 sharedError={sharedSchedules.error}
               />
             ) : (
-              <div className="border border-dashed border-[#B8BFD3] bg-[#F8F8FC] p-3 text-sm leading-6 text-[#5A637D]">
+              <div className="border border-dashed border-[#d7dbe0] bg-[#F8F8FC] p-3 text-sm leading-6 text-[#5A637D]">
                 학생을 선택하면 날짜별 스케줄이 표시됩니다.
               </div>
             )}
@@ -225,7 +225,7 @@ export function MakeupCalendarPanel({
                     type="time"
                     value={startTime}
                     onChange={(event) => setStartTime(event.target.value)}
-                    className="min-h-11 border border-[#B8BFD3] bg-[#FCFCFE] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#485A83] focus:ring-2 focus:ring-[#DDE3F5]"
+                    className="min-h-11 border border-[#d7dbe0] bg-[#FCFCFE] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#aeb5bf] focus:ring-2 focus:ring-[#e1e4e8]"
                   />
                 </label>
                 <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
@@ -234,7 +234,7 @@ export function MakeupCalendarPanel({
                     type="time"
                     value={endTime}
                     onChange={(event) => setEndTime(event.target.value)}
-                    className="min-h-11 border border-[#B8BFD3] bg-[#FCFCFE] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#485A83] focus:ring-2 focus:ring-[#DDE3F5]"
+                    className="min-h-11 border border-[#d7dbe0] bg-[#FCFCFE] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#aeb5bf] focus:ring-2 focus:ring-[#e1e4e8]"
                   />
                 </label>
               </div>
@@ -254,8 +254,8 @@ export function MakeupCalendarPanel({
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition",
             selectedStudent && isTimeRangeValid && !hasConflicts
               ? isSelected
-                ? "bg-[#334163] text-white"
-                : "bg-[#485A83] text-white hover:bg-[#334163]"
+                ? "bg-[#2f3437] text-white"
+                : "bg-[#2f3437] text-white hover:bg-[#17191f]"
               : "bg-[#D8DDE8] text-[#6B7280]",
           ].join(" ")}
         >

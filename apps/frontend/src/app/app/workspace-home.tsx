@@ -247,7 +247,7 @@ export function WorkspaceHome({
       <section className="hidden border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:block sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-5 sm:shadow-sm xl:hidden">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-[#315C7C]">{academyName}</p>
+            <p className="text-sm font-semibold text-[#494d5a]">{academyName}</p>
             <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
               {copy.title}
             </h2>
@@ -301,7 +301,7 @@ export function WorkspaceHome({
       <section className="hidden overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm sm:block xl:hidden">
         <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-[#315C7C]">
+            <p className="text-sm font-semibold text-[#494d5a]">
               {isToday ? "오늘 요약" : "선택 날짜 요약"}
             </p>
             {loadState.status === "loading" ? (
@@ -1329,12 +1329,12 @@ function HomeDateControl({
           <ChevronLeft size={18} />
         </button>
 
-        <label className="relative flex min-h-11 w-full cursor-pointer items-center gap-2 overflow-hidden rounded-md border border-[#C9D6E2] bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-[#315C7C] hover:bg-[#EAF1F8] focus-within:border-[#315C7C] focus-within:ring-2 focus-within:ring-[#C9D6E2]">
-          <CalendarDays size={17} className="shrink-0 text-[#315C7C]" />
+        <label className="relative flex min-h-11 w-full cursor-pointer items-center gap-2 overflow-hidden rounded-md border border-[#C9D6E2] bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-[#494d5a] hover:bg-[#f6f7f8] focus-within:border-[#494d5a] focus-within:ring-2 focus-within:ring-[#C9D6E2]">
+          <CalendarDays size={17} className="shrink-0 text-[#494d5a]" />
           <span className="min-w-0 flex-1 truncate tabular-nums">
             {formatHomeDate(value)}
           </span>
-          <span className="shrink-0 text-xs font-semibold text-[#315C7C]">
+          <span className="shrink-0 text-xs font-semibold text-[#494d5a]">
             달력 선택
           </span>
           <input
@@ -1471,7 +1471,7 @@ function TodayScheduleSection({
       <div className="border-b border-[#D6E0E5] bg-[#E7EEF1] px-4 py-3.5 sm:px-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#315C7C]">
+            <p className="text-xs font-bold uppercase tracking-wide text-[#494d5a]">
               오늘 일정
             </p>
             <h3 className="mt-1 text-lg font-black leading-tight text-[var(--clinic-text)] sm:text-xl">
@@ -1969,7 +1969,7 @@ function HomeEmptyState({
             <button
               type="button"
               onClick={() => onDateChange(shiftDate(getTodayDate(), -1))}
-              className="min-h-10 rounded-md border border-[#C9D6E2] bg-white px-4 text-sm font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8]"
+              className="min-h-10 rounded-md border border-[#C9D6E2] bg-white px-4 text-sm font-semibold text-[#494d5a] transition hover:bg-[#f6f7f8]"
             >
               어제 기록 보기
             </button>
@@ -2035,7 +2035,7 @@ function SummaryButton({
   const valueClass = {
     default: "text-stone-950",
     danger: "text-red-700",
-    success: "text-[#315C7C]",
+    success: "text-[#494d5a]",
   }[tone];
 
   return (
@@ -2046,13 +2046,13 @@ function SummaryButton({
       className={[
         "rounded-lg border px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
         isActive
-          ? "border-[#315C7C] bg-[#EAF1F8]"
-          : "border-stone-300 bg-white hover:border-[#315C7C] hover:bg-[#F8FAFC]",
+          ? "border-[#494d5a] bg-[#f6f7f8]"
+          : "border-stone-300 bg-white hover:border-[#494d5a] hover:bg-[#F8FAFC]",
       ].join(" ")}
     >
       <span className="block text-xs font-medium text-stone-500">{label}</span>
       <span className={`mt-1 block text-xl font-semibold ${valueClass}`}>{value}</span>
-      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#315C7C]">
+      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#494d5a]">
         목록 보기
         <ArrowRight size={13} />
       </span>
@@ -2091,7 +2091,7 @@ function HomeFollowupRow({
           <span
             className={[
               "rounded-md px-2 py-1 text-xs font-semibold",
-              isSent ? "bg-[#EAF1F8] text-[#244B67]" : "bg-amber-50 text-amber-800",
+              isSent ? "bg-[#f6f7f8] text-[#2f3437]" : "bg-amber-50 text-amber-800",
             ].join(" ")}
           >
             {isSent ? "연락 완료" : item.followupStatus === "draft" ? "기록 저장" : "연락 필요"}
@@ -2115,7 +2115,7 @@ function HomeFollowupRow({
               reason: followupReasonForStatus(item.status),
             })
           }
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#315C7C] transition hover:bg-[#EAF1F8] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#494d5a] transition hover:bg-[#f6f7f8] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
         >
           문자 작성
           <ArrowRight size={13} />
@@ -2408,7 +2408,7 @@ function getBlockedScheduleBadgeTone(item: HomeScheduleItem) {
   const category = getBlockedScheduleCategory(item);
 
   if (category === "shared") {
-    return "bg-[#EAF1F8] text-[#315C7C]";
+    return "bg-[#f6f7f8] text-[#494d5a]";
   }
 
   if (category === "manual") {
@@ -2522,7 +2522,7 @@ function scheduleTypeLabel(scheduleType: string) {
 function scheduleTypeTone(scheduleType: string) {
   const tones: Record<string, string> = {
     regular_class: "bg-blue-50 text-blue-800",
-    makeup: "bg-[#EAF1F8] text-[#244B67]",
+    makeup: "bg-[#f6f7f8] text-[#2f3437]",
     external: "bg-stone-100 text-stone-700",
     manual_external_class: "bg-amber-50 text-amber-800",
     consultation: "bg-violet-50 text-violet-800",

@@ -61,14 +61,14 @@ export function WeeklySchedulePanel({
       aria-labelledby="weekly-schedule-title"
       className="message-zone-plan overflow-hidden border"
     >
-      <div className="border-b border-[#B8BFD3] bg-[#E4E7F0] px-4 py-3">
+      <div className="border-b border-[#d7dbe0] bg-[#E4E7F0] px-4 py-3">
         <div className="flex items-center gap-2">
-          <CalendarDays className="text-[#485A83]" size={18} />
+          <CalendarDays className="text-[#62656f]" size={18} />
           <h2 id="weekly-schedule-title" className="text-sm font-semibold text-stone-950">
             주간 스케줄
           </h2>
           {activeSchedules.length > 0 ? (
-            <span className="ml-auto border border-[#B8BFD3] bg-[#F8F8FC] px-2 py-0.5 text-xs font-bold text-[#5A637D]">
+            <span className="ml-auto border border-[#d7dbe0] bg-[#F8F8FC] px-2 py-0.5 text-xs font-bold text-[#5A637D]">
               {activeSchedules.length}개
             </span>
           ) : null}
@@ -82,7 +82,7 @@ export function WeeklySchedulePanel({
 
       <div>
         {selectedStudent ? (
-          <div className="border-l-4 border-l-[#485A83] bg-[#F8F8FC] px-4 py-3">
+          <div className="border border-[#d7dbe0] bg-[#f6f7f8] px-4 py-3">
             <p className="text-xs font-bold text-[#5A637D]">
               {selectedClassName ?? "반 미지정"}
             </p>
@@ -135,9 +135,9 @@ function ScheduleRow({
   onMakeupCandidateSelect: (schedule: OperationsStudentSchedule) => void;
 }) {
   return (
-    <div className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-3 bg-[#F8F8FC] px-4 py-2.5 hover:bg-[#EEF1F8]">
+    <div className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-3 bg-[#F8F8FC] px-4 py-2.5 hover:bg-[#f6f7f8]">
       <div className="flex items-center gap-2">
-        <span className="flex size-8 items-center justify-center border border-[#B8BFD3] bg-[#EAEDF4] text-xs font-black text-[#485A83]">
+        <span className="flex size-8 items-center justify-center border border-[#d7dbe0] bg-[#EAEDF4] text-xs font-black text-[#62656f]">
           {weekDayShortLabel(schedule.dayOfWeek)}
         </span>
       </div>

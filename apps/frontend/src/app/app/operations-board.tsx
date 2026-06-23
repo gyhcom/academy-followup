@@ -1093,7 +1093,7 @@ function MessageModeTabs({
             ].join(" ")}
           >
             <span className="block text-sm font-bold">{item.label}</span>
-            <span className={["mt-0.5 block text-xs", isActive ? "text-[#4F5BE7]" : "text-[#6F737C]"].join(" ")}>
+            <span className={["mt-0.5 block text-xs", isActive ? "text-[#2f3437]" : "text-[#6F737C]"].join(" ")}>
               {item.detail}
             </span>
           </button>
@@ -1153,7 +1153,7 @@ function BulkMessagePanel({
   return (
     <section className="border border-[#B8C9D0] bg-[#F4F8F9]">
       <div className="border-b border-stone-200 px-4 py-4">
-        <p className="text-sm font-semibold text-[#315C7C]">전체문자</p>
+        <p className="text-sm font-semibold text-[#62656f]">전체문자</p>
         <h2 className="mt-1 text-xl font-semibold text-stone-950">
           여러 반에 같은 안내를 한 번에 보냅니다
         </h2>
@@ -1252,7 +1252,7 @@ function BulkMessagePanel({
               type="checkbox"
               checked={excludeDuplicates}
               onChange={(event) => onExcludeDuplicatesChange(event.target.checked)}
-              className="mt-1 size-4 accent-[#315C7C]"
+              className="mt-1 size-4 accent-[#2f3437]"
             />
             <span>
               <span className="block font-semibold">중복 수신자 제외</span>
@@ -1335,7 +1335,7 @@ function BulkMessagePanel({
             className={[
               "flex min-h-12 w-full items-center justify-center gap-2 px-4 text-sm font-bold transition",
               canSend
-                ? "bg-[#315C7C] text-white hover:bg-[#244B67]"
+                ? "bg-[#2f3437] text-white hover:bg-[#17191f]"
                 : "bg-stone-300 text-stone-600",
             ].join(" ")}
           >
@@ -1437,12 +1437,12 @@ function MessageComposer({
     >
       <div className="border-b border-[#DED8CF] bg-[#F7F6F2] px-4 py-4">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[#4F5BE7]" size={18} aria-hidden="true" />
+          <MessageSquareText className="text-[#62656f]" size={18} aria-hidden="true" />
           <h2 id={`${composerId}-title`} className="text-base font-bold text-[#1F2328]">
             문자 초안
           </h2>
           {isPreviewReady ? (
-            <span className="ml-auto border border-[#D7DAF8] bg-[#F1F2FF] px-2 py-0.5 text-xs font-bold text-[#4F5BE7]">
+            <span className="ml-auto border border-[#d7dbe0] bg-[#f6f7f8] px-2 py-0.5 text-xs font-bold text-[#62656f]">
               수정 가능
             </span>
           ) : null}
@@ -1452,7 +1452,7 @@ function MessageComposer({
               aria-label="문자 작성 닫기"
               title="닫기"
               onClick={onClose}
-              className="ml-1 flex size-8 shrink-0 items-center justify-center border border-[#D7DAF8] bg-[#F1F2FF] text-[#4F5BE7]"
+              className="ml-1 flex size-8 shrink-0 items-center justify-center border border-[#d7dbe0] bg-[#f6f7f8] text-[#62656f]"
             >
               <X size={16} aria-hidden="true" />
             </button>
@@ -1589,7 +1589,7 @@ function MessageComposer({
                 : "학생과 사유를 선택하면 문자 초안이 표시됩니다."
             }
             rows={8}
-            className="mt-2 h-40 w-full resize-none border border-[#D6D0C6] bg-[#FFFEFA] px-3 py-3 text-sm leading-6 text-[#1F2328] outline-none transition disabled:bg-[#F0EEE8] disabled:text-[#8A8780] focus:border-[#4F5BE7] focus:ring-2 focus:ring-[#E5E7FF] sm:h-44"
+            className="mt-2 h-40 w-full resize-none border border-[#D6D0C6] bg-[#FFFEFA] px-3 py-3 text-sm leading-6 text-[#1F2328] outline-none transition disabled:bg-[#F0EEE8] disabled:text-[#8A8780] focus:border-[#aeb5bf] focus:ring-2 focus:ring-[#e1e4e8] sm:h-44"
           />
           <p
             className={[
@@ -1623,7 +1623,7 @@ function MessageComposer({
         >
           <div className="flex items-start gap-2">
             {isPreviewReady && !isPreviewError ? (
-              <CheckCircle2 className="mt-0.5 shrink-0 text-[#4F5BE7]" size={17} aria-hidden="true" />
+              <CheckCircle2 className="mt-0.5 shrink-0 text-[#62656f]" size={17} aria-hidden="true" />
             ) : (
               <AlertCircle className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
             )}
@@ -1673,7 +1673,7 @@ function MessageComposer({
 
         <div className="border border-[#DED8CF] bg-[#F7F6F2] p-3">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <p className="text-xs font-black uppercase tracking-[0.12em] text-[#4F5BE7]">
+            <p className="text-xs font-black uppercase tracking-[0.12em] text-[#62656f]">
               실행 단계
             </p>
             <span className="text-[11px] font-bold text-[#5F6368]">
@@ -1687,7 +1687,7 @@ function MessageComposer({
             className={[
               "flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border px-4 text-sm font-bold transition",
               canSaveFollowup
-                ? "border-[#4F5BE7] bg-[#4F5BE7] text-white hover:bg-[#3E49C5]"
+                ? "border-[#c9cdd2] bg-[#fffefa] text-[#2f3437] hover:border-[#aeb5bf] hover:bg-[#f6f7f8]"
                 : "border-[#DED8CF] bg-[#E9E7E1] text-[#8A8780]",
             ].join(" ")}
           >
@@ -1785,7 +1785,7 @@ function MessageComposer({
                     canRegisterMakeupSchedule &&
                     makeupScheduleSave.status !== "saving" &&
                     makeupScheduleSave.status !== "saved"
-                      ? "bg-[#485A83] text-white hover:bg-[#334163]"
+                      ? "bg-[#2f3437] text-white hover:bg-[#17191f]"
                       : "bg-[#E9E7E1] text-[#8A8780]",
                   ].join(" ")}
                 >
@@ -1833,7 +1833,7 @@ function ComposerSummaryRow({
       <span
         className={[
           "truncate text-sm font-semibold",
-          tone === "blue" ? "text-[#485A83]" : "text-[#1F2328]",
+          tone === "blue" ? "text-[#62656f]" : "text-[#1F2328]",
         ].join(" ")}
       >
         {value}

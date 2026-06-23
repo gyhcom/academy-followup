@@ -9,14 +9,14 @@
   --clinic-panel-strong: #e7e6de;
   --clinic-border: #d8d6cb;
   --clinic-border-strong: #b8b5a8;
-  --clinic-primary: #3f46c8;
-  --clinic-primary-dark: #202468;
+  --clinic-primary: #2f3437;
+  --clinic-primary-dark: #17191f;
   --clinic-navy: #1b1d2a;
   --clinic-navy-2: #292d45;
-  --clinic-accent: #4f5be7;
+  --clinic-accent: #8f959e;
   --clinic-text: #17191f;
   --clinic-muted: #62656f;
-  --clinic-rail: #4f5be7;
+  --clinic-rail: #8f959e;
   --clinic-warning: #9a5b05;
   --clinic-danger: #b92b2b;
   --clinic-success: #147154;
@@ -24,8 +24,8 @@
   --console-radius: 8px;
   --console-shadow: 0 1px 2px rgba(25, 27, 34, 0.05);
   --console-row: #fffefa;
-  --console-row-hover: #f3f2ff;
-  --console-row-selected: #ececff;
+  --console-row-hover: #f7f7f5;
+  --console-row-selected: #f1f2f2;
   --console-line: #e4e1d7;
   --console-line-strong: #c8c4b7;
   --console-ink-soft: #494d5a;
@@ -38,12 +38,12 @@
   --console-status-success-bg: #e9f7ef;
   --console-status-success-border: #8bd4b7;
   --console-status-success-text: #106c50;
-  --console-status-info-bg: #eef0ff;
-  --console-status-info-border: #a9b0f5;
-  --console-status-info-text: #343da5;
-  --console-status-violet-bg: #f0edff;
-  --console-status-violet-border: #b9aff1;
-  --console-status-violet-text: #5948a4;
+  --console-status-info-bg: #f1f4f6;
+  --console-status-info-border: #c9d1d7;
+  --console-status-info-text: #40515d;
+  --console-status-violet-bg: #f4f3f1;
+  --console-status-violet-border: #d2cec7;
+  --console-status-violet-text: #5c574f;
 }
 
 @theme inline {
@@ -236,7 +236,7 @@ button:not(:disabled) {
 
   .academy-console .console-row-selected {
     background: var(--console-row-selected);
-    box-shadow: inset 3px 0 0 var(--clinic-primary);
+    box-shadow: none;
   }
 
   .academy-console .console-work-panel {
@@ -246,7 +246,7 @@ button:not(:disabled) {
   }
 
   .academy-console .console-section-rail {
-    border-left: 4px solid var(--clinic-primary);
+    border-left: 1px solid var(--clinic-border);
   }
 
   .academy-console .console-lozenge {

@@ -135,7 +135,7 @@ export function StudentBulkImportForm({
               onChange={(event) => setCsvText(event.target.value)}
               rows={12}
               spellCheck={false}
-              className="min-h-72 w-full min-w-0 resize-y rounded-md border border-[#D8D0C4] bg-white px-3 py-2 font-mono text-xs leading-5 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-72 w-full min-w-0 resize-y rounded-md border border-[#D8D0C4] bg-white px-3 py-2 font-mono text-xs leading-5 outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
         </div>
@@ -180,7 +180,7 @@ export function StudentBulkImportForm({
           className={[
             "mt-3 rounded-md border px-3 py-2 text-sm",
             status.status === "saved"
-              ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+              ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
               : "border-red-200 bg-red-50 text-red-900",
           ].join(" ")}
         >
@@ -202,7 +202,7 @@ export function StudentBulkImportForm({
           onClick={() => onSubmit(validRows)}
           className={[
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
-            canSubmit ? "bg-[#315C7C] text-white hover:bg-[#244B67]" : "bg-stone-300 text-stone-600",
+            canSubmit ? "bg-[#494d5a] text-white hover:bg-[#2f3437]" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >
           <Save size={16} />
@@ -223,7 +223,7 @@ function ImportStat({
   tone?: "default" | "good" | "bad";
 }) {
   const valueClass =
-    tone === "good" ? "text-[#315C7C]" : tone === "bad" ? "text-red-700" : "text-stone-950";
+    tone === "good" ? "text-[#494d5a]" : tone === "bad" ? "text-red-700" : "text-stone-950";
 
   return (
     <div className="min-w-0 px-3 py-3">
@@ -247,7 +247,7 @@ function ImportPreviewRow({ row }: { row: StudentImportValidatedRow }) {
           <span
             className={[
               "rounded px-1.5 py-0.5 text-[11px] font-semibold",
-              isValid ? "bg-[#EAF1F8] text-[#244B67]" : "bg-red-50 text-red-800",
+              isValid ? "bg-[#f6f7f8] text-[#2f3437]" : "bg-red-50 text-red-800",
             ].join(" ")}
           >
             {isValid ? "등록 가능" : "확인 필요"}
@@ -269,7 +269,7 @@ function ImportPreviewRow({ row }: { row: StudentImportValidatedRow }) {
       </div>
       <div className="text-left text-xs font-medium text-stone-500 sm:text-right">
         <p>{row.status === "active" ? "재원" : row.status === "paused" ? "휴원" : "퇴원"}</p>
-        <p className={row.scheduleShareConsentConfirmed ? "text-[#315C7C]" : "text-stone-400"}>
+        <p className={row.scheduleShareConsentConfirmed ? "text-[#494d5a]" : "text-stone-400"}>
           {row.scheduleShareConsentConfirmed ? "공유 동의" : "공유 미동의"}
         </p>
       </div>

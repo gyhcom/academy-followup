@@ -825,7 +825,7 @@ export function BulkScheduleForm({
                     "min-h-9 rounded-sm border px-3 text-xs font-semibold transition",
                     isSelected
                       ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
-                      : "border-[#B8C9D0] bg-[#F7FAFA] text-[#244B67]",
+                      : "border-[#B8C9D0] bg-[#F7FAFA] text-[#2f3437]",
                   ].join(" ")}
                 >
                   {group.label}

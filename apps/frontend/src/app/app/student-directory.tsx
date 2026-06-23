@@ -664,14 +664,14 @@ function StudentDetailPanel({
   return (
     <aside className="bg-[#F4F8F9] lg:sticky lg:top-4">
       <section className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
-        <div className="border-b border-[#0B3E49] bg-[var(--clinic-primary-dark)] px-4 py-3 text-white">
+        <div className="border-b border-[#d7dbe0] bg-[#fafafa] px-4 py-3 text-[#2f3437]">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-cyan-100/70">
+              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#858895]">
                 Student File
               </p>
-              <h3 className="mt-1 truncate text-lg font-black text-white">{student.name}</h3>
-              <p className="mt-1 truncate text-xs font-medium text-cyan-50/72">
+              <h3 className="mt-1 truncate text-lg font-black text-[#17191f]">{student.name}</h3>
+              <p className="mt-1 truncate text-xs font-medium text-[#62656f]">
                 {student.className ?? "미배정"} · {student.gradeLabel ?? "학년 미지정"} · {student.parentName ?? "학부모"}
               </p>
             </div>
@@ -713,7 +713,7 @@ function StudentDetailPanel({
             <button
               type="button"
               onClick={() => onCreateSchedule(student)}
-              className="flex min-h-10 items-center justify-center gap-1 border border-[var(--clinic-primary)] bg-[var(--clinic-primary)] px-3 text-xs font-bold text-white transition hover:bg-[var(--clinic-primary-dark)]"
+              className="flex min-h-10 items-center justify-center gap-1 border border-[#c9cdd2] bg-[#fffefa] px-3 text-xs font-bold text-[#2f3437] transition hover:border-[#aeb5bf] hover:bg-[#f6f7f8]"
             >
               <CalendarDays size={13} />
               스케줄 추가
@@ -736,7 +736,7 @@ function StudentDetailPanel({
               <button
                 type="button"
                 onClick={() => onCreateSchedule(student)}
-                className="mt-3 flex min-h-9 w-full items-center justify-center gap-1 border border-[var(--clinic-primary)] bg-[var(--clinic-primary)] px-3 text-xs font-bold text-white transition hover:bg-[var(--clinic-primary-dark)]"
+                className="mt-3 flex min-h-9 w-full items-center justify-center gap-1 border border-[#c9cdd2] bg-[#fffefa] px-3 text-xs font-bold text-[#2f3437] transition hover:border-[#aeb5bf] hover:bg-[#f6f7f8]"
               >
                 <CalendarDays size={13} />
                 스케줄 바로 추가
@@ -1123,7 +1123,7 @@ function SharedSchedulePanel({
   return (
     <section aria-labelledby="shared-schedule-title">
       <div className="flex items-center gap-2">
-        <Link2 className="text-[#315C7C]" size={16} />
+        <Link2 className="text-[#494d5a]" size={16} />
         <div className="min-w-0">
           <p id="shared-schedule-title" className="text-sm font-semibold text-stone-950">
             타 학원 스케줄 공유
@@ -1248,7 +1248,7 @@ function SharedSchedulePanel({
             type="button"
             disabled={isSaving || !hasShareConsent}
             onClick={onCreateCode}
-            className="flex min-h-9 w-full items-center justify-center rounded-sm bg-[var(--clinic-primary)] px-3 text-xs font-semibold text-white disabled:opacity-50"
+            className="flex min-h-9 w-full items-center justify-center rounded-sm border border-[#c9cdd2] bg-[#fffefa] px-3 text-xs font-semibold text-[#2f3437] transition hover:border-[#aeb5bf] hover:bg-[#f6f7f8] disabled:opacity-50"
           >
             공유 코드 만들기
           </button>
@@ -1271,13 +1271,13 @@ function SharedSchedulePanel({
               onChange={(event) => setCodeInput(event.target.value)}
               disabled={!hasShareConsent}
               placeholder="상대 학원 공유 코드"
-              className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-10 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#f6f7f8]"
             />
             <button
               type="button"
               disabled={isSaving || !hasShareConsent || !codeInput.trim()}
               onClick={handleConnect}
-              className="min-h-10 rounded-sm border border-[var(--clinic-primary)] px-3 text-xs font-semibold text-[#315C7C] disabled:border-stone-200 disabled:text-stone-400"
+              className="min-h-10 rounded-sm border border-[var(--clinic-primary)] px-3 text-xs font-semibold text-[#494d5a] disabled:border-stone-200 disabled:text-stone-400"
             >
               코드로 연결
             </button>

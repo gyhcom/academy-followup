@@ -14,7 +14,7 @@ export function SummaryCard({
 }) {
   return (
     <article className="console-row grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 px-3 py-3 sm:px-4">
-      <div className="flex size-9 shrink-0 items-center justify-center border border-[#B8D7D8] bg-[#E1F0EF] text-[var(--clinic-primary)]">
+      <div className="flex size-9 shrink-0 items-center justify-center border border-[#d7dbe0] bg-[#f6f7f8] text-[#494d5a]">
         {icon}
       </div>
       <div className="min-w-0">
@@ -56,7 +56,7 @@ export function ManagementPanel({
             className={[
               "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-sm border px-3 text-xs font-semibold sm:min-h-10",
               onAction
-                ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white transition hover:border-[var(--clinic-primary-dark)] hover:bg-[var(--clinic-primary-dark)]"
+                ? "border-[#c9cdd2] bg-[#fffefa] text-[#2f3437] transition hover:border-[#aeb5bf] hover:bg-[#f6f7f8]"
                 : "cursor-not-allowed border-[#D6E0E5] bg-[#F4F8F9] text-[var(--clinic-muted)]",
             ].join(" ")}
           >

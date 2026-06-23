@@ -105,7 +105,7 @@ export function StudentFollowupHistory({
                     </p>
                   </div>
                   {item.status === "sent" ? (
-                    <CheckCircle2 className="mt-0.5 shrink-0 text-[#315C7C]" size={17} />
+                    <CheckCircle2 className="mt-0.5 shrink-0 text-[#494d5a]" size={17} />
                   ) : item.status === "failed" ? (
                     <AlertCircle className="mt-0.5 shrink-0 text-red-700" size={17} />
                   ) : (
@@ -151,7 +151,7 @@ function HistoryMessage({
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     draft: "border-amber-200 bg-amber-50 text-amber-800",
-    sent: "border-[#C9D6E2] bg-[#EAF1F8] text-[#315C7C]",
+    sent: "border-[#C9D6E2] bg-[#f6f7f8] text-[#494d5a]",
     failed: "border-red-200 bg-red-50 text-red-800",
   };
 

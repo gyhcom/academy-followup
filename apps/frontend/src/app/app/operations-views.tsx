@@ -164,7 +164,7 @@ function OperationsHeader({
     <section className="mb-3 border border-[#D8D6DE] bg-[#F7F7F4] px-4 py-3 sm:mb-4">
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div className="min-w-0">
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#315C7C]">
+          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#62656f]">
             Message Workbench
           </p>
           <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
@@ -457,7 +457,7 @@ function MobileSelectionBar({
         <button
           type="button"
           onClick={onOpenComposer}
-          className="min-h-11 shrink-0 rounded-md bg-[#315C7C] px-4 text-sm font-semibold text-white"
+          className="min-h-11 shrink-0 rounded-md border border-[#c9cdd2] bg-[#fffefa] px-4 text-sm font-semibold text-[#2f3437] transition hover:border-[#aeb5bf] hover:bg-[#f6f7f8]"
         >
           초안 확인
         </button>

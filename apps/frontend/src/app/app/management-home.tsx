@@ -978,7 +978,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-sm border px-3 py-2 text-sm",
                 templateFormStatus.status === "saved"
-                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+                  ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -1011,7 +1011,7 @@ export function ManagementHome({
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, academyName: event.target.value })
               }
-              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
 
@@ -1023,7 +1023,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderName: event.target.value })
               }
               placeholder="문자에 표시할 학원명"
-              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
 
@@ -1035,7 +1035,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderPhone: event.target.value })
               }
               placeholder="0410000000"
-              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
 
@@ -1051,7 +1051,7 @@ export function ManagementHome({
                   duplicateGuardMinutes: Number(event.target.value),
                 })
               }
-              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
 
@@ -1062,7 +1062,7 @@ export function ManagementHome({
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, smsDryRun: event.target.checked })
               }
-              className="size-4 accent-[#315C7C]"
+              className="size-4 accent-[#494d5a]"
             />
             실제 문자 발송 막기
           </label>
@@ -1077,7 +1077,7 @@ export function ManagementHome({
                   allowAssistantSend: event.target.checked,
                 })
               }
-              className="size-4 accent-[#315C7C]"
+              className="size-4 accent-[#494d5a]"
             />
             보조 선생님 발송 허용
           </label>
@@ -1088,7 +1088,7 @@ export function ManagementHome({
             className={[
               "mt-3 rounded-sm border px-3 py-2 text-sm",
               settingsFormStatus.status === "saved"
-                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+                ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -1157,7 +1157,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-sm border px-3 py-2 text-sm",
                 classFormStatus.status === "saved"
-                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+                  ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -1171,7 +1171,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-sm border px-3 py-2 text-sm",
                 bulkScheduleFormStatus.status === "saved"
-                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+                  ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -1179,7 +1179,7 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="mb-3 rounded-sm border border-[#C9D6E2] bg-[#F8FBFD] px-3 py-3 text-sm text-[#244B67]">
+          <div className="mb-3 rounded-sm border border-[#C9D6E2] bg-[#F8FBFD] px-3 py-3 text-sm text-[#2f3437]">
             반을 만든 뒤 <span className="font-semibold">수업 시간 등록</span>을 누르면
             그 반의 재원 학생 전체에게 같은 주간 스케줄이 추가됩니다.
           </div>
@@ -1259,7 +1259,7 @@ export function ManagementHome({
               className={[
                 "mb-3 rounded-sm border px-3 py-2 text-sm",
                 memberFormStatus.status === "saved"
-                  ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+                  ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
                   : "border-red-200 bg-red-50 text-red-900",
               ].join(" ")}
             >
@@ -1317,7 +1317,7 @@ export function ManagementHome({
               <button
                 type="button"
                 onClick={returnToManagementSetup}
-                className="inline-flex min-h-8 shrink-0 items-center gap-1 border border-[#8FA6B0] bg-[#F7FAFA] px-2.5 text-xs font-bold text-[#315C7C] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                className="inline-flex min-h-8 shrink-0 items-center gap-1 border border-[#8FA6B0] bg-[#F7FAFA] px-2.5 text-xs font-bold text-[#494d5a] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
               >
                 <ArrowLeft size={13} aria-hidden="true" />
                 관리 메인
@@ -1332,7 +1332,7 @@ export function ManagementHome({
             <button
               type="button"
               onClick={openMissingScheduleStudents}
-              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 text-xs font-bold text-[#315C7C] transition hover:bg-[#EDF3F5] sm:min-h-10"
+              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 text-xs font-bold text-[#494d5a] transition hover:bg-[#EDF3F5] sm:min-h-10"
             >
               <CalendarDays size={14} />
               스케줄 미등록 보기
@@ -1368,7 +1368,7 @@ export function ManagementHome({
             className={[
               "mb-3 rounded-sm border px-3 py-2 text-sm",
               bulkStudentImportStatus.status === "saved"
-                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+                ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -1395,7 +1395,7 @@ export function ManagementHome({
             className={[
               "mb-3 rounded-sm border px-3 py-2 text-sm",
               studentFormStatus.status === "saved"
-                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+                ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -1424,7 +1424,7 @@ export function ManagementHome({
             className={[
               "mb-3 rounded-sm border px-3 py-2 text-sm",
               scheduleFormStatus.status === "saved"
-                ? "border-[#C9D6E2] bg-[#EAF1F8] text-[#244B67]"
+                ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
                 : "border-red-200 bg-red-50 text-red-900",
             ].join(" ")}
           >
@@ -1642,7 +1642,7 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
               type="checkbox"
               checked={includePrivate}
               onChange={(event) => setIncludePrivate(event.target.checked)}
-              className="size-4 accent-[#315C7C]"
+              className="size-4 accent-[#494d5a]"
             />
             원문 포함
           </label>
@@ -1714,7 +1714,7 @@ function MessageTemplateForm({
     <div className="mb-4 rounded-sm border border-[#C9D6E2] bg-[#F8FBFD] p-3 sm:p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#315C7C]">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#494d5a]">
             {form.reasonLabel}
           </p>
           <h4 className="mt-1 text-base font-semibold text-[var(--clinic-text)]">
@@ -1728,7 +1728,7 @@ function MessageTemplateForm({
             onChange={(event) =>
               onChange({ ...form, isActive: event.target.checked })
             }
-            className="size-4 accent-[#315C7C]"
+            className="size-4 accent-[#494d5a]"
           />
           미리보기 사용
         </label>
@@ -1741,7 +1741,7 @@ function MessageTemplateForm({
             value={form.title}
             onChange={(event) => onChange({ ...form, title: event.target.value })}
             placeholder={`${form.reasonLabel} 안내`}
-            className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
           />
         </label>
 
@@ -1751,7 +1751,7 @@ function MessageTemplateForm({
             value={form.body}
             onChange={(event) => onChange({ ...form, body: event.target.value })}
             rows={7}
-            className="min-h-40 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 py-2 text-sm leading-6 outline-none focus:border-[#315C7C] focus:ring-2 focus:ring-[#EAF1F8]"
+            className="min-h-40 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 py-2 text-sm leading-6 outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
           />
           <span
             className={[
@@ -2088,9 +2088,9 @@ function SetupWorkflow({
 
       <aside className="overflow-hidden border border-[#C9D6E2] bg-[#F7FAFA]">
         <div className="border-b border-[#C9D6E2] bg-[#F8FBFD] px-4 py-3">
-          <p className="text-sm font-semibold text-[#244B67]">현재 배정 모델</p>
+          <p className="text-sm font-semibold text-[#2f3437]">현재 배정 모델</p>
         </div>
-        <dl className="divide-y divide-[#EAF1F8] text-sm">
+        <dl className="divide-y divide-[#f6f7f8] text-sm">
           <div className="px-4 py-3">
             <dt className="font-semibold text-[var(--clinic-text)]">반 담당</dt>
             <dd className="mt-1 leading-6 text-[var(--clinic-muted)]">
