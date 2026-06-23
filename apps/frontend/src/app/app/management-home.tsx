@@ -1909,16 +1909,16 @@ function ManagementSectionReturnBar({
   onBack: () => void;
 }) {
   return (
-    <section className="flex flex-col gap-2 border border-[#B8C9D0] border-l-4 border-l-[var(--clinic-primary)] bg-[#F4F8F9] p-3 sm:flex-row sm:items-center sm:justify-between">
+    <section className="flex flex-col gap-2 border border-[#B8C9D0] border-l-4 border-l-[var(--clinic-primary)] bg-[#F7FAFA] px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
-        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#315C7C]">
-          Management Work Area
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#526873]">
+          선택 작업 영역
         </p>
         <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
           <h2 className="text-base font-black text-[var(--clinic-text)]">
             {sectionLabel}
           </h2>
-          <span className="border border-[#C9D7DC] bg-[#E7EEF1] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
+          <span className="border border-[#C9D7DC] bg-[#EDF3F5] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
             {sectionGroup}
           </span>
           <span className="text-xs font-semibold text-[var(--clinic-muted)]">
@@ -2143,15 +2143,6 @@ function PolicyPill({
         ].join(" ")}
         aria-hidden="true"
       />
-    </div>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="grid min-h-8 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-1.5 py-1">
-      <p className="truncate text-[11px] font-semibold text-cyan-50/62">{label}</p>
-      <p className="shrink-0 text-xs font-bold tabular-nums text-white">{value}</p>
     </div>
   );
 }
@@ -2482,31 +2473,101 @@ function ManagementCommandCenter({
   }>;
   onSelectSection: (section: ManagementSection) => void;
 }) {
+  const summaryRows: Array<{
+    label: string;
+    value: string;
+    detail: string;
+    section: ManagementSection;
+    tone: "default" | "warning" | "success";
+  }> = [
+    {
+      label: "재원 학생",
+      value: `${activeStudents}명`,
+      detail: "명단 기준",
+      section: "students",
+      tone: "default",
+    },
+    {
+      label: "스케줄 미등록",
+      value: `${missingScheduleCount}명`,
+      detail: missingScheduleCount > 0 ? "출석 누락 확인 필요" : "출석 준비 완료",
+      section: "students",
+      tone: missingScheduleCount > 0 ? "warning" : "success",
+    },
+    {
+      label: "반",
+      value: `${classCount}개`,
+      detail: "수업/시간표 관리",
+      section: "classes",
+      tone: "default",
+    },
+    {
+      label: "직원",
+      value: `${memberCount}명`,
+      detail: "계정/권한 관리",
+      section: "members",
+      tone: "default",
+    },
+  ];
+
   return (
     <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9] xl:sticky xl:top-4">
-      <div className="border-b border-[#0B3E49] bg-[var(--clinic-primary-dark)] px-3 py-3 text-white sm:px-4">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-100/70">
-          Academy Admin
+      <div className="border-b border-[#C9D7DC] bg-[#F7FAFA] px-3 py-3 sm:px-4">
+        <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#315C7C]">
+          관리 콘솔
         </p>
-        <div className="mt-2 flex flex-col gap-3">
-          <div className="min-w-0">
-            <h2 className="text-xl font-bold leading-tight text-white xl:text-lg">
-              {academyName}
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-cyan-50/72 xl:text-xs xl:leading-5">
-              운영 세팅, 명단, 수업, 직원, 문자, 정책을 업무 단위로 관리합니다.
-            </p>
-          </div>
-          <div className="divide-y divide-white/10 border-y border-white/15 text-[11px]">
-            <Metric label="학생" value={`${activeStudents}명`} />
-            <Metric label="미등록" value={`${missingScheduleCount}명`} />
-            <Metric label="반" value={`${classCount}개`} />
-            <Metric label="직원" value={`${memberCount}명`} />
-          </div>
+        <div className="mt-1 min-w-0">
+          <h2 className="truncate text-lg font-black leading-tight text-[var(--clinic-text)] xl:text-base">
+            {academyName}
+          </h2>
+          <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
+            명단, 수업, 직원, 문자, 정책을 업무 단위로 관리합니다.
+          </p>
         </div>
       </div>
 
-      <div className="divide-y divide-[#C9D7DC]">
+      <div className="border-b border-[#C9D7DC] bg-[#F7FAFA]">
+        <div className="border-b border-[#D6E2E6] bg-[#EDF3F5] px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#526873] sm:px-4">
+          운영 요약
+        </div>
+        <div className="divide-y divide-[#D6E2E6]">
+          {summaryRows.map((row) => {
+            const valueClass =
+              row.tone === "warning"
+                ? "text-[#B65D00]"
+                : row.tone === "success"
+                  ? "text-[#0F7A62]"
+                  : "text-[var(--clinic-text)]";
+
+            return (
+              <button
+                key={row.label}
+                type="button"
+                onClick={() => onSelectSection(row.section)}
+                className="grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 py-2 text-left transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] sm:px-4"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate text-xs font-bold text-[#405763]">
+                    {row.label}
+                  </span>
+                  <span className="mt-0.5 block truncate text-[11px] font-semibold text-[var(--clinic-muted)]">
+                    {row.detail}
+                  </span>
+                </span>
+                <span className={`shrink-0 text-sm font-black tabular-nums ${valueClass}`}>
+                  {row.value}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="bg-[#F7FAFA]">
+        <div className="border-b border-[#D6E2E6] bg-[#EDF3F5] px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#526873] sm:px-4">
+          업무 메뉴
+        </div>
+        <div className="divide-y divide-[#D6E2E6]">
         {sections.map((section) => {
           const isActive = activeSection === section.id;
 
@@ -2518,7 +2579,7 @@ function ManagementCommandCenter({
               aria-current={isActive ? "page" : undefined}
               onClick={() => onSelectSection(section.id)}
               className={[
-                "group grid min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-l-[3px] px-3 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
+                "group grid min-h-[3.25rem] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-l-[3px] px-3 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)] sm:px-4",
                 isActive
                   ? "border-l-[var(--clinic-primary)] bg-[#E1F0EF] text-[var(--clinic-text)]"
                   : "border-l-transparent bg-[#F7FAFA] text-[var(--clinic-text)] hover:border-l-[#B8C9D0] hover:bg-[#EDF3F5]",
@@ -2529,23 +2590,31 @@ function ManagementCommandCenter({
                   <span className="truncate text-sm font-bold">{section.label}</span>
                   <span
                     className={[
-                      "shrink-0 border px-2 py-0.5 text-[11px] font-semibold",
+                      "shrink-0 border px-2 py-0.5 text-[11px] font-black tabular-nums",
                       isActive
-                        ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
+                        ? "border-[#0F8F87] bg-[#D8EFEC] text-[#006C70]"
                         : "border-[#C9D7DC] bg-[#EDF3F5] text-[var(--clinic-muted)]",
                     ].join(" ")}
                   >
                     {section.count}
                   </span>
                 </span>
-                <span className="mt-0.5 block truncate text-xs text-[var(--clinic-muted)]">
-                  {section.group} · {section.status}
+                <span className="mt-0.5 block truncate text-xs font-semibold text-[var(--clinic-muted)]">
+                  {section.detail}
                 </span>
-                <span className="sr-only">{section.detail}</span>
+                <span className="mt-1 flex min-w-0 items-center gap-1.5">
+                  <span className="truncate text-[11px] font-semibold text-[#6C7F87]">
+                    {section.group}
+                  </span>
+                  <span className="h-1 w-1 shrink-0 bg-[#A9BCC4]" aria-hidden="true" />
+                  <span className="truncate text-[11px] font-semibold text-[#6C7F87]">
+                    {section.status}
+                  </span>
+                </span>
               </span>
               <span
                 className={[
-                  "flex size-7 items-center justify-center rounded transition",
+                  "flex size-7 items-center justify-center transition",
                   isActive
                     ? "text-[var(--clinic-primary)]"
                     : "text-[#A9BCC4] group-hover:text-[var(--clinic-muted)]",
@@ -2556,6 +2625,7 @@ function ManagementCommandCenter({
             </button>
           );
         })}
+        </div>
       </div>
     </section>
   );
