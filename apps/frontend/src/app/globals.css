@@ -74,19 +74,19 @@ button:not(:disabled) {
 }
 
 .academy-console .message-workbench {
-  --message-select-surface: #eef1fb;
+  --message-select-surface: #f5f5f8;
   --message-select-panel: #fffefa;
-  --message-select-line: #d3d7eb;
+  --message-select-line: #dedde5;
   --message-select-accent: #4f5be7;
-  --message-plan-surface: #f1eee6;
+  --message-plan-surface: #f5f3ef;
   --message-plan-panel: #fffefa;
-  --message-plan-line: #d7d0c3;
+  --message-plan-line: #ded8cf;
   --message-plan-accent: #6a5f4b;
-  --message-compose-surface: #f3eadc;
-  --message-compose-panel: #fff7ea;
-  --message-compose-line: #d7bd95;
-  --message-compose-accent: #996014;
-  --message-compose-ink: #2c2118;
+  --message-compose-surface: #f7f6f2;
+  --message-compose-panel: #fffefa;
+  --message-compose-line: #ded8cf;
+  --message-compose-accent: #4f5be7;
+  --message-compose-ink: #1f2328;
 }
 
 .academy-console .message-zone-select {
@@ -268,19 +268,19 @@ button:not(:disabled) {
   }
 
   .academy-console .message-workbench {
-    --message-select-surface: #eef1fb;
+    --message-select-surface: #f5f5f8;
     --message-select-panel: #fffefa;
-    --message-select-line: #d3d7eb;
+    --message-select-line: #dedde5;
     --message-select-accent: #4f5be7;
-    --message-plan-surface: #f1eee6;
+    --message-plan-surface: #f5f3ef;
     --message-plan-panel: #fffefa;
-    --message-plan-line: #d7d0c3;
+    --message-plan-line: #ded8cf;
     --message-plan-accent: #6a5f4b;
-    --message-compose-surface: #f3eadc;
-    --message-compose-panel: #fff7ea;
-    --message-compose-line: #d7bd95;
-    --message-compose-accent: #996014;
-    --message-compose-ink: #2c2118;
+    --message-compose-surface: #f7f6f2;
+    --message-compose-panel: #fffefa;
+    --message-compose-line: #ded8cf;
+    --message-compose-accent: #4f5be7;
+    --message-compose-ink: #1f2328;
   }
 
   .academy-console .message-zone-select {
