@@ -1,49 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #e4eaed;
-  --foreground: #10232c;
-  --clinic-page: #e4eaed;
-  --clinic-panel: #f2f6f7;
-  --clinic-panel-muted: #e9f0f2;
-  --clinic-panel-strong: #dbe5e8;
-  --clinic-border: #afc0c8;
-  --clinic-border-strong: #7f939d;
-  --clinic-primary: #005f66;
-  --clinic-primary-dark: #062f3b;
-  --clinic-navy: #062634;
-  --clinic-navy-2: #0a3949;
-  --clinic-accent: #27736e;
-  --clinic-text: #10232c;
-  --clinic-muted: #526873;
-  --clinic-rail: #0b565d;
-  --clinic-warning: #8f5100;
-  --clinic-danger: #9f241c;
-  --clinic-success: #0f6848;
-  --clinic-violet: #5e5278;
-  --console-radius: 2px;
-  --console-shadow: none;
-  --console-row: #f6f9fa;
-  --console-row-hover: #eaf1f3;
-  --console-row-selected: #d9e8e8;
-  --console-line: #cfdbdf;
-  --console-line-strong: #97abb4;
-  --console-ink-soft: #405763;
-  --console-status-pending-bg: #f4ead8;
-  --console-status-pending-border: #c99a4b;
-  --console-status-pending-text: #754605;
-  --console-status-danger-bg: #f2e2df;
-  --console-status-danger-border: #cb8b85;
-  --console-status-danger-text: #8b1e17;
-  --console-status-success-bg: #e2eee8;
-  --console-status-success-border: #8eb4a3;
-  --console-status-success-text: #0c5f41;
-  --console-status-info-bg: #e4edf3;
-  --console-status-info-border: #95adbd;
-  --console-status-info-text: #244b67;
-  --console-status-violet-bg: #ebe7f0;
-  --console-status-violet-border: #aaa0ba;
-  --console-status-violet-text: #51476c;
+  --background: #f5f4ef;
+  --foreground: #17191f;
+  --clinic-page: #f5f4ef;
+  --clinic-panel: #fbfaf7;
+  --clinic-panel-muted: #f1f0ea;
+  --clinic-panel-strong: #e7e6de;
+  --clinic-border: #d8d6cb;
+  --clinic-border-strong: #b8b5a8;
+  --clinic-primary: #3f46c8;
+  --clinic-primary-dark: #202468;
+  --clinic-navy: #1b1d2a;
+  --clinic-navy-2: #292d45;
+  --clinic-accent: #4f5be7;
+  --clinic-text: #17191f;
+  --clinic-muted: #62656f;
+  --clinic-rail: #4f5be7;
+  --clinic-warning: #9a5b05;
+  --clinic-danger: #b92b2b;
+  --clinic-success: #147154;
+  --clinic-violet: #6458b7;
+  --console-radius: 8px;
+  --console-shadow: 0 1px 2px rgba(25, 27, 34, 0.05);
+  --console-row: #fffefa;
+  --console-row-hover: #f3f2ff;
+  --console-row-selected: #ececff;
+  --console-line: #e4e1d7;
+  --console-line-strong: #c8c4b7;
+  --console-ink-soft: #494d5a;
+  --console-status-pending-bg: #fff4dc;
+  --console-status-pending-border: #e1a848;
+  --console-status-pending-text: #8a4f02;
+  --console-status-danger-bg: #fff0ee;
+  --console-status-danger-border: #ea8e86;
+  --console-status-danger-text: #a32121;
+  --console-status-success-bg: #e9f7ef;
+  --console-status-success-border: #8bd4b7;
+  --console-status-success-text: #106c50;
+  --console-status-info-bg: #eef0ff;
+  --console-status-info-border: #a9b0f5;
+  --console-status-info-text: #343da5;
+  --console-status-violet-bg: #f0edff;
+  --console-status-violet-border: #b9aff1;
+  --console-status-violet-text: #5948a4;
 }
 
 @theme inline {
@@ -74,18 +74,18 @@ button:not(:disabled) {
 }
 
 .academy-console .message-workbench {
-  --message-select-surface: #eaf1f6;
-  --message-select-panel: #f6f9fc;
-  --message-select-line: #afc0cd;
-  --message-select-accent: #2f5f7e;
-  --message-plan-surface: #f0f1f7;
-  --message-plan-panel: #f8f8fc;
-  --message-plan-line: #b8bfd3;
-  --message-plan-accent: #485a83;
-  --message-compose-surface: #f8f0e3;
-  --message-compose-panel: #fff9f0;
-  --message-compose-line: #d7c0a3;
-  --message-compose-accent: #8a4f12;
+  --message-select-surface: #f4f5fb;
+  --message-select-panel: #fffefa;
+  --message-select-line: #d9dce8;
+  --message-select-accent: #4f5be7;
+  --message-plan-surface: #f3f1ec;
+  --message-plan-panel: #fffefa;
+  --message-plan-line: #ddd8cc;
+  --message-plan-accent: #6a5f4b;
+  --message-compose-surface: #f6f1e8;
+  --message-compose-panel: #fffaf2;
+  --message-compose-line: #dfcba9;
+  --message-compose-accent: #996014;
   --message-compose-ink: #2c2118;
 }
 
@@ -134,7 +134,7 @@ button:not(:disabled) {
   }
 
   .academy-console .bg-white {
-    background-color: #f7fafa !important;
+    background-color: #fffefa !important;
   }
 
   .academy-console :where(
@@ -147,7 +147,7 @@ button:not(:disabled) {
     [class*="bg-stone-50"],
     [class*="bg-slate-50"]
   ) {
-    background-color: #f4f8f9 !important;
+    background-color: #f8f7f2 !important;
   }
 
   .academy-console :where(
@@ -156,7 +156,7 @@ button:not(:disabled) {
     [class*="bg-[#F2F6"],
     [class*="bg-[#F1F5"]
   ) {
-    background-color: #e7eef1 !important;
+    background-color: #eeeeE6 !important;
   }
 
   .academy-console :where([class*="bg-amber-50"], [class*="bg-[#FFF7"], [class*="bg-[#FFE"]) {
@@ -207,12 +207,12 @@ button:not(:disabled) {
   .academy-console .console-surface {
     border: 1px solid var(--clinic-border);
     background: var(--clinic-panel);
-    box-shadow: none;
+    box-shadow: var(--console-shadow);
   }
 
   .academy-console .console-header-row {
     border-bottom: 1px solid var(--console-line);
-    background: var(--clinic-panel-strong);
+    background: #f3f1ec;
     padding: 0.75rem 1rem;
   }
 
@@ -231,12 +231,13 @@ button:not(:disabled) {
 
   .academy-console .console-row-selected {
     background: var(--console-row-selected);
-    box-shadow: inset 4px 0 0 var(--clinic-primary);
+    box-shadow: inset 3px 0 0 var(--clinic-primary);
   }
 
   .academy-console .console-work-panel {
     border: 1px solid var(--clinic-border);
-    background: #f8fbfc;
+    background: #fffefa;
+    box-shadow: var(--console-shadow);
   }
 
   .academy-console .console-section-rail {
@@ -258,22 +259,22 @@ button:not(:disabled) {
 
   .academy-console .console-action-dock {
     border-top: 1px solid var(--console-line);
-    background: #f4f8f9;
+    background: #fffefa;
   }
 
   .academy-console .message-workbench {
-    --message-select-surface: #eaf1f6;
-    --message-select-panel: #f6f9fc;
-    --message-select-line: #afc0cd;
-    --message-select-accent: #2f5f7e;
-    --message-plan-surface: #f0f1f7;
-    --message-plan-panel: #f8f8fc;
-    --message-plan-line: #b8bfd3;
-    --message-plan-accent: #485a83;
-    --message-compose-surface: #f8f0e3;
-    --message-compose-panel: #fff9f0;
-    --message-compose-line: #d7c0a3;
-    --message-compose-accent: #8a4f12;
+    --message-select-surface: #f4f5fb;
+    --message-select-panel: #fffefa;
+    --message-select-line: #d9dce8;
+    --message-select-accent: #4f5be7;
+    --message-plan-surface: #f3f1ec;
+    --message-plan-panel: #fffefa;
+    --message-plan-line: #ddd8cc;
+    --message-plan-accent: #6a5f4b;
+    --message-compose-surface: #f6f1e8;
+    --message-compose-panel: #fffaf2;
+    --message-compose-line: #dfcba9;
+    --message-compose-accent: #996014;
     --message-compose-ink: #2c2118;
   }
 

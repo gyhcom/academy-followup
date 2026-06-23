@@ -248,7 +248,7 @@ export function AppWorkspace({
           "sm:grid sm:min-h-[calc(100vh-4.5rem)]",
           visibleView === "attendance"
             ? "sm:grid-cols-[13.5rem_minmax(0,1fr)] lg:grid-cols-[13.75rem_minmax(0,1fr)]"
-            : "sm:grid-cols-[15.75rem_minmax(0,1fr)] lg:grid-cols-[16.5rem_minmax(0,1fr)]",
+            : "sm:grid-cols-[14.75rem_minmax(0,1fr)] lg:grid-cols-[15.25rem_minmax(0,1fr)]",
         ].join(" ")}
       >
         <WorkspaceNavigation
@@ -261,7 +261,7 @@ export function AppWorkspace({
 
         <div
           className={[
-            "min-w-0 space-y-4 px-3 py-4 sm:space-y-4 sm:px-4 sm:py-4",
+            "min-w-0 space-y-3 px-3 py-3 sm:space-y-3 sm:px-3 sm:py-3",
             visibleView === "attendance" ? "xl:px-3 2xl:px-4" : "xl:px-6",
           ].join(" ")}
         >
@@ -405,23 +405,23 @@ function WorkspaceContextHeader({
 }) {
   if (activeView === "attendance") {
     return (
-      <section className="hidden min-h-12 border border-[#B8C9D0] bg-[#F4F8F9] px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
+      <section className="hidden min-h-12 border border-[var(--clinic-border)] bg-[#fffefa] px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="text-sm font-semibold text-[#243844]">운영 기준일</span>
-          <span className="text-lg font-bold tabular-nums text-[#17232B]">
+          <span className="text-sm font-semibold text-[var(--clinic-muted)]">운영 기준일</span>
+          <span className="text-lg font-bold tabular-nums text-[var(--clinic-text)]">
             {formatContextDate(selectedDate)}
           </span>
-          <CalendarDays size={18} className="shrink-0 text-[#17232B]" aria-hidden="true" />
+          <CalendarDays size={18} className="shrink-0 text-[var(--clinic-primary)]" aria-hidden="true" />
         </div>
 
-        <div className="flex shrink-0 items-center gap-4 text-sm text-[#334B58]">
+        <div className="flex shrink-0 items-center gap-4 text-sm text-[var(--clinic-muted)]">
           <div className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[#334B58]">
+            <span className="flex size-9 items-center justify-center border border-[var(--clinic-border)] bg-[#f1f0ea] text-[var(--clinic-primary)]">
               <User size={17} aria-hidden="true" />
             </span>
             <span className="leading-tight">
-              <span className="block font-bold text-[#17232B]">{teacherName}</span>
-              <span className="block text-xs font-semibold text-[#60717B]">{roleLabel}</span>
+              <span className="block font-bold text-[var(--clinic-text)]">{teacherName}</span>
+              <span className="block text-xs font-semibold text-[var(--clinic-muted)]">{roleLabel}</span>
             </span>
           </div>
           <LogoutButton />
@@ -431,7 +431,7 @@ function WorkspaceContextHeader({
   }
 
   return (
-    <section className="hidden min-h-12 border border-[#B8C9D0] bg-[#F4F8F9] px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
+    <section className="hidden min-h-12 border border-[var(--clinic-border)] bg-[#fffefa] px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
       <div className="flex min-w-0 items-center gap-3">
         <span className="h-6 w-1 bg-[var(--clinic-primary)]" aria-hidden="true" />
         <div className="min-w-0">
@@ -445,10 +445,10 @@ function WorkspaceContextHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-2 text-xs text-[var(--clinic-muted)]">
-        <span className="border border-[#B8C9D0] bg-[#EAF1F3] px-3 py-1.5 font-semibold text-[var(--clinic-text)]">
+        <span className="border border-[var(--clinic-border)] bg-[#f6f5ef] px-3 py-1.5 font-semibold text-[var(--clinic-text)]">
           운영 기준 {formatContextDate(selectedDate)}
         </span>
-        <span className="border border-[#B8C9D0] bg-[#F7FAFA] px-3 py-1.5">
+        <span className="border border-[var(--clinic-border)] bg-[#fffefa] px-3 py-1.5">
           {teacherName} · {roleLabel}
         </span>
         <LogoutButton />
@@ -551,19 +551,19 @@ function WorkspaceNavigation({
   return (
     <>
       <aside className="hidden sm:sticky sm:top-0 sm:block sm:h-screen sm:self-start">
-        <section className="flex h-full flex-col overflow-hidden border-r border-[#0F4050] bg-[#062634] text-white">
-          <div className="border-b border-white/10 px-4 py-4">
+        <section className="flex h-full flex-col overflow-hidden border-r border-[var(--clinic-border)] bg-[#fbfaf7] text-[var(--clinic-text)]">
+          <div className="border-b border-[var(--console-line)] px-4 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center border border-white/20 bg-white/8 text-white">
+              <div className="flex size-10 items-center justify-center border border-[#dcd9cd] bg-[#f0efe8] text-[var(--clinic-primary)]">
                 <ShieldCheck size={22} aria-hidden="true" />
               </div>
               <div>
                 <p className="max-w-[10rem] truncate text-sm font-bold leading-tight">{academyName}</p>
-                <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-cyan-100/60">ACADEMY OS</p>
+                <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--clinic-muted)]">ACADEMY OS</p>
               </div>
             </div>
-            <p className="mt-3 text-xs font-semibold text-cyan-50/80">{shellLabel}</p>
-            <p className="mt-1 text-xs leading-5 text-cyan-50/55">{shellDescription}</p>
+            <p className="mt-3 text-xs font-semibold text-[var(--clinic-text)]">{shellLabel}</p>
+            <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">{shellDescription}</p>
           </div>
           <nav
             aria-label={shellLabel}
@@ -586,26 +586,26 @@ function WorkspaceNavigation({
           </nav>
           {canManage ? (
             <div
-              className="mx-3 mb-3 border border-white/10 bg-white/[0.035] px-3 py-2 text-cyan-50/62"
+              className="mx-3 mb-3 border border-[var(--console-line)] bg-[#f6f5ef] px-3 py-2 text-[var(--clinic-muted)]"
               aria-label="준비 중인 운영 영역"
             >
               <div className="flex items-center gap-2">
                 <BookOpen size={15} aria-hidden="true" />
-                <p className="text-xs font-semibold text-cyan-50/76">교재/비용</p>
+                <p className="text-xs font-semibold text-[var(--clinic-text)]">교재/비용</p>
               </div>
-              <p className="mt-1 text-[11px] leading-4 text-cyan-50/46">
+              <p className="mt-1 text-[11px] leading-4 text-[var(--clinic-muted)]">
                 비용 기록과 월말 안내 문자는 후속 단계에서 연결합니다.
               </p>
             </div>
           ) : null}
-          <div className="border-t border-white/10 px-4 py-3 text-xs text-cyan-50/55">
+          <div className="border-t border-[var(--console-line)] px-4 py-3 text-xs text-[var(--clinic-muted)]">
             <p className="font-semibold">{roleLabel}</p>
             <p className="mt-1">v1.0.0</p>
           </div>
         </section>
       </aside>
 
-      <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[#B8C9D0] bg-[#F4F8F9]/96 px-3 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur sm:hidden">
+      <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[var(--clinic-border)] bg-[#fbfaf7]/96 px-3 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur sm:hidden">
         <nav
           aria-label={shellLabel}
           className={["grid gap-1.5", getMobileGridClass(mobileItems.length)].join(" ")}
@@ -743,10 +743,10 @@ function WorkspaceNavButton({
         aria-pressed={isActive}
         onClick={onClick}
         className={[
-          "group relative grid min-h-10 w-full grid-cols-[1.7rem_minmax(0,1fr)_0.75rem] items-center gap-2 border-l-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70",
+          "group relative grid min-h-10 w-full grid-cols-[1.7rem_minmax(0,1fr)_0.75rem] items-center gap-2 border-l-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
           isActive
-            ? "border-l-[#8DB9B6] bg-[#0A3D4A] text-white"
-            : "border-l-transparent text-cyan-50/72 hover:border-l-[#6FA4A5] hover:bg-white/[0.045] hover:text-white",
+            ? "border-l-[var(--clinic-primary)] bg-[#ececff] text-[var(--clinic-text)]"
+            : "border-l-transparent text-[var(--clinic-muted)] hover:border-l-[#c4c7ef] hover:bg-[#f2f1fb] hover:text-[var(--clinic-text)]",
           disabled ? "cursor-not-allowed opacity-55" : "",
         ].join(" ")}
       >
@@ -755,8 +755,8 @@ function WorkspaceNavButton({
           className={[
             "flex size-7 shrink-0 items-center justify-center",
             isActive
-              ? "text-[#C8E2E0]"
-              : "text-cyan-50/58 group-hover:text-cyan-100",
+              ? "text-[var(--clinic-primary)]"
+              : "text-[#858895] group-hover:text-[var(--clinic-primary)]",
           ].join(" ")}
         >
           {icon}
@@ -766,7 +766,7 @@ function WorkspaceNavButton({
           <span
             className={[
               "mt-0.5 block truncate text-xs",
-              isActive ? "text-cyan-50/68" : "text-cyan-50/46",
+              isActive ? "text-[#62656f]" : "text-[#858895]",
             ].join(" ")}
           >
             {description}
@@ -777,10 +777,10 @@ function WorkspaceNavButton({
           className={[
             "text-xs font-semibold",
             disabled
-              ? "border border-cyan-50/20 px-1.5 py-0.5 text-[10px] text-cyan-50/50"
+              ? "border border-[var(--clinic-border)] px-1.5 py-0.5 text-[10px] text-[var(--clinic-muted)]"
               : isActive
-                ? "text-[#C8E2E0]"
-                : "text-cyan-50/30 group-hover:text-cyan-50/60",
+                ? "text-[var(--clinic-primary)]"
+                : "text-[#a3a5ad] group-hover:text-[var(--clinic-primary)]",
           ].join(" ")}
         >
           {disabled ? (statusLabel ?? "준비") : "›"}
@@ -797,10 +797,10 @@ function WorkspaceNavButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "flex min-h-12 flex-col items-center justify-center gap-1 border px-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-[#0F8F87]",
+        "flex min-h-12 flex-col items-center justify-center gap-1 border px-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
         isActive
-          ? "border-[#005F66] bg-[#D9E8E8] text-[#062F3B]"
-          : "border-transparent bg-transparent text-stone-700 hover:bg-[#E8EFF1]",
+          ? "border-[#b8bdf4] bg-[#ececff] text-[var(--clinic-primary-dark)]"
+          : "border-transparent bg-transparent text-stone-700 hover:bg-[#f2f1fb]",
         disabled ? "cursor-not-allowed opacity-55" : "",
       ].join(" ")}
     >
@@ -808,7 +808,7 @@ function WorkspaceNavButton({
         aria-hidden="true"
         className={[
           "flex size-6 shrink-0 items-center justify-center",
-          isActive ? "text-[#244B67]" : "text-stone-500",
+          isActive ? "text-[var(--clinic-primary)]" : "text-stone-500",
         ].join(" ")}
       >
         {icon}

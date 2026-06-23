@@ -2511,9 +2511,9 @@ function ManagementCommandCenter({
   ];
 
   return (
-    <section className="overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9] xl:sticky xl:top-4">
-      <div className="border-b border-[#C9D7DC] bg-[#F7FAFA] px-3 py-3 sm:px-4">
-        <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#315C7C]">
+    <section className="overflow-hidden border border-[var(--clinic-border)] bg-[#fffefa] shadow-[var(--console-shadow)] xl:sticky xl:top-4">
+      <div className="border-b border-[var(--console-line)] bg-[#fffefa] px-3 py-3 sm:px-4">
+        <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[var(--clinic-primary)]">
           관리 콘솔
         </p>
         <div className="mt-1 min-w-0">
@@ -2526,11 +2526,11 @@ function ManagementCommandCenter({
         </div>
       </div>
 
-      <div className="border-b border-[#C9D7DC] bg-[#F7FAFA]">
-        <div className="border-b border-[#D6E2E6] bg-[#EDF3F5] px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#526873] sm:px-4">
+      <div className="border-b border-[var(--console-line)] bg-[#fffefa]">
+        <div className="border-b border-[var(--console-line)] bg-[#f3f1ec] px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[var(--clinic-muted)] sm:px-4">
           운영 요약
         </div>
-        <div className="divide-y divide-[#D6E2E6]">
+        <div className="divide-y divide-[var(--console-line)]">
           {summaryRows.map((row) => {
             const valueClass =
               row.tone === "warning"
@@ -2544,7 +2544,7 @@ function ManagementCommandCenter({
                 key={row.label}
                 type="button"
                 onClick={() => onSelectSection(row.section)}
-                className="grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 py-2 text-left transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#84C7CB] sm:px-4"
+                className="grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 py-2 text-left transition hover:bg-[#f2f1fb] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa] sm:px-4"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-xs font-bold text-[#405763]">
@@ -2563,11 +2563,11 @@ function ManagementCommandCenter({
         </div>
       </div>
 
-      <div className="bg-[#F7FAFA]">
-        <div className="border-b border-[#D6E2E6] bg-[#EDF3F5] px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#526873] sm:px-4">
+      <div className="bg-[#fffefa]">
+        <div className="border-b border-[var(--console-line)] bg-[#f3f1ec] px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[var(--clinic-muted)] sm:px-4">
           업무 메뉴
         </div>
-        <div className="divide-y divide-[#D6E2E6]">
+        <div className="divide-y divide-[var(--console-line)]">
         {sections.map((section) => {
           const isActive = activeSection === section.id;
 
@@ -2581,8 +2581,8 @@ function ManagementCommandCenter({
               className={[
                 "group grid min-h-[3.25rem] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-l-[3px] px-3 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)] sm:px-4",
                 isActive
-                  ? "border-l-[var(--clinic-primary)] bg-[#E1F0EF] text-[var(--clinic-text)]"
-                  : "border-l-transparent bg-[#F7FAFA] text-[var(--clinic-text)] hover:border-l-[#B8C9D0] hover:bg-[#EDF3F5]",
+                  ? "border-l-[var(--clinic-primary)] bg-[#ececff] text-[var(--clinic-text)]"
+                  : "border-l-transparent bg-[#fffefa] text-[var(--clinic-text)] hover:border-l-[#c4c7ef] hover:bg-[#f2f1fb]",
               ].join(" ")}
             >
               <span className="min-w-0">
@@ -2592,8 +2592,8 @@ function ManagementCommandCenter({
                     className={[
                       "shrink-0 border px-2 py-0.5 text-[11px] font-black tabular-nums",
                       isActive
-                        ? "border-[#0F8F87] bg-[#D8EFEC] text-[#006C70]"
-                        : "border-[#C9D7DC] bg-[#EDF3F5] text-[var(--clinic-muted)]",
+                        ? "border-[#b8bdf4] bg-[#f4f4ff] text-[var(--clinic-primary)]"
+                        : "border-[var(--console-line)] bg-[#f3f1ec] text-[var(--clinic-muted)]",
                     ].join(" ")}
                   >
                     {section.count}
