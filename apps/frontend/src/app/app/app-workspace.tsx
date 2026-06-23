@@ -4,12 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   BarChart3,
-  BookOpen,
   CalendarDays,
   Home,
   MessageCircle,
   Settings,
-  ShieldCheck,
   User,
 } from "lucide-react";
 import {
@@ -433,14 +431,13 @@ function WorkspaceContextHeader({
   return (
     <section className="hidden min-h-12 border border-[var(--clinic-border)] bg-[#fffefa] px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
       <div className="flex min-w-0 items-center gap-3">
-        <span className="h-6 w-1 bg-[var(--clinic-primary)]" aria-hidden="true" />
         <div className="min-w-0">
-        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--clinic-primary)]">
-          {getWorkspaceViewLabel(activeView, canManage)}
-        </p>
-        <h2 className="mt-0.5 truncate text-base font-extrabold text-[var(--clinic-text)]">
-          {getContextViewTitle(activeView, canManage)} · {academyName}
-        </h2>
+          <p className="text-[11px] font-medium text-[var(--clinic-muted)]">
+            {getWorkspaceViewLabel(activeView, canManage)}
+          </p>
+          <h2 className="mt-0.5 truncate text-base font-semibold text-[var(--clinic-text)]">
+            {getContextViewTitle(activeView, canManage)} · {academyName}
+          </h2>
         </div>
       </div>
 
@@ -544,30 +541,20 @@ function WorkspaceNavigation({
   const navItems = getWorkspaceNavItems(canManage);
   const mobileItems = navItems.filter((item) => item.showOnMobile);
   const shellLabel = canManage ? "학원 운영 콘솔" : "수업 처리 도구";
-  const shellDescription = canManage
-    ? "학생, 출석, 문자, 비용, 리포트를 업무 순서대로 봅니다."
-    : "담당 수업 출석과 연락 처리만 빠르게 사용합니다.";
 
   return (
     <>
       <aside className="hidden sm:sticky sm:top-0 sm:block sm:h-screen sm:self-start">
         <section className="flex h-full flex-col overflow-hidden border-r border-[var(--clinic-border)] bg-[#fbfaf7] text-[var(--clinic-text)]">
-          <div className="border-b border-[var(--console-line)] px-4 py-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center border border-[#dcd9cd] bg-[#f0efe8] text-[var(--clinic-primary)]">
-                <ShieldCheck size={22} aria-hidden="true" />
-              </div>
-              <div>
-                <p className="max-w-[10rem] truncate text-sm font-bold leading-tight">{academyName}</p>
-                <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--clinic-muted)]">ACADEMY OS</p>
-              </div>
+          <div className="border-b border-[var(--console-line)] px-4 py-3">
+            <div className="min-w-0">
+              <p className="max-w-[11rem] truncate text-sm font-semibold leading-tight text-[var(--clinic-text)]">{academyName}</p>
+              <p className="mt-1 text-[11px] font-medium text-[var(--clinic-muted)]">{shellLabel}</p>
             </div>
-            <p className="mt-3 text-xs font-semibold text-[var(--clinic-text)]">{shellLabel}</p>
-            <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">{shellDescription}</p>
           </div>
           <nav
             aria-label={shellLabel}
-            className="flex-1 space-y-0.5 p-2"
+            className="flex-1 space-y-0.5 p-2.5"
           >
             {navItems.map((item) => (
               <WorkspaceNavButton
@@ -584,23 +571,8 @@ function WorkspaceNavigation({
               />
             ))}
           </nav>
-          {canManage ? (
-            <div
-              className="mx-3 mb-3 border border-[var(--console-line)] bg-[#f6f5ef] px-3 py-2 text-[var(--clinic-muted)]"
-              aria-label="준비 중인 운영 영역"
-            >
-              <div className="flex items-center gap-2">
-                <BookOpen size={15} aria-hidden="true" />
-                <p className="text-xs font-semibold text-[var(--clinic-text)]">교재/비용</p>
-              </div>
-              <p className="mt-1 text-[11px] leading-4 text-[var(--clinic-muted)]">
-                비용 기록과 월말 안내 문자는 후속 단계에서 연결합니다.
-              </p>
-            </div>
-          ) : null}
-          <div className="border-t border-[var(--console-line)] px-4 py-3 text-xs text-[var(--clinic-muted)]">
-            <p className="font-semibold">{roleLabel}</p>
-            <p className="mt-1">v1.0.0</p>
+          <div className="border-t border-[var(--console-line)] px-4 py-3">
+            <p className="truncate text-xs font-medium text-[var(--clinic-muted)]">{roleLabel}</p>
           </div>
         </section>
       </aside>
@@ -739,14 +711,14 @@ function WorkspaceNavButton({
       <button
         type="button"
         disabled={disabled}
-        aria-label={label}
+        aria-label={`${label} · ${description}`}
         aria-pressed={isActive}
         onClick={onClick}
         className={[
-          "group relative grid min-h-10 w-full grid-cols-[1.7rem_minmax(0,1fr)_0.75rem] items-center gap-2 border px-3 py-2 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
+          "group relative grid min-h-9 w-full grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 px-2.5 py-1.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
           isActive
-            ? "border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
-            : "border-transparent text-[var(--clinic-muted)] hover:border-[#e1e4e8] hover:bg-[#f8f9fa] hover:text-[var(--clinic-text)]",
+            ? "bg-[#f1f2f2] text-[var(--clinic-text)]"
+            : "text-[var(--clinic-muted)] hover:bg-[#f8f9fa] hover:text-[var(--clinic-text)]",
           disabled ? "cursor-not-allowed opacity-55" : "",
         ].join(" ")}
       >
@@ -762,20 +734,12 @@ function WorkspaceNavButton({
           {icon}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-semibold">{label}</span>
-          <span
-            className={[
-              "mt-0.5 block truncate text-xs",
-              isActive ? "text-[#62656f]" : "text-[#858895]",
-            ].join(" ")}
-          >
-            {description}
-          </span>
+          <span className="block truncate text-sm font-medium">{label}</span>
         </span>
         <span
           aria-hidden="true"
           className={[
-            "text-xs font-semibold",
+            "text-[11px] font-medium",
             disabled
               ? "border border-[var(--clinic-border)] px-1.5 py-0.5 text-[10px] text-[var(--clinic-muted)]"
               : isActive
@@ -793,7 +757,7 @@ function WorkspaceNavButton({
     <button
       type="button"
       disabled={disabled}
-      aria-label={label}
+      aria-label={`${label} · ${description}`}
       aria-pressed={isActive}
       onClick={onClick}
       className={[
