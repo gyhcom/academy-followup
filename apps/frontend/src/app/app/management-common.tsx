@@ -79,16 +79,19 @@ export function StatusBadge({ status }: { status: string }) {
     left: "퇴원",
   };
   const styles: Record<string, string> = {
-    active: "bg-[#EAF7F2] text-[#0F766E]",
-    paused: "bg-amber-50 text-amber-800",
-    left: "bg-stone-200 text-stone-700",
+    active:
+      "border-[var(--console-status-success-border)] bg-[var(--console-status-success-bg)] text-[var(--console-status-success-text)]",
+    paused:
+      "border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] text-[var(--console-status-pending-text)]",
+    left:
+      "border-[#AEBBC1] bg-[#E5EBEE] text-[#405763]",
   };
 
   return (
     <span
       className={[
-        "shrink-0 rounded-sm border px-2 py-1 text-xs font-semibold",
-        styles[status] ?? "bg-stone-200 text-stone-700",
+        "shrink-0 border px-2 py-1 text-xs font-bold",
+        styles[status] ?? "border-[#AEBBC1] bg-[#E5EBEE] text-[#405763]",
       ].join(" ")}
     >
       {labels[status] ?? status}

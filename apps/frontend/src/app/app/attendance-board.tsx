@@ -2896,7 +2896,7 @@ function ContactLozenge({
 }) {
   if (record?.followupStatus === "sent") {
     return (
-      <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-emerald-300 bg-[#EEF8F3] px-2 text-[11px] font-bold text-[var(--clinic-success)]">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-[var(--console-status-success-border)] bg-[var(--console-status-success-bg)] px-2 text-[11px] font-bold text-[var(--console-status-success-text)]">
         문자 완료
       </span>
     );
@@ -2904,7 +2904,7 @@ function ContactLozenge({
 
   if (status === "late" || status === "absent") {
     return (
-      <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-amber-300 bg-[#FFF7E8] px-2 text-[11px] font-bold text-[var(--clinic-warning)]">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] px-2 text-[11px] font-bold text-[var(--console-status-pending-text)]">
         연락 필요
       </span>
     );
@@ -2912,7 +2912,7 @@ function ContactLozenge({
 
   if (status === "needs_check") {
     return (
-      <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-red-300 bg-[#FFF1F0] px-2 text-[11px] font-bold text-[var(--clinic-danger)]">
+      <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-[var(--console-status-danger-border)] bg-[var(--console-status-danger-bg)] px-2 text-[11px] font-bold text-[var(--console-status-danger-text)]">
         확인 필요
       </span>
     );
@@ -5040,12 +5040,18 @@ function createDefaultNote(status: AttendanceStatus) {
 function attendanceStatusClass(status: AttendanceStatus) {
   const classes: Record<AttendanceStatus, string> = {
     pending: "border-[#C9D7DC] bg-[#EEF4F6] text-[var(--clinic-muted)]",
-    present: "border-[#8BC9BF] bg-[#EAF6F4] text-[var(--clinic-primary)]",
-    late: "border-amber-300 bg-[#FFF7E8] text-[var(--clinic-warning)]",
-    absent: "border-red-300 bg-[#FFF1F0] text-[var(--clinic-danger)]",
-    makeup: "border-violet-300 bg-[#F1ECF8] text-[var(--clinic-violet)]",
-    excused: "border-violet-300 bg-[#F1ECF8] text-[var(--clinic-violet)]",
-    needs_check: "border-red-300 bg-[#FFF1F0] text-[var(--clinic-danger)]",
+    present:
+      "border-[var(--console-status-success-border)] bg-[var(--console-status-success-bg)] text-[var(--console-status-success-text)]",
+    late:
+      "border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] text-[var(--console-status-pending-text)]",
+    absent:
+      "border-[var(--console-status-danger-border)] bg-[var(--console-status-danger-bg)] text-[var(--console-status-danger-text)]",
+    makeup:
+      "border-[var(--console-status-violet-border)] bg-[var(--console-status-violet-bg)] text-[var(--console-status-violet-text)]",
+    excused:
+      "border-[var(--console-status-violet-border)] bg-[var(--console-status-violet-bg)] text-[var(--console-status-violet-text)]",
+    needs_check:
+      "border-[var(--console-status-danger-border)] bg-[var(--console-status-danger-bg)] text-[var(--console-status-danger-text)]",
   };
 
   return classes[status];

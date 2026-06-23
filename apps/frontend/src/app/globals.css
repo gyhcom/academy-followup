@@ -1,34 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #e7eef1;
+  --background: #e4eaed;
   --foreground: #10232c;
-  --clinic-page: #e7eef1;
-  --clinic-panel: #f4f8f9;
-  --clinic-panel-muted: #edf3f5;
-  --clinic-panel-strong: #dfe9ec;
-  --clinic-border: #b8c9d0;
-  --clinic-border-strong: #839aa4;
-  --clinic-primary: #006f73;
-  --clinic-primary-dark: #073342;
+  --clinic-page: #e4eaed;
+  --clinic-panel: #f2f6f7;
+  --clinic-panel-muted: #e9f0f2;
+  --clinic-panel-strong: #dbe5e8;
+  --clinic-border: #afc0c8;
+  --clinic-border-strong: #7f939d;
+  --clinic-primary: #005f66;
+  --clinic-primary-dark: #062f3b;
   --clinic-navy: #062634;
   --clinic-navy-2: #0a3949;
-  --clinic-accent: #0f8f87;
+  --clinic-accent: #27736e;
   --clinic-text: #10232c;
   --clinic-muted: #526873;
-  --clinic-rail: #0f5f63;
-  --clinic-warning: #b56a00;
-  --clinic-danger: #b42318;
-  --clinic-success: #087443;
-  --clinic-violet: #6d4ca0;
+  --clinic-rail: #0b565d;
+  --clinic-warning: #8f5100;
+  --clinic-danger: #9f241c;
+  --clinic-success: #0f6848;
+  --clinic-violet: #5e5278;
   --console-radius: 2px;
   --console-shadow: none;
-  --console-row: #f8fbfb;
-  --console-row-hover: #eef5f6;
-  --console-row-selected: #dceeed;
-  --console-line: #d6e2e6;
-  --console-line-strong: #9fb4bc;
+  --console-row: #f6f9fa;
+  --console-row-hover: #eaf1f3;
+  --console-row-selected: #d9e8e8;
+  --console-line: #cfdbdf;
+  --console-line-strong: #97abb4;
   --console-ink-soft: #405763;
+  --console-status-pending-bg: #f4ead8;
+  --console-status-pending-border: #c99a4b;
+  --console-status-pending-text: #754605;
+  --console-status-danger-bg: #f2e2df;
+  --console-status-danger-border: #cb8b85;
+  --console-status-danger-text: #8b1e17;
+  --console-status-success-bg: #e2eee8;
+  --console-status-success-border: #8eb4a3;
+  --console-status-success-text: #0c5f41;
+  --console-status-info-bg: #e4edf3;
+  --console-status-info-border: #95adbd;
+  --console-status-info-text: #244b67;
+  --console-status-violet-bg: #ebe7f0;
+  --console-status-violet-border: #aaa0ba;
+  --console-status-violet-text: #51476c;
 }
 
 @theme inline {
@@ -114,6 +129,10 @@ button:not(:disabled) {
     box-shadow: none !important;
   }
 
+  .academy-console :where([class*="rounded-full"]) {
+    border-radius: var(--console-radius) !important;
+  }
+
   .academy-console .bg-white {
     background-color: #f7fafa !important;
   }
@@ -138,6 +157,51 @@ button:not(:disabled) {
     [class*="bg-[#F1F5"]
   ) {
     background-color: #e7eef1 !important;
+  }
+
+  .academy-console :where([class*="bg-amber-50"], [class*="bg-[#FFF7"], [class*="bg-[#FFE"]) {
+    border-color: var(--console-status-pending-border) !important;
+    background-color: var(--console-status-pending-bg) !important;
+  }
+
+  .academy-console :where([class*="text-amber-700"], [class*="text-amber-800"], [class*="text-amber-900"], [class*="text-amber-950"]) {
+    color: var(--console-status-pending-text) !important;
+  }
+
+  .academy-console :where([class*="bg-red-50"], [class*="bg-[#FFF1"], [class*="bg-[#FEE"]) {
+    border-color: var(--console-status-danger-border) !important;
+    background-color: var(--console-status-danger-bg) !important;
+  }
+
+  .academy-console :where([class*="text-red-700"], [class*="text-red-800"], [class*="text-red-900"], [class*="text-red-950"]) {
+    color: var(--console-status-danger-text) !important;
+  }
+
+  .academy-console :where([class*="bg-emerald-50"], [class*="bg-green-50"], [class*="bg-[#EAF7"], [class*="bg-[#EAF6"]) {
+    border-color: var(--console-status-success-border) !important;
+    background-color: var(--console-status-success-bg) !important;
+  }
+
+  .academy-console :where([class*="text-emerald-700"], [class*="text-emerald-800"], [class*="text-green-700"], [class*="text-green-800"], [class*="text-[#0F766E]"]) {
+    color: var(--console-status-success-text) !important;
+  }
+
+  .academy-console :where([class*="bg-blue-50"], [class*="bg-cyan-50"], [class*="bg-[#EAF1F8]"]) {
+    border-color: var(--console-status-info-border) !important;
+    background-color: var(--console-status-info-bg) !important;
+  }
+
+  .academy-console :where([class*="text-blue-700"], [class*="text-blue-800"], [class*="text-cyan-700"], [class*="text-cyan-800"], [class*="text-[#244B67]"]) {
+    color: var(--console-status-info-text) !important;
+  }
+
+  .academy-console :where([class*="bg-violet-50"], [class*="bg-purple-50"], [class*="bg-[#F1ECF8]"]) {
+    border-color: var(--console-status-violet-border) !important;
+    background-color: var(--console-status-violet-bg) !important;
+  }
+
+  .academy-console :where([class*="text-violet-700"], [class*="text-violet-800"], [class*="text-purple-700"], [class*="text-purple-800"]) {
+    color: var(--console-status-violet-text) !important;
   }
 
   .academy-console .console-surface {
@@ -189,6 +253,7 @@ button:not(:disabled) {
     font-weight: 800;
     line-height: 1;
     white-space: nowrap;
+    letter-spacing: 0;
   }
 
   .academy-console .console-action-dock {

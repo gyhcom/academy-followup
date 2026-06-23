@@ -2464,15 +2464,15 @@ function filterLabel(filter: FollowupFilter) {
 
 function statusTone(status: AttendanceStatus) {
   if (status === "absent") {
-    return "border-red-300 bg-[#FFF1F0] text-red-800";
+    return "border-[var(--console-status-danger-border)] bg-[var(--console-status-danger-bg)] text-[var(--console-status-danger-text)]";
   }
 
   if (status === "late" || status === "needs_check") {
-    return "border-amber-300 bg-[#FFF7E8] text-amber-900";
+    return "border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] text-[var(--console-status-pending-text)]";
   }
 
   if (status === "present") {
-    return "border-emerald-300 bg-[#EEF8F3] text-emerald-900";
+    return "border-[var(--console-status-success-border)] bg-[var(--console-status-success-bg)] text-[var(--console-status-success-text)]";
   }
 
   if (status === "pending") {
@@ -2486,9 +2486,9 @@ function selectedChipTone(tone: "default" | "blue" | "green" | "amber" | "red" |
   const tones = {
     default: "border-[#10232C] bg-[#10232C] text-white",
     blue: "border-[#073342] bg-[#073342] text-white",
-    green: "border-emerald-800 bg-emerald-800 text-white",
-    amber: "border-amber-800 bg-amber-800 text-white",
-    red: "border-red-800 bg-red-800 text-white",
+    green: "border-[var(--console-status-success-text)] bg-[var(--console-status-success-text)] text-white",
+    amber: "border-[var(--console-status-pending-text)] bg-[var(--console-status-pending-text)] text-white",
+    red: "border-[var(--console-status-danger-text)] bg-[var(--console-status-danger-text)] text-white",
     violet: "border-[#334B58] bg-[#334B58] text-white",
   };
 

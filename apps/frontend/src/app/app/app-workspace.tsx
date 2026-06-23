@@ -745,8 +745,8 @@ function WorkspaceNavButton({
         className={[
           "group relative grid min-h-10 w-full grid-cols-[1.7rem_minmax(0,1fr)_0.75rem] items-center gap-2 border-l-[3px] px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70",
           isActive
-            ? "border-l-[#22C7BD] bg-[#0D5262] text-white"
-            : "border-l-transparent text-cyan-50/74 hover:border-l-cyan-200/45 hover:bg-white/6 hover:text-white",
+            ? "border-l-[#8DB9B6] bg-[#0A3D4A] text-white"
+            : "border-l-transparent text-cyan-50/72 hover:border-l-[#6FA4A5] hover:bg-white/[0.045] hover:text-white",
           disabled ? "cursor-not-allowed opacity-55" : "",
         ].join(" ")}
       >
@@ -755,8 +755,8 @@ function WorkspaceNavButton({
           className={[
             "flex size-7 shrink-0 items-center justify-center",
             isActive
-              ? "text-cyan-50"
-              : "text-cyan-50/62 group-hover:text-cyan-100",
+              ? "text-[#C8E2E0]"
+              : "text-cyan-50/58 group-hover:text-cyan-100",
           ].join(" ")}
         >
           {icon}
@@ -766,7 +766,7 @@ function WorkspaceNavButton({
           <span
             className={[
               "mt-0.5 block truncate text-xs",
-              isActive ? "text-cyan-50/72" : "text-cyan-50/48",
+              isActive ? "text-cyan-50/68" : "text-cyan-50/46",
             ].join(" ")}
           >
             {description}
@@ -779,7 +779,7 @@ function WorkspaceNavButton({
             disabled
               ? "border border-cyan-50/20 px-1.5 py-0.5 text-[10px] text-cyan-50/50"
               : isActive
-                ? "text-cyan-100"
+                ? "text-[#C8E2E0]"
                 : "text-cyan-50/30 group-hover:text-cyan-50/60",
           ].join(" ")}
         >
@@ -799,7 +799,7 @@ function WorkspaceNavButton({
       className={[
         "flex min-h-12 flex-col items-center justify-center gap-1 border px-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-[#0F8F87]",
         isActive
-          ? "border-[#006F73] bg-[#DCEBEC] text-[#073342]"
+          ? "border-[#005F66] bg-[#D9E8E8] text-[#062F3B]"
           : "border-transparent bg-transparent text-stone-700 hover:bg-[#E8EFF1]",
         disabled ? "cursor-not-allowed opacity-55" : "",
       ].join(" ")}
