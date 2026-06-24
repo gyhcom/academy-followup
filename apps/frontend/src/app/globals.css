@@ -74,17 +74,17 @@ button:not(:disabled) {
 }
 
 .academy-console .message-workbench {
-  --message-select-surface: #f4f4f1;
+  --message-select-surface: #f6f6f2;
   --message-select-panel: #fffefa;
-  --message-select-line: #d8d6de;
-  --message-select-accent: #62656f;
-  --message-plan-surface: #f7f6f2;
+  --message-select-line: #dedbd1;
+  --message-select-accent: #5f6368;
+  --message-plan-surface: #f2f4f5;
   --message-plan-panel: #fffefa;
-  --message-plan-line: #ded8cf;
-  --message-plan-accent: #62656f;
-  --message-compose-surface: #f4f4f1;
+  --message-plan-line: #d5d9dd;
+  --message-plan-accent: #58616a;
+  --message-compose-surface: #fbf7ef;
   --message-compose-panel: #fffefa;
-  --message-compose-line: #d8d6de;
+  --message-compose-line: #ded4c5;
   --message-compose-accent: #17232b;
   --message-compose-ink: #1f2328;
 }

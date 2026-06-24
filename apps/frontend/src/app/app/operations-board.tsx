@@ -903,7 +903,7 @@ export function OperationsBoard({
         : "파일럿 시연을 위해 먼저 반과 학생 데이터를 추가해야 합니다.";
 
     return (
-        <section className="border border-[#B8C9D0] bg-[#F4F8F9] p-6">
+        <section className="border border-[#D8D6DE] bg-[#FBFAF7] p-6">
         <div className="flex gap-3">
           <AlertCircle className="mt-0.5 text-amber-700" size={21} />
           <div>
@@ -1151,7 +1151,7 @@ function BulkMessagePanel({
     (targetType !== "grade" || Boolean(gradeLabel));
 
   return (
-    <section className="border border-[#B8C9D0] bg-[#F4F8F9]">
+    <section className="border border-[#D8D6DE] bg-[#F4F4F1]">
       <div className="border-b border-stone-200 px-4 py-4">
         <p className="text-sm font-semibold text-[#62656f]">전체문자</p>
         <h2 className="mt-1 text-xl font-semibold text-stone-950">
@@ -1196,7 +1196,7 @@ function BulkMessagePanel({
               <select
                 value={classId}
                 onChange={(event) => onClassIdChange(event.target.value)}
-                className="min-h-11 border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB]"
+                className="min-h-11 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm outline-none focus:border-[#9f9da5] focus:ring-2 focus:ring-[#D8DAFA]"
               >
                 {classes.map((classItem) => (
                   <option key={classItem.id} value={classItem.id}>
@@ -1213,7 +1213,7 @@ function BulkMessagePanel({
               <select
                 value={gradeLabel}
                 onChange={(event) => onGradeLabelChange(event.target.value)}
-                className="min-h-11 border border-[#B8C9D0] bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB]"
+                className="min-h-11 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm outline-none focus:border-[#9f9da5] focus:ring-2 focus:ring-[#D8DAFA]"
               >
                 <option value="">학년 선택</option>
                 {gradeOptions.map((grade) => (
@@ -1247,7 +1247,7 @@ function BulkMessagePanel({
             </div>
           </fieldset>
 
-          <label className="flex items-start gap-3 border border-amber-300 bg-[#FFF7E8] p-3 text-sm text-amber-950">
+          <label className="flex items-start gap-3 border border-[#DED4C5] bg-[#FBF7EF] p-3 text-sm text-[#3F3428]">
             <input
               type="checkbox"
               checked={excludeDuplicates}
@@ -1270,7 +1270,7 @@ function BulkMessagePanel({
               value={messageBody}
               onChange={(event) => onMessageBodyChange(event.target.value)}
               rows={9}
-              className="min-h-52 border border-[#B8C9D0] bg-[#F7FAFA] px-3 py-3 text-sm leading-6 outline-none focus:border-[#007A7C] focus:ring-2 focus:ring-[#84C7CB]"
+              className="min-h-52 border border-[#D8D6DE] bg-[#FFFEFA] px-3 py-3 text-sm leading-6 outline-none focus:border-[#9f9da5] focus:ring-2 focus:ring-[#D8DAFA]"
             />
           </label>
           <p
@@ -1435,7 +1435,7 @@ function MessageComposer({
         className,
       ].join(" ")}
     >
-      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3">
+      <div className="border-b border-[#DED4C5] bg-[#FBF7EF] px-4 py-3">
         <div className="flex items-center gap-2">
           <MessageSquareText className="text-[#62656f]" size={18} aria-hidden="true" />
           <h2 id={`${composerId}-title`} className="text-base font-bold text-[#1F2328]">
@@ -1496,7 +1496,7 @@ function MessageComposer({
           </div>
         ) : null}
 
-        <fieldset className="message-zone-compose-panel border p-3">
+        <fieldset className="border-t border-[#DED4C5] px-1 py-3">
           <legend className="px-1 text-sm font-bold text-[#1F2328]">사유 선택</legend>
           <p className="mt-1 text-xs leading-5 text-[#5F6368]">
             사유를 바꾸면 아래 문자 초안만 다시 준비됩니다. 기록 저장과 테스트 발송은 하단 버튼에서 따로 실행합니다.
@@ -1511,9 +1511,9 @@ function MessageComposer({
                   aria-pressed={isSelected}
                   onClick={() => onReasonChange(reason.id)}
                   className={[
-                    "min-h-10 border px-3 text-left text-sm font-bold transition",
+                    "min-h-10 border px-3 text-left text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D8DAFA]",
                     isSelected
-                      ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B] shadow-[inset_0_0_0_1px_rgba(23,35,43,0.06)]"
+                      ? "border-[#2F3437] bg-[#F4F4F1] text-[#17232B] shadow-[inset_0_0_0_1px_rgba(23,35,43,0.08)]"
                       : "border-[#DEDEE4] bg-[#FFFEFA] text-[#3F434A] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
                   ].join(" ")}
                 >
@@ -1524,7 +1524,7 @@ function MessageComposer({
           </div>
         </fieldset>
 
-        <fieldset className="message-zone-compose-panel border p-3">
+        <fieldset className="border-t border-[#DED4C5] px-1 py-3">
           <legend className="px-1 text-sm font-bold text-[#1F2328]">수신자</legend>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {messageRecipientTypes.map((recipientType) => {
@@ -1541,9 +1541,9 @@ function MessageComposer({
                   aria-pressed={isSelected}
                   onClick={() => onRecipientTypeChange(recipientType)}
                   className={[
-                    "min-h-10 border px-2 text-xs font-bold transition",
+                    "min-h-10 border px-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D8DAFA]",
                     isSelected
-                      ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B] shadow-[inset_0_0_0_1px_rgba(23,35,43,0.06)]"
+                      ? "border-[#2F3437] bg-[#F4F4F1] text-[#17232B] shadow-[inset_0_0_0_1px_rgba(23,35,43,0.08)]"
                       : "border-[#DEDEE4] bg-[#FFFEFA] text-[#3F434A] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
@@ -1671,7 +1671,7 @@ function MessageComposer({
           </div>
         ) : null}
 
-        <div className="border border-[#D8D6DE] bg-[#FBFAF7] p-3">
+        <div className="border border-[#DED4C5] bg-[#F5EFE4] p-3">
           <div className="mb-2 flex items-center justify-between gap-2">
             <p className="text-xs font-black uppercase tracking-[0.12em] text-[#62656f]">
               실행 단계

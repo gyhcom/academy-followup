@@ -52,7 +52,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
         totalStudents={props.totalStudents}
       />
 
-      <section className="grid min-h-[42rem] min-w-0 overflow-hidden border border-[#D8D6DE] bg-[#F4F4F1] lg:grid-cols-[minmax(0,1fr)_18.5rem] xl:grid-cols-[minmax(0,1fr)_19rem]">
+      <section className="grid min-h-[42rem] min-w-0 overflow-hidden border border-[#D8D6DE] bg-[#F4F4F1] lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_21rem]">
         <div className="flex min-h-0 min-w-0 flex-col">
           <ClassPicker
             classes={props.classes}
@@ -60,7 +60,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
             onClassSelect={props.onClassSelect}
           />
 
-          <div className="grid min-h-0 min-w-0 flex-1 lg:grid-cols-[12rem_minmax(0,1fr)] 2xl:grid-cols-[14rem_minmax(0,1fr)]">
+          <div className="grid min-h-0 min-w-0 flex-1 lg:grid-cols-[17rem_minmax(0,1fr)] 2xl:grid-cols-[18.5rem_minmax(0,1fr)]">
             <div className="min-h-0 min-w-0 border-r border-[#D8D6DE]">
               <StudentSelectionList
                 selectedClass={props.selectedClass}
@@ -71,7 +71,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
               />
             </div>
 
-            <section className="message-zone-plan min-w-0 border-r p-4">
+            <section className="message-zone-plan min-w-0 border-r p-3 2xl:p-4">
               <ScheduleAndHistoryPanel
                 selectedClassName={props.selectedClass?.name}
                 selectedStudent={props.selectedStudent}
@@ -218,7 +218,7 @@ function ClassPicker({
               aria-pressed={isSelected}
               onClick={() => onClassSelect(classItem.id)}
               className={[
-                "min-h-10 w-[13rem] shrink-0 border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#D8DAFA]",
+                "min-h-10 w-[12.5rem] shrink-0 border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#D8DAFA]",
                 isSelected
                   ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B]"
                   : "border-[#DEDDE5] bg-[#F7F7F4] text-[#30343B] hover:border-[#C9C7D2] hover:bg-[#FFFFFF]",
@@ -271,7 +271,7 @@ function StudentSelectionList({
         </span>
       </div>
 
-      <div className="message-zone-select-panel max-h-[min(42rem,calc(100vh-22rem))] overflow-y-auto lg:min-h-0 lg:flex-1">
+      <div className="message-zone-select-panel overflow-y-auto lg:min-h-0 lg:flex-1">
         {selectedClass?.students.length ? (
           selectedClass.students.map((student) => {
             const isSelected = student.id === selectedStudent?.id;
@@ -336,7 +336,7 @@ function StudentSelectionList({
                     type="button"
                     onClick={() => onStudentSelect(student.id)}
                     className={[
-                      "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                      "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D8DAFA]",
                       isSelected
                         ? "border-[#C9C7D2] bg-[#F4F4F8] text-[#30343B]"
                         : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:bg-[#F7F7FA]",
@@ -359,7 +359,7 @@ function StudentSelectionList({
                             aria-pressed={isReasonSelected}
                             onClick={() => onStudentReasonSelect(student.id, reasonId)}
                             className={[
-                              "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                              "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D8DAFA]",
                             isReasonSelected
                                 ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B] shadow-[inset_0_0_0_1px_rgba(23,35,43,0.06)]"
                                 : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",

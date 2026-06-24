@@ -111,10 +111,10 @@ export function MakeupCalendarPanel({
         </p>
       </div>
 
-      <div className="space-y-3 p-4">
-        <div className="grid gap-3 xl:grid-cols-[minmax(18rem,21rem)_minmax(0,1fr)]">
+      <div className="space-y-3 p-3 2xl:p-4">
+        <div className="grid gap-3 2xl:grid-cols-[18rem_minmax(0,1fr)]">
           <div className="message-zone-plan-panel border px-3 py-3">
-            <div className="mx-auto w-full max-w-[20rem]">
+            <div className="mx-auto w-full max-w-[17.5rem]">
               <div className="flex items-center justify-between gap-2">
                 <button
                   type="button"
@@ -139,7 +139,7 @@ export function MakeupCalendarPanel({
                 </button>
               </div>
 
-              <div className="mt-3 grid grid-cols-7 gap-1 text-center">
+              <div className="mt-3 grid grid-cols-7 gap-0.5 text-center">
                 {weekDayHeaders.map((dayOfWeek) => (
                   <div
                     key={dayOfWeek}
@@ -213,30 +213,34 @@ export function MakeupCalendarPanel({
               </div>
             )}
 
-            <div className="message-zone-plan-panel border px-3 py-3">
-              <p className="text-xs font-semibold text-[#62656f]">선택 날짜</p>
-              <p className="mt-1 text-sm font-semibold text-stone-950">
-                {formatDateForCandidate(selectedDate)}
-              </p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
-                  시작 시간
-                  <input
-                    type="time"
-                    value={startTime}
-                    onChange={(event) => setStartTime(event.target.value)}
-                    className="min-h-11 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#e1e4e8]"
-                  />
-                </label>
-                <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
-                  종료 시간
-                  <input
-                    type="time"
-                    value={endTime}
-                    onChange={(event) => setEndTime(event.target.value)}
-                    className="min-h-11 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#e1e4e8]"
-                  />
-                </label>
+            <div className="message-zone-plan-panel border">
+              <div className="border-b border-[#D8D6DE] px-3 py-2">
+                <p className="text-xs font-semibold text-[#62656f]">선택 날짜 / 보강 시간</p>
+                <p className="mt-1 text-sm font-semibold text-stone-950">
+                  {formatDateForCandidate(selectedDate)}
+                </p>
+              </div>
+              <div className="px-3 py-3">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
+                    시작 시간
+                    <input
+                      type="time"
+                      value={startTime}
+                      onChange={(event) => setStartTime(event.target.value)}
+                      className="min-h-11 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#e1e4e8]"
+                    />
+                  </label>
+                  <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
+                    종료 시간
+                    <input
+                      type="time"
+                      value={endTime}
+                      onChange={(event) => setEndTime(event.target.value)}
+                      className="min-h-11 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#e1e4e8]"
+                    />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
