@@ -85,6 +85,7 @@ type ManagementNavigateView =
   | "operations"
   | "attendance"
   | "students"
+  | "classes"
   | "reports"
   | "management";
 
@@ -829,16 +830,16 @@ export function ManagementHome({
   }> = [
     {
       id: "setup",
-      label: "시작",
-      group: "운영 세팅",
+      label: "시작 순서",
+      group: "초기 점검",
       detail: "선생님 등록부터 출석 확인까지 초기 순서",
       count: "순서",
       status: attendanceSessionCount > 0 ? "출석 준비됨" : "출석 확인 필요",
     },
     {
       id: "students",
-      label: "명단",
-      group: "명단/배정",
+      label: "학생 명단",
+      group: "학생 메뉴",
       detail: "학생, CSV, 스케줄, 공유 동의",
       count: `${activeStudents.length}명`,
       status:
@@ -850,31 +851,31 @@ export function ManagementHome({
     },
     {
       id: "classes",
-      label: "수업",
-      group: "반/시간표",
+      label: "수업/반 설정",
+      group: "운영 설정",
       detail: "반, 담당 선생님, 반 공통 수업 시간",
       count: `${classes.length}개`,
       status: classes.length > 0 ? "반 관리 가능" : "반 생성 필요",
     },
     {
       id: "members",
-      label: "직원",
-      group: "구성원",
+      label: "직원/권한",
+      group: "운영 설정",
       detail: "직위, 권한, 담당 반",
       count: `${members.length}명`,
       status: members.length > 0 ? "계정 관리 가능" : "직원 등록 필요",
     },
     {
       id: "templates",
-      label: "문자",
-      group: "커뮤니케이션",
+      label: "문자 템플릿",
+      group: "운영 설정",
       detail: "결석, 지각, 보강 안내 템플릿",
       count: `${templates.length}개`,
       status: "템플릿 관리",
     },
     {
       id: "settings",
-      label: "정책",
+      label: "운영 정책",
       group: "운영 정책",
       detail: "발신 정보, 테스트 모드, 보조 선생님 발송 권한",
       count: settings.smsDryRun ? "테스트 모드" : "실발송",
@@ -882,7 +883,7 @@ export function ManagementHome({
     },
     {
       id: "reports",
-      label: "리포트",
+      label: "운영 리포트",
       group: "운영 증거",
       detail: "출석, 문자, 명단, 이력 CSV 보관",
       count: "CSV",
@@ -890,7 +891,7 @@ export function ManagementHome({
     },
     {
       id: "history",
-      label: "이력",
+      label: "변경 이력",
       group: "운영 로그",
       detail: "학생, 반, 스케줄, 설정 최근 변경",
       count: `${auditLogItems.length}건`,
@@ -903,7 +904,7 @@ export function ManagementHome({
 
   return (
     <div className="space-y-4 text-[var(--clinic-text)]">
-      {!isStudentLedgerMode ? (
+      {activeSection === "setup" ? (
         <ManagementCommandCenter
           academyName={academyName}
           activeStudents={activeStudents.length}
@@ -912,6 +913,7 @@ export function ManagementHome({
           memberCount={members.length}
           activeSection={activeSection}
           sections={managementSections}
+          onNavigate={onNavigate}
           onSelectSection={setActiveSection}
         />
       ) : null}
@@ -2222,6 +2224,7 @@ function ManagementCommandCenter({
   memberCount,
   activeSection,
   sections,
+  onNavigate,
   onSelectSection,
 }: {
   academyName: string;
@@ -2238,47 +2241,51 @@ function ManagementCommandCenter({
     count: string;
     status: string;
   }>;
+  onNavigate: (view: ManagementNavigateView) => void;
   onSelectSection: (section: ManagementSection) => void;
 }) {
   const summaryRows: Array<{
     label: string;
     value: string;
     detail: string;
-    section: ManagementSection;
+    onClick: () => void;
     tone: "default" | "warning" | "success";
   }> = [
     {
       label: "재원 학생",
       value: `${activeStudents}명`,
-      detail: "명단 기준",
-      section: "students",
+      detail: "학생 화면에서 확인",
+      onClick: () => onNavigate("students"),
       tone: "default",
     },
     {
       label: "스케줄 미등록",
       value: `${missingScheduleCount}명`,
-      detail: missingScheduleCount > 0 ? "출석 누락 확인 필요" : "출석 준비 완료",
-      section: "students",
+      detail: missingScheduleCount > 0 ? "학생 화면에서 보정" : "출석 준비 완료",
+      onClick: () => onNavigate("students"),
       tone: missingScheduleCount > 0 ? "warning" : "success",
     },
     {
       label: "반",
       value: `${classCount}개`,
-      detail: "수업/시간표 관리",
-      section: "classes",
+      detail: "클래스 화면에서 관리",
+      onClick: () => onNavigate("classes"),
       tone: "default",
     },
     {
       label: "직원",
       value: `${memberCount}명`,
       detail: "계정/권한 관리",
-      section: "members",
+      onClick: () => onSelectSection("members"),
       tone: "default",
     },
   ];
+  const settingSections = sections.filter((section) =>
+    ["classes", "members", "templates", "settings", "history"].includes(section.id),
+  );
 
   return (
-    <section className="overflow-hidden border border-[var(--clinic-border)] bg-[#fffefa] shadow-[var(--console-shadow)]">
+    <section className="overflow-hidden border border-[var(--clinic-border)] bg-[#fffefa]">
       <div className="border-b border-[var(--console-line)] px-4 py-3">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
           <div className="min-w-0">
@@ -2289,11 +2296,11 @@ function ManagementCommandCenter({
               {academyName}
             </h2>
             <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
-              명단, 수업, 직원, 문자, 정책을 업무 단위로 관리합니다.
+              직원, 수업/반, 문자 템플릿, 운영 정책을 설정합니다. 학생 명단과 리포트는 왼쪽 메뉴에서 확인합니다.
             </p>
           </div>
 
-          <div className="flex min-w-0 flex-wrap gap-1.5">
+          <div className="grid min-w-0 grid-cols-2 gap-1.5 sm:grid-cols-4">
             {summaryRows.map((row) => {
               const valueClass =
                 row.tone === "warning"
@@ -2306,11 +2313,16 @@ function ManagementCommandCenter({
                 <button
                   key={row.label}
                   type="button"
-                  onClick={() => onSelectSection(row.section)}
-                  className="inline-flex min-h-8 items-center gap-2 border border-[var(--console-line)] bg-[#f8f7f2] px-2.5 text-xs font-bold text-[#494d5a] transition hover:bg-[#f2f1fb] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+                  onClick={row.onClick}
+                  className="group min-h-10 border border-[var(--console-line)] bg-[#f8f7f2] px-2.5 py-1.5 text-left text-xs text-[#494d5a] transition hover:border-[#c7ccd2] hover:bg-[#f5f4ef] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
                 >
-                  <span>{row.label}</span>
-                  <span className={`tabular-nums ${valueClass}`}>{row.value}</span>
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="font-bold">{row.label}</span>
+                    <span className={`font-black tabular-nums ${valueClass}`}>{row.value}</span>
+                  </span>
+                  <span className="mt-0.5 block truncate text-[11px] font-semibold text-[var(--clinic-muted)]">
+                    {row.detail}
+                  </span>
                 </button>
               );
             })}
@@ -2318,8 +2330,17 @@ function ManagementCommandCenter({
         </div>
       </div>
 
+      <div className="grid border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-2 sm:grid-cols-[9rem_minmax(0,1fr)] sm:items-center sm:gap-3">
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#6f737c]">
+          관리 설정
+        </p>
+        <p className="mt-1 text-xs font-semibold text-[var(--clinic-muted)] sm:mt-0">
+          좌측 메뉴와 중복되는 학생·리포트는 제외하고, 실제 설정 작업만 표시합니다.
+        </p>
+      </div>
+
       <div className="divide-y divide-[var(--console-line)]">
-        {sections.map((section) => {
+        {settingSections.map((section) => {
           const isActive = activeSection === section.id;
 
           return (
@@ -2330,7 +2351,7 @@ function ManagementCommandCenter({
               aria-current={isActive ? "page" : undefined}
               onClick={() => onSelectSection(section.id)}
               className={[
-                "group grid min-h-14 w-full grid-cols-[7rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa] sm:grid-cols-[8rem_minmax(0,1fr)_7rem_auto]",
+                "group grid min-h-13 w-full grid-cols-[7.5rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa] sm:grid-cols-[9rem_minmax(0,1fr)_7rem_auto]",
                 isActive
                   ? "bg-[#f6f7f8] text-[var(--clinic-text)]"
                   : "bg-[#fffefa] text-[var(--clinic-text)] hover:bg-[#f8f9fa]",
