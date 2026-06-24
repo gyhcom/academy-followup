@@ -1013,7 +1013,7 @@ export function ManagementHome({
               onChange={(event) =>
                 setSettingsForm({ ...settingsForm, academyName: event.target.value })
               }
-              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
+              className="min-h-11 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
 
@@ -1025,7 +1025,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderName: event.target.value })
               }
               placeholder="문자에 표시할 학원명"
-              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
+              className="min-h-11 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
 
@@ -1037,7 +1037,7 @@ export function ManagementHome({
                 setSettingsForm({ ...settingsForm, senderPhone: event.target.value })
               }
               placeholder="0410000000"
-              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
+              className="min-h-11 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
 
@@ -1053,11 +1053,11 @@ export function ManagementHome({
                   duplicateGuardMinutes: Number(event.target.value),
                 })
               }
-              className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
+              className="min-h-11 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
 
-          <label className="flex min-h-11 items-center gap-3 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm font-medium text-[var(--clinic-text)]">
+          <label className="flex min-h-11 items-center gap-3 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-medium text-[var(--clinic-text)]">
             <input
               type="checkbox"
               checked={settingsForm.smsDryRun}
@@ -1069,7 +1069,7 @@ export function ManagementHome({
             실제 문자 발송 막기
           </label>
 
-          <label className="flex min-h-11 items-center gap-3 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm font-medium text-[var(--clinic-text)]">
+          <label className="flex min-h-11 items-center gap-3 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-medium text-[var(--clinic-text)]">
             <input
               type="checkbox"
               checked={settingsForm.allowAssistantSend}
@@ -1181,13 +1181,13 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="mb-3 rounded-sm border border-[#C9D6E2] bg-[#F8FBFD] px-3 py-3 text-sm text-[#2f3437]">
+          <div className="mb-3 rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-3 text-sm text-[#2f3437]">
             반을 만든 뒤 <span className="font-semibold">수업 시간 등록</span>을 누르면
             그 반의 재원 학생 전체에게 같은 주간 스케줄이 추가됩니다.
           </div>
 
-          <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
-            <div className="hidden grid-cols-[minmax(140px,1fr)_72px_64px_minmax(96px,0.8fr)_220px] border-b border-[#B8C9D0] bg-[#E7EEF1] px-3 py-2.5 text-xs font-semibold text-[var(--clinic-muted)] md:grid">
+          <div className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
+            <div className="hidden grid-cols-[minmax(140px,1fr)_72px_64px_minmax(96px,0.8fr)_220px] border-b border-[#D8D6DE] bg-[#F4F4F1] px-3 py-2.5 text-xs font-semibold text-[var(--clinic-muted)] md:grid">
               <span>반</span>
               <span>과목</span>
               <span>학년</span>
@@ -1197,7 +1197,7 @@ export function ManagementHome({
             {classes.map((classItem) => (
               <div
                 key={classItem.id}
-                className="grid min-w-0 gap-3 border-b border-[#D6E0E5] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(140px,1fr)_72px_64px_minmax(96px,0.8fr)_220px] md:items-center"
+                className="grid min-w-0 gap-3 border-b border-[#E4E1DC] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(140px,1fr)_72px_64px_minmax(96px,0.8fr)_220px] md:items-center"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-[var(--clinic-text)]">{classItem.name}</p>
@@ -1205,11 +1205,11 @@ export function ManagementHome({
                     {[classItem.subject, displayGradeLabel(classItem.gradeLabel), classItem.teacherName ?? "담당 미지정"].filter(Boolean).join(" · ")}
                   </p>
                 </div>
-                <p className="hidden text-sm text-[#405763] md:block">{classItem.subject ?? "-"}</p>
-                <p className="hidden text-sm text-[#405763] md:block">{displayGradeLabel(classItem.gradeLabel) ?? "-"}</p>
-                <p className="hidden truncate text-sm text-[#405763] md:block">{classItem.teacherName ?? "미지정"}</p>
+                <p className="hidden text-sm text-[#494d5a] md:block">{classItem.subject ?? "-"}</p>
+                <p className="hidden text-sm text-[#494d5a] md:block">{displayGradeLabel(classItem.gradeLabel) ?? "-"}</p>
+                <p className="hidden truncate text-sm text-[#494d5a] md:block">{classItem.teacherName ?? "미지정"}</p>
                 <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
-                  <span className="w-fit shrink-0 rounded-md bg-[#EDF3F5] px-2.5 py-1 text-xs font-semibold text-[#405763]">
+                  <span className="w-fit shrink-0 border border-[#D8D6DE] bg-[#F4F4F1] px-2.5 py-1 text-xs font-semibold text-[#494d5a]">
                     학생 {classItem.studentCount}명
                   </span>
                   <button
@@ -1223,7 +1223,7 @@ export function ManagementHome({
                   <button
                     type="button"
                     onClick={() => openEditClassForm(classItem)}
-                    className="flex min-h-8 min-w-[58px] shrink-0 items-center justify-center gap-1 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-2.5 text-xs font-semibold text-[#405763] transition hover:bg-[#EDF3F5]"
+                    className="flex min-h-8 min-w-[58px] shrink-0 items-center justify-center gap-1 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-2.5 text-xs font-semibold text-[#494d5a] transition hover:bg-[#F7F7FA]"
                   >
                     <Pencil size={13} />
                     수정
@@ -1269,8 +1269,8 @@ export function ManagementHome({
             </p>
           ) : null}
 
-          <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
-            <div className="hidden grid-cols-[minmax(120px,1fr)_minmax(160px,1.05fr)_72px_96px_68px_76px] border-b border-[#B8C9D0] bg-[#E7EEF1] px-3 py-2.5 text-xs font-semibold text-[var(--clinic-muted)] md:grid">
+          <div className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
+            <div className="hidden grid-cols-[minmax(120px,1fr)_minmax(160px,1.05fr)_72px_96px_68px_76px] border-b border-[#D8D6DE] bg-[#F4F4F1] px-3 py-2.5 text-xs font-semibold text-[var(--clinic-muted)] md:grid">
               <span>이름</span>
               <span>이메일</span>
               <span>직위</span>
@@ -1281,20 +1281,20 @@ export function ManagementHome({
             {members.map((member) => (
               <div
                 key={member.id}
-                className="grid min-w-0 gap-2 border-b border-[#D6E0E5] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(120px,1fr)_minmax(160px,1.05fr)_72px_96px_68px_76px] md:items-center"
+                className="grid min-w-0 gap-2 border-b border-[#E4E1DC] px-3 py-3.5 last:border-b-0 md:grid-cols-[minmax(120px,1fr)_minmax(160px,1.05fr)_72px_96px_68px_76px] md:items-center"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-[var(--clinic-text)]">{member.name}</p>
                   <p className="mt-1 truncate text-xs text-[var(--clinic-muted)] md:hidden">{member.email}</p>
                 </div>
-                <p className="hidden truncate text-sm text-[#405763] md:block">{member.email}</p>
-                <p className="text-sm text-[#405763]">{roleLabel(member.role)}</p>
-                <p className="text-sm text-[#405763]">{member.maskedPhone ?? "미등록"}</p>
-                <p className="text-sm text-[#405763]">담당 {member.classCount}개</p>
+                <p className="hidden truncate text-sm text-[#494d5a] md:block">{member.email}</p>
+                <p className="text-sm text-[#494d5a]">{roleLabel(member.role)}</p>
+                <p className="text-sm text-[#494d5a]">{member.maskedPhone ?? "미등록"}</p>
+                <p className="text-sm text-[#494d5a]">담당 {member.classCount}개</p>
                 <button
                   type="button"
                   onClick={() => openEditMemberForm(member)}
-                  className="flex min-h-8 min-w-[64px] shrink-0 items-center justify-center gap-1 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-2.5 text-xs font-semibold text-[#405763] transition hover:bg-[#EDF3F5] md:ml-auto"
+                  className="flex min-h-8 min-w-[64px] shrink-0 items-center justify-center gap-1 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-2.5 text-xs font-semibold text-[#494d5a] transition hover:bg-[#F7F7FA] md:ml-auto"
                 >
                   <Pencil size={13} />
                   수정
@@ -1319,7 +1319,7 @@ export function ManagementHome({
               <button
                 type="button"
                 onClick={returnToManagementSetup}
-                className="inline-flex min-h-8 shrink-0 items-center gap-1 border border-[#8FA6B0] bg-[#F7FAFA] px-2.5 text-xs font-bold text-[#494d5a] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                className="inline-flex min-h-8 shrink-0 items-center gap-1 border border-[#D8D6DE] bg-[#FFFEFA] px-2.5 text-xs font-bold text-[#494d5a] transition hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
               >
                 <ArrowLeft size={13} aria-hidden="true" />
                 관리 메인
@@ -1334,7 +1334,7 @@ export function ManagementHome({
             <button
               type="button"
               onClick={openMissingScheduleStudents}
-              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 text-xs font-bold text-[#494d5a] transition hover:bg-[#EDF3F5] sm:min-h-10"
+              className="flex min-h-9 w-auto shrink-0 items-center justify-center gap-2 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-xs font-bold text-[#494d5a] transition hover:bg-[#F7F7FA] sm:min-h-10"
             >
               <CalendarDays size={14} />
               스케줄 미등록 보기
@@ -1556,8 +1556,8 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
     : [];
 
   return (
-    <div className="border border-[#B8C9D0] bg-[#F4F8F9]">
-      <div className="border-b border-[#B8C9D0] bg-[#E7EEF1] px-3 py-3">
+    <div className="border border-[#D8D6DE] bg-[#FFFEFA]">
+      <div className="border-b border-[#D8D6DE] bg-[#F4F4F1] px-3 py-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-black text-[var(--clinic-text)]">조회 기간</p>
@@ -1565,7 +1565,7 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
               파일럿 기간 동안 남은 출석, 문자, 변경 기록을 요약합니다.
             </p>
           </div>
-          <div className="grid grid-cols-3 border border-[#B8C9D0] bg-[#F4F8F9]">
+          <div className="grid grid-cols-3 border border-[#D8D6DE] bg-[#FFFEFA]">
             {[
               ["today", "오늘"],
               ["7d", "7일"],
@@ -1577,7 +1577,7 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
                 aria-pressed={range === rangeValue}
                 onClick={() => setRange(rangeValue as ReportRange)}
                 className={[
-                  "min-h-9 border-r border-[#B8C9D0] px-3 text-xs font-black transition last:border-r-0",
+                  "min-h-9 border-r border-[#D8D6DE] px-3 text-xs font-black transition last:border-r-0",
                   range === rangeValue
                     ? "bg-[#f6f7f8] text-[#2f3437]"
                     : "text-[var(--clinic-muted)] hover:bg-[#f8f9fa]",
@@ -1597,11 +1597,11 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
       ) : null}
 
       {summary ? (
-        <div className="divide-y divide-[#C9D7DC] border-b border-[#B8C9D0]">
+        <div className="divide-y divide-[#E4E1DC] border-b border-[#D8D6DE]">
           {reportCards.map((card) => (
             <div
               key={card.title}
-              className="grid grid-cols-[minmax(0,1fr)_120px] items-center gap-3 bg-[#F7FAFA] px-3 py-3"
+              className="grid grid-cols-[minmax(0,1fr)_120px] items-center gap-3 bg-[#FFFEFA] px-3 py-3"
             >
               <span className="min-w-0">
                 <span className="block text-sm font-black text-[var(--clinic-text)]">
@@ -1611,22 +1611,22 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
                   {card.detail}
                 </span>
               </span>
-              <span className="text-right text-xl font-black tabular-nums text-[#0B4150]">
+              <span className="text-right text-xl font-black tabular-nums text-[#17232B]">
                 {card.value}
               </span>
             </div>
           ))}
         </div>
       ) : (
-        <div className="border-b border-[#B8C9D0] bg-[#F7FAFA] px-3 py-4 text-sm leading-6 text-[var(--clinic-muted)]">
+        <div className="border-b border-[#D8D6DE] bg-[#FFFEFA] px-3 py-4 text-sm leading-6 text-[var(--clinic-muted)]">
           {status.status === "saving"
             ? "운영 리포트를 불러오는 중입니다."
             : "조회할 리포트가 없습니다. 출석 체크나 문자 기록이 쌓이면 이곳에 요약이 표시됩니다."}
         </div>
       )}
 
-      <div className="bg-[#F4F8F9]">
-        <div className="flex items-start justify-between gap-3 border-b border-[#B8C9D0] px-3 py-3">
+      <div className="bg-[#FFFEFA]">
+        <div className="flex items-start justify-between gap-3 border-b border-[#D8D6DE] px-3 py-3">
           <div>
             <p className="text-sm font-black text-[var(--clinic-text)]">CSV 내보내기</p>
             <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
@@ -1637,7 +1637,7 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
             className={`flex shrink-0 items-center gap-2 border px-2.5 py-2 text-xs font-bold ${
               includePrivate
                 ? "border-amber-300 bg-amber-50 text-amber-800"
-                : "border-[#B8C9D0] bg-[#F7FAFA] text-[var(--clinic-text)]"
+                : "border-[#D8D6DE] bg-[#FFFEFA] text-[var(--clinic-text)]"
             }`}
           >
             <input
@@ -1650,7 +1650,7 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
           </label>
         </div>
 
-        <div className="divide-y divide-[#C9D7DC]">
+        <div className="divide-y divide-[#E4E1DC]">
           {[
             ["students", "학생 목록", "반, 연락처, 공유 동의"],
             ["attendance", "출석 기록", "날짜, 수업, 상태"],
@@ -1665,7 +1665,7 @@ function OperationalReportPanel({ auditLogs }: { auditLogs: ManagementAuditLog[]
               className={`flex min-h-14 w-full items-center justify-between gap-3 px-3 text-left transition disabled:cursor-wait disabled:opacity-70 ${
                 includePrivate
                     ? "bg-amber-50 hover:bg-amber-100/70"
-                    : "bg-[#F7FAFA] hover:bg-[#f8f9fa]"
+                    : "bg-[#FFFEFA] hover:bg-[#F7F7FA]"
               }`}
             >
               <span className="flex min-w-0 items-center gap-3">
@@ -1713,7 +1713,7 @@ function MessageTemplateForm({
   const bodyMetrics = getMessageLengthMetrics(form.body);
 
   return (
-    <div className="mb-4 rounded-sm border border-[#C9D6E2] bg-[#F8FBFD] p-3 sm:p-4">
+    <div className="mb-4 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] p-3 sm:p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-[#494d5a]">
@@ -1723,7 +1723,7 @@ function MessageTemplateForm({
             문자 템플릿 수정
           </h4>
         </div>
-        <label className="flex w-fit items-center gap-2 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-3 py-2 text-xs font-semibold text-[#405763]">
+        <label className="flex w-fit items-center gap-2 rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-2 text-xs font-semibold text-[#494d5a]">
           <input
             type="checkbox"
             checked={form.isActive}
@@ -1743,7 +1743,7 @@ function MessageTemplateForm({
             value={form.title}
             onChange={(event) => onChange({ ...form, title: event.target.value })}
             placeholder={`${form.reasonLabel} 안내`}
-            className="min-h-11 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
+            className="min-h-11 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
           />
         </label>
 
@@ -1753,7 +1753,7 @@ function MessageTemplateForm({
             value={form.body}
             onChange={(event) => onChange({ ...form, body: event.target.value })}
             rows={7}
-            className="min-h-40 rounded-sm border border-stone-300 bg-[#F7FAFA] px-3 py-2 text-sm leading-6 outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
+            className="min-h-40 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 py-2 text-sm leading-6 outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
           />
           <span
             className={[
@@ -1776,7 +1776,7 @@ function MessageTemplateForm({
         </label>
       </div>
 
-      <div className="mt-3 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-3 py-2 text-xs leading-5 text-[var(--clinic-muted)]">
+      <div className="mt-3 rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-2 text-xs leading-5 text-[var(--clinic-muted)]">
         사용할 수 있는 변수:
         <span className="ml-1 font-semibold text-[var(--clinic-text)]">
           {"{{academyName}}"}, {"{{studentName}}"}, {"{{teacherName}}"},{" "}
@@ -1794,7 +1794,7 @@ function MessageTemplateForm({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-10 rounded-sm border border-[#8FA6B0] bg-[#F7FAFA] px-4 text-sm font-semibold text-[#405763] transition hover:bg-[#EDF3F5]"
+          className="min-h-10 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-4 text-sm font-semibold text-[#494d5a] transition hover:bg-[#F7F7FA]"
         >
           취소
         </button>
@@ -1821,8 +1821,8 @@ function MessageTemplateList({
   onEditTemplate: (template: ManagementMessageTemplate) => void;
 }) {
   return (
-    <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
-      <div className="hidden grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] border-b border-[#B8C9D0] bg-[#E7EEF1] px-3 py-2.5 text-xs font-semibold text-[var(--clinic-muted)] md:grid">
+    <div className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
+      <div className="hidden grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] border-b border-[#D8D6DE] bg-[#F4F4F1] px-3 py-2.5 text-xs font-semibold text-[var(--clinic-muted)] md:grid">
         <span>사유</span>
         <span>제목</span>
         <span>본문 미리보기</span>
@@ -1835,8 +1835,8 @@ function MessageTemplateList({
           <div
             key={template.reason}
             className={[
-              "grid min-w-0 gap-2 border-b border-[#D6E0E5] px-3 py-3.5 last:border-b-0 md:grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] md:items-center",
-              isActive ? "bg-[#F8FBFD]" : "",
+              "grid min-w-0 gap-2 border-b border-[#E4E1DC] px-3 py-3.5 last:border-b-0 md:grid-cols-[140px_minmax(160px,0.7fr)_minmax(280px,1.5fr)_90px] md:items-center",
+              isActive ? "bg-[#F7F7FA]" : "",
             ].join(" ")}
           >
             <div className="min-w-0">
@@ -1862,7 +1862,7 @@ function MessageTemplateList({
               <button
                 type="button"
                 onClick={() => onEditTemplate(template)}
-                className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-sm border border-[#B8C9D0] bg-[#F7FAFA] px-2.5 text-xs font-semibold text-[#405763] transition hover:bg-[#EDF3F5] md:ml-auto"
+                className="flex min-h-8 w-fit shrink-0 items-center gap-1 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-2.5 text-xs font-semibold text-[#494d5a] transition hover:bg-[#F7F7FA] md:ml-auto"
               >
                 <Pencil size={13} />
                 수정
@@ -1896,7 +1896,7 @@ function ManagementSectionReturnBar({
           <h2 className="text-base font-black text-[var(--clinic-text)]">
             {sectionLabel}
           </h2>
-          <span className="border border-[#C9D7DC] bg-[#EDF3F5] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
+          <span className="border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-0.5 text-[11px] font-bold text-[#494d5a]">
             {sectionGroup}
           </span>
           <span className="text-xs font-semibold text-[var(--clinic-muted)]">
@@ -1907,7 +1907,7 @@ function ManagementSectionReturnBar({
       <button
         type="button"
         onClick={onBack}
-        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-sm border border-[#d7dbe0] bg-[#F7FAFA] px-3 text-sm font-bold text-[#494d5a] transition hover:border-[#c7ccd2] hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:w-auto"
+        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-bold text-[#494d5a] transition hover:border-[#c7ccd2] hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:w-auto"
       >
         <ArrowLeft size={15} aria-hidden="true" />
         관리 메인으로
@@ -2017,7 +2017,7 @@ function SetupWorkflow({
               <h3 className="text-lg font-semibold text-[var(--clinic-text)]">
                 {completedCount} / {setupSteps.length} 단계 완료
               </h3>
-              <span className="border border-[#C9D7DC] bg-[#E7EEF1] px-2 py-0.5 text-[11px] font-bold text-[#405763]">
+              <span className="border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-0.5 text-[11px] font-bold text-[#494d5a]">
                 다음: {nextStep.title}
               </span>
             </div>
@@ -2036,19 +2036,19 @@ function SetupWorkflow({
         </div>
       </div>
 
-      <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
+      <div className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
         {setupSteps.map((step) => (
           <button
             key={step.step}
             type="button"
             onClick={step.onAction}
-            className="grid w-full gap-3 border-b border-[#D6E0E5] px-4 py-3 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
+            className="grid w-full gap-3 border-b border-[#E4E1DC] px-4 py-3 text-left transition last:border-b-0 hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa] sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:items-center"
           >
             <div
               className={[
                 "flex size-8 items-center justify-center border text-sm font-semibold",
                 step.isDone
-                  ? "border-[#d7dbe0] bg-white text-[#2f3437]"
+                  ? "border-[#D8D6DE] bg-[#FFFEFA] text-[#2f3437]"
                   : "border-[#d7dbe0] bg-[#f6f7f8] text-[#62656f]",
               ].join(" ")}
             >
@@ -2061,7 +2061,7 @@ function SetupWorkflow({
                   className={[
                     "border px-2 py-0.5 text-xs font-semibold",
                     step.isDone
-                      ? "border-[#d7dbe0] bg-white text-[#2f3437]"
+                      ? "border-[#D8D6DE] bg-[#FFFEFA] text-[#2f3437]"
                       : "border-amber-200 bg-amber-50 text-amber-800",
                   ].join(" ")}
                 >
@@ -2078,8 +2078,8 @@ function SetupWorkflow({
               className={[
                 "inline-flex min-h-9 items-center justify-center rounded-sm px-3 text-sm font-semibold transition",
                 step.isDone
-                  ? "border border-[#8FA6B0] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#EDF3F5]"
-                  : "border border-[#8FA6B0] bg-[#F7FAFA] text-[var(--clinic-text)] hover:bg-[#EDF3F5]",
+                  ? "border border-[#D8D6DE] bg-[#FFFEFA] text-[var(--clinic-text)] hover:bg-[#F7F7FA]"
+                  : "border border-[#D8D6DE] bg-[#FFFEFA] text-[var(--clinic-text)] hover:bg-[#F7F7FA]",
               ].join(" ")}
             >
               {step.actionLabel}
@@ -2088,11 +2088,11 @@ function SetupWorkflow({
         ))}
       </div>
 
-      <aside className="overflow-hidden border border-[#C9D6E2] bg-[#F7FAFA]">
-        <div className="border-b border-[#C9D6E2] bg-[#F8FBFD] px-4 py-3">
+      <aside className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
+        <div className="border-b border-[#D8D6DE] bg-[#F4F4F1] px-4 py-3">
           <p className="text-sm font-semibold text-[#2f3437]">현재 배정 모델</p>
         </div>
-        <dl className="divide-y divide-[#f6f7f8] text-sm">
+        <dl className="divide-y divide-[#E4E1DC] text-sm">
           <div className="px-4 py-3">
             <dt className="font-semibold text-[var(--clinic-text)]">반 담당</dt>
             <dd className="mt-1 leading-6 text-[var(--clinic-muted)]">
@@ -2120,7 +2120,7 @@ function SetupWorkflow({
 function AuditLogList({ auditLogs }: { auditLogs: ManagementAuditLog[] }) {
   if (auditLogs.length === 0) {
     return (
-      <div className="rounded-sm border border-dashed border-[#DED8CE] bg-[#F7FAFA] px-4 py-8 text-center">
+      <div className="rounded-sm border border-dashed border-[#DED8CE] bg-[#FFFEFA] px-4 py-8 text-center">
         <p className="text-sm font-semibold text-[var(--clinic-text)]">
           아직 기록된 변경 이력이 없습니다.
         </p>
@@ -2132,15 +2132,15 @@ function AuditLogList({ auditLogs }: { auditLogs: ManagementAuditLog[] }) {
   }
 
   return (
-    <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
+    <div className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
       {auditLogs.map((log) => (
         <div
           key={log.id}
-          className="grid gap-2 border-b border-[#D6E0E5] px-3 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+          className="grid gap-2 border-b border-[#E4E1DC] px-3 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
         >
           <div className="min-w-0">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <span className="rounded-md bg-[#F3EFE7] px-2 py-0.5 text-[11px] font-semibold text-[#405763]">
+              <span className="border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-0.5 text-[11px] font-semibold text-[#494d5a]">
                 {getAuditActionLabel(log.action)}
               </span>
               <span className="truncate text-sm font-semibold text-[var(--clinic-text)]">
@@ -2377,7 +2377,7 @@ function ManagementCommandCenter({
               </span>
 
               <span className="min-w-0">
-                <span className="block truncate text-xs font-semibold text-[#405763]">
+                <span className="block truncate text-xs font-semibold text-[#494d5a]">
                   {section.detail}
                 </span>
                 <span className="mt-0.5 block truncate text-[11px] font-semibold text-[#858895]">
