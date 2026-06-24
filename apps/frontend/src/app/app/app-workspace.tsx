@@ -561,6 +561,7 @@ function WorkspaceNavigation({
   const isManagementGroupActive = canManage && isManagementGroupView(activeView);
   const [isManagementGroupManuallyOpen, setIsManagementGroupManuallyOpen] =
     useState(false);
+  const managementSubmenuId = "workspace-management-submenu";
   const isManagementGroupExpanded =
     canManage &&
     (activeView === "students" ||
@@ -612,6 +613,7 @@ function WorkspaceNavigation({
                     expanded={
                       isManagementItem ? isManagementGroupExpanded : undefined
                     }
+                    controlsId={isManagementItem ? managementSubmenuId : undefined}
                     disabled={item.disabled}
                     statusLabel={item.statusLabel}
                     variant="desktop"
@@ -619,7 +621,12 @@ function WorkspaceNavigation({
                   />
 
                   {isManagementItem && isManagementGroupExpanded ? (
-                    <div className="mt-1 rounded-md border border-[#e1dfd7] bg-[#f3f2ed] p-1">
+                    <div
+                      id={managementSubmenuId}
+                      role="group"
+                      aria-label="관리 하위 메뉴"
+                      className="mt-1 rounded-md border border-[#e1dfd7] bg-[#f3f2ed] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]"
+                    >
                       <p className="px-2 pb-1 pt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#858895]">
                         관리 하위 메뉴
                       </p>
@@ -809,6 +816,7 @@ function WorkspaceNavButton({
   description,
   isActive,
   expanded,
+  controlsId,
   disabled = false,
   statusLabel,
   variant,
@@ -820,6 +828,7 @@ function WorkspaceNavButton({
   description: string;
   isActive: boolean;
   expanded?: boolean;
+  controlsId?: string;
   disabled?: boolean;
   statusLabel?: string;
   variant: "desktop" | "mobile";
@@ -833,6 +842,7 @@ function WorkspaceNavButton({
         aria-label={`${label} · ${description}`}
         aria-pressed={isActive}
         aria-expanded={expanded}
+        aria-controls={controlsId}
         onClick={onClick}
         className={[
           "group relative grid min-h-9 w-full grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 px-2.5 py-1.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
