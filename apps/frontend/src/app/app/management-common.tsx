@@ -42,7 +42,7 @@ export function ManagementPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="console-surface min-w-0 bg-transparent sm:bg-[#F4F8F9]">
+    <section className="console-surface min-w-0 bg-transparent sm:bg-[#F4F4F1]">
       <div className="console-header-row flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h3 className="text-lg font-extrabold text-[var(--clinic-text)] sm:text-base">{title}</h3>
@@ -57,7 +57,7 @@ export function ManagementPanel({
               "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-sm border px-3 text-xs font-semibold sm:min-h-10",
               onAction
                 ? "border-[#c9cdd2] bg-[#fffefa] text-[#2f3437] transition hover:border-[#aeb5bf] hover:bg-[#f6f7f8]"
-                : "cursor-not-allowed border-[#D6E0E5] bg-[#F4F8F9] text-[var(--clinic-muted)]",
+                : "cursor-not-allowed border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-muted)]",
             ].join(" ")}
           >
             {actionIcon}
@@ -84,14 +84,14 @@ export function StatusBadge({ status }: { status: string }) {
     paused:
       "border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] text-[var(--console-status-pending-text)]",
     left:
-      "border-[#AEBBC1] bg-[#E5EBEE] text-[#405763]",
+      "border-[#D8D6DE] bg-[#F4F4F1] text-[#494d5a]",
   };
 
   return (
     <span
       className={[
         "shrink-0 border px-2 py-1 text-xs font-bold",
-        styles[status] ?? "border-[#AEBBC1] bg-[#E5EBEE] text-[#405763]",
+        styles[status] ?? "border-[#D8D6DE] bg-[#F4F4F1] text-[#494d5a]",
       ].join(" ")}
     >
       {labels[status] ?? status}

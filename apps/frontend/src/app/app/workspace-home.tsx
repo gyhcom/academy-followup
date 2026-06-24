@@ -556,7 +556,7 @@ function PcOperationsDashboard({
                 </p>
               </div>
               {loadState.status === "loading" ? (
-                <span className="inline-flex items-center gap-1.5 border border-[#B8C9D0] bg-[#EDF3F5] px-2 py-1 text-xs font-semibold text-stone-500">
+                <span className="inline-flex items-center gap-1.5 border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-1 text-xs font-semibold text-[#62656f]">
                   <Loader2 size={13} className="animate-spin" />
                   불러오는 중
                 </span>
@@ -758,7 +758,7 @@ function PcScheduleButton({
     <button
       type="button"
       onClick={() => onNavigate("attendance")}
-      className="flex min-h-[4.25rem] w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F2F8F8] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]"
+      className="flex min-h-[4.25rem] w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
     >
       {content}
     </button>
@@ -810,8 +810,8 @@ function PcStudentFilterBar({
               isSelected
                 ? selectedChipTone(option.tone)
                 : isUnavailable
-                  ? "cursor-not-allowed border-[#C9D7DC] bg-[#EDF3F5] text-[#91A2AA] opacity-70"
-                : "border-[#B8C9D0] bg-[#F7FAFA] text-[var(--clinic-muted)] hover:border-[#839AA4] hover:bg-[#EDF3F5]",
+                  ? "cursor-not-allowed border-[#D8D6DE] bg-[#F4F4F1] text-[#9f9da5] opacity-70"
+                : "border-[#D8D6DE] bg-[#FFFEFA] text-[var(--clinic-muted)] hover:border-[#BFC2C8] hover:bg-[#F7F7FA]",
             ].join(" ")}
           >
             {option.label}
@@ -821,8 +821,8 @@ function PcStudentFilterBar({
                 isSelected
                   ? "border-white/20 bg-white/15 text-white"
                   : isUnavailable
-                    ? "border-[#D6E1E6] bg-[#E7EEF1] text-[#91A2AA]"
-                    : "border-[#C9D7DC] bg-[#E8F0F2] text-[var(--clinic-muted)]",
+                    ? "border-[#D8D6DE] bg-[#F4F4F1] text-[#9f9da5]"
+                    : "border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-muted)]",
               ].join(" ")}
             >
               {option.count}
@@ -1225,7 +1225,7 @@ function MobileHomeExperience({
           <h2 className="mt-1 text-[1.45rem] font-black leading-[1.15] tracking-tight">
             {formatHomeDate(selectedDate)} 처리 현황
           </h2>
-          <p className="mt-2 text-sm leading-6 text-[#405763]">
+          <p className="mt-2 text-sm leading-6 text-[var(--clinic-muted)]">
             출석 체크, 미발송 연락, 보강 제외 일정을 기준 날짜별로 확인합니다.
           </p>
         </div>
@@ -1235,15 +1235,15 @@ function MobileHomeExperience({
             <MobileHeroMetric label="확인할 학생" value={`${followupItems.length}명`} />
             <MobileHeroMetric label="연락 필요" value={`${unsentCount}명`} tone="warm" />
           </div>
-          <p className="mt-3 border-t border-[#C5D4DA] pt-3 text-xs font-bold text-[#405763]">
+          <p className="mt-3 border-t border-[#D8D6DE] pt-3 text-xs font-bold text-[#494d5a]">
             오늘 {isStaffHome ? "담당 수업" : "학원 일정"}{" "}
             {scheduleSummary.academyScheduleCount}개 · 보강 불가{" "}
             {scheduleSummary.blockedScheduleCount}건
           </p>
 
-          <div className="mt-3 border border-[#B8C9D0] bg-[#F7FAFA] p-3">
+          <div className="mt-3 border border-[#D8D6DE] bg-[#FFFEFA] p-3">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center border border-[#AFC1C8] bg-[#E7EEF1] text-[var(--clinic-primary)]">
+              <div className="flex size-10 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-primary)]">
                 <Image
                   src="/icons/education/education-book.svg"
                   alt=""
@@ -1280,7 +1280,7 @@ function MobileHomeExperience({
             <p className="text-lg font-black text-stone-950">빠른 시작</p>
             <p className="mt-0.5 text-xs font-medium text-stone-500">수업 후 처리할 일을 바로 엽니다.</p>
           </div>
-          <span className="border border-[#B8C9D0] bg-[#E7EEF1] px-2.5 py-1 text-xs font-bold text-[#405763]">
+          <span className="border border-[#D8D6DE] bg-[#F4F4F1] px-2.5 py-1 text-xs font-bold text-[#494d5a]">
             {isToday ? "오늘" : "선택일"}
           </span>
         </div>
@@ -1318,8 +1318,8 @@ function MobileHomeExperience({
         </div>
       </section>
 
-      <section className="overflow-hidden border border-[#d7dbe0] bg-[#F7FAFA]">
-        <div className="border-b border-[#D6E0E5] bg-[#E7EEF1] px-4 py-4">
+      <section className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
+        <div className="border-b border-[#D8D6DE] bg-[#F4F4F1] px-4 py-4">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-[var(--clinic-primary)]">
@@ -1329,11 +1329,11 @@ function MobileHomeExperience({
                 {formatHomeDate(selectedDate)}
               </h3>
             </div>
-            <span className="border border-[#AFC1C8] bg-[#F7FAFA] px-2.5 py-1 text-xs font-bold text-[var(--clinic-primary)]">
+            <span className="border border-[#D8D6DE] bg-[#FFFEFA] px-2.5 py-1 text-xs font-bold text-[#494d5a]">
               운영 현황
             </span>
           </div>
-          <p className="mt-2 text-sm leading-6 text-[#405763]">
+          <p className="mt-2 text-sm leading-6 text-[var(--clinic-muted)]">
             숫자를 누르면 해당 학생 목록이 펼쳐집니다.
           </p>
           {loadState.status === "error" ? (
@@ -1438,6 +1438,7 @@ function HomeDateControl({
             type="date"
             value={value}
             aria-label="운영 기준 날짜 선택"
+            suppressHydrationWarning
             onChange={(event) => {
               if (event.target.value) {
                 onChange(event.target.value);
@@ -1475,7 +1476,7 @@ function MobileHeroMetric({
         "border px-3 py-3",
         tone === "warm"
           ? "border-amber-300 bg-[#FFF6E7] text-[#7D3A15]"
-          : "border-[#B8C9D0] bg-[#F7FAFA] text-[var(--clinic-text)]",
+          : "border-[#D8D6DE] bg-[#FFFEFA] text-[var(--clinic-text)]",
       ].join(" ")}
     >
       <p className={["text-xs font-bold", tone === "warm" ? "text-[#A0531D]" : "text-[var(--clinic-muted)]"].join(" ")}>
@@ -1511,12 +1512,12 @@ function MobileActionCard({
       type="button"
       onClick={onClick}
       className={[
-        "group min-h-[5.75rem] border bg-[#F7FAFA] p-3 text-left text-[var(--clinic-text)] transition hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+        "group min-h-[5.75rem] border bg-[#FFFEFA] p-3 text-left text-[var(--clinic-text)] transition hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
         toneClass,
       ].join(" ")}
     >
       <span className="flex items-start justify-between gap-3">
-        <span className="flex size-9 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[var(--clinic-primary)]">
+        <span className="flex size-9 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-primary)]">
           {icon}
         </span>
         <ArrowRight size={16} className="mt-1 text-[#78909A] transition group-active:translate-x-0.5" />
@@ -1561,11 +1562,11 @@ function TodayScheduleSection({
     <section
       aria-label="오늘 일정"
       className={[
-        "overflow-hidden border border-[#d7dbe0] bg-[#F7FAFA]",
+        "overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]",
         className,
       ].join(" ")}
     >
-      <div className="border-b border-[#D6E0E5] bg-[#E7EEF1] px-4 py-3.5 sm:px-5">
+      <div className="border-b border-[#D8D6DE] bg-[#F4F4F1] px-4 py-3.5 sm:px-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-wide text-[#494d5a]">
@@ -1575,7 +1576,7 @@ function TodayScheduleSection({
               {formatHomeDate(selectedDate)} 시간순
             </h3>
           </div>
-          <span className="shrink-0 border border-[#B8C9D0] bg-[#F7FAFA] px-2.5 py-1 text-xs font-bold text-[var(--clinic-primary)]">
+          <span className="shrink-0 border border-[#D8D6DE] bg-[#FFFEFA] px-2.5 py-1 text-xs font-bold text-[#494d5a]">
             {isStaffHome ? "담당 " : ""}수업 {summary.academyScheduleCount} · 공유일정{" "}
             {summary.blockedScheduleCount}
           </span>
@@ -1589,7 +1590,7 @@ function TodayScheduleSection({
             : "이 날짜에는 학원 일정이 없습니다. 관리 탭에서 수업 시간이나 타 학원 일정을 등록하면 여기에 표시됩니다."}
         </div>
       ) : (
-        <div className="divide-y divide-[#D6E0E5]">
+        <div className="divide-y divide-[#E4E1DC]">
           <div className="px-4 py-2.5 sm:px-5">
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -1598,7 +1599,7 @@ function TodayScheduleSection({
                   {academyScheduleDescription}
                 </p>
               </div>
-              <span className="border border-[#B8C9D0] bg-[#EDF3F5] px-2 py-1 text-[11px] font-black text-[#405763]">
+              <span className="border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-1 text-[11px] font-black text-[#494d5a]">
                 {academyItems.length}개
               </span>
             </div>
@@ -1610,12 +1611,12 @@ function TodayScheduleSection({
                 : `${academyScheduleLabel}이 없습니다. 수업 시간 등록 후 출석 체크를 시작할 수 있습니다.`}
             </div>
           ) : (
-            <div className="divide-y divide-[#D6E0E5]">
+            <div className="divide-y divide-[#E4E1DC]">
               {visibleAcademyItems.map((item) => (
                 <TodayScheduleRow key={item.id} item={item} onNavigate={onNavigate} />
               ))}
               {hiddenAcademyCount > 0 ? (
-                <div className="bg-[#EDF3F5] px-4 py-3 text-center text-xs font-bold text-[var(--clinic-muted)] sm:px-5">
+                <div className="bg-[#F4F4F1] px-4 py-3 text-center text-xs font-bold text-[var(--clinic-muted)] sm:px-5">
                   그 외 학원 일정 {hiddenAcademyCount}건은 출석/관리 화면에서 확인하세요.
                 </div>
               ) : null}
@@ -1982,7 +1983,7 @@ function MobileSummaryButton({
         "border px-3 py-3 text-left transition",
         isActive
           ? "border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
-          : `bg-[#F7FAFA] text-[var(--clinic-text)] ${toneClass} hover:bg-[#f8f9fa]`,
+          : `bg-[#FFFEFA] text-[var(--clinic-text)] ${toneClass} hover:bg-[#F7F7FA]`,
       ].join(" ")}
     >
       <span className={["block text-xs font-black", isActive ? "text-[#62656f]" : "text-[var(--clinic-muted)]"].join(" ")}>{label}</span>
@@ -2036,7 +2037,7 @@ function MobileFollowupRow({
           {isSent ? "연락 완료" : item.followupStatus === "draft" ? "기록 저장" : "연락 필요"}
         </span>
       </span>
-      <span className="mt-1 flex size-9 items-center justify-center border border-[#B8C9D0] bg-[#E7EEF1] text-[var(--clinic-primary)]">
+      <span className="mt-1 flex size-9 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-primary)]">
         <ArrowRight size={15} />
       </span>
     </button>
@@ -2573,10 +2574,10 @@ function statusTone(status: AttendanceStatus) {
   }
 
   if (status === "pending") {
-    return "border-[#C9D7DC] bg-[#EEF4F6] text-stone-700";
+    return "border-[#D8D6DE] bg-[#F4F4F1] text-stone-700";
   }
 
-  return "border-[#AFC1C8] bg-[#E7EEF1] text-[#405763]";
+  return "border-[#D8D6DE] bg-[#F4F4F1] text-[#494d5a]";
 }
 
 function selectedChipTone(tone: "default" | "blue" | "green" | "amber" | "red" | "violet") {
