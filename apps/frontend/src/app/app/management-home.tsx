@@ -2296,7 +2296,7 @@ function ManagementCommandCenter({
               {academyName}
             </h2>
             <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
-              직원, 수업/반, 문자 템플릿, 운영 정책을 설정합니다. 학생 명단과 리포트는 왼쪽 메뉴에서 확인합니다.
+              학생, 반, 직원, 문자 템플릿, 운영 정책을 업무 단위로 관리합니다. 리포트는 왼쪽 리포트 메뉴에서 확인합니다.
             </p>
           </div>
 
@@ -2335,7 +2335,7 @@ function ManagementCommandCenter({
           관리 설정
         </p>
         <p className="mt-1 text-xs font-semibold text-[var(--clinic-muted)] sm:mt-0">
-          좌측 메뉴와 중복되는 학생·리포트는 제외하고, 실제 설정 작업만 표시합니다.
+          자주 바꾸는 운영 설정을 먼저 표시합니다. 학생 명단은 왼쪽 관리 하위 메뉴에서 바로 열 수 있습니다.
         </p>
       </div>
 
