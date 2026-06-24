@@ -472,7 +472,7 @@ function FeesPlaceholder({
   return (
     <section className="border border-[#D8D6DE] bg-[#FFFEFA] p-6">
       <div className="max-w-3xl">
-        <p className="text-xs font-semibold text-[#494d5a]">준비 중인 운영 영역</p>
+        <p className="text-xs font-semibold text-[#494d5a]">다음 단계 운영 영역</p>
         <h2 className="mt-2 text-2xl font-semibold text-stone-950">교재/비용</h2>
         <p className="mt-2 text-sm leading-6 text-stone-600">
           교재비와 수강료는 결제/수납 시스템으로 바로 확장하지 않고, 학생별 금액 기록과

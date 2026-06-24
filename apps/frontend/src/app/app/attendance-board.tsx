@@ -1339,7 +1339,7 @@ function AttendanceViewTabs({
     {
       id: "ledger",
       label: "학생별 장부",
-      description: "준비 중",
+      description: "다음 단계",
       ownerOnly: true,
     },
   ];
@@ -1729,7 +1729,7 @@ function AttendanceCalendarDayCell({
           ) : null}
         </div>
       </div>
-      <div className="mt-3 min-w-0 space-y-1.5 text-[12px] leading-5 text-[#405763]">
+      <div className="mt-3 min-w-0 space-y-1.5 text-[12px] leading-5 text-[#494d5a]">
         <div
           className={[
             "min-w-0 rounded-sm px-1.5 py-1 text-[11px] font-semibold leading-4",
@@ -2012,7 +2012,7 @@ function AttendanceDayDetailPanel({
           {activeTab === "students" ? (
             <>
               {studentStatusFilter !== "all" ? (
-                <div className="mb-2 flex items-center justify-between gap-2 border border-[#C4D5DA] bg-[#F7FAF8] px-3 py-2 text-xs font-bold text-[#405763]">
+                <div className="mb-2 flex items-center justify-between gap-2 border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-2 text-xs font-bold text-[#494d5a]">
                   <span>
                     {activeStudentFilterLabel} {activeStudentFilterCount}명 표시
                     중
@@ -2388,7 +2388,7 @@ function StudentScheduleDrawer({
                     .filter(Boolean)
                     .join(" · ") || "학교/학년 미등록"}
                 </p>
-                <p className="mt-2 text-sm font-semibold tabular-nums text-[#405763]">
+                <p className="mt-2 text-sm font-semibold tabular-nums text-[#494d5a]">
                   {row.student.maskedStudentPhone ??
                     row.student.maskedParentPhone}
                 </p>
@@ -5459,7 +5459,7 @@ function createDefaultNote(status: AttendanceStatus) {
 
 function attendanceStatusClass(status: AttendanceStatus) {
   const classes: Record<AttendanceStatus, string> = {
-    pending: "border-[#C9D7DC] bg-[#EEF4F6] text-[var(--clinic-muted)]",
+    pending: "border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-muted)]",
     present:
       "border-[var(--console-status-success-border)] bg-[var(--console-status-success-bg)] text-[var(--console-status-success-text)]",
     late: "border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] text-[var(--console-status-pending-text)]",

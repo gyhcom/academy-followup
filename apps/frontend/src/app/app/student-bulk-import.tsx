@@ -85,7 +85,7 @@ export function StudentBulkImportForm({
   }
 
   return (
-    <div className="mb-4 min-w-0 overflow-hidden rounded-xl border border-[#E6E0D5] bg-[#F7F5F0] p-3">
+    <div className="mb-4 min-w-0 overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA] p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-stone-950">학생 CSV 일괄 등록</p>
@@ -100,7 +100,7 @@ export function StudentBulkImportForm({
           type="button"
           aria-label="학생 일괄 등록 닫기"
           onClick={onCancel}
-          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-[#E6E0D5] bg-white text-stone-600"
+          className="flex size-8 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#FFFEFA] text-stone-600 transition hover:bg-[#F7F7FA]"
         >
           <X size={15} />
         </button>
@@ -109,7 +109,7 @@ export function StudentBulkImportForm({
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <div className="min-w-0 space-y-3">
           <div className="flex flex-col gap-2 sm:flex-row">
-            <label className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm font-semibold text-stone-800 sm:w-auto">
+            <label className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-semibold text-stone-800 transition hover:bg-[#F7F7FA] sm:w-auto">
               <FileSpreadsheet size={16} />
               CSV 파일 선택
               <input
@@ -122,7 +122,7 @@ export function StudentBulkImportForm({
             <button
               type="button"
               onClick={downloadTemplate}
-              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-[#D8D0C4] bg-white px-3 text-sm font-semibold text-stone-800 sm:w-auto"
+              className="flex min-h-11 w-full items-center justify-center gap-2 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-semibold text-stone-800 transition hover:bg-[#F7F7FA] sm:w-auto"
             >
               <Download size={16} />
               템플릿 다운로드
@@ -136,13 +136,13 @@ export function StudentBulkImportForm({
               onChange={(event) => setCsvText(event.target.value)}
               rows={12}
               spellCheck={false}
-              className="min-h-72 w-full min-w-0 resize-y rounded-md border border-[#D8D0C4] bg-white px-3 py-2 font-mono text-xs leading-5 outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
+              className="min-h-72 w-full min-w-0 resize-y border border-[#D8D6DE] bg-[#FFFEFA] px-3 py-2 font-mono text-xs leading-5 outline-none focus:border-[#494d5a] focus:ring-2 focus:ring-[#f6f7f8]"
             />
           </label>
         </div>
 
-        <div className="min-w-0 rounded-lg border border-[#E6E0D5] bg-white">
-          <div className="grid grid-cols-3 divide-x divide-[#E6E0D5] border-b border-[#E6E0D5] bg-[#FBFAF7] text-center">
+        <div className="min-w-0 border border-[#D8D6DE] bg-[#FFFEFA]">
+          <div className="grid grid-cols-3 divide-x divide-[#E4E1DC] border-b border-[#D8D6DE] bg-[#F4F4F1] text-center">
             <ImportStat label="전체" value={`${validation.rows.length}명`} />
             <ImportStat label="등록 가능" value={`${validRows.length}명`} tone="good" />
             <ImportStat label="확인 필요" value={`${invalidRows.length}명`} tone="bad" />
@@ -169,7 +169,7 @@ export function StudentBulkImportForm({
           </div>
 
           {validation.rows.length > 80 ? (
-            <p className="border-t border-[#E6E0D5] px-3 py-2 text-xs text-stone-500">
+            <p className="border-t border-[#D8D6DE] px-3 py-2 text-xs text-stone-500">
               화면에는 80명까지만 미리보기로 표시합니다. 실제 등록은 유효한 전체 행을 처리합니다.
             </p>
           ) : null}
@@ -179,9 +179,9 @@ export function StudentBulkImportForm({
       {status.status === "saved" || status.status === "error" ? (
         <p
           className={[
-            "mt-3 rounded-md border px-3 py-2 text-sm",
+            "mt-3 border px-3 py-2 text-sm",
             status.status === "saved"
-              ? "border-[#C9D6E2] bg-[#f6f7f8] text-[#2f3437]"
+              ? "border-[#D8D6DE] bg-[#F4F4F1] text-[#2f3437]"
               : "border-red-200 bg-red-50 text-red-900",
           ].join(" ")}
         >
@@ -193,7 +193,7 @@ export function StudentBulkImportForm({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 w-full min-w-0 rounded-md border border-[#D8D0C4] bg-white px-4 text-sm font-semibold text-stone-700 sm:w-auto"
+          className="min-h-11 w-full min-w-0 border border-[#D8D6DE] bg-[#FFFEFA] px-4 text-sm font-semibold text-stone-700 transition hover:bg-[#F7F7FA] sm:w-auto"
         >
           취소
         </button>
@@ -202,7 +202,7 @@ export function StudentBulkImportForm({
           disabled={!canSubmit}
           onClick={() => onSubmit(validRows)}
           className={[
-            "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold sm:w-auto",
+            "flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-semibold sm:w-auto",
             canSubmit ? "bg-[#494d5a] text-white hover:bg-[#2f3437]" : "bg-stone-300 text-stone-600",
           ].join(" ")}
         >

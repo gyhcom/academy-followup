@@ -36,13 +36,13 @@ export function StudentFollowupHistory({
       aria-labelledby="student-followup-history-title"
       className={[
         compact
-          ? "border border-[#B8C9D0] bg-[#F4F8F9]"
-          : "rounded-lg border border-stone-200 bg-white",
+          ? "border border-[#D8D6DE] bg-[#FFFEFA]"
+          : "border border-[#D8D6DE] bg-[#FFFEFA]",
       ].join(" ")}
     >
-      <div className={compact ? "border-b border-[#C9D7DC] px-3 py-2.5" : "border-b border-stone-200 px-4 py-3"}>
+      <div className={compact ? "border-b border-[#D8D6DE] px-3 py-2.5" : "border-b border-[#D8D6DE] px-4 py-3"}>
         <div className="flex items-center gap-2">
-          <History className="text-[#007A7C]" size={compact ? 16 : 18} />
+          <History className="text-[#494d5a]" size={compact ? 16 : 18} />
           <h2
             id="student-followup-history-title"
             className="text-sm font-bold text-[var(--clinic-text)]"
@@ -50,7 +50,7 @@ export function StudentFollowupHistory({
             최근 연락 기록
           </h2>
           {history.status === "ready" ? (
-            <span className="ml-auto border border-[#C9D7DC] bg-[#EDF3F5] px-2 py-0.5 text-xs font-bold text-[var(--clinic-muted)]">
+            <span className="ml-auto border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-0.5 text-xs font-bold text-[var(--clinic-muted)]">
               {history.items.length}건
             </span>
           ) : null}
@@ -89,7 +89,7 @@ export function StudentFollowupHistory({
         ) : null}
 
         {history.status === "ready" && history.items.length > 0 ? (
-          <ol className={compact ? "divide-y divide-[#C9D7DC]" : "divide-y divide-stone-100"}>
+          <ol className={compact ? "divide-y divide-[#E4E1DC]" : "divide-y divide-[#E4E1DC]"}>
             {history.items.map((item) => (
               <li key={item.id} className={compact ? "border-l-2 border-l-transparent px-3 py-2.5" : "border-l-2 border-l-transparent px-4 py-3"}>
                 <div className="flex items-start justify-between gap-3">
@@ -136,10 +136,10 @@ function HistoryMessage({
   return (
     <div
       className={[
-        "flex items-start gap-2 rounded-md border p-3 text-sm leading-6",
+        "flex items-start gap-2 border p-3 text-sm leading-6",
         tone === "error"
           ? "border-red-200 bg-red-50 text-red-900"
-          : "border-stone-200 bg-stone-50 text-stone-600",
+          : "border-[#D8D6DE] bg-[#F4F4F1] text-stone-600",
       ].join(" ")}
     >
       <span className="mt-0.5 shrink-0">{icon}</span>
@@ -151,15 +151,15 @@ function HistoryMessage({
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     draft: "border-amber-200 bg-amber-50 text-amber-800",
-    sent: "border-[#C9D6E2] bg-[#f6f7f8] text-[#494d5a]",
+    sent: "border-[#D8D6DE] bg-[#F4F4F1] text-[#494d5a]",
     failed: "border-red-200 bg-red-50 text-red-800",
   };
 
   return (
     <span
       className={[
-        "rounded-md border px-2 py-0.5 text-xs font-semibold",
-        styles[status] ?? "border-stone-200 bg-stone-50 text-stone-600",
+        "border px-2 py-0.5 text-xs font-semibold",
+        styles[status] ?? "border-[#D8D6DE] bg-[#F4F4F1] text-stone-600",
       ].join(" ")}
     >
       {statusLabel(status)}

@@ -961,7 +961,7 @@ function AppShell({
             {hasPlatformAdmin ? (
               <Link
                 href="/platform"
-                className="hidden min-h-10 items-center rounded-md border border-[#B8C9D0] bg-white px-3 text-sm font-semibold text-[var(--clinic-text)] transition hover:border-[var(--clinic-primary)] hover:bg-[#F5FAFA] sm:flex"
+                className="hidden min-h-10 items-center border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-semibold text-[var(--clinic-text)] transition hover:border-[#BFC2C8] hover:bg-[#F7F7FA] sm:flex"
               >
                 플랫폼 관리
               </Link>
@@ -984,7 +984,7 @@ function EmptyState({
   description: string;
 }) {
   return (
-    <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section className="border border-[#D8D6DE] bg-[#FFFEFA] p-6">
       <div className="flex gap-3">
         <div className="mt-0.5 text-amber-700">
           <AlertCircle size={21} />
