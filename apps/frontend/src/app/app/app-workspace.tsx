@@ -95,6 +95,10 @@ type WorkspaceView =
   | "attendance"
   | "students"
   | "classes"
+  | "members"
+  | "templates"
+  | "settings"
+  | "history"
   | "fees"
   | "reports"
   | "management";
@@ -351,7 +355,20 @@ export function AppWorkspace({
 }
 
 function normalizeWorkspaceView(view: WorkspaceView, canManage: boolean): WorkspaceView {
-  if (!canManage && ["students", "classes", "fees", "reports", "management"].includes(view)) {
+  if (
+    !canManage &&
+    [
+      "students",
+      "classes",
+      "members",
+      "templates",
+      "settings",
+      "history",
+      "fees",
+      "reports",
+      "management",
+    ].includes(view)
+  ) {
     return "home";
   }
 
@@ -365,6 +382,22 @@ function getManagementInitialSection(view: WorkspaceView) {
 
   if (view === "classes") {
     return "classes";
+  }
+
+  if (view === "members") {
+    return "members";
+  }
+
+  if (view === "templates") {
+    return "templates";
+  }
+
+  if (view === "settings") {
+    return "settings";
+  }
+
+  if (view === "history") {
+    return "history";
   }
 
   if (view === "reports") {
@@ -384,6 +417,10 @@ function getWorkspaceViewLabel(view: WorkspaceView, canManage: boolean) {
   if (view === "attendance") return "출석부";
   if (view === "students") return "학생";
   if (view === "classes") return "클래스";
+  if (view === "members") return "직원/권한";
+  if (view === "templates") return "문자 템플릿";
+  if (view === "settings") return "운영 정책";
+  if (view === "history") return "변경 이력";
   if (view === "operations") return "문자";
   if (view === "fees") return "교재/비용";
   if (view === "reports") return "리포트";
@@ -396,6 +433,10 @@ function getContextViewTitle(view: WorkspaceView, canManage: boolean) {
   if (view === "operations") return "문자";
   if (view === "students") return "학생";
   if (view === "classes") return "클래스 관리";
+  if (view === "members") return "직원/권한";
+  if (view === "templates") return "문자 템플릿";
+  if (view === "settings") return "운영 정책";
+  if (view === "history") return "변경 이력";
   if (view === "fees") return "교재/비용";
   if (view === "reports") return "리포트";
   if (view === "management") return "관리";
@@ -566,6 +607,10 @@ function WorkspaceNavigation({
     canManage &&
     (activeView === "students" ||
       activeView === "classes" ||
+      activeView === "members" ||
+      activeView === "templates" ||
+      activeView === "settings" ||
+      activeView === "history" ||
       (activeView === "management" && isManagementGroupManuallyOpen));
 
   function handleDesktopNavClick(view: WorkspaceView) {
@@ -642,6 +687,30 @@ function WorkspaceNavigation({
                           description="반·시간표"
                           isActive={activeView === "classes"}
                           onClick={() => onChange("classes")}
+                        />
+                        <WorkspaceManagementSubButton
+                          label="직원/권한"
+                          description="계정·담당 반"
+                          isActive={activeView === "members"}
+                          onClick={() => onChange("members")}
+                        />
+                        <WorkspaceManagementSubButton
+                          label="문자 템플릿"
+                          description="결석·지각·보강"
+                          isActive={activeView === "templates"}
+                          onClick={() => onChange("templates")}
+                        />
+                        <WorkspaceManagementSubButton
+                          label="운영 정책"
+                          description="발신·테스트 모드"
+                          isActive={activeView === "settings"}
+                          onClick={() => onChange("settings")}
+                        />
+                        <WorkspaceManagementSubButton
+                          label="변경 이력"
+                          description="최근 작업 로그"
+                          isActive={activeView === "history"}
+                          onClick={() => onChange("history")}
                         />
                       </div>
                     </div>
@@ -766,7 +835,15 @@ function getMobileGridClass(itemCount: number) {
 }
 
 function isManagementGroupView(view: WorkspaceView) {
-  return view === "management" || view === "students" || view === "classes";
+  return [
+    "management",
+    "students",
+    "classes",
+    "members",
+    "templates",
+    "settings",
+    "history",
+  ].includes(view);
 }
 
 function WorkspaceManagementSubButton({
