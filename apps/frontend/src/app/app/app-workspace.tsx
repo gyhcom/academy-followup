@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 import {
   BarChart3,
   CalendarDays,
+  ChevronDown,
+  ChevronRight,
   Home,
   MessageCircle,
   Settings,
@@ -556,7 +558,27 @@ function WorkspaceNavigation({
   const desktopItems = navItems.filter((item) => item.showOnDesktop !== false);
   const mobileItems = navItems.filter((item) => item.showOnMobile);
   const shellLabel = canManage ? "학원 운영 콘솔" : "수업 처리 도구";
-  const isManagementGroupOpen = canManage && isManagementGroupView(activeView);
+  const isManagementGroupActive = canManage && isManagementGroupView(activeView);
+  const [isManagementGroupManuallyOpen, setIsManagementGroupManuallyOpen] =
+    useState(false);
+  const isManagementGroupExpanded =
+    canManage &&
+    (activeView === "students" ||
+      activeView === "classes" ||
+      (activeView === "management" && isManagementGroupManuallyOpen));
+
+  function handleDesktopNavClick(view: WorkspaceView) {
+    if (view !== "management") {
+      setIsManagementGroupManuallyOpen(false);
+      onChange(view);
+      return;
+    }
+
+    setIsManagementGroupManuallyOpen(
+      isManagementGroupActive ? !isManagementGroupExpanded : true,
+    );
+    onChange("management");
+  }
 
   return (
     <>
@@ -587,26 +609,34 @@ function WorkspaceNavigation({
                         ? isManagementGroupView(activeView)
                         : activeView === item.view
                     }
+                    expanded={
+                      isManagementItem ? isManagementGroupExpanded : undefined
+                    }
                     disabled={item.disabled}
                     statusLabel={item.statusLabel}
                     variant="desktop"
-                    onClick={() => onChange(item.view)}
+                    onClick={() => handleDesktopNavClick(item.view)}
                   />
 
-                  {isManagementItem && isManagementGroupOpen ? (
-                    <div className="ml-9 mt-1 space-y-0.5 border-l border-[var(--console-line)] pl-2">
-                      <WorkspaceManagementSubButton
-                        label="학생 관리"
-                        description="명단·스케줄"
-                        isActive={activeView === "students"}
-                        onClick={() => onChange("students")}
-                      />
-                      <WorkspaceManagementSubButton
-                        label="클래스 관리"
-                        description="반·시간표"
-                        isActive={activeView === "classes"}
-                        onClick={() => onChange("classes")}
-                      />
+                  {isManagementItem && isManagementGroupExpanded ? (
+                    <div className="mt-1 rounded-md border border-[#e1dfd7] bg-[#f3f2ed] p-1">
+                      <p className="px-2 pb-1 pt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#858895]">
+                        관리 하위 메뉴
+                      </p>
+                      <div className="space-y-0.5">
+                        <WorkspaceManagementSubButton
+                          label="학생 관리"
+                          description="명단·스케줄"
+                          isActive={activeView === "students"}
+                          onClick={() => onChange("students")}
+                        />
+                        <WorkspaceManagementSubButton
+                          label="클래스 관리"
+                          description="반·시간표"
+                          isActive={activeView === "classes"}
+                          onClick={() => onChange("classes")}
+                        />
+                      </div>
                     </div>
                   ) : null}
                 </div>
@@ -778,6 +808,7 @@ function WorkspaceNavButton({
   shortLabel,
   description,
   isActive,
+  expanded,
   disabled = false,
   statusLabel,
   variant,
@@ -788,6 +819,7 @@ function WorkspaceNavButton({
   shortLabel: string;
   description: string;
   isActive: boolean;
+  expanded?: boolean;
   disabled?: boolean;
   statusLabel?: string;
   variant: "desktop" | "mobile";
@@ -800,6 +832,7 @@ function WorkspaceNavButton({
         disabled={disabled}
         aria-label={`${label} · ${description}`}
         aria-pressed={isActive}
+        aria-expanded={expanded}
         onClick={onClick}
         className={[
           "group relative grid min-h-9 w-full grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 px-2.5 py-1.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
@@ -826,7 +859,7 @@ function WorkspaceNavButton({
         <span
           aria-hidden="true"
           className={[
-            "text-[11px] font-medium",
+            "flex min-w-5 items-center justify-center text-[11px] font-medium",
             disabled
               ? "border border-[var(--clinic-border)] px-1.5 py-0.5 text-[10px] text-[var(--clinic-muted)]"
               : isActive
@@ -834,7 +867,13 @@ function WorkspaceNavButton({
                 : "text-[#a3a5ad] group-hover:text-[#2f3437]",
           ].join(" ")}
         >
-          {disabled ? (statusLabel ?? "준비") : "›"}
+          {disabled ? (
+            statusLabel ?? "준비"
+          ) : expanded ? (
+            <ChevronDown size={15} strokeWidth={1.8} />
+          ) : (
+            <ChevronRight size={15} strokeWidth={1.8} />
+          )}
         </span>
       </button>
     );
