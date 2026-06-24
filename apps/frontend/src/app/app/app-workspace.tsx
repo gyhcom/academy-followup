@@ -137,6 +137,7 @@ export function AppWorkspace({
   const [selectedDate, setSelectedDate] = useState(attendanceDate);
   const [workspaceAttendanceRecords, setWorkspaceAttendanceRecords] =
     useState(attendanceRecords);
+  const [managementResetKey, setManagementResetKey] = useState(0);
   const attendanceSessionCount = useMemo(() => {
     const selectedDayOfWeek = getDayOfWeek(selectedDate);
     const sessionKeys = new Set<string>();
@@ -229,6 +230,11 @@ export function AppWorkspace({
     const currentView = normalizeWorkspaceView(activeView, canManage);
 
     if (nextView === currentView) {
+      if (nextView === "management") {
+        setManagementResetKey((value) => value + 1);
+        scrollToTop();
+      }
+
       return;
     }
 
@@ -323,7 +329,7 @@ export function AppWorkspace({
             />
           ) : (
             <ManagementHome
-              key={visibleView}
+              key={`${visibleView}:${managementResetKey}`}
               academyName={academyName}
               classes={managementClasses}
               members={managementMembers}
