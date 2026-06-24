@@ -180,7 +180,11 @@ const editableStatuses: AttendanceStatus[] = [
   "needs_check",
   "makeup",
 ];
-const exceptionStatuses: AttendanceStatus[] = ["absent", "needs_check", "makeup"];
+const exceptionStatuses: AttendanceStatus[] = [
+  "absent",
+  "needs_check",
+  "makeup",
+];
 const attendanceFilterLabels: Record<AttendanceFilter, string> = {
   all: "전체",
   unchecked: "체크 필요만",
@@ -202,7 +206,8 @@ export function AttendanceBoard({
   const [attendanceRecords, setAttendanceRecords] = useState(initialRecords);
   const attendanceRecordsRef = useRef(initialRecords);
   const [selectedSessionKey, setSelectedSessionKey] = useState("");
-  const [attendanceFilter, setAttendanceFilter] = useState<AttendanceFilter>("all");
+  const [attendanceFilter, setAttendanceFilter] =
+    useState<AttendanceFilter>("all");
   const [expandedExceptionKey, setExpandedExceptionKey] = useState("");
   const [loadState, setLoadState] = useState<{
     status: "idle" | "loading" | "error";
@@ -213,9 +218,8 @@ export function AttendanceBoard({
     status: "idle" | "saving" | "saved" | "error";
     error: string;
   }>({ key: "", status: "idle", error: "" });
-  const [followupTarget, setFollowupTarget] = useState<AttendanceFollowupTarget | null>(
-    null,
-  );
+  const [followupTarget, setFollowupTarget] =
+    useState<AttendanceFollowupTarget | null>(null);
   const [messagePreview, setMessagePreview] = useState<MessagePreviewState>({
     key: "",
     status: "idle",
@@ -241,12 +245,17 @@ export function AttendanceBoard({
     error: "",
   });
   const [duplicateWarning, setDuplicateWarning] = useState("");
-  const [bulkTarget, setBulkTarget] = useState<BulkAttendanceTarget | null>(null);
-  const [bulkSelectedStudentIds, setBulkSelectedStudentIds] = useState<string[]>([]);
+  const [bulkTarget, setBulkTarget] = useState<BulkAttendanceTarget | null>(
+    null,
+  );
+  const [bulkSelectedStudentIds, setBulkSelectedStudentIds] = useState<
+    string[]
+  >([]);
   const [bulkMessageTemplate, setBulkMessageTemplate] = useState("");
   const [bulkRecipientType, setBulkRecipientType] =
     useState<MessageRecipientType>("parent");
-  const [selectedWorkbenchStudentId, setSelectedWorkbenchStudentId] = useState("");
+  const [selectedWorkbenchStudentId, setSelectedWorkbenchStudentId] =
+    useState("");
   const [bulkSubmit, setBulkSubmit] = useState<BulkSubmitState>({
     status: "idle",
     message: "",
@@ -258,15 +267,24 @@ export function AttendanceBoard({
   const [attendanceReloadKey, setAttendanceReloadKey] = useState(0);
   const selectedDayOfWeek = getDayOfWeek(selectedDate);
   const dateAttendanceRecords = useMemo(
-    () => attendanceRecords.filter((record) => record.attendanceDate === selectedDate),
+    () =>
+      attendanceRecords.filter(
+        (record) => record.attendanceDate === selectedDate,
+      ),
     [attendanceRecords, selectedDate],
   );
   const sessions = useMemo(
-    () => buildAttendanceSessions(classes, dateAttendanceRecords, selectedDayOfWeek),
+    () =>
+      buildAttendanceSessions(
+        classes,
+        dateAttendanceRecords,
+        selectedDayOfWeek,
+      ),
     [classes, dateAttendanceRecords, selectedDayOfWeek],
   );
   const selectedSession =
-    sessions.find((session) => session.key === selectedSessionKey) ?? sessions[0];
+    sessions.find((session) => session.key === selectedSessionKey) ??
+    sessions[0];
   const selectedSessionRecords = useMemo(
     () =>
       selectedSession
@@ -287,14 +305,18 @@ export function AttendanceBoard({
     : null;
   const filteredStudents = selectedSession
     ? selectedSession.students.filter((student) => {
-        const status = normalizeAttendanceStatus(recordsByStudent.get(student.id)?.status);
+        const status = normalizeAttendanceStatus(
+          recordsByStudent.get(student.id)?.status,
+        );
 
         if (attendanceFilter === "unchecked") {
           return status === "pending";
         }
 
         if (attendanceFilter === "attention") {
-          return status === "absent" || status === "late" || status === "needs_check";
+          return (
+            status === "absent" || status === "late" || status === "needs_check"
+          );
         }
 
         return true;
@@ -307,31 +329,40 @@ export function AttendanceBoard({
   const needsCheckStudents = selectedSession
     ? selectedSession.students.filter(
         (student) =>
-          normalizeAttendanceStatus(recordsByStudent.get(student.id)?.status) ===
-          "needs_check",
+          normalizeAttendanceStatus(
+            recordsByStudent.get(student.id)?.status,
+          ) === "needs_check",
       )
     : [];
   const lateStudents = selectedSession
     ? selectedSession.students.filter(
-        (student) => normalizeAttendanceStatus(recordsByStudent.get(student.id)?.status) === "late",
+        (student) =>
+          normalizeAttendanceStatus(
+            recordsByStudent.get(student.id)?.status,
+          ) === "late",
       )
     : [];
   const absentStudents = selectedSession
     ? selectedSession.students.filter(
         (student) =>
-          normalizeAttendanceStatus(recordsByStudent.get(student.id)?.status) === "absent",
+          normalizeAttendanceStatus(
+            recordsByStudent.get(student.id)?.status,
+          ) === "absent",
       )
     : [];
   const selectedBulkStudents = bulkTarget
-    ? bulkTarget.students.filter((student) => bulkSelectedStudentIds.includes(student.id))
+    ? bulkTarget.students.filter((student) =>
+        bulkSelectedStudentIds.includes(student.id),
+      )
     : [];
   const effectiveBulkRecipientType =
     selectedBulkStudents.some((student) => !student.maskedStudentPhone) &&
     bulkRecipientType !== "parent"
       ? "parent"
       : bulkRecipientType;
-  const effectiveRecipientType =
-    followupTarget?.student.maskedStudentPhone ? selectedRecipientType : "parent";
+  const effectiveRecipientType = followupTarget?.student.maskedStudentPhone
+    ? selectedRecipientType
+    : "parent";
   const followupTargetKey = followupTarget
     ? `${followupTarget.key}:${effectiveRecipientType}`
     : "";
@@ -344,9 +375,11 @@ export function AttendanceBoard({
   const isPreviewLoading =
     Boolean(followupTarget) && messagePreview.key !== followupTargetKey;
   const isPreviewReady =
-    messagePreview.key === followupTargetKey && messagePreview.status === "ready";
+    messagePreview.key === followupTargetKey &&
+    messagePreview.status === "ready";
   const isPreviewError =
-    messagePreview.key === followupTargetKey && messagePreview.status === "error";
+    messagePreview.key === followupTargetKey &&
+    messagePreview.status === "error";
   const isDraftEdited = isPreviewReady && messageBody !== messagePreview.body;
   const isMessageBlank = isPreviewReady && messageBody.trim().length === 0;
   const isFollowupSaving =
@@ -359,7 +392,8 @@ export function AttendanceBoard({
     followupSave.status === "saved";
   const savedFollowupId = isFollowupSaved ? followupSave.followupId : "";
   const isMessageSending =
-    messageSend.followupId === savedFollowupId && messageSend.status === "sending";
+    messageSend.followupId === savedFollowupId &&
+    messageSend.status === "sending";
   const isMessageSent =
     Boolean(savedFollowupId) &&
     messageSend.followupId === savedFollowupId &&
@@ -375,8 +409,9 @@ export function AttendanceBoard({
       ? messageSend.error
       : "";
   const selectedWorkbenchStudent =
-    filteredStudents.find((student) => student.id === selectedWorkbenchStudentId) ??
-    filteredStudents[0];
+    filteredStudents.find(
+      (student) => student.id === selectedWorkbenchStudentId,
+    ) ?? filteredStudents[0];
   const canUseCalendarView = role === "owner" || role === "manager";
   const [attendanceView, setAttendanceView] = useState<AttendanceBoardView>(
     canUseCalendarView ? "calendar" : "today",
@@ -394,11 +429,14 @@ export function AttendanceBoard({
   );
   const effectiveAttendanceView = canUseCalendarView ? attendanceView : "today";
 
-  const applyAttendanceRecords = useCallback((nextRecords: AttendanceRecordItem[]) => {
-    attendanceRecordsRef.current = nextRecords;
-    setAttendanceRecords(nextRecords);
-    onRecordsChange?.(nextRecords);
-  }, [onRecordsChange]);
+  const applyAttendanceRecords = useCallback(
+    (nextRecords: AttendanceRecordItem[]) => {
+      attendanceRecordsRef.current = nextRecords;
+      setAttendanceRecords(nextRecords);
+      onRecordsChange?.(nextRecords);
+    },
+    [onRecordsChange],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -407,7 +445,10 @@ export function AttendanceBoard({
       setLoadState({ status: "loading", error: "" });
 
       try {
-        const payload = await fetchAttendanceRecords(selectedDate, controller.signal);
+        const payload = await fetchAttendanceRecords(
+          selectedDate,
+          controller.signal,
+        );
         const nextRecords = payload.records ?? [];
         applyAttendanceRecords(nextRecords);
         setLoadState({ status: "idle", error: "" });
@@ -470,7 +511,10 @@ export function AttendanceBoard({
           status: "error",
           title: "",
           body: "",
-          error: error instanceof Error ? error.message : "문자 초안을 만들지 못했습니다.",
+          error:
+            error instanceof Error
+              ? error.message
+              : "문자 초안을 만들지 못했습니다.",
         });
         setMessageDraft({ key: "", body: "" });
       }
@@ -478,7 +522,10 @@ export function AttendanceBoard({
 
     async function loadDuplicateWarning() {
       try {
-        const payload = await fetchFollowupHistory(target.student.id, controller.signal);
+        const payload = await fetchFollowupHistory(
+          target.student.id,
+          controller.signal,
+        );
 
         const warning = getRecentDuplicateWarning({
           followups: payload.followups ?? [],
@@ -500,7 +547,10 @@ export function AttendanceBoard({
     };
   }, [followupTarget, effectiveRecipientType]);
 
-  async function handleStatusChange(student: AttendanceStudent, status: AttendanceStatus) {
+  async function handleStatusChange(
+    student: AttendanceStudent,
+    status: AttendanceStatus,
+  ) {
     if (!selectedSession) {
       return;
     }
@@ -526,7 +576,9 @@ export function AttendanceBoard({
       status,
     });
 
-    applyAttendanceRecords(mergeAttendanceRecord(previousRecords, optimisticRecord));
+    applyAttendanceRecords(
+      mergeAttendanceRecord(previousRecords, optimisticRecord),
+    );
 
     try {
       const payload = await saveAttendanceRecord({
@@ -541,7 +593,10 @@ export function AttendanceBoard({
 
       const savedRecord = payload.record;
       const followupReason = getFollowupReasonForAttendanceStatus(status);
-      const nextRecords = mergeAttendanceRecord(attendanceRecordsRef.current, savedRecord);
+      const nextRecords = mergeAttendanceRecord(
+        attendanceRecordsRef.current,
+        savedRecord,
+      );
 
       applyAttendanceRecords(nextRecords);
       setSaveState({ key: updateKey, status: "saved", error: "" });
@@ -565,7 +620,9 @@ export function AttendanceBoard({
         key: updateKey,
         status: "error",
         error:
-          error instanceof Error ? error.message : "출석 상태를 저장하지 못했습니다.",
+          error instanceof Error
+            ? error.message
+            : "출석 상태를 저장하지 못했습니다.",
       });
     }
   }
@@ -579,7 +636,12 @@ export function AttendanceBoard({
   }
 
   async function handleSaveAttendanceFollowup() {
-    if (!followupTarget || !isPreviewReady || isMessageBlank || isFollowupSaving) {
+    if (
+      !followupTarget ||
+      !isPreviewReady ||
+      isMessageBlank ||
+      isFollowupSaving
+    ) {
       return;
     }
 
@@ -622,7 +684,8 @@ export function AttendanceBoard({
             ? {
                 ...record,
                 followupId: payload.followup?.id ?? record.followupId,
-                followupStatus: payload.followup?.status ?? record.followupStatus,
+                followupStatus:
+                  payload.followup?.status ?? record.followupStatus,
                 followupSentAt: null,
               }
             : record,
@@ -664,7 +727,9 @@ export function AttendanceBoard({
         dryRun: payload.dryRun ?? true,
         message:
           payload.message ??
-          (payload.dryRun ? "테스트 발송을 완료했습니다." : "문자를 발송했습니다."),
+          (payload.dryRun
+            ? "테스트 발송을 완료했습니다."
+            : "문자를 발송했습니다."),
         error: "",
       });
       applyAttendanceRecords(
@@ -685,7 +750,9 @@ export function AttendanceBoard({
         dryRun: true,
         message: "",
         error:
-          error instanceof Error ? error.message : "문자를 발송하지 못했습니다.",
+          error instanceof Error
+            ? error.message
+            : "문자를 발송하지 못했습니다.",
       });
     }
   }
@@ -723,7 +790,12 @@ export function AttendanceBoard({
         ? current.filter((id) => id !== studentId)
         : [...current, studentId],
     );
-    setBulkSubmit((current) => ({ ...current, status: "idle", message: "", error: "" }));
+    setBulkSubmit((current) => ({
+      ...current,
+      status: "idle",
+      message: "",
+      error: "",
+    }));
   }
 
   async function handleSubmitBulkAttendance(sendNow: boolean) {
@@ -754,7 +826,9 @@ export function AttendanceBoard({
       });
       const recordsPayload = await fetchAttendanceRecords(selectedDate);
 
-      applyAttendanceRecords(recordsPayload.records ?? attendanceRecordsRef.current);
+      applyAttendanceRecords(
+        recordsPayload.records ?? attendanceRecordsRef.current,
+      );
       setBulkSubmit({
         status: sendNow ? "sent" : "saved",
         message: sendNow
@@ -865,339 +939,371 @@ export function AttendanceBoard({
       ) : null}
 
       {effectiveAttendanceView === "ledger" && canUseCalendarView ? (
-        <AttendanceLedgerSkeleton onOpenCalendar={() => setAttendanceView("calendar")} />
+        <AttendanceLedgerSkeleton
+          onOpenCalendar={() => setAttendanceView("calendar")}
+        />
       ) : null}
 
       {effectiveAttendanceView === "today" ? (
         <>
-      <div className="hidden lg:block">
-        <AttendanceWorkbench
-          teacherName={teacherName}
-          selectedDate={selectedDate}
-          sessions={sessions}
-          selectedSession={selectedSession}
-          selectedSessionKey={selectedSession?.key ?? ""}
-          dateAttendanceRecords={dateAttendanceRecords}
-          loadState={loadState}
-          overview={overview}
-          summary={summary}
-          attendanceFilter={attendanceFilter}
-          filteredStudents={filteredStudents}
-          recordsByStudent={recordsByStudent}
-          saveState={saveState}
-          selectedWorkbenchStudent={selectedWorkbenchStudent}
-          bulkTarget={bulkTarget}
-          selectedBulkStudents={selectedBulkStudents}
-          bulkSelectedStudentIds={bulkSelectedStudentIds}
-          bulkMessageTemplate={bulkMessageTemplate}
-          bulkSubmit={bulkSubmit}
-          effectiveBulkRecipientType={effectiveBulkRecipientType}
-          lateStudents={lateStudents}
-          absentStudents={absentStudents}
-          followupTarget={followupTarget}
-          duplicateWarning={duplicateWarning}
-          effectiveRecipientType={effectiveRecipientType}
-          isDraftEdited={isDraftEdited}
-          isFollowupSaved={isFollowupSaved}
-          isFollowupSaving={isFollowupSaving}
-          isMessageBlank={isMessageBlank}
-          isMessageSending={isMessageSending}
-          isMessageSent={isMessageSent}
-          isPreviewError={isPreviewError}
-          isPreviewLoading={isPreviewLoading}
-          isPreviewReady={isPreviewReady}
-          messageBody={messageBody}
-          messagePreview={messagePreview}
-          messageSend={messageSend}
-          followupSaveError={followupSaveError}
-          messageSendError={messageSendError}
-          needsCheckStudents={needsCheckStudents}
-          sendBlockedMessage={assistantSendBlockedMessage}
-          onRefresh={() => setAttendanceReloadKey((current) => current + 1)}
-          onOpenClassManagement={() => onNavigate?.("management")}
-          onOpenStudentProfile={() => onNavigate?.("students")}
-          onOpenMessages={() => onNavigate?.("operations")}
-          onSelectSession={(sessionKey) => {
-            setSelectedSessionKey(sessionKey);
-            setAttendanceFilter("all");
-            setExpandedExceptionKey("");
-            setBulkTarget(null);
-            setBulkSelectedStudentIds([]);
-            setSelectedWorkbenchStudentId("");
-          }}
-          onFilterChange={setAttendanceFilter}
-          onStartBulk={handleStartBulkAttendance}
-          onClearBulk={() => {
-            setBulkTarget(null);
-            setBulkSelectedStudentIds([]);
-          }}
-          onToggleBulkStudent={handleToggleBulkStudent}
-          onSelectStudent={(studentId) => setSelectedWorkbenchStudentId(studentId)}
-          onOpenStudentFollowup={handleOpenWorkbenchFollowup}
-          onDismissBulk={() => {
-            setBulkTarget(null);
-            setBulkSelectedStudentIds([]);
-          }}
-          onBulkMessageTemplateChange={(body) => {
-            setBulkMessageTemplate(body);
-            setBulkSubmit((current) => ({
-              ...current,
-              status: "idle",
-              message: "",
-              error: "",
-            }));
-          }}
-          onBulkRecipientTypeChange={setBulkRecipientType}
-          onSubmitBulk={handleSubmitBulkAttendance}
-          onDismissFollowup={() => {
-            setDuplicateWarning("");
-            setFollowupTarget(null);
-          }}
-          onMessageChange={(body) => setMessageDraft({ key: followupTargetKey, body })}
-          onRecipientTypeChange={setSelectedRecipientType}
-          onRestorePreview={handleRestorePreview}
-          onSaveFollowup={handleSaveAttendanceFollowup}
-          onSendMessage={handleSendAttendanceMessage}
-        />
-      </div>
-
-      <div className="lg:hidden">
-      <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-2 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
-        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-[#494d5a] sm:text-sm">{academyName}</p>
-            <h2 className="mt-0.5 text-xl font-semibold leading-tight text-stone-950 sm:mt-1 sm:text-3xl">
-              반별 출석부
-            </h2>
-            <p className="mt-1 text-sm leading-5 text-stone-600 sm:leading-6">
-              {teacherName}님, 수업을 고르고 도착만 빠르게 체크합니다.
-            </p>
+          <div className="hidden lg:block">
+            <AttendanceWorkbench
+              teacherName={teacherName}
+              selectedDate={selectedDate}
+              sessions={sessions}
+              selectedSession={selectedSession}
+              selectedSessionKey={selectedSession?.key ?? ""}
+              dateAttendanceRecords={dateAttendanceRecords}
+              loadState={loadState}
+              overview={overview}
+              summary={summary}
+              attendanceFilter={attendanceFilter}
+              filteredStudents={filteredStudents}
+              recordsByStudent={recordsByStudent}
+              saveState={saveState}
+              selectedWorkbenchStudent={selectedWorkbenchStudent}
+              bulkTarget={bulkTarget}
+              selectedBulkStudents={selectedBulkStudents}
+              bulkSelectedStudentIds={bulkSelectedStudentIds}
+              bulkMessageTemplate={bulkMessageTemplate}
+              bulkSubmit={bulkSubmit}
+              effectiveBulkRecipientType={effectiveBulkRecipientType}
+              lateStudents={lateStudents}
+              absentStudents={absentStudents}
+              followupTarget={followupTarget}
+              duplicateWarning={duplicateWarning}
+              effectiveRecipientType={effectiveRecipientType}
+              isDraftEdited={isDraftEdited}
+              isFollowupSaved={isFollowupSaved}
+              isFollowupSaving={isFollowupSaving}
+              isMessageBlank={isMessageBlank}
+              isMessageSending={isMessageSending}
+              isMessageSent={isMessageSent}
+              isPreviewError={isPreviewError}
+              isPreviewLoading={isPreviewLoading}
+              isPreviewReady={isPreviewReady}
+              messageBody={messageBody}
+              messagePreview={messagePreview}
+              messageSend={messageSend}
+              followupSaveError={followupSaveError}
+              messageSendError={messageSendError}
+              needsCheckStudents={needsCheckStudents}
+              sendBlockedMessage={assistantSendBlockedMessage}
+              onRefresh={() => setAttendanceReloadKey((current) => current + 1)}
+              onOpenClassManagement={() => onNavigate?.("management")}
+              onOpenStudentProfile={() => onNavigate?.("students")}
+              onOpenMessages={() => onNavigate?.("operations")}
+              onSelectSession={(sessionKey) => {
+                setSelectedSessionKey(sessionKey);
+                setAttendanceFilter("all");
+                setExpandedExceptionKey("");
+                setBulkTarget(null);
+                setBulkSelectedStudentIds([]);
+                setSelectedWorkbenchStudentId("");
+              }}
+              onFilterChange={setAttendanceFilter}
+              onStartBulk={handleStartBulkAttendance}
+              onClearBulk={() => {
+                setBulkTarget(null);
+                setBulkSelectedStudentIds([]);
+              }}
+              onToggleBulkStudent={handleToggleBulkStudent}
+              onSelectStudent={(studentId) =>
+                setSelectedWorkbenchStudentId(studentId)
+              }
+              onOpenStudentFollowup={handleOpenWorkbenchFollowup}
+              onDismissBulk={() => {
+                setBulkTarget(null);
+                setBulkSelectedStudentIds([]);
+              }}
+              onBulkMessageTemplateChange={(body) => {
+                setBulkMessageTemplate(body);
+                setBulkSubmit((current) => ({
+                  ...current,
+                  status: "idle",
+                  message: "",
+                  error: "",
+                }));
+              }}
+              onBulkRecipientTypeChange={setBulkRecipientType}
+              onSubmitBulk={handleSubmitBulkAttendance}
+              onDismissFollowup={() => {
+                setDuplicateWarning("");
+                setFollowupTarget(null);
+              }}
+              onMessageChange={(body) =>
+                setMessageDraft({ key: followupTargetKey, body })
+              }
+              onRecipientTypeChange={setSelectedRecipientType}
+              onRestorePreview={handleRestorePreview}
+              onSaveFollowup={handleSaveAttendanceFollowup}
+              onSendMessage={handleSendAttendanceMessage}
+            />
           </div>
 
-          <AttendanceDateControl value={selectedDate} onChange={onDateChange} />
-        </div>
-      </section>
-
-      <AttendanceOverviewStrip overview={overview} />
-
-      <section className="grid gap-3 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start lg:gap-4 xl:grid-cols-[18rem_minmax(0,1.15fr)_24rem] 2xl:grid-cols-[20rem_minmax(0,1.25fr)_26rem]">
-        <SessionList
-          sessions={sessions}
-          selectedSessionKey={selectedSession?.key ?? ""}
-          records={dateAttendanceRecords}
-          loadState={loadState.status}
-          selectedDate={selectedDate}
-          overview={overview}
-          teacherName={teacherName}
-          onOpenClassManagement={() => onNavigate?.("management")}
-          onOpenMessages={() => onNavigate?.("operations")}
-          onSelect={(sessionKey) => {
-            setSelectedSessionKey(sessionKey);
-            setAttendanceFilter("all");
-            setExpandedExceptionKey("");
-            setBulkTarget(null);
-            setBulkSelectedStudentIds([]);
-          }}
-        />
-
-        <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
-          <div className="border-b border-stone-200 px-3 py-2.5 sm:px-5 sm:py-3">
-            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <UserCheck size={16} className="text-[#494d5a] sm:size-[18px]" />
-                  <h3 className="text-sm font-semibold text-stone-950 sm:text-base">
-                    {selectedSession?.className ?? "선택된 수업 없음"}
-                  </h3>
+          <div className="lg:hidden">
+            <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-2 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
+              <div className="flex flex-col gap-2.5 lg:flex-row lg:items-end lg:justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-[#494d5a] sm:text-sm">
+                    {academyName}
+                  </p>
+                  <h2 className="mt-0.5 text-xl font-semibold leading-tight text-stone-950 sm:mt-1 sm:text-3xl">
+                    반별 출석부
+                  </h2>
+                  <p className="mt-1 text-sm leading-5 text-stone-600 sm:leading-6">
+                    {teacherName}님, 수업을 고르고 도착만 빠르게 체크합니다.
+                  </p>
                 </div>
-                {selectedSession ? (
-                  <p className="mt-0.5 text-xs text-stone-500 sm:mt-1 sm:text-sm">
-                    {selectedSession.startTime} - {selectedSession.endTime} ·{" "}
-                    {selectedSession.subject ?? "과목 미지정"}
-                  </p>
-                ) : (
-                  <p className="mt-0.5 text-xs text-stone-500 sm:mt-1 sm:text-sm">
-                    선택한 날짜에 수업이 없습니다. 다른 날짜를 보거나 관리 탭에서 수업 시간을 등록해 주세요.
-                  </p>
-                )}
+
+                <AttendanceDateControl
+                  value={selectedDate}
+                  onChange={onDateChange}
+                />
               </div>
+            </section>
 
-              {summary ? <AttendanceSummary summary={summary} /> : null}
-            </div>
+            <AttendanceOverviewStrip overview={overview} />
 
-            {selectedSession ? (
-              <AttendanceFilterBar
-                value={attendanceFilter}
-                summary={summary}
-                totalCount={selectedSession.students.length}
-                onChange={setAttendanceFilter}
-              />
-            ) : null}
-
-            {selectedSession ? (
-              <AttendanceBulkActionBar
-                lateCount={lateStudents.length}
-                absentCount={absentStudents.length}
-                activeReason={bulkTarget?.reason ?? null}
-                selectedCount={selectedBulkStudents.length}
-                onStart={handleStartBulkAttendance}
-                onClear={() => {
+            <section className="grid gap-3 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start lg:gap-4 xl:grid-cols-[18rem_minmax(0,1.15fr)_24rem] 2xl:grid-cols-[20rem_minmax(0,1.25fr)_26rem]">
+              <SessionList
+                sessions={sessions}
+                selectedSessionKey={selectedSession?.key ?? ""}
+                records={dateAttendanceRecords}
+                loadState={loadState.status}
+                selectedDate={selectedDate}
+                overview={overview}
+                teacherName={teacherName}
+                onOpenClassManagement={() => onNavigate?.("management")}
+                onOpenMessages={() => onNavigate?.("operations")}
+                onSelect={(sessionKey) => {
+                  setSelectedSessionKey(sessionKey);
+                  setAttendanceFilter("all");
+                  setExpandedExceptionKey("");
                   setBulkTarget(null);
                   setBulkSelectedStudentIds([]);
                 }}
               />
-            ) : null}
 
-            {loadState.status === "error" ? (
-              <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-900">
-                {loadState.error}
-              </div>
-            ) : null}
-          </div>
+              <section className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
+                <div className="border-b border-stone-200 px-3 py-2.5 sm:px-5 sm:py-3">
+                  <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <UserCheck
+                          size={16}
+                          className="text-[#494d5a] sm:size-[18px]"
+                        />
+                        <h3 className="text-sm font-semibold text-stone-950 sm:text-base">
+                          {selectedSession?.className ?? "선택된 수업 없음"}
+                        </h3>
+                      </div>
+                      {selectedSession ? (
+                        <p className="mt-0.5 text-xs text-stone-500 sm:mt-1 sm:text-sm">
+                          {selectedSession.startTime} -{" "}
+                          {selectedSession.endTime} ·{" "}
+                          {selectedSession.subject ?? "과목 미지정"}
+                        </p>
+                      ) : (
+                        <p className="mt-0.5 text-xs text-stone-500 sm:mt-1 sm:text-sm">
+                          선택한 날짜에 수업이 없습니다. 다른 날짜를 보거나 관리
+                          탭에서 수업 시간을 등록해 주세요.
+                        </p>
+                      )}
+                    </div>
 
-          {selectedSession ? (
-            <div>
-              <div className="hidden grid-cols-[minmax(18rem,1fr)_6.25rem_8rem] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5 xl:grid-cols-[minmax(20rem,1fr)_7rem_8.5rem]">
-                <span>학생</span>
-                <span>도착</span>
-                <span>상태</span>
-              </div>
+                    {summary ? <AttendanceSummary summary={summary} /> : null}
+                  </div>
 
-              <div className="divide-y divide-stone-200">
-                {filteredStudents.length > 0 ? (
-                  filteredStudents.map((student) => {
-                    const record = recordsByStudent.get(student.id);
-                    const status = normalizeAttendanceStatus(record?.status);
-                    const updateKey = getAttendanceUpdateKey({
-                      studentId: student.id,
-                      classId: selectedSession.classId,
-                      attendanceDate: selectedDate,
-                      scheduledStartTime: selectedSession.startTime,
-                      scheduledEndTime: selectedSession.endTime,
-                    });
-                    const isSaving =
-                      saveState.key === updateKey && saveState.status === "saving";
-                    const isSaved =
-                      saveState.key === updateKey && saveState.status === "saved";
-                    const saveError =
-                      saveState.key === updateKey && saveState.status === "error"
-                        ? saveState.error
-                        : "";
-                    const isExceptionOpen = expandedExceptionKey === updateKey;
-                    const isBulkSelectable =
-                      bulkTarget !== null &&
-                      status === attendanceStatusForBulkReason(bulkTarget.reason);
-                    const isBulkSelected = bulkSelectedStudentIds.includes(student.id);
+                  {selectedSession ? (
+                    <AttendanceFilterBar
+                      value={attendanceFilter}
+                      summary={summary}
+                      totalCount={selectedSession.students.length}
+                      onChange={setAttendanceFilter}
+                    />
+                  ) : null}
 
-                    return (
-                      <AttendanceStudentRow
-                        key={student.id}
-                        student={student}
-                        status={status}
-                        record={record}
-                        isSaving={isSaving}
-                        isSaved={isSaved}
-                        saveError={saveError}
-                        isExceptionOpen={isExceptionOpen}
-                        isBulkSelectable={isBulkSelectable}
-                        isBulkSelected={isBulkSelected}
-                        bulkReason={bulkTarget?.reason ?? null}
-                        onToggleBulkSelection={() => handleToggleBulkStudent(student.id)}
-                        onToggleException={() =>
-                          setExpandedExceptionKey((current) =>
-                            current === updateKey ? "" : updateKey,
-                          )
-                        }
-                        onStatusChange={(nextStatus) => {
-                          setExpandedExceptionKey("");
-                          handleStatusChange(student, nextStatus);
-                        }}
-                      />
-                    );
-                  })
+                  {selectedSession ? (
+                    <AttendanceBulkActionBar
+                      lateCount={lateStudents.length}
+                      absentCount={absentStudents.length}
+                      activeReason={bulkTarget?.reason ?? null}
+                      selectedCount={selectedBulkStudents.length}
+                      onStart={handleStartBulkAttendance}
+                      onClear={() => {
+                        setBulkTarget(null);
+                        setBulkSelectedStudentIds([]);
+                      }}
+                    />
+                  ) : null}
+
+                  {loadState.status === "error" ? (
+                    <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-900">
+                      {loadState.error}
+                    </div>
+                  ) : null}
+                </div>
+
+                {selectedSession ? (
+                  <div>
+                    <div className="hidden grid-cols-[minmax(18rem,1fr)_6.25rem_8rem] gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-500 sm:grid sm:px-5 xl:grid-cols-[minmax(20rem,1fr)_7rem_8.5rem]">
+                      <span>학생</span>
+                      <span>도착</span>
+                      <span>상태</span>
+                    </div>
+
+                    <div className="divide-y divide-stone-200">
+                      {filteredStudents.length > 0 ? (
+                        filteredStudents.map((student) => {
+                          const record = recordsByStudent.get(student.id);
+                          const status = normalizeAttendanceStatus(
+                            record?.status,
+                          );
+                          const updateKey = getAttendanceUpdateKey({
+                            studentId: student.id,
+                            classId: selectedSession.classId,
+                            attendanceDate: selectedDate,
+                            scheduledStartTime: selectedSession.startTime,
+                            scheduledEndTime: selectedSession.endTime,
+                          });
+                          const isSaving =
+                            saveState.key === updateKey &&
+                            saveState.status === "saving";
+                          const isSaved =
+                            saveState.key === updateKey &&
+                            saveState.status === "saved";
+                          const saveError =
+                            saveState.key === updateKey &&
+                            saveState.status === "error"
+                              ? saveState.error
+                              : "";
+                          const isExceptionOpen =
+                            expandedExceptionKey === updateKey;
+                          const isBulkSelectable =
+                            bulkTarget !== null &&
+                            status ===
+                              attendanceStatusForBulkReason(bulkTarget.reason);
+                          const isBulkSelected =
+                            bulkSelectedStudentIds.includes(student.id);
+
+                          return (
+                            <AttendanceStudentRow
+                              key={student.id}
+                              student={student}
+                              status={status}
+                              record={record}
+                              isSaving={isSaving}
+                              isSaved={isSaved}
+                              saveError={saveError}
+                              isExceptionOpen={isExceptionOpen}
+                              isBulkSelectable={isBulkSelectable}
+                              isBulkSelected={isBulkSelected}
+                              bulkReason={bulkTarget?.reason ?? null}
+                              onToggleBulkSelection={() =>
+                                handleToggleBulkStudent(student.id)
+                              }
+                              onToggleException={() =>
+                                setExpandedExceptionKey((current) =>
+                                  current === updateKey ? "" : updateKey,
+                                )
+                              }
+                              onStatusChange={(nextStatus) => {
+                                setExpandedExceptionKey("");
+                                handleStatusChange(student, nextStatus);
+                              }}
+                            />
+                          );
+                        })
+                      ) : (
+                        <div className="px-4 py-8 text-center text-sm leading-6 text-stone-500 sm:px-5">
+                          현재 필터에 해당하는 학생이 없습니다. 필터를 `전체`로
+                          바꾸거나 학생의 출석 상태를 확인해 주세요.
+                        </div>
+                      )}
+                    </div>
+
+                    {summary ? (
+                      <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-stone-200 bg-white/95 px-4 py-2 text-sm shadow-[0_-8px_20px_rgba(28,25,23,0.06)] backdrop-blur sm:px-5">
+                        <span className="font-medium text-stone-600">
+                          이 수업 체크 필요
+                        </span>
+                        <span className="rounded-full bg-stone-950 px-2.5 py-1 text-xs font-semibold text-white">
+                          {summary.pending}명
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
                 ) : (
-                  <div className="px-4 py-8 text-center text-sm leading-6 text-stone-500 sm:px-5">
-                    현재 필터에 해당하는 학생이 없습니다. 필터를 `전체`로 바꾸거나 학생의 출석 상태를 확인해 주세요.
+                  <div className="p-5 text-sm leading-6 text-stone-600">
+                    선택한 날짜에 수업 기록이나 주간 스케줄이 없습니다. 관리
+                    탭에서 반 공통 수업 시간을 등록하면 출석부에 표시됩니다.
                   </div>
                 )}
-              </div>
+              </section>
 
-              {summary ? (
-                <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-stone-200 bg-white/95 px-4 py-2 text-sm shadow-[0_-8px_20px_rgba(28,25,23,0.06)] backdrop-blur sm:px-5">
-                  <span className="font-medium text-stone-600">이 수업 체크 필요</span>
-                  <span className="rounded-full bg-stone-950 px-2.5 py-1 text-xs font-semibold text-white">
-                    {summary.pending}명
-                  </span>
-                </div>
-              ) : null}
-            </div>
-          ) : (
-            <div className="p-5 text-sm leading-6 text-stone-600">
-              선택한 날짜에 수업 기록이나 주간 스케줄이 없습니다. 관리 탭에서 반 공통 수업 시간을 등록하면 출석부에 표시됩니다.
-            </div>
-          )}
-        </section>
-
-        {bulkTarget ? (
-          <BulkAttendanceFollowupPanel
-            className="lg:col-span-2 xl:col-span-1"
-            bulkTarget={bulkTarget}
-            messageTemplate={bulkMessageTemplate}
-            selectedRecipientType={effectiveBulkRecipientType}
-            selectedStudents={selectedBulkStudents}
-            submitState={bulkSubmit}
-            sendBlockedMessage={assistantSendBlockedMessage}
-            onDismiss={() => {
-              setBulkTarget(null);
-              setBulkSelectedStudentIds([]);
-            }}
-            onMessageTemplateChange={(body) => {
-              setBulkMessageTemplate(body);
-              setBulkSubmit((current) => ({
-                ...current,
-                status: "idle",
-                message: "",
-                error: "",
-              }));
-            }}
-            onRecipientTypeChange={setBulkRecipientType}
-            onSubmit={handleSubmitBulkAttendance}
-          />
-        ) : (
-          <AttendanceFollowupPanel
-            className="lg:col-span-2 xl:col-span-1"
-            duplicateWarning={duplicateWarning}
-            followupSaveError={followupSaveError}
-            followupTarget={followupTarget}
-            selectedRecipientType={effectiveRecipientType}
-            isDraftEdited={isDraftEdited}
-            isFollowupSaved={isFollowupSaved}
-            isFollowupSaving={isFollowupSaving}
-            isMessageBlank={isMessageBlank}
-            isMessageSending={isMessageSending}
-            isMessageSent={isMessageSent}
-            isPreviewError={isPreviewError}
-            isPreviewLoading={isPreviewLoading}
-            isPreviewReady={isPreviewReady}
-            messageBody={messageBody}
-            messagePreview={messagePreview}
-            messageSend={messageSend}
-            messageSendError={messageSendError}
-            needsCheckStudents={needsCheckStudents}
-            sendBlockedMessage={assistantSendBlockedMessage}
-            onDismiss={() => {
-              setDuplicateWarning("");
-              setFollowupTarget(null);
-            }}
-            onMessageChange={(body) => setMessageDraft({ key: followupTargetKey, body })}
-            onRecipientTypeChange={setSelectedRecipientType}
-            onRestorePreview={handleRestorePreview}
-            onSaveFollowup={handleSaveAttendanceFollowup}
-            onSendMessage={handleSendAttendanceMessage}
-          />
-        )}
-      </section>
-      </div>
+              {bulkTarget ? (
+                <BulkAttendanceFollowupPanel
+                  className="lg:col-span-2 xl:col-span-1"
+                  bulkTarget={bulkTarget}
+                  messageTemplate={bulkMessageTemplate}
+                  selectedRecipientType={effectiveBulkRecipientType}
+                  selectedStudents={selectedBulkStudents}
+                  submitState={bulkSubmit}
+                  sendBlockedMessage={assistantSendBlockedMessage}
+                  onDismiss={() => {
+                    setBulkTarget(null);
+                    setBulkSelectedStudentIds([]);
+                  }}
+                  onMessageTemplateChange={(body) => {
+                    setBulkMessageTemplate(body);
+                    setBulkSubmit((current) => ({
+                      ...current,
+                      status: "idle",
+                      message: "",
+                      error: "",
+                    }));
+                  }}
+                  onRecipientTypeChange={setBulkRecipientType}
+                  onSubmit={handleSubmitBulkAttendance}
+                />
+              ) : (
+                <AttendanceFollowupPanel
+                  className="lg:col-span-2 xl:col-span-1"
+                  duplicateWarning={duplicateWarning}
+                  followupSaveError={followupSaveError}
+                  followupTarget={followupTarget}
+                  selectedRecipientType={effectiveRecipientType}
+                  isDraftEdited={isDraftEdited}
+                  isFollowupSaved={isFollowupSaved}
+                  isFollowupSaving={isFollowupSaving}
+                  isMessageBlank={isMessageBlank}
+                  isMessageSending={isMessageSending}
+                  isMessageSent={isMessageSent}
+                  isPreviewError={isPreviewError}
+                  isPreviewLoading={isPreviewLoading}
+                  isPreviewReady={isPreviewReady}
+                  messageBody={messageBody}
+                  messagePreview={messagePreview}
+                  messageSend={messageSend}
+                  messageSendError={messageSendError}
+                  needsCheckStudents={needsCheckStudents}
+                  sendBlockedMessage={assistantSendBlockedMessage}
+                  onDismiss={() => {
+                    setDuplicateWarning("");
+                    setFollowupTarget(null);
+                  }}
+                  onMessageChange={(body) =>
+                    setMessageDraft({ key: followupTargetKey, body })
+                  }
+                  onRecipientTypeChange={setSelectedRecipientType}
+                  onRestorePreview={handleRestorePreview}
+                  onSaveFollowup={handleSaveAttendanceFollowup}
+                  onSendMessage={handleSendAttendanceMessage}
+                />
+              )}
+            </section>
+          </div>
         </>
       ) : null}
     </div>
@@ -1244,7 +1350,11 @@ function AttendanceViewTabs({
 
   return (
     <div className="border border-[#d8dde2] bg-[#fafafa] px-2 py-2">
-      <div className="flex gap-1 overflow-x-auto" role="tablist" aria-label="출석부 보기 전환">
+      <div
+        className="flex gap-1 overflow-x-auto"
+        role="tablist"
+        aria-label="출석부 보기 전환"
+      >
         {actionableTabs.map((tab) => {
           const isActive = value === tab.id;
 
@@ -1260,8 +1370,8 @@ function AttendanceViewTabs({
               className={[
                 "min-h-10 shrink-0 rounded-sm border px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
                 isActive
-                    ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
-                    : "border-transparent bg-[#fafafa] text-[#62656f] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
+                  ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
+                  : "border-transparent bg-[#fafafa] text-[#62656f] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
               ].join(" ")}
             >
               <span className="block text-sm font-bold">{tab.label}</span>
@@ -1333,7 +1443,9 @@ function AttendanceCalendarView({
               <h2 className="text-lg font-extrabold tracking-[-0.02em] text-[#17232B] sm:text-xl">
                 출석부
               </h2>
-              <span className="text-sm font-bold text-[#4B4F58]">{formatMonthTitle(selectedMonth)}</span>
+              <span className="text-sm font-bold text-[#4B4F58]">
+                {formatMonthTitle(selectedMonth)}
+              </span>
               <span className="hidden text-xs font-medium text-[#73777F] sm:inline">
                 날짜 선택 후 수업과 학생 목록을 확인합니다.
               </span>
@@ -1349,7 +1461,9 @@ function AttendanceCalendarView({
             <div className="inline-flex min-h-9 items-center gap-2 border border-[#D8D6DE] bg-[#F4F4F1] px-3 text-sm text-[#62656f]">
               <CalendarDays size={15} aria-hidden="true" />
               <span className="text-xs font-bold text-[#73777F]">선택</span>
-              <b className="font-extrabold text-[#17232B]">{formatDateKoreanShort(selectedDate)}</b>
+              <b className="font-extrabold text-[#17232B]">
+                {formatDateKoreanShort(selectedDate)}
+              </b>
             </div>
             <div className="inline-flex border border-[#D8D6DE] bg-[#FFFEFA] p-0.5">
               <button
@@ -1440,14 +1554,20 @@ function AttendanceMonthCalendar({
   selectedMonth: string;
   onDateSelect: (date: string) => void;
 }) {
-  const days = useMemo(() => getCalendarGridDays(selectedMonth), [selectedMonth]);
+  const days = useMemo(
+    () => getCalendarGridDays(selectedMonth),
+    [selectedMonth],
+  );
   const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
 
   return (
     <div className="min-w-0 border-r border-[var(--console-line)] bg-[#f5f4ef] p-3 sm:p-4">
       <div className="grid grid-cols-7 overflow-hidden border-b border-l border-[var(--console-line)] bg-[#f0efe8] text-center text-[12px] font-bold text-[var(--clinic-muted)]">
         {weekdays.map((weekday) => (
-          <div key={weekday} className="border-r border-[var(--console-line)] px-2 py-2">
+          <div
+            key={weekday}
+            className="border-r border-[var(--console-line)] px-2 py-2"
+          >
             {weekday}
           </div>
         ))}
@@ -1538,12 +1658,10 @@ function AttendanceCalendarDayCell({
       : undefined,
   ].filter((row): row is NonNullable<typeof row> => row !== undefined);
   const displayedStatusRows = visibleStatusRows.slice(0, 3);
-  const hiddenStatusCount = visibleStatusRows.length - displayedStatusRows.length;
-  const statusLabel = attentionCount > 0
-      ? "연락"
-      : hasUnchecked
-        ? "미체크"
-        : "정상";
+  const hiddenStatusCount =
+    visibleStatusRows.length - displayedStatusRows.length;
+  const statusLabel =
+    attentionCount > 0 ? "연락" : hasUnchecked ? "미체크" : "정상";
   const statusClass = !hasClass
     ? "border-[#dedbd1] bg-[#f0efe8] text-[#858895]"
     : attentionCount > 0
@@ -1597,13 +1715,15 @@ function AttendanceCalendarDayCell({
                 : "border-transparent bg-transparent text-[#17232B]",
           ].join(" ")}
         >
-          <span className="text-lg font-extrabold leading-none tabular-nums">{dayNumber}</span>
+          <span className="text-lg font-extrabold leading-none tabular-nums">
+            {dayNumber}
+          </span>
           <span className="whitespace-nowrap text-xs font-bold text-[#60717B]">
             {weekdayLabel}
           </span>
           {isToday ? (
             <span
-              className="ml-0.5 size-1.5 shrink-0 bg-[var(--clinic-primary)]"
+              className="ml-0.5 size-1.5 shrink-0 bg-[#858895]"
               aria-label="오늘"
             />
           ) : null}
@@ -1622,25 +1742,31 @@ function AttendanceCalendarDayCell({
         >
           {hasClass ? (
             <span className="block min-w-0 truncate">
-              수업 <b className="font-extrabold tabular-nums text-[#17232B]">{summary.totalSessions}</b>
+              수업{" "}
+              <b className="font-extrabold tabular-nums text-[#17232B]">
+                {summary.totalSessions}
+              </b>
               <span className="mx-1 text-[#A3B0B6]">·</span>
-              <b className="font-extrabold tabular-nums text-[#17232B]">{summary.totalStudents}</b>명
+              <b className="font-extrabold tabular-nums text-[#17232B]">
+                {summary.totalStudents}
+              </b>
+              명
             </span>
           ) : (
             <span className="block truncate">수업 없음</span>
           )}
         </div>
         <div className="grid min-w-0 grid-cols-1 gap-y-0.5 text-[11px] leading-4">
-          {visibleStatusRows.length > 0 ? (
-            displayedStatusRows.map((row) => (
-              <MetricLine
-                key={row.label}
-                label={row.label}
-                value={row.value}
-                tone={row.tone}
-              />
-            ))
-          ) : null}
+          {visibleStatusRows.length > 0
+            ? displayedStatusRows.map((row) => (
+                <MetricLine
+                  key={row.label}
+                  label={row.label}
+                  value={row.value}
+                  tone={row.tone}
+                />
+              ))
+            : null}
           {hiddenStatusCount > 0 ? (
             <span className="truncate text-[11px] font-bold text-[#60717B]">
               외 {hiddenStatusCount}개 상태
@@ -1668,9 +1794,9 @@ function MetricLine({
         ? "text-red-700"
         : tone === "info"
           ? "text-blue-700"
-        : tone === "muted"
-          ? "text-[#8CA0A8]"
-          : "text-[#17232B]";
+          : tone === "muted"
+            ? "text-[#8CA0A8]"
+            : "text-[#17232B]";
   const dotClass =
     tone === "warning"
       ? "bg-amber-400"
@@ -1678,9 +1804,9 @@ function MetricLine({
         ? "bg-red-500"
         : tone === "info"
           ? "bg-[#4f5be7]"
-        : tone === "muted"
-          ? "bg-[#B8C6CB]"
-          : "bg-[var(--clinic-primary)]";
+          : tone === "muted"
+            ? "bg-[#B8C6CB]"
+            : "bg-[#9f9da5]";
 
   return (
     <span className="flex min-w-0 items-center justify-between gap-2">
@@ -1723,10 +1849,19 @@ function AttendanceDayDetailPanel({
     useState<AttendanceDayStatusFilter>("all");
   const attentionRows = studentRows.filter(
     (row) =>
-      row.status === "late" || row.status === "absent" || row.status === "needs_check",
+      row.status === "late" ||
+      row.status === "absent" ||
+      row.status === "needs_check",
   );
-  const filteredStudentRows = filterDayStudentRows(studentRows, studentStatusFilter);
-  const tabs: Array<{ id: AttendanceDayDetailTab; label: string; count: number }> = [
+  const filteredStudentRows = filterDayStudentRows(
+    studentRows,
+    studentStatusFilter,
+  );
+  const tabs: Array<{
+    id: AttendanceDayDetailTab;
+    label: string;
+    count: number;
+  }> = [
     { id: "classes", label: "수업별", count: sessions.length },
     { id: "students", label: "학생별", count: studentRows.length },
     { id: "attention", label: "연락 필요", count: attentionRows.length },
@@ -1757,7 +1892,7 @@ function AttendanceDayDetailPanel({
         <div className="border-b border-[var(--console-line)] bg-[#fffefa] p-4 text-[var(--clinic-text)]">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--clinic-primary)]">
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#62656f]">
                 선택 날짜
               </p>
               <h3 className="mt-1 text-xl font-extrabold tracking-[-0.01em] text-[var(--clinic-text)]">
@@ -1770,7 +1905,7 @@ function AttendanceDayDetailPanel({
           </div>
           <div className="mt-3 flex items-center justify-between gap-2 text-[11px] font-bold text-[var(--clinic-muted)]">
             <span>요약 숫자를 누르면 아래 목록이 바로 필터됩니다.</span>
-            <span className="shrink-0 text-[var(--clinic-primary)]">필터 선택</span>
+            <span className="shrink-0 text-[#62656f]">클릭 가능</span>
           </div>
           <div className="mt-2 overflow-hidden border border-[var(--console-line)] bg-[#fffefa] text-xs">
             <SummaryFilterButton
@@ -1782,54 +1917,70 @@ function AttendanceDayDetailPanel({
             <SummaryFilterButton
               label="학생"
               value={overview.totalStudents}
-              isActive={activeTab === "students" && studentStatusFilter === "all"}
+              isActive={
+                activeTab === "students" && studentStatusFilter === "all"
+              }
               onClick={() => openStudentFilter("all")}
             />
             <SummaryFilterButton
               label="출석"
               value={overview.counts.present}
               tone="success"
-              isActive={activeTab === "students" && studentStatusFilter === "present"}
+              isActive={
+                activeTab === "students" && studentStatusFilter === "present"
+              }
               onClick={() => openStudentFilter("present")}
             />
             <SummaryFilterButton
               label="지각"
               value={overview.counts.late}
               tone="warning"
-              isActive={activeTab === "students" && studentStatusFilter === "late"}
+              isActive={
+                activeTab === "students" && studentStatusFilter === "late"
+              }
               onClick={() => openStudentFilter("late")}
             />
             <SummaryFilterButton
               label="결석"
               value={overview.counts.absent}
               tone="danger"
-              isActive={activeTab === "students" && studentStatusFilter === "absent"}
+              isActive={
+                activeTab === "students" && studentStatusFilter === "absent"
+              }
               onClick={() => openStudentFilter("absent")}
             />
             <SummaryFilterButton
               label="미체크"
               value={overview.counts.pending}
-              isActive={activeTab === "students" && studentStatusFilter === "pending"}
+              isActive={
+                activeTab === "students" && studentStatusFilter === "pending"
+              }
               onClick={() => openStudentFilter("pending")}
             />
             <SummaryFilterButton
               label="확인 필요"
               value={overview.counts.needs_check}
               tone="warning"
-              isActive={activeTab === "students" && studentStatusFilter === "needs_check"}
+              isActive={
+                activeTab === "students" &&
+                studentStatusFilter === "needs_check"
+              }
               onClick={() => openStudentFilter("needs_check")}
             />
           </div>
           <button
             type="button"
             onClick={onOpenToday}
-            className="mt-3 inline-flex min-h-10 w-full items-center justify-center border border-[var(--clinic-primary)] bg-[var(--clinic-primary)] px-3 text-sm font-bold text-white hover:bg-[var(--clinic-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+            className="mt-3 inline-flex min-h-10 w-full items-center justify-center border border-[#17232B] bg-[#17232B] px-3 text-sm font-bold text-white hover:bg-[#2f3437] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
           >
             오늘 처리 화면에서 출석 체크
           </button>
         </div>
 
-        <div className="flex border-b border-[var(--console-line)] bg-[#f3f1ec] p-1" role="tablist">
+        <div
+          className="flex border-b border-[var(--console-line)] bg-[#f3f1ec] p-1"
+          role="tablist"
+        >
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -1844,7 +1995,8 @@ function AttendanceDayDetailPanel({
                   : "text-[var(--clinic-muted)] hover:bg-[#fffefa]/80",
               ].join(" ")}
             >
-              {tab.label} <span className="font-semibold text-[#9a9ca5]">{tab.count}</span>
+              {tab.label}{" "}
+              <span className="font-semibold text-[#9a9ca5]">{tab.count}</span>
             </button>
           ))}
         </div>
@@ -1862,12 +2014,13 @@ function AttendanceDayDetailPanel({
               {studentStatusFilter !== "all" ? (
                 <div className="mb-2 flex items-center justify-between gap-2 border border-[#C4D5DA] bg-[#F7FAF8] px-3 py-2 text-xs font-bold text-[#405763]">
                   <span>
-                    {activeStudentFilterLabel} {activeStudentFilterCount}명 표시 중
+                    {activeStudentFilterLabel} {activeStudentFilterCount}명 표시
+                    중
                   </span>
                   <button
                     type="button"
                     onClick={() => setStudentStatusFilter("all")}
-                    className="text-[var(--clinic-primary)] underline-offset-2 hover:underline"
+                    className="text-[#2f3437] underline-offset-2 hover:underline"
                   >
                     전체 보기
                   </button>
@@ -1929,8 +2082,8 @@ function SummaryFilterButton({
         isDisabled
           ? "cursor-not-allowed bg-[#f1f0ea] text-[#aaa8a0]"
           : isActive
-          ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
-          : `cursor-pointer bg-[#fffefa] hover:bg-[#f8f9fa] ${toneClass}`,
+            ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
+            : `cursor-pointer bg-[#fffefa] hover:bg-[#f8f9fa] ${toneClass}`,
       ].join(" ")}
     >
       <span
@@ -1945,7 +2098,11 @@ function SummaryFilterButton({
       <span
         className={[
           "inline-flex items-center gap-0.5 text-[10px] font-black uppercase tracking-[0.08em] transition-transform group-hover:translate-x-0.5",
-          isDisabled ? "text-[#b6b3aa]" : isActive ? "text-[var(--clinic-primary)]" : "text-[var(--clinic-muted)]",
+          isDisabled
+            ? "text-[#b6b3aa]"
+            : isActive
+              ? "text-[#2f3437]"
+              : "text-[var(--clinic-muted)]",
         ].join(" ")}
       >
         보기
@@ -1976,7 +2133,8 @@ function AttendanceClassSummaryList({
     <div className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
       {sessions.map((session) => {
         const summary = getSessionSummary(session, records);
-        const contactNeeded = summary.late + summary.absent + summary.needs_check;
+        const contactNeeded =
+          summary.late + summary.absent + summary.needs_check;
 
         return (
           <button
@@ -1997,7 +2155,8 @@ function AttendanceClassSummaryList({
                   </p>
                 </div>
                 <p className="mt-1.5 text-xs font-medium text-[var(--clinic-muted)]">
-                  담당 {session.subject ?? "과목 미지정"} · 학생 {session.students.length}명
+                  담당 {session.subject ?? "과목 미지정"} · 학생{" "}
+                  {session.students.length}명
                 </p>
               </div>
               {contactNeeded > 0 ? (
@@ -2105,8 +2264,9 @@ function AttendanceDayStudentList({
                     ) : null}
                   </div>
                   <p className="mt-1 truncate text-xs font-medium text-[var(--clinic-muted)]">
-                    {[row.student.schoolName, row.student.gradeLabel].filter(Boolean).join(" · ") ||
-                      "학교/학년 미등록"}{" "}
+                    {[row.student.schoolName, row.student.gradeLabel]
+                      .filter(Boolean)
+                      .join(" · ") || "학교/학년 미등록"}{" "}
                     · {row.session.className}
                   </p>
                 </div>
@@ -2120,7 +2280,7 @@ function AttendanceDayStudentList({
                   <ContactLozenge record={row.record} status={row.status} />
                   <ChevronRight
                     size={14}
-                    className="shrink-0 text-[#9f9da5] transition group-hover:translate-x-0.5 group-hover:text-[var(--clinic-primary)]"
+                    className="shrink-0 text-[#9f9da5] transition group-hover:translate-x-0.5 group-hover:text-[#2f3437]"
                     aria-hidden="true"
                   />
                 </div>
@@ -2152,7 +2312,13 @@ function StudentScheduleDrawer({
 }) {
   const [historyState, setHistoryState] = useState<{
     status: "idle" | "loading" | "ready" | "error";
-    items: Array<{ id: string; reason: string; status: string; sentAt: string | null; createdAt: string }>;
+    items: Array<{
+      id: string;
+      reason: string;
+      status: string;
+      sentAt: string | null;
+      createdAt: string;
+    }>;
   }>({ status: "loading", items: [] });
   const monthlyRecords = records.filter(
     (record) =>
@@ -2171,7 +2337,10 @@ function StudentScheduleDrawer({
     fetchFollowupHistory(row.student.id, controller.signal)
       .then((payload) => {
         if (!controller.signal.aborted) {
-          setHistoryState({ status: "ready", items: (payload.followups ?? []).slice(0, 5) });
+          setHistoryState({
+            status: "ready",
+            items: (payload.followups ?? []).slice(0, 5),
+          });
         }
       })
       .catch(() => {
@@ -2186,14 +2355,16 @@ function StudentScheduleDrawer({
   }, [row.student.id]);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-[#0B2530]/30 backdrop-blur-[1px]">
-      <aside className="h-full w-full max-w-[27rem] overflow-y-auto border-l border-[#C2D1D8] bg-[#F8FBFC] shadow-2xl">
+    <div className="fixed inset-0 z-50 flex justify-end bg-[#17232B]/25 backdrop-blur-[1px]">
+      <aside className="h-full w-full max-w-[27rem] overflow-y-auto border-l border-[#D8D6DE] bg-[#F4F4F1] shadow-2xl">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#d7dbe0] bg-[#fafafa] px-4 py-3 text-[#2f3437]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#858895]">
               학생 스케줄
             </p>
-            <h3 className="text-lg font-bold text-[#17191f]">{row.student.name}</h3>
+            <h3 className="text-lg font-bold text-[#17191f]">
+              {row.student.name}
+            </h3>
           </div>
           <button
             type="button"
@@ -2205,17 +2376,21 @@ function StudentScheduleDrawer({
           </button>
         </div>
 
-        <div className="border-x border-[#C2D1D8] bg-[#F7FAFA]">
-          <section className="border-b border-[#d7dbe0] bg-[#f6f7f8] px-4 py-4">
+        <div className="border-x border-[#D8D6DE] bg-[#FBFAF7]">
+          <section className="border-b border-[#D8D6DE] bg-[#F7F7F5] px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xl font-bold text-[#17232B]">{row.student.name}</p>
+                <p className="text-xl font-bold text-[#17232B]">
+                  {row.student.name}
+                </p>
                 <p className="mt-1 text-sm text-[#60717B]">
-                  {[row.student.schoolName, row.student.gradeLabel].filter(Boolean).join(" · ") ||
-                    "학교/학년 미등록"}
+                  {[row.student.schoolName, row.student.gradeLabel]
+                    .filter(Boolean)
+                    .join(" · ") || "학교/학년 미등록"}
                 </p>
                 <p className="mt-2 text-sm font-semibold tabular-nums text-[#405763]">
-                  {row.student.maskedStudentPhone ?? row.student.maskedParentPhone}
+                  {row.student.maskedStudentPhone ??
+                    row.student.maskedParentPhone}
                 </p>
               </div>
               <StatusLozenge status={row.status} />
@@ -2225,7 +2400,10 @@ function StudentScheduleDrawer({
           <DrawerSection title="선택 날짜 수업 정보">
             <InfoRow label="날짜" value={formatDateKoreanLong(selectedDate)} />
             <InfoRow label="수업" value={row.session.className} />
-            <InfoRow label="시간" value={`${row.session.startTime} - ${row.session.endTime}`} />
+            <InfoRow
+              label="시간"
+              value={`${row.session.startTime} - ${row.session.endTime}`}
+            />
             <InfoRow label="담당" value={`${teacherName} 선생님`} />
             <div className="mt-2 flex flex-wrap gap-2">
               <StatusLozenge status={row.status} />
@@ -2241,27 +2419,41 @@ function StudentScheduleDrawer({
                   .map((schedule) => (
                     <div
                       key={`${schedule.dayOfWeek}:${schedule.startTime}:${schedule.title}`}
-                      className="flex items-center justify-between gap-3 border-b border-[#EDF2F4] pb-2 text-sm last:border-b-0 last:pb-0"
+                      className="flex items-center justify-between gap-3 border-b border-[#E4E1DC] pb-2 text-sm last:border-b-0 last:pb-0"
                     >
-                      <span className="font-bold text-[#263A45]">
+                      <span className="font-bold text-[#494d5a]">
                         {weekdayShortLabel(schedule.dayOfWeek)}
                       </span>
-                      <span className="min-w-0 flex-1 truncate text-[#526A75]">
+                      <span className="min-w-0 flex-1 truncate text-[#62656f]">
                         {schedule.startTime} {schedule.title}
                       </span>
                     </div>
                   ))
               ) : (
-                <p className="text-sm text-[#60717B]">등록된 주간 스케줄이 없습니다.</p>
+                <p className="text-sm text-[#60717B]">
+                  등록된 주간 스케줄이 없습니다.
+                </p>
               )}
             </div>
           </DrawerSection>
 
           <DrawerSection title="이번 달 출석 이력">
-            <div className="overflow-hidden border border-[#DCE8EA] bg-[#F7FAF8] text-xs">
-              <DrawerMetricRow label="출석" value={monthlySummary.present} tone="success" />
-              <DrawerMetricRow label="지각" value={monthlySummary.late} tone="warning" />
-              <DrawerMetricRow label="결석" value={monthlySummary.absent} tone="danger" />
+            <div className="overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7] text-xs">
+              <DrawerMetricRow
+                label="출석"
+                value={monthlySummary.present}
+                tone="success"
+              />
+              <DrawerMetricRow
+                label="지각"
+                value={monthlySummary.late}
+                tone="warning"
+              />
+              <DrawerMetricRow
+                label="결석"
+                value={monthlySummary.absent}
+                tone="danger"
+              />
               <DrawerMetricRow label="미체크" value={monthlySummary.pending} />
             </div>
             <p className="mt-2 text-xs leading-5 text-[#78909A]">
@@ -2271,29 +2463,34 @@ function StudentScheduleDrawer({
 
           <DrawerSection title="최근 연락 기록">
             {historyState.status === "loading" ? (
-              <p className="text-sm text-[#60717B]">연락 기록을 불러오는 중입니다.</p>
+              <p className="text-sm text-[#60717B]">
+                연락 기록을 불러오는 중입니다.
+              </p>
             ) : historyState.items.length > 0 ? (
               <div className="space-y-2">
                 {historyState.items.map((item) => (
                   <div
                     key={item.id}
-                    className="border-b border-[#EDF2F4] pb-2 text-sm last:border-b-0 last:pb-0"
+                    className="border-b border-[#E4E1DC] pb-2 text-sm last:border-b-0 last:pb-0"
                   >
-                    <p className="font-semibold text-[#263A45]">
+                    <p className="font-semibold text-[#494d5a]">
                       {formatCompactDateTime(item.sentAt ?? item.createdAt)}
                     </p>
                     <p className="text-xs text-[#60717B]">
-                      {reasonLabel(item.reason as FollowupReason)} · {item.status}
+                      {reasonLabel(item.reason as FollowupReason)} ·{" "}
+                      {item.status}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[#60717B]">최근 연락 기록이 없습니다.</p>
+              <p className="text-sm text-[#60717B]">
+                최근 연락 기록이 없습니다.
+              </p>
             )}
           </DrawerSection>
 
-          <section className="sticky bottom-0 border-t border-[#C9D7DC] bg-[#F4F8F9] p-3">
+          <section className="sticky bottom-0 border-t border-[#D8D6DE] bg-[#FBFAF7] p-3">
             <h4 className="mb-2 text-sm font-bold text-[#17232B]">작업</h4>
             <div className="space-y-2">
               <button
@@ -2304,15 +2501,24 @@ function StudentScheduleDrawer({
                 <Send size={16} aria-hidden="true" />
                 문자 작성
               </button>
-              <div className="grid gap-2 border border-[#C6D4DA] bg-[#F7FAFA] p-3 text-xs leading-5 text-[#60717B]">
+              <div className="grid gap-2 border border-[#D8D6DE] bg-[#F4F4F1] p-3 text-xs leading-5 text-[#62656f]">
                 <div className="flex items-start gap-2">
-                  <Pencil className="mt-0.5 shrink-0 text-[#8CA0A8]" size={15} aria-hidden="true" />
+                  <Pencil
+                    className="mt-0.5 shrink-0 text-[#8CA0A8]"
+                    size={15}
+                    aria-hidden="true"
+                  />
                   <span>
-                    메모가 필요하면 문자 작성 화면에서 연락 기록으로 남겨 주세요.
+                    메모가 필요하면 문자 작성 화면에서 연락 기록으로 남겨
+                    주세요.
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <List className="mt-0.5 shrink-0 text-[#8CA0A8]" size={15} aria-hidden="true" />
+                  <List
+                    className="mt-0.5 shrink-0 text-[#8CA0A8]"
+                    size={15}
+                    aria-hidden="true"
+                  />
                   <span>
                     전체 이력은 문자 화면에서 학생을 선택해 확인합니다.
                   </span>
@@ -2334,7 +2540,7 @@ function DrawerSection({
   children: ReactNode;
 }) {
   return (
-    <section className="border-b border-[#C9D7DC] bg-[#F7FAFA] px-4 py-3">
+    <section className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3">
       <h4 className="mb-2 text-sm font-bold text-[#17232B]">{title}</h4>
       {children}
     </section>
@@ -2360,18 +2566,22 @@ function DrawerMetricRow({
           : "text-[#60717B]";
 
   return (
-    <div className="grid min-h-9 grid-cols-[minmax(0,1fr)_auto] items-center border-b border-[#DCE8EA] px-3 py-1.5 last:border-b-0">
-      <span className="text-xs font-bold text-[#60717B]">{label}</span>
-      <b className={["text-sm font-black tabular-nums", toneClass].join(" ")}>{value}</b>
+    <div className="grid min-h-9 grid-cols-[minmax(0,1fr)_auto] items-center border-b border-[#E4E1DC] px-3 py-1.5 last:border-b-0">
+      <span className="text-xs font-bold text-[#62656f]">{label}</span>
+      <b className={["text-sm font-black tabular-nums", toneClass].join(" ")}>
+        {value}
+      </b>
     </div>
   );
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-[#EDF2F4] py-2 text-sm last:border-b-0">
-      <span className="font-semibold text-[#60717B]">{label}</span>
-      <span className="min-w-0 truncate text-right font-bold text-[#263A45]">{value}</span>
+    <div className="flex items-center justify-between gap-3 border-b border-[#E4E1DC] py-2 text-sm last:border-b-0">
+      <span className="font-semibold text-[#62656f]">{label}</span>
+      <span className="min-w-0 truncate text-right font-bold text-[#494d5a]">
+        {value}
+      </span>
     </div>
   );
 }
@@ -2382,19 +2592,22 @@ function AttendanceLedgerSkeleton({
   onOpenCalendar: () => void;
 }) {
   return (
-    <section className="rounded-md border border-[#C2D1D8] bg-white p-6 shadow-[0_1px_2px_rgba(13,38,48,0.06)]">
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#007A7C]">
+    <section className="border border-[#D8D6DE] bg-[#FBFAF7] p-6">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#62656f]">
         Student Ledger
       </p>
-      <h2 className="mt-2 text-2xl font-bold text-[#17232B]">학생별 월간 출석 장부</h2>
+      <h2 className="mt-2 text-2xl font-bold text-[#17232B]">
+        학생별 월간 출석 장부
+      </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-[#60717B]">
-        학생 row와 날짜 column을 사용하는 월간 matrix는 다음 단계에서 구현합니다. 학생명 column
-        sticky, 날짜 column horizontal scroll, cell 상태 badge 기준으로 설계합니다.
+        학생 row와 날짜 column을 사용하는 월간 matrix는 다음 단계에서
+        구현합니다. 학생명 column sticky, 날짜 column horizontal scroll, cell
+        상태 badge 기준으로 설계합니다.
       </p>
       <button
         type="button"
         onClick={onOpenCalendar}
-        className="mt-4 inline-flex min-h-10 items-center rounded-sm bg-[#007A7C] px-4 text-sm font-bold text-white hover:bg-[#00686A] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+        className="mt-4 inline-flex min-h-10 items-center rounded-sm bg-[#17232B] px-4 text-sm font-bold text-white hover:bg-[#2f3437] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
       >
         달력 보기로 돌아가기
       </button>
@@ -2478,7 +2691,11 @@ function AttendanceWorkbench({
   attendanceFilter: AttendanceFilter;
   filteredStudents: AttendanceStudent[];
   recordsByStudent: Map<string, AttendanceRecordItem>;
-  saveState: { key: string; status: "idle" | "saving" | "saved" | "error"; error: string };
+  saveState: {
+    key: string;
+    status: "idle" | "saving" | "saved" | "error";
+    error: string;
+  };
   selectedWorkbenchStudent: AttendanceStudent | undefined;
   bulkTarget: BulkAttendanceTarget | null;
   selectedBulkStudents: AttendanceStudent[];
@@ -2535,9 +2752,9 @@ function AttendanceWorkbench({
   const selectedStatus = normalizeAttendanceStatus(selectedRecord?.status);
 
   return (
-    <section className="rounded-none bg-[#F3F7F8]">
-      <div className="grid min-h-[calc(100vh-7.25rem)] gap-0 overflow-hidden border border-[#B8C9D0] bg-[#F4F8F9] lg:grid-cols-[15.5rem_minmax(0,1fr)_17.25rem] xl:grid-cols-[16rem_minmax(0,1fr)_18rem] 2xl:grid-cols-[19.5rem_minmax(0,1fr)_22rem]">
-        <aside className="min-w-0 border-r border-[#D5E0E4] bg-[#F8FBFC]">
+    <section className="rounded-none bg-[#F4F4F1]">
+      <div className="grid min-h-[calc(100vh-7.25rem)] gap-0 overflow-hidden border border-[#D8D6DE] bg-[#F4F4F1] lg:grid-cols-[15.5rem_minmax(0,1fr)_17.25rem] xl:grid-cols-[16rem_minmax(0,1fr)_18rem] 2xl:grid-cols-[19.5rem_minmax(0,1fr)_22rem]">
+        <aside className="min-w-0 border-r border-[#D8D6DE] bg-[#FBFAF7]">
           <SessionList
             sessions={sessions}
             selectedSessionKey={selectedSessionKey}
@@ -2553,8 +2770,8 @@ function AttendanceWorkbench({
           />
         </aside>
 
-        <section className="min-w-0 overflow-hidden bg-[#F7FAFA]">
-          <div className="border-b border-[#B8C9D0] bg-[#F4F8F9] px-4 py-4">
+        <section className="min-w-0 overflow-hidden bg-[#F7F7F5]">
+          <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-4">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <h2 className="truncate text-2xl font-bold tracking-[-0.02em] text-[#17232B]">
@@ -2562,12 +2779,13 @@ function AttendanceWorkbench({
                 </h2>
                 {selectedSession ? (
                   <p className="mt-1 text-sm font-medium text-[#60717B]">
-                    {selectedSession.className} ({selectedSession.startTime} - {selectedSession.endTime}) ·{" "}
-                    {teacherName} 선생님
+                    {selectedSession.className} ({selectedSession.startTime} -{" "}
+                    {selectedSession.endTime}) · {teacherName} 선생님
                   </p>
                 ) : (
                   <p className="mt-1 text-sm text-[#60717B]">
-                    이 날짜에 수업이 없습니다. 날짜나 수업 시간 등록 상태를 확인해 주세요.
+                    이 날짜에 수업이 없습니다. 날짜나 수업 시간 등록 상태를
+                    확인해 주세요.
                   </p>
                 )}
               </div>
@@ -2575,7 +2793,7 @@ function AttendanceWorkbench({
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex min-h-9 items-center gap-2 border border-[#AEBFC7] bg-[#F7FAFA] px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                  className="inline-flex min-h-9 items-center gap-2 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-semibold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
                 >
                   <Printer size={16} aria-hidden="true" />
                   출석부 인쇄
@@ -2583,7 +2801,7 @@ function AttendanceWorkbench({
                 <button
                   type="button"
                   onClick={onRefresh}
-                  className="inline-flex min-h-9 items-center gap-2 border border-[#AEBFC7] bg-[#F7FAFA] px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                  className="inline-flex min-h-9 items-center gap-2 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-semibold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
                 >
                   <RefreshCw size={16} aria-hidden="true" />
                   새로고침
@@ -2640,7 +2858,7 @@ function AttendanceWorkbench({
           )}
         </section>
 
-        <aside className="min-w-0 border-l border-[#D5E0E4] bg-[#F8FBFC]">
+        <aside className="min-w-0 border-l border-[#D8D6DE] bg-[#FBFAF7]">
           {bulkTarget ? (
             <BulkAttendanceFollowupPanel
               bulkTarget={bulkTarget}
@@ -2717,7 +2935,11 @@ function AttendanceLedgerTable({
   session: AttendanceSession;
   selectedDate: string;
   recordsByStudent: Map<string, AttendanceRecordItem>;
-  saveState: { key: string; status: "idle" | "saving" | "saved" | "error"; error: string };
+  saveState: {
+    key: string;
+    status: "idle" | "saving" | "saved" | "error";
+    error: string;
+  };
   selectedStudentId: string;
   bulkTarget: BulkAttendanceTarget | null;
   selectedBulkStudentIds: string[];
@@ -2728,34 +2950,57 @@ function AttendanceLedgerTable({
   if (students.length === 0) {
     return (
       <div className="px-4 py-10 text-center text-sm leading-6 text-stone-500">
-        현재 필터에 해당하는 학생이 없습니다. 필터를 전체로 바꾸거나 출석 상태를 확인해 주세요.
+        현재 필터에 해당하는 학생이 없습니다. 필터를 전체로 바꾸거나 출석 상태를
+        확인해 주세요.
       </div>
     );
   }
 
   const footerSummaryItems = [
-    { label: "출석", value: summary?.present ?? 0, className: "text-[#007A7C]" },
+    {
+      label: "출석",
+      value: summary?.present ?? 0,
+      className: "text-[#007A7C]",
+    },
     { label: "지각", value: summary?.late ?? 0, className: "text-[#B26A00]" },
     { label: "결석", value: summary?.absent ?? 0, className: "text-[#B42318]" },
-    { label: "미체크", value: summary?.pending ?? 0, className: "text-[#334B58]" },
+    {
+      label: "미체크",
+      value: summary?.pending ?? 0,
+      className: "text-[#334B58]",
+    },
   ].filter((item) => item.value > 0);
 
   return (
-    <div className="overflow-hidden border border-[#B8C9D0] bg-[#F7FAFA]">
+    <div className="overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7]">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[47rem] table-fixed border-separate border-spacing-0 text-left">
-          <thead className="bg-[#E7EEF1] text-[12px] font-bold text-[#405763]">
+          <thead className="bg-[#F0F0EC] text-[12px] font-bold text-[#62656f]">
             <tr>
-              <th className="w-8 border-b border-r border-[#D6E0E4] px-2 py-3">
+              <th className="w-8 border-b border-r border-[#D8D6DE] px-2 py-3">
                 <span className="sr-only">선택</span>
               </th>
-              <th className="w-[23%] border-b border-r border-[#D6E0E4] px-2 py-3">학생명</th>
-              <th className="w-[16%] border-b border-r border-[#D6E0E4] px-2 py-3">학교 / 학년</th>
-              <th className="w-[13%] border-b border-r border-[#D6E0E4] px-2 py-3">휴대폰</th>
-              <th className="w-[13%] border-b border-r border-[#D6E0E4] px-2 py-3">수업시간</th>
-              <th className="w-[12%] border-b border-r border-[#D6E0E4] px-2 py-3">출석 상태</th>
-              <th className="w-[12%] border-b border-r border-[#D6E0E4] px-2 py-3">연락 상태</th>
-              <th className="w-[8%] border-b border-[#D6E0E4] px-2 py-3">메모</th>
+              <th className="w-[23%] border-b border-r border-[#D8D6DE] px-2 py-3">
+                학생명
+              </th>
+              <th className="w-[16%] border-b border-r border-[#D8D6DE] px-2 py-3">
+                학교 / 학년
+              </th>
+              <th className="w-[13%] border-b border-r border-[#D8D6DE] px-2 py-3">
+                휴대폰
+              </th>
+              <th className="w-[13%] border-b border-r border-[#D8D6DE] px-2 py-3">
+                수업시간
+              </th>
+              <th className="w-[12%] border-b border-r border-[#D8D6DE] px-2 py-3">
+                출석 상태
+              </th>
+              <th className="w-[12%] border-b border-r border-[#D8D6DE] px-2 py-3">
+                연락 상태
+              </th>
+              <th className="w-[8%] border-b border-[#D8D6DE] px-2 py-3">
+                메모
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -2769,12 +3014,15 @@ function AttendanceLedgerTable({
                 scheduledStartTime: session.startTime,
                 scheduledEndTime: session.endTime,
               });
-              const isSaving = saveState.key === updateKey && saveState.status === "saving";
+              const isSaving =
+                saveState.key === updateKey && saveState.status === "saving";
               const isSelected = selectedStudentId === student.id;
               const isBulkSelectable =
                 bulkTarget !== null &&
                 status === attendanceStatusForBulkReason(bulkTarget.reason);
-              const isBulkSelected = selectedBulkStudentIds.includes(student.id);
+              const isBulkSelected = selectedBulkStudentIds.includes(
+                student.id,
+              );
 
               return (
                 <tr
@@ -2789,27 +3037,27 @@ function AttendanceLedgerTable({
                     }
                   }}
                   className={[
-                    "group cursor-pointer border-b border-[var(--clinic-border)] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--clinic-accent)]",
+                    "group cursor-pointer border-b border-[#D8D6DE] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
                     isSelected
                       ? "bg-[#f6f7f8] ring-1 ring-inset ring-[#d7dbe0]"
-                      : "bg-[#F7FAFA] hover:bg-[#f8f9fa]",
+                      : "bg-[#FBFAF7] hover:bg-[#f8f9fa]",
                     isSaving ? "opacity-70" : "",
                   ].join(" ")}
                 >
-                  <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
+                  <td className="border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle">
                     <input
                       type="checkbox"
                       checked={isBulkSelected}
                       disabled={!isBulkSelectable}
                       onClick={(event) => event.stopPropagation()}
                       onChange={() => onToggleBulkStudent(student.id)}
-                      className="size-4 accent-[var(--clinic-primary)] disabled:opacity-30"
+                      className="size-4 accent-[#17232B] disabled:opacity-30"
                       aria-label={`${student.name} 일괄 문자 대상 선택`}
                     />
                   </td>
-                  <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
+                  <td className="border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle">
                     <div className="flex items-center gap-2">
-                      <span className="flex size-7 shrink-0 items-center justify-center border border-[#AFC3CA] bg-[#E3EEF0] text-xs font-bold text-[#005F62]">
+                      <span className="flex size-7 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-xs font-bold text-[#494d5a]">
                         {getStudentInitial(student.name)}
                       </span>
                       <div className="min-w-0">
@@ -2822,24 +3070,25 @@ function AttendanceLedgerTable({
                       </div>
                     </div>
                   </td>
-                  <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs text-[#435864]">
-                    {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
-                      "학교/학년 미등록"}
+                  <td className="truncate border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle text-xs text-[#494d5a]">
+                    {[student.schoolName, student.gradeLabel]
+                      .filter(Boolean)
+                      .join(" · ") || "학교/학년 미등록"}
                   </td>
-                  <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs tabular-nums text-[#435864]">
+                  <td className="truncate border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle text-xs tabular-nums text-[#494d5a]">
                     {student.maskedStudentPhone ?? student.maskedParentPhone}
                   </td>
-                  <td className="truncate border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle text-xs tabular-nums text-[#334B58]">
+                  <td className="truncate border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle text-xs tabular-nums text-[#494d5a]">
                     {session.startTime}-{session.endTime}
                   </td>
-                  <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
+                  <td className="border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle">
                     <StatusLozenge status={status} />
                   </td>
-                  <td className="border-b border-r border-[#E0E8EB] px-2 py-2.5 align-middle">
+                  <td className="border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle">
                     <ContactLozenge record={record} status={status} />
                   </td>
-                  <td className="border-b border-[#E0E8EB] px-2 py-2.5 align-middle">
-                    <span className="rounded-sm border border-[#d5e1e5] bg-[#f5f9fa] px-1.5 py-1 text-[11px] font-semibold text-[var(--clinic-muted)]">
+                  <td className="border-b border-[#E4E1DC] px-2 py-2.5 align-middle">
+                    <span className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-1.5 py-1 text-[11px] font-semibold text-[#62656f]">
                       {record?.note ? "있음" : "-"}
                     </span>
                   </td>
@@ -2849,7 +3098,7 @@ function AttendanceLedgerTable({
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between gap-3 border-t border-[#B8C9D0] bg-[#F4F8F9] px-4 py-3 text-sm text-[#405763]">
+      <div className="flex items-center justify-between gap-3 border-t border-[#D8D6DE] bg-[#F4F4F1] px-4 py-3 text-sm text-[#494d5a]">
         <div className="flex flex-wrap items-center gap-4">
           <span className="font-semibold">전체 {students.length}명</span>
           {footerSummaryItems.map((item) => (
@@ -2911,7 +3160,7 @@ function ContactLozenge({
   }
 
   return (
-    <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-[#C9D7DC] bg-[#EEF4F6] px-2 text-[11px] font-bold text-[var(--clinic-muted)]">
+    <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-[#D8D6DE] bg-[#F4F4F1] px-2 text-[11px] font-bold text-[#62656f]">
       대기
     </span>
   );
@@ -2938,11 +3187,18 @@ function WorkbenchStudentPanel({
 }) {
   const [historyState, setHistoryState] = useState<{
     status: "idle" | "loading" | "ready" | "error";
-    items: Array<{ id: string; reason: string; status: string; sentAt: string | null; createdAt: string }>;
+    items: Array<{
+      id: string;
+      reason: string;
+      status: string;
+      sentAt: string | null;
+      createdAt: string;
+    }>;
   }>({ status: "idle", items: [] });
   const selectedStudentId = student?.id ?? "";
-  const canOpenFollowup =
-    Boolean(student && record && getFollowupReasonForAttendanceStatus(status));
+  const canOpenFollowup = Boolean(
+    student && record && getFollowupReasonForAttendanceStatus(status),
+  );
 
   useEffect(() => {
     if (!selectedStudentId) {
@@ -2975,48 +3231,56 @@ function WorkbenchStudentPanel({
     ? getSortedActiveSchedules(student.schedules).slice(0, 3)
     : [];
   const processedAt = record?.arrivedAt ?? record?.checkedAt ?? null;
-  const classDescriptor = [student?.schoolName, student?.gradeLabel, session?.className]
+  const classDescriptor = [
+    student?.schoolName,
+    student?.gradeLabel,
+    session?.className,
+  ]
     .filter(Boolean)
     .join(" · ");
 
   return (
-    <section className="sticky top-4 flex h-[calc(100vh-9rem)] flex-col overflow-hidden border-l border-[#d7dbe0] bg-[#f7f8f9]">
-      <div className="flex items-center justify-between border-b border-[#d7dbe0] bg-[#fafafa] px-4 py-3 text-[#2f3437]">
+    <section className="sticky top-4 flex h-[calc(100vh-9rem)] flex-col overflow-hidden border-l border-[#D8D6DE] bg-[#F4F4F1]">
+      <div className="flex items-center justify-between border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3 text-[#2f3437]">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#858895]">
             student case
           </p>
           <h3 className="mt-1 text-base font-bold">학생 처리 패널</h3>
         </div>
-        <ChevronRight size={17} className="rotate-90 text-[#858895]" aria-hidden="true" />
+        <ChevronRight
+          size={17}
+          className="rotate-90 text-[#858895]"
+          aria-hidden="true"
+        />
       </div>
 
       {!student ? (
-        <div className="m-3 border border-dashed border-[#B8C9CE] bg-[#F5FAFA] p-4 text-sm leading-6 text-[#60717B]">
+        <div className="m-3 border border-dashed border-[#D8D6DE] bg-[#FBFAF7] p-4 text-sm leading-6 text-[#62656f]">
           학생을 선택하면 오늘 처리 상태와 연락 작업이 표시됩니다.
         </div>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 overflow-y-auto">
-            <section className="border-b border-[#C9D7DC] bg-[#F7FBFB] px-4 py-4">
+            <section className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex min-w-0 items-center gap-2">
-                    <h4 className="truncate text-2xl font-black tracking-[-0.03em] text-[#132934]">
+                    <h4 className="truncate text-2xl font-black tracking-[-0.03em] text-[#17232B]">
                       {student.name}
                     </h4>
-                    <span className="flex size-6 shrink-0 items-center justify-center border border-[#AFC3CA] bg-[#E3EEF0] text-[11px] font-bold text-[#005F62]">
+                    <span className="flex size-6 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-[11px] font-bold text-[#494d5a]">
                       {getStudentInitial(student.name)}
                     </span>
                   </div>
-                  <p className="mt-1 truncate text-sm font-semibold text-[#526873]">
+                  <p className="mt-1 truncate text-sm font-semibold text-[#62656f]">
                     {classDescriptor || "학교/학년 미등록"}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={onOpenStudentProfile}
-                className="min-h-8 shrink-0 border border-[#AEBFC7] bg-[#F7FAFA] px-2.5 text-xs font-bold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                  className="min-h-8 shrink-0 border border-[#D8D6DE] bg-[#FBFAF7] px-2.5 text-xs font-bold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
                 >
                   프로필
                 </button>
@@ -3025,29 +3289,37 @@ function WorkbenchStudentPanel({
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <StatusLozenge status={status} />
                 <ContactLozenge record={record} status={status} />
-                <span className="inline-flex min-h-6 items-center border border-[#C9D7DC] bg-[#F7FAFA] px-2 text-[11px] font-bold tabular-nums text-[#526873]">
+                <span className="inline-flex min-h-6 items-center border border-[#D8D6DE] bg-[#F4F4F1] px-2 text-[11px] font-bold tabular-nums text-[#62656f]">
                   {student.maskedStudentPhone ?? student.maskedParentPhone}
-                  <span className="ml-1 font-medium text-[#78909A]">(학생)</span>
+                  <span className="ml-1 font-medium text-[#78909A]">
+                    (학생)
+                  </span>
                 </span>
               </div>
             </section>
 
-            <section className="border-b border-[#d7dbe0] bg-[#f6f7f8] px-4 py-3">
+            <section className="border-b border-[#D8D6DE] bg-[#F7F7F5] px-4 py-3">
               <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#62656f]">
                 <CheckCircle2 size={14} aria-hidden="true" />
                 오늘 처리
               </div>
-              <p className="mt-1 text-sm font-bold text-[#132934]">
-                {session ? `${session.className} · ${session.startTime}-${session.endTime}` : "선택된 수업 없음"}
+              <p className="mt-1 text-sm font-bold text-[#17232B]">
+                {session
+                  ? `${session.className} · ${session.startTime}-${session.endTime}`
+                  : "선택된 수업 없음"}
               </p>
-              <p className="mt-1 text-xs font-medium text-[#526873]">
-                {processedAt ? `${formatCompactDateTime(processedAt)} 처리 기록` : "아직 처리 시각이 없습니다."}
+              <p className="mt-1 text-xs font-medium text-[#62656f]">
+                {processedAt
+                  ? `${formatCompactDateTime(processedAt)} 처리 기록`
+                  : "아직 처리 시각이 없습니다."}
               </p>
             </section>
 
             <PanelBlock title="수업 정보">
               <PanelDataRow icon={<Clock3 size={14} />} label="수업시간" mono>
-                {session ? `${session.startTime} - ${session.endTime}` : "시간 정보 없음"}
+                {session
+                  ? `${session.startTime} - ${session.endTime}`
+                  : "시간 정보 없음"}
               </PanelDataRow>
               <PanelDataRow icon={<UserCheck size={14} />} label="담당">
                 {teacherName} 선생님
@@ -3066,29 +3338,37 @@ function WorkbenchStudentPanel({
                 <button
                   type="button"
                   onClick={onOpenMessages}
-                  className="text-xs font-bold text-[#007A7C] hover:underline"
+                  className="text-xs font-bold text-[#494d5a] hover:underline"
                 >
                   전체 보기
                 </button>
               }
             >
               {historyState.status === "loading" ? (
-                <p className="px-4 py-3 text-sm text-[#60717B]">연락 기록을 불러오는 중입니다.</p>
+                <p className="px-4 py-3 text-sm text-[#60717B]">
+                  연락 기록을 불러오는 중입니다.
+                </p>
               ) : historyState.items.length > 0 ? (
                 historyState.items.map((item) => (
                   <div
                     key={item.id}
-                    className="grid min-h-10 grid-cols-[5.8rem_minmax(0,1fr)_auto] items-center gap-2 border-b border-[#E0E9EC] px-4 py-2 text-xs text-[#405763] last:border-b-0"
+                    className="grid min-h-10 grid-cols-[5.8rem_minmax(0,1fr)_auto] items-center gap-2 border-b border-[#E4E1DC] px-4 py-2 text-xs text-[#494d5a] last:border-b-0"
                   >
-                    <span className="tabular-nums text-[#60717B]">{formatCompactDateTime(item.createdAt)}</span>
-                    <span className="truncate font-bold">{reasonLabel(item.reason as FollowupReason)}</span>
-                    <span className="rounded-sm border border-[#C8D7DD] bg-[#F7FBFB] px-1.5 py-0.5 text-[10px] font-black text-[#60717B]">
+                    <span className="tabular-nums text-[#60717B]">
+                      {formatCompactDateTime(item.createdAt)}
+                    </span>
+                    <span className="truncate font-bold">
+                      {reasonLabel(item.reason as FollowupReason)}
+                    </span>
+                    <span className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-1.5 py-0.5 text-[10px] font-black text-[#62656f]">
                       {item.status === "sent" ? "발송" : "기록"}
                     </span>
                   </div>
                 ))
               ) : (
-                <p className="px-4 py-3 text-sm text-[#60717B]">아직 연락 기록이 없습니다.</p>
+                <p className="px-4 py-3 text-sm text-[#60717B]">
+                  아직 연락 기록이 없습니다.
+                </p>
               )}
             </PanelBlock>
 
@@ -3098,7 +3378,7 @@ function WorkbenchStudentPanel({
                 <button
                   type="button"
                   onClick={onOpenStudentProfile}
-                  className="text-xs font-bold text-[#007A7C] hover:underline"
+                  className="text-xs font-bold text-[#494d5a] hover:underline"
                 >
                   관리
                 </button>
@@ -3108,30 +3388,35 @@ function WorkbenchStudentPanel({
                 weeklySchedules.map((schedule) => (
                   <div
                     key={schedule.id}
-                    className="grid min-h-10 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 border-b border-[#E0E9EC] px-4 py-2 text-sm text-[#405763] last:border-b-0"
+                    className="grid min-h-10 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 border-b border-[#E4E1DC] px-4 py-2 text-sm text-[#494d5a] last:border-b-0"
                   >
-                    <span className="font-black text-[#007A7C]">{weekdayShortLabel(schedule.dayOfWeek)}</span>
+                    <span className="font-black text-[#494d5a]">
+                      {weekdayShortLabel(schedule.dayOfWeek)}
+                    </span>
                     <span className="truncate tabular-nums">
-                      {schedule.startTime} - {schedule.endTime} {session?.className ?? ""}
+                      {schedule.startTime} - {schedule.endTime}{" "}
+                      {session?.className ?? ""}
                     </span>
                   </div>
                 ))
               ) : (
-                <p className="px-4 py-3 text-sm text-[#60717B]">등록된 주간 스케줄이 없습니다.</p>
+                <p className="px-4 py-3 text-sm text-[#60717B]">
+                  등록된 주간 스케줄이 없습니다.
+                </p>
               )}
             </PanelBlock>
           </div>
 
-          <div className="border-t border-[#C9D7DC] bg-[#F7FBFB] p-3 shadow-[0_-8px_18px_rgba(8,42,58,0.05)]">
+          <div className="border-t border-[#D8D6DE] bg-[#FBFAF7] p-3 shadow-[0_-8px_18px_rgba(23,35,43,0.04)]">
             <button
               type="button"
               disabled={!canOpenFollowup}
               onClick={() => onOpenFollowup(student)}
               className={[
-                "flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+                "flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
                 canOpenFollowup
-                  ? "border border-[#005F62] bg-[#007A7C] text-white hover:bg-[#006266]"
-                  : "bg-[#DCE6EA] text-[#78909A]",
+                  ? "border border-[#17232B] bg-[#17232B] text-white hover:bg-[#2f3437]"
+                  : "bg-[#E9E7E1] text-[#9f9da5]",
               ].join(" ")}
             >
               <Send size={17} aria-hidden="true" />
@@ -3142,7 +3427,7 @@ function WorkbenchStudentPanel({
                 type="button"
                 disabled={!canOpenFollowup}
                 onClick={() => onOpenFollowup(student)}
-                className="flex min-h-10 items-center justify-center gap-2 border border-[#AEBFC7] bg-[#F7FAFA] px-3 text-sm font-bold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB] disabled:cursor-not-allowed disabled:bg-[#EEF3F5] disabled:text-[#93A3AA]"
+                className="flex min-h-10 items-center justify-center gap-2 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-bold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] disabled:cursor-not-allowed disabled:bg-[#E9E7E1] disabled:text-[#9f9da5]"
               >
                 <Pencil size={16} aria-hidden="true" />
                 기록 작성
@@ -3150,7 +3435,7 @@ function WorkbenchStudentPanel({
               <button
                 type="button"
                 onClick={onOpenMessages}
-                className="flex min-h-10 items-center justify-center gap-2 border border-[#AEBFC7] bg-[#F7FAFA] px-3 text-sm font-bold text-[#334B58] transition hover:bg-[#EDF3F5] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+                className="flex min-h-10 items-center justify-center gap-2 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-bold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
               >
                 <List size={16} aria-hidden="true" />
                 이력
@@ -3173,9 +3458,9 @@ function PanelBlock({
   children: ReactNode;
 }) {
   return (
-    <section className="border-b border-[#C9D7DC] bg-[#F7FBFB]">
-      <div className="flex min-h-10 items-center justify-between gap-2 border-b border-[#DCE6EA] bg-[#F0F6F7] px-4">
-        <h4 className="text-[12px] font-black uppercase tracking-[0.14em] text-[#334B58]">
+    <section className="border-b border-[#D8D6DE] bg-[#FBFAF7]">
+      <div className="flex min-h-10 items-center justify-between gap-2 border-b border-[#E4E1DC] bg-[#F4F4F1] px-4">
+        <h4 className="text-[12px] font-black uppercase tracking-[0.14em] text-[#494d5a]">
           {title}
         </h4>
         {action}
@@ -3197,12 +3482,14 @@ function PanelDataRow({
   mono?: boolean;
 }) {
   return (
-    <div className="grid min-h-11 grid-cols-[1.25rem_5rem_minmax(0,1fr)] items-center gap-2 border-b border-[#E0E9EC] px-4 py-2 last:border-b-0">
-      <span className="text-[#78909A]" aria-hidden="true">
+    <div className="grid min-h-11 grid-cols-[1.25rem_5rem_minmax(0,1fr)] items-center gap-2 border-b border-[#E4E1DC] px-4 py-2 last:border-b-0">
+      <span className="text-[#858895]" aria-hidden="true">
         {icon}
       </span>
-      <span className="text-xs font-bold text-[#60717B]">{label}</span>
-      <span className={`min-w-0 truncate text-sm font-bold text-[#17232B] ${mono ? "tabular-nums" : ""}`}>
+      <span className="text-xs font-bold text-[#62656f]">{label}</span>
+      <span
+        className={`min-w-0 truncate text-sm font-bold text-[#17232B] ${mono ? "tabular-nums" : ""}`}
+      >
         {children}
       </span>
     </div>
@@ -3240,13 +3527,15 @@ function AttendanceDateControl({
 
   return (
     <div className="w-full lg:max-w-sm">
-      <span className="mb-1 block text-xs font-semibold text-[var(--clinic-muted)]">조회 날짜</span>
+      <span className="mb-1 block text-xs font-semibold text-[var(--clinic-muted)]">
+        조회 날짜
+      </span>
       <div className="grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] gap-1.5 sm:grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] sm:gap-2">
         <button
           type="button"
           aria-label="전날 출석부 보기"
           onClick={() => onChange(shiftDate(value, -1))}
-          className="flex min-h-10 items-center justify-center rounded-sm border border-[#c9d8dd] bg-white text-[var(--clinic-muted)] transition hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa] sm:min-h-11"
+          className="flex min-h-10 items-center justify-center rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] text-[#62656f] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-11"
         >
           <ChevronLeft size={18} />
         </button>
@@ -3268,7 +3557,7 @@ function AttendanceDateControl({
           <button
             type="button"
             onClick={openCalendar}
-            className="flex min-h-10 w-full items-center gap-2 rounded-sm border border-[#c9d8dd] bg-white px-2.5 text-left text-sm font-semibold text-[var(--clinic-text)] transition hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa] focus:border-[var(--clinic-primary)] focus:outline-none focus:ring-2 focus:ring-[#b7ece6] sm:min-h-11 sm:px-3"
+            className="flex min-h-10 w-full items-center gap-2 rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2.5 text-left text-sm font-semibold text-[var(--clinic-text)] transition hover:bg-[#F4F4F1] focus:border-[#9f9da5] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-11 sm:px-3"
           >
             <CalendarDays size={17} className="shrink-0 text-stone-500" />
             <span className="min-w-0 flex-1 truncate tabular-nums">
@@ -3282,16 +3571,28 @@ function AttendanceDateControl({
           type="button"
           aria-label="다음날 출석부 보기"
           onClick={() => onChange(shiftDate(value, 1))}
-          className="flex min-h-10 items-center justify-center rounded-sm border border-[#c9d8dd] bg-white text-[var(--clinic-muted)] transition hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa] sm:min-h-11"
+          className="flex min-h-10 items-center justify-center rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] text-[#62656f] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-11"
         >
           <ChevronRight size={18} />
         </button>
       </div>
 
       <div className="mt-1.5 grid grid-cols-3 gap-1.5 sm:mt-2 sm:gap-2">
-        <DateShortcutButton label="어제" date={shiftDate(getTodayDate(), -1)} onChange={onChange} />
-        <DateShortcutButton label="오늘" date={getTodayDate()} onChange={onChange} />
-        <DateShortcutButton label="내일" date={shiftDate(getTodayDate(), 1)} onChange={onChange} />
+        <DateShortcutButton
+          label="어제"
+          date={shiftDate(getTodayDate(), -1)}
+          onChange={onChange}
+        />
+        <DateShortcutButton
+          label="오늘"
+          date={getTodayDate()}
+          onChange={onChange}
+        />
+        <DateShortcutButton
+          label="내일"
+          date={shiftDate(getTodayDate(), 1)}
+          onChange={onChange}
+        />
       </div>
     </div>
   );
@@ -3310,20 +3611,24 @@ function DateShortcutButton({
     <button
       type="button"
       onClick={() => onChange(date)}
-      className="min-h-8 rounded-sm border border-[#c9d8dd] bg-[#f4f9fa] px-2 text-xs font-semibold text-[var(--clinic-muted)] transition hover:border-[var(--clinic-accent)] hover:bg-[#e4f5f3] hover:text-[var(--clinic-primary)] sm:min-h-9"
+      className="min-h-8 rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2 text-xs font-semibold text-[#62656f] transition hover:bg-[#F4F4F1] hover:text-[#2f3437] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-9"
     >
       {label}
     </button>
   );
 }
 
-function AttendanceOverviewStrip({ overview }: { overview: AttendanceOverview }) {
+function AttendanceOverviewStrip({
+  overview,
+}: {
+  overview: AttendanceOverview;
+}) {
   const uncheckedCount = overview.counts.pending;
   const needsAttentionCount =
     overview.counts.absent + overview.counts.late + overview.counts.needs_check;
 
   return (
-    <section className="grid grid-cols-4 overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)] text-center">
+    <section className="grid grid-cols-4 overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7] text-center">
       <CompactOverviewItem label="수업" value={`${overview.totalSessions}개`} />
       <CompactOverviewItem label="학생" value={`${overview.totalStudents}명`} />
       <CompactOverviewItem label="체크 필요" value={`${uncheckedCount}명`} />
@@ -3345,9 +3650,18 @@ function CompactOverviewItem({
   value: string;
 }) {
   return (
-    <div className={["border-r border-[var(--clinic-border)] px-2 py-2 last:border-r-0 sm:px-3 sm:py-3", className].join(" ")}>
-      <p className="text-[11px] font-medium text-[var(--clinic-muted)] sm:text-xs">{label}</p>
-      <p className="mt-0.5 text-sm font-semibold tabular-nums text-[var(--clinic-text)] sm:mt-1 sm:text-base">{value}</p>
+    <div
+      className={[
+        "border-r border-[#E4E1DC] px-2 py-2 last:border-r-0 sm:px-3 sm:py-3",
+        className,
+      ].join(" ")}
+    >
+      <p className="text-[11px] font-medium text-[var(--clinic-muted)] sm:text-xs">
+        {label}
+      </p>
+      <p className="mt-0.5 text-sm font-semibold tabular-nums text-[var(--clinic-text)] sm:mt-1 sm:text-base">
+        {value}
+      </p>
     </div>
   );
 }
@@ -3379,19 +3693,26 @@ function SessionList({
 }) {
   if (variant === "mobile") {
     return (
-      <section className="overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)]">
-        <div className="border-b border-[var(--clinic-border)] bg-[#fafafa] px-3 py-2.5 sm:px-4 sm:py-3">
+      <section className="overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7]">
+        <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2.5 sm:px-4 sm:py-3">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold text-[var(--clinic-text)]">오늘 수업</h3>
+            <h3 className="text-sm font-semibold text-[var(--clinic-text)]">
+              오늘 수업
+            </h3>
             {loadState === "loading" ? (
-              <Loader2 size={16} className="animate-spin text-[var(--clinic-muted)]" />
+              <Loader2
+                size={16}
+                className="animate-spin text-[var(--clinic-muted)]"
+              />
             ) : (
-              <span className="text-xs font-medium text-[var(--clinic-muted)]">{sessions.length}개</span>
+              <span className="text-xs font-medium text-[var(--clinic-muted)]">
+                {sessions.length}개
+              </span>
             )}
           </div>
         </div>
 
-        <div className="max-h-40 divide-y divide-[#dbe6ea] overflow-y-auto overscroll-contain sm:max-h-none">
+        <div className="max-h-40 divide-y divide-[#E4E1DC] overflow-y-auto overscroll-contain sm:max-h-none">
           {sessions.length > 0 ? (
             sessions.map((session) => {
               const isSelected = session.key === selectedSessionKey;
@@ -3406,14 +3727,16 @@ function SessionList({
                   className={[
                     "grid min-h-[3.55rem] w-full grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2 border border-transparent px-2.5 py-2 text-left transition sm:min-h-[4.25rem] sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:gap-3 sm:px-4 sm:py-3",
                     isSelected
-                      ? "border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
-                      : "bg-[var(--clinic-panel)] text-[var(--clinic-text)] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
+                      ? "border-[#D8D6DE] bg-[#F6F7F8] text-[var(--clinic-text)]"
+                      : "bg-[#FBFAF7] text-[var(--clinic-text)] hover:border-[#E4E1DC] hover:bg-[#F7F7F5]",
                   ].join(" ")}
                 >
                   <span
                     className={[
                       "flex size-8 items-center justify-center rounded-md text-xs font-semibold sm:size-9 sm:text-sm",
-                      isSelected ? "border border-[#d7dbe0] bg-white text-[#2f3437]" : "bg-[#e6eef1] text-[var(--clinic-muted)]",
+                      isSelected
+                        ? "border border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437]"
+                        : "bg-[#F4F4F1] text-[var(--clinic-muted)]",
                     ].join(" ")}
                   >
                     {getClassInitial(session.className)}
@@ -3425,7 +3748,9 @@ function SessionList({
                     <span
                       className={[
                         "mt-0.5 flex items-center gap-1 truncate text-[11px] sm:text-xs",
-                        isSelected ? "text-[var(--clinic-primary)]" : "text-[var(--clinic-muted)]",
+                        isSelected
+                          ? "text-[#2f3437]"
+                          : "text-[var(--clinic-muted)]",
                       ].join(" ")}
                     >
                       <Clock3 size={13} className="shrink-0" />
@@ -3438,8 +3763,8 @@ function SessionList({
                       className={[
                         "rounded-full px-1.5 py-0.5 text-[11px] font-semibold sm:px-2 sm:py-1 sm:text-xs",
                         progress.pending > 0
-                          ? "bg-[var(--clinic-primary-dark)] text-white"
-                          : "bg-[#eef4f6] text-[var(--clinic-muted)]",
+                          ? "border border-[#D8D6DE] bg-[#F4F4F1] text-[#2f3437]"
+                          : "border border-[#E4E1DC] bg-[#F4F4F1] text-[var(--clinic-muted)]",
                       ].join(" ")}
                     >
                       {progress.pending} 체크 필요
@@ -3455,7 +3780,8 @@ function SessionList({
             })
           ) : (
             <p className="px-1 py-2 text-sm leading-6 text-stone-500">
-              이 날짜에 표시할 수업이 없습니다. 다른 날짜를 선택하거나 수업 시간 등록 상태를 확인해 주세요.
+              이 날짜에 표시할 수업이 없습니다. 다른 날짜를 선택하거나 수업 시간
+              등록 상태를 확인해 주세요.
             </p>
           )}
         </div>
@@ -3464,17 +3790,23 @@ function SessionList({
   }
 
   return (
-    <section className="h-full overflow-hidden bg-[#F8FBFC]">
-      <div className="border-b border-[#D5E0E4] bg-white px-4 py-4">
+    <section className="h-full overflow-hidden bg-[#FBFAF7]">
+      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-4">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <h3 className="text-xl font-bold tracking-[-0.02em] text-[#17232B]">오늘 수업</h3>
-            <RefreshCw size={15} className="text-[#78909A]" aria-hidden="true" />
+            <h3 className="text-xl font-bold tracking-[-0.02em] text-[#17232B]">
+              오늘 수업
+            </h3>
+            <RefreshCw
+              size={15}
+              className="text-[#78909A]"
+              aria-hidden="true"
+            />
           </div>
           <button
             type="button"
             onClick={onOpenClassManagement}
-            className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#9BADB6] bg-white px-3 text-sm font-semibold text-[#334B58] transition hover:bg-[#F2F6F7] focus:outline-none focus:ring-2 focus:ring-[#84C7CB]"
+            className="inline-flex min-h-9 items-center gap-1.5 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-semibold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
           >
             <Plus size={15} aria-hidden="true" />
             수업 추가
@@ -3494,7 +3826,7 @@ function SessionList({
         </p>
       </div>
 
-      <div className="max-h-[calc(100vh-18rem)] space-y-3 overflow-y-auto overscroll-contain p-3 pb-4">
+      <div className="max-h-[calc(100vh-18rem)] divide-y divide-[#E4E1DC] overflow-y-auto overscroll-contain">
         {sessions.length > 0 ? (
           sessions.map((session) => {
             const isSelected = session.key === selectedSessionKey;
@@ -3508,10 +3840,10 @@ function SessionList({
                 aria-pressed={isSelected}
                 onClick={() => onSelect(session.key)}
                 className={[
-                  "w-full rounded-md border px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+                  "w-full border-l-2 px-4 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
                   isSelected
-                    ? "border-[#d7dbe0] bg-[#f6f7f8]"
-                    : "border-[#D5E0E4] bg-white hover:border-[#B8C8CF] hover:bg-[#F8F9FA]",
+                    ? "border-l-[#17232B] bg-[#F6F7F8]"
+                    : "border-l-transparent bg-[#FBFAF7] hover:bg-[#F7F7F5]",
                 ].join(" ")}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -3527,35 +3859,46 @@ function SessionList({
                     </p>
                   </div>
                   <div className="shrink-0 text-right text-sm">
-                    <p className="font-bold text-[#17232B]">{session.students.length}명</p>
+                    <p className="font-bold text-[#17232B]">
+                      {session.students.length}명
+                    </p>
                     <p className="mt-0.5 text-xs text-[#78909A]">정원</p>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-1.5 text-[11px] font-bold xl:text-xs">
-                  <span className="whitespace-nowrap text-[#007A7C]">{sessionSummary.present} 출석</span>
-                  <span className="whitespace-nowrap text-[#B26A00]">{sessionSummary.late} 지각</span>
-                  <span className="whitespace-nowrap text-[#B42318]">{sessionSummary.absent} 결석</span>
-                  <span className="whitespace-nowrap text-[#334B58]">{progress.pending} 미체크</span>
+                  <span className="whitespace-nowrap text-[#007A7C]">
+                    {sessionSummary.present} 출석
+                  </span>
+                  <span className="whitespace-nowrap text-[#B26A00]">
+                    {sessionSummary.late} 지각
+                  </span>
+                  <span className="whitespace-nowrap text-[#B42318]">
+                    {sessionSummary.absent} 결석
+                  </span>
+                  <span className="whitespace-nowrap text-[#334B58]">
+                    {progress.pending} 미체크
+                  </span>
                 </div>
               </button>
             );
           })
         ) : (
-          <p className="rounded-md border border-dashed border-[#C6D4DA] bg-white px-3 py-4 text-sm leading-6 text-stone-500">
-            이 날짜에 표시할 수업이 없습니다. 다른 날짜를 선택하거나 수업 시간 등록 상태를 확인해 주세요.
+          <p className="m-3 border border-dashed border-[#D8D6DE] bg-[#FBFAF7] px-3 py-4 text-sm leading-6 text-stone-500">
+            이 날짜에 표시할 수업이 없습니다. 다른 날짜를 선택하거나 수업 시간
+            등록 상태를 확인해 주세요.
           </p>
         )}
       </div>
-      <div className="border-t border-[#D5E0E4] bg-white p-3">
+      <div className="border-t border-[#D8D6DE] bg-[#FBFAF7] p-3">
         <button
           type="button"
           disabled={sessions.length === 0}
           onClick={onOpenMessages}
           className={[
-            "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border px-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#84C7CB]",
+            "inline-flex min-h-11 w-full items-center justify-center gap-2 border px-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
             sessions.length === 0
-              ? "cursor-not-allowed border-[#C6D4DA] bg-[#F2F6F7] text-[#8CA0A8]"
-              : "border-[#007A7C] bg-white text-[#007A7C] hover:bg-[#F0FAF9]",
+              ? "cursor-not-allowed border-[#D8D6DE] bg-[#E9E7E1] text-[#9f9da5]"
+              : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:bg-[#F4F4F1]",
           ].join(" ")}
         >
           <Send size={16} aria-hidden="true" />
@@ -3587,35 +3930,42 @@ function AttendanceFilterBar({
   };
 
   return (
-    <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1 sm:mt-4 sm:gap-2" aria-label="출석 학생 필터">
-      {(Object.keys(attendanceFilterLabels) as AttendanceFilter[]).map((filter) => {
-        const isSelected = value === filter;
+    <div
+      className="mt-3 flex gap-1.5 overflow-x-auto pb-1 sm:mt-4 sm:gap-2"
+      aria-label="출석 학생 필터"
+    >
+      {(Object.keys(attendanceFilterLabels) as AttendanceFilter[]).map(
+        (filter) => {
+          const isSelected = value === filter;
 
-        return (
-          <button
-            key={filter}
-            type="button"
-            aria-pressed={isSelected}
-            onClick={() => onChange(filter)}
-            className={[
-              "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)] sm:min-h-9 sm:px-3",
-              isSelected
-                ? "border-[var(--clinic-primary-dark)] bg-[var(--clinic-primary-dark)] text-white"
-                : "border-[#c9d8dd] bg-white text-[var(--clinic-muted)] hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa]",
-            ].join(" ")}
-          >
-            {attendanceFilterLabels[filter]}
-            <span
+          return (
+            <button
+              key={filter}
+              type="button"
+              aria-pressed={isSelected}
+              onClick={() => onChange(filter)}
               className={[
-                "rounded-full px-1.5 py-0.5 tabular-nums",
-                isSelected ? "bg-white/15 text-white" : "bg-[#edf4f6] text-[var(--clinic-muted)]",
+                "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-9 sm:px-3",
+                isSelected
+                  ? "border-[#17232B] bg-[#17232B] text-white"
+                  : "border-[#D8D6DE] bg-[#FBFAF7] text-[#62656f] hover:bg-[#F4F4F1]",
               ].join(" ")}
             >
-              {counts[filter]}
-            </span>
-          </button>
-        );
-      })}
+              {attendanceFilterLabels[filter]}
+              <span
+                className={[
+                  "rounded-full px-1.5 py-0.5 tabular-nums",
+                  isSelected
+                    ? "bg-white/15 text-white"
+                    : "bg-[#F4F4F1] text-[#62656f]",
+                ].join(" ")}
+              >
+                {counts[filter]}
+              </span>
+            </button>
+          );
+        },
+      )}
     </div>
   );
 }
@@ -3640,9 +3990,9 @@ function AttendanceBulkActionBar({
   }
 
   return (
-    <div className="mt-4 rounded-md border border-[#D6E0E4] bg-white px-3 py-3 shadow-[0_1px_2px_rgba(13,38,48,0.06)]">
+    <div className="mt-4 border border-[#D8D6DE] bg-[#FBFAF7] px-3 py-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-sm border border-[#BFD4D6] bg-[#F0FAF9] px-3 py-2 text-sm font-bold text-[#005F62]">
+        <span className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-2 text-sm font-bold text-[#2f3437]">
           {activeReason ? `${selectedCount}명 선택됨` : "일괄 처리"}
         </span>
         <button
@@ -3651,10 +4001,10 @@ function AttendanceBulkActionBar({
           aria-pressed={activeReason === "late"}
           onClick={() => onStart("late")}
           className={[
-            "min-h-9 rounded-sm border px-4 text-sm font-bold transition",
+            "min-h-9 rounded-sm border px-4 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
             activeReason === "late"
               ? "border-amber-300 bg-amber-50 text-[var(--clinic-warning)]"
-              : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-amber-200 hover:bg-amber-50",
+              : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:border-amber-200 hover:bg-amber-50",
             lateCount === 0 ? "cursor-not-allowed opacity-45" : "",
           ].join(" ")}
         >
@@ -3666,10 +4016,10 @@ function AttendanceBulkActionBar({
           aria-pressed={activeReason === "absence"}
           onClick={() => onStart("absence")}
           className={[
-            "min-h-9 rounded-sm border px-4 text-sm font-bold transition",
+            "min-h-9 rounded-sm border px-4 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
             activeReason === "absence"
               ? "border-red-200 bg-red-50 text-[var(--clinic-danger)]"
-              : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-red-200 hover:bg-red-50",
+              : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:border-red-200 hover:bg-red-50",
             absentCount === 0 ? "cursor-not-allowed opacity-45" : "",
           ].join(" ")}
         >
@@ -3681,7 +4031,7 @@ function AttendanceBulkActionBar({
               우측 패널에서 선택 학생 문자 내용을 확인합니다.
             </span>
             <span
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#9FCBCD] bg-[#E7F5F4] px-4 text-sm font-bold text-[#005F62]"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-4 text-sm font-bold text-[#2f3437]"
               aria-label="선택 학생 문자 패널이 우측에 열려 있습니다"
             >
               <Send size={15} aria-hidden="true" />
@@ -3690,7 +4040,7 @@ function AttendanceBulkActionBar({
             <button
               type="button"
               onClick={onClear}
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#c9d8dd] bg-white px-3 text-sm font-semibold text-[var(--clinic-muted)] hover:bg-[#f3f9fa]"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-semibold text-[#62656f] hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
             >
               <X size={15} aria-hidden="true" />
               선택 해제
@@ -3708,13 +4058,15 @@ function AttendanceSummary({
   summary: Record<AttendanceStatus, number>;
 }) {
   return (
-    <dl className="grid grid-cols-5 divide-x divide-[var(--clinic-border)] rounded-sm border border-[var(--clinic-border)] bg-[#edf4f6] text-center text-[11px] sm:text-xs">
+    <dl className="grid grid-cols-5 divide-x divide-[#E4E1DC] border border-[#D8D6DE] bg-[#FBFAF7] text-center text-[11px] sm:text-xs">
       {editableStatuses.map((status) => (
         <div key={status} className="min-w-0 px-1.5 py-1.5 sm:px-2 sm:py-2">
           <dt className="truncate font-medium text-[var(--clinic-muted)]">
             {attendanceDisplayLabel(status)}
           </dt>
-          <dd className="mt-0.5 text-sm font-semibold text-[var(--clinic-text)] sm:mt-1 sm:text-base">{summary[status]}</dd>
+          <dd className="mt-0.5 text-sm font-semibold text-[var(--clinic-text)] sm:mt-1 sm:text-base">
+            {summary[status]}
+          </dd>
         </div>
       ))}
     </dl>
@@ -3800,9 +4152,13 @@ function AttendanceStudentRow({
             ) : null}
           </div>
           <p className="mt-0.5 truncate text-xs text-stone-500">
-            {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
-              "학년 정보 없음"}
-            <span className="hidden sm:inline"> · {student.maskedParentPhone}</span>
+            {[student.schoolName, student.gradeLabel]
+              .filter(Boolean)
+              .join(" · ") || "학년 정보 없음"}
+            <span className="hidden sm:inline">
+              {" "}
+              · {student.maskedParentPhone}
+            </span>
           </p>
           <AttendanceSaveStatus
             isSaving={isSaving}
@@ -3909,18 +4265,20 @@ function AttendanceArrivalToggle({
       disabled={isSaving}
       onClick={onToggle}
       className={[
-        "inline-flex min-h-8 w-12 items-center rounded-full border p-0.5 transition focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]",
+        "inline-flex min-h-8 w-12 items-center rounded-full border p-0.5 transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
         isPresent
-          ? "justify-end border-[var(--clinic-primary)] bg-[var(--clinic-primary)]"
-          : "justify-start border-[#c9d8dd] bg-[#e6eef1] hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa]",
+          ? "justify-end border-[#17232B] bg-[#17232B]"
+          : "justify-start border-[#D8D6DE] bg-[#F4F4F1] hover:bg-[#F7F7F5]",
         isSaving ? "cursor-wait opacity-60" : "",
       ].join(" ")}
     >
-      <span className="sr-only">{isPresent ? "도착을 체크 필요로 변경" : "도착으로 변경"}</span>
+      <span className="sr-only">
+        {isPresent ? "도착을 체크 필요로 변경" : "도착으로 변경"}
+      </span>
       <span
         className={[
           "flex size-6 items-center justify-center rounded-full bg-white shadow-sm transition",
-          isPresent ? "text-[var(--clinic-primary)]" : "text-[var(--clinic-muted)]",
+          isPresent ? "text-[#17232B]" : "text-[var(--clinic-muted)]",
         ].join(" ")}
       >
         {isPresent ? <Check size={14} /> : null}
@@ -3943,11 +4301,13 @@ function AttendanceSaveStatus({
   }
 
   if (isSaved) {
-    return <p className="text-[11px] font-medium text-[var(--clinic-primary)]">저장됨</p>;
+    return <p className="text-[11px] font-medium text-[#62656f]">저장됨</p>;
   }
 
   if (checkedAt) {
-    return <p className="text-[11px] text-stone-400">{formatTime(checkedAt)}</p>;
+    return (
+      <p className="text-[11px] text-stone-400">{formatTime(checkedAt)}</p>
+    );
   }
 
   return <p className="text-[11px] text-stone-400">대기</p>;
@@ -3980,8 +4340,10 @@ function BulkAttendanceFollowupPanel({
 }) {
   const messageMetrics = getMessageLengthMetrics(messageTemplate);
   const isMessageBlank = messageTemplate.trim().length === 0;
-  const isBusy = submitState.status === "saving" || submitState.status === "sending";
-  const hasCompletedSubmit = submitState.status === "saved" || submitState.status === "sent";
+  const isBusy =
+    submitState.status === "saving" || submitState.status === "sending";
+  const hasCompletedSubmit =
+    submitState.status === "saved" || submitState.status === "sent";
   const canSave =
     selectedStudents.length > 0 &&
     !isMessageBlank &&
@@ -3994,28 +4356,38 @@ function BulkAttendanceFollowupPanel({
   );
 
   return (
-    <section className={["overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)] xl:sticky xl:top-5", className].join(" ")}>
-      <div className="border-b border-[var(--clinic-border)] bg-[#fafafa] px-3 py-2.5 sm:px-4 sm:py-3">
+    <section
+      className={[
+        "overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7] xl:sticky xl:top-5",
+        className,
+      ].join(" ")}
+    >
+      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[#62656f]" size={18} aria-hidden="true" />
+          <MessageSquareText
+            className="text-[#62656f]"
+            size={18}
+            aria-hidden="true"
+          />
           <h3 className="text-sm font-semibold text-[var(--clinic-text)]">
             {reasonLabel(bulkTarget.reason)} 일괄 문자
           </h3>
           <button
             type="button"
             onClick={onDismiss}
-            className="ml-auto rounded-sm border border-[#d7dbe0] bg-white px-2 py-1 text-xs font-semibold text-[#62656f] hover:bg-[#f6f7f8]"
+            className="ml-auto rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2 py-1 text-xs font-semibold text-[#62656f] hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
           >
             닫기
           </button>
         </div>
         <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
-          선택 학생 → 이름 치환 → 기록 저장 또는 테스트 발송 중 하나를 선택합니다.
+          선택 학생 → 이름 치환 → 기록 저장 또는 테스트 발송 중 하나를
+          선택합니다.
         </p>
       </div>
 
       <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-        <div className="border border-[#d7dbe0] bg-[#f6f7f8] px-3 py-3">
+        <div className="border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-3">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-[var(--clinic-text)]">
               선택 학생 {selectedStudents.length}명
@@ -4040,7 +4412,7 @@ function BulkAttendanceFollowupPanel({
               selectedStudents.map((student) => (
                 <span
                   key={student.id}
-                  className="rounded-sm border border-[#c9d8dd] bg-white px-2 py-1 text-xs font-semibold text-[var(--clinic-text)]"
+                  className="rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2 py-1 text-xs font-semibold text-[#2f3437]"
                 >
                   {student.name}
                 </span>
@@ -4054,11 +4426,14 @@ function BulkAttendanceFollowupPanel({
         </div>
 
         <fieldset>
-          <legend className="text-sm font-semibold text-[var(--clinic-text)]">수신자</legend>
+          <legend className="text-sm font-semibold text-[var(--clinic-text)]">
+            수신자
+          </legend>
           <div className="mt-2 grid grid-cols-3 gap-2">
             {messageRecipientTypes.map((recipientType) => {
               const needsStudentPhone = recipientType !== "parent";
-              const isDisabled = needsStudentPhone && selectedStudentPhoneMissing;
+              const isDisabled =
+                needsStudentPhone && selectedStudentPhoneMissing;
               const isSelected = selectedRecipientType === recipientType;
 
               return (
@@ -4069,10 +4444,10 @@ function BulkAttendanceFollowupPanel({
                   aria-pressed={isSelected}
                   onClick={() => onRecipientTypeChange(recipientType)}
                   className={[
-                    "min-h-10 rounded-sm border px-2 text-xs font-semibold transition",
+                    "min-h-10 rounded-sm border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
                     isSelected
-                      ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
-                      : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa]",
+                      ? "border-[#17232B] bg-[#17232B] text-white"
+                      : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:bg-[#F4F4F1]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
                 >
@@ -4100,7 +4475,7 @@ function BulkAttendanceFollowupPanel({
             value={messageTemplate}
             onChange={(event) => onMessageTemplateChange(event.target.value)}
             rows={8}
-            className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#c9d8dd] bg-white px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#b7ece6]"
+            className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition focus:border-[#9f9da5] focus:ring-2 focus:ring-[#c9cdfa]"
           />
           <p
             className={[
@@ -4112,7 +4487,8 @@ function BulkAttendanceFollowupPanel({
                   : "text-[var(--clinic-muted)]",
             ].join(" ")}
           >
-            공통 본문 {messageMetrics.charCount}자 · {messageMetrics.byteCount}byte ·{" "}
+            공통 본문 {messageMetrics.charCount}자 · {messageMetrics.byteCount}
+            byte ·{" "}
             {isMessageBlank
               ? "본문이 비어 있으면 저장할 수 없습니다."
               : messageMetrics.isOverLimit
@@ -4123,12 +4499,15 @@ function BulkAttendanceFollowupPanel({
           </p>
         </div>
 
-        <div className="rounded-sm border border-[var(--clinic-border)] bg-[#f4f9fa] p-3 text-sm leading-6 text-[var(--clinic-text)]">
+        <div className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] p-3 text-sm leading-6 text-[var(--clinic-text)]">
           <div className="flex items-start gap-2">
-            <CheckCircle2 className="mt-0.5 shrink-0 text-[var(--clinic-primary)]" size={17} />
+            <CheckCircle2
+              className="mt-0.5 shrink-0 text-[#494d5a]"
+              size={17}
+            />
             <p>
-              본문의 `{"{{studentName}}"}` 자리에는 저장/발송 시 학생 이름이 각각 들어갑니다.
-              예: {selectedStudents[0]?.name ?? "학생명"}
+              본문의 `{"{{studentName}}"}` 자리에는 저장/발송 시 학생 이름이
+              각각 들어갑니다. 예: {selectedStudents[0]?.name ?? "학생명"}
             </p>
           </div>
         </div>
@@ -4150,7 +4529,7 @@ function BulkAttendanceFollowupPanel({
               "rounded-md border p-3 text-sm leading-6",
               submitState.status === "error"
                 ? "border-red-200 bg-red-50 text-red-900"
-                : "border-[#b7d8d4] bg-[#e3f3f1] text-[var(--clinic-primary-dark)]",
+                : "border-emerald-200 bg-emerald-50 text-emerald-900",
             ].join(" ")}
           >
             <div className="flex items-start gap-2">
@@ -4170,7 +4549,8 @@ function BulkAttendanceFollowupPanel({
                 </p>
                 {hasCompletedSubmit ? (
                   <p className="mt-1 text-xs text-[var(--clinic-muted)]">
-                    같은 선택 묶음에서는 추가 저장/발송을 막아 중복 기록을 방지합니다.
+                    같은 선택 묶음에서는 추가 저장/발송을 막아 중복 기록을
+                    방지합니다.
                   </p>
                 ) : null}
               </div>
@@ -4184,10 +4564,10 @@ function BulkAttendanceFollowupPanel({
             disabled={!canSave}
             onClick={() => onSubmit(false)}
             className={[
-              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition",
+              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
               canSave
-                ? "bg-[var(--clinic-primary)] text-white hover:bg-[var(--clinic-primary-dark)]"
-                : "bg-[#d7e3e7] text-[var(--clinic-muted)]",
+                ? "bg-[#17232B] text-white hover:bg-[#2f3437]"
+                : "bg-[#E9E7E1] text-[#9f9da5]",
             ].join(" ")}
           >
             <Send size={17} />
@@ -4202,10 +4582,10 @@ function BulkAttendanceFollowupPanel({
             disabled={!canSend}
             onClick={() => onSubmit(true)}
             className={[
-              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition",
+              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
               canSend
-                ? "bg-[var(--clinic-primary-dark)] text-white hover:bg-[#052f38]"
-                : "bg-[#c9d8dd] text-[var(--clinic-primary-dark)]",
+                ? "bg-[#2f3437] text-white hover:bg-[#17232B]"
+                : "bg-[#E9E7E1] text-[#62656f]",
             ].join(" ")}
           >
             <Send size={17} />
@@ -4217,7 +4597,7 @@ function BulkAttendanceFollowupPanel({
                   : "문자 발송 완료"
                 : submitState.status === "saved"
                   ? "저장 완료"
-                : "테스트 발송"}
+                  : "테스트 발송"}
           </button>
         </div>
       </div>
@@ -4282,20 +4662,35 @@ function AttendanceFollowupPanel({
 }) {
   const messageMetrics = getMessageLengthMetrics(messageBody);
   const canSaveFollowup =
-    isPreviewReady && !isMessageBlank && !messageMetrics.isOverLimit && !isFollowupSaving;
-  const canSendMessage = isFollowupSaved && !isMessageSending && !sendBlockedMessage;
+    isPreviewReady &&
+    !isMessageBlank &&
+    !messageMetrics.isOverLimit &&
+    !isFollowupSaving;
+  const canSendMessage =
+    isFollowupSaved && !isMessageSending && !sendBlockedMessage;
 
   return (
-    <section className={["overflow-hidden rounded-md border border-[var(--clinic-border)] bg-[var(--clinic-panel)] xl:sticky xl:top-5", className].join(" ")}>
-      <div className="border-b border-[var(--clinic-border)] bg-[#fafafa] px-3 py-2.5 sm:px-4 sm:py-3">
+    <section
+      className={[
+        "overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7] xl:sticky xl:top-5",
+        className,
+      ].join(" ")}
+    >
+      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
-          <MessageSquareText className="text-[#62656f]" size={18} aria-hidden="true" />
-          <h3 className="text-sm font-semibold text-[var(--clinic-text)]">결석/지각 문자</h3>
+          <MessageSquareText
+            className="text-[#62656f]"
+            size={18}
+            aria-hidden="true"
+          />
+          <h3 className="text-sm font-semibold text-[var(--clinic-text)]">
+            결석/지각 문자
+          </h3>
           {followupTarget ? (
             <button
               type="button"
               onClick={onDismiss}
-              className="ml-auto rounded-sm border border-[#d7dbe0] bg-white px-2 py-1 text-xs font-semibold text-[#62656f] hover:bg-[#f6f7f8]"
+              className="ml-auto rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2 py-1 text-xs font-semibold text-[#62656f] hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
             >
               닫기
             </button>
@@ -4308,11 +4703,11 @@ function AttendanceFollowupPanel({
 
       {!followupTarget ? (
         <div className="space-y-3 p-3 sm:p-4">
-          <div className="rounded-sm border border-[var(--clinic-border)] bg-[#f4f9fa] p-3 text-sm leading-6 text-[var(--clinic-muted)]">
+          <div className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] p-3 text-sm leading-6 text-[var(--clinic-muted)]">
             <p className="font-semibold text-[var(--clinic-text)]">대기 상태</p>
             <p className="mt-1">
-              `확인 필요`는 바로 문자를 만들지 않습니다. 미도착 학생을 잠시 대기시킨
-              뒤 결석이나 지각으로 확정하면 문자 초안이 생성됩니다.
+              `확인 필요`는 바로 문자를 만들지 않습니다. 미도착 학생을 잠시
+              대기시킨 뒤 결석이나 지각으로 확정하면 문자 초안이 생성됩니다.
             </p>
           </div>
 
@@ -4336,13 +4731,16 @@ function AttendanceFollowupPanel({
         </div>
       ) : (
         <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-          <div className="border border-[#d7dbe0] bg-[#f6f7f8] px-3 py-3">
-            <p className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--clinic-primary)]">선택 학생</p>
+          <div className="border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-3">
+            <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#62656f]">
+              선택 학생
+            </p>
             <p className="mt-1 text-base font-semibold text-[var(--clinic-text)]">
               {followupTarget.student.name}
             </p>
             <p className="mt-1 text-xs text-[var(--clinic-muted)]">
-              {followupTarget.session.className} · {followupTarget.session.startTime}-
+              {followupTarget.session.className} ·{" "}
+              {followupTarget.session.startTime}-
               {followupTarget.session.endTime}
             </p>
             <p className="mt-2 inline-flex rounded-sm border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-[var(--clinic-danger)]">
@@ -4351,12 +4749,15 @@ function AttendanceFollowupPanel({
           </div>
 
           <fieldset>
-            <legend className="text-sm font-semibold text-[var(--clinic-text)]">수신자</legend>
+            <legend className="text-sm font-semibold text-[var(--clinic-text)]">
+              수신자
+            </legend>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {messageRecipientTypes.map((recipientType) => {
                 const needsStudentPhone = recipientType !== "parent";
                 const isDisabled =
-                  needsStudentPhone && !followupTarget.student.maskedStudentPhone;
+                  needsStudentPhone &&
+                  !followupTarget.student.maskedStudentPhone;
                 const isSelected = selectedRecipientType === recipientType;
 
                 return (
@@ -4367,10 +4768,10 @@ function AttendanceFollowupPanel({
                     aria-pressed={isSelected}
                     onClick={() => onRecipientTypeChange(recipientType)}
                     className={[
-                      "min-h-10 rounded-sm border px-2 text-xs font-semibold transition",
+                      "min-h-10 rounded-sm border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
                       isSelected
-                        ? "border-[var(--clinic-primary)] bg-[var(--clinic-primary)] text-white"
-                        : "border-[#c9d8dd] bg-white text-[var(--clinic-text)] hover:border-[var(--clinic-accent)] hover:bg-[#f4fbfa]",
+                        ? "border-[#17232B] bg-[#17232B] text-white"
+                        : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:bg-[#F4F4F1]",
                       isDisabled ? "cursor-not-allowed opacity-45" : "",
                     ].join(" ")}
                   >
@@ -4380,7 +4781,8 @@ function AttendanceFollowupPanel({
               })}
             </div>
             <p className="mt-2 text-xs leading-5 text-[var(--clinic-muted)]">
-              학생 연락처: {followupTarget.student.maskedStudentPhone ?? "미등록"}
+              학생 연락처:{" "}
+              {followupTarget.student.maskedStudentPhone ?? "미등록"}
             </p>
           </fieldset>
 
@@ -4407,7 +4809,7 @@ function AttendanceFollowupPanel({
                 title="원문으로 되돌리기"
                 disabled={!isDraftEdited}
                 onClick={onRestorePreview}
-                className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#c9d8dd] bg-white text-[var(--clinic-muted)] disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] text-[#62656f] hover:bg-[#F4F4F1] disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
               >
                 <RotateCcw size={15} />
               </button>
@@ -4424,7 +4826,7 @@ function AttendanceFollowupPanel({
                   : "결석 또는 지각 학생을 선택하면 문자 초안이 표시됩니다."
               }
               rows={8}
-              className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#c9d8dd] bg-white px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition disabled:bg-[#eef4f6] disabled:text-[var(--clinic-muted)] focus:border-[var(--clinic-primary)] focus:ring-2 focus:ring-[#b7ece6]"
+              className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition disabled:bg-[#E9E7E1] disabled:text-[var(--clinic-muted)] focus:border-[#9f9da5] focus:ring-2 focus:ring-[#c9cdfa]"
             />
             <p
               className={[
@@ -4453,12 +4855,15 @@ function AttendanceFollowupPanel({
               "rounded-sm border p-3 text-sm leading-6",
               isPreviewError
                 ? "border-red-200 bg-red-50 text-red-900"
-                : "border-[var(--clinic-border)] bg-[#f4f9fa] text-[var(--clinic-text)]",
+                : "border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-text)]",
             ].join(" ")}
           >
             <div className="flex items-start gap-2">
               {isPreviewReady && !isPreviewError ? (
-                <CheckCircle2 className="mt-0.5 shrink-0 text-[var(--clinic-primary)]" size={17} />
+                <CheckCircle2
+                  className="mt-0.5 shrink-0 text-[#494d5a]"
+                  size={17}
+                />
               ) : (
                 <AlertCircle className="mt-0.5 shrink-0" size={17} />
               )}
@@ -4478,7 +4883,7 @@ function AttendanceFollowupPanel({
                 "rounded-sm border p-3 text-sm leading-6",
                 followupSaveError
                   ? "border-red-200 bg-red-50 text-red-900"
-                  : "border-[#b7d8d4] bg-[#e3f3f1] text-[var(--clinic-primary-dark)]",
+                  : "border-emerald-200 bg-emerald-50 text-emerald-900",
               ].join(" ")}
             >
               <div className="flex items-start gap-2">
@@ -4500,10 +4905,10 @@ function AttendanceFollowupPanel({
             disabled={!canSaveFollowup}
             onClick={onSaveFollowup}
             className={[
-              "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition",
+              "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
               canSaveFollowup
-                ? "bg-[var(--clinic-primary)] text-white hover:bg-[var(--clinic-primary-dark)]"
-                : "bg-[#d7e3e7] text-[var(--clinic-muted)]",
+                ? "bg-[#17232B] text-white hover:bg-[#2f3437]"
+                : "bg-[#E9E7E1] text-[#9f9da5]",
             ].join(" ")}
           >
             <Send size={17} />
@@ -4530,10 +4935,10 @@ function AttendanceFollowupPanel({
                 disabled={!canSendMessage}
                 onClick={onSendMessage}
                 className={[
-                  "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition",
+                  "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
                   canSendMessage
-                    ? "bg-[var(--clinic-primary-dark)] text-white hover:bg-[#052f38]"
-                    : "bg-[#c9d8dd] text-[var(--clinic-primary-dark)]",
+                    ? "bg-[#2f3437] text-white hover:bg-[#17232B]"
+                    : "bg-[#E9E7E1] text-[#62656f]",
                 ].join(" ")}
               >
                 <Send size={17} />
@@ -4552,7 +4957,7 @@ function AttendanceFollowupPanel({
                     "rounded-sm border p-3 text-sm leading-6",
                     messageSendError
                       ? "border-red-200 bg-red-50 text-red-900"
-                      : "border-[#b7d8d4] bg-[#e3f3f1] text-[var(--clinic-primary-dark)]",
+                      : "border-emerald-200 bg-emerald-50 text-emerald-900",
                   ].join(" ")}
                 >
                   <div className="flex items-start gap-2">
@@ -4584,7 +4989,9 @@ function buildAttendanceSessions(
   dayOfWeek: number,
 ): AttendanceSession[] {
   const sessionMap = new Map<string, AttendanceSession>();
-  const classMap = new Map(classes.map((classItem) => [classItem.id, classItem]));
+  const classMap = new Map(
+    classes.map((classItem) => [classItem.id, classItem]),
+  );
   const studentsById = new Map<string, AttendanceStudent>();
 
   classes.forEach((classItem) => {
@@ -4600,7 +5007,8 @@ function buildAttendanceSessions(
           (schedule) =>
             schedule.classId === classItem.id &&
             schedule.dayOfWeek === dayOfWeek &&
-            (schedule.scheduleType === "regular_class" || schedule.scheduleType === "makeup"),
+            (schedule.scheduleType === "regular_class" ||
+              schedule.scheduleType === "makeup"),
         )
         .forEach((schedule) => {
           addSessionStudent({
@@ -4636,7 +5044,10 @@ function buildAttendanceSessions(
 
     const recordStudent = studentsById.get(record.studentId);
 
-    if (recordStudent && !session.students.some((item) => item.id === recordStudent.id)) {
+    if (
+      recordStudent &&
+      !session.students.some((item) => item.id === recordStudent.id)
+    ) {
       session.students.push(recordStudent);
     }
   });
@@ -4723,14 +5134,19 @@ function summarizeSession(
   };
 
   students.forEach((student) => {
-    const status = normalizeAttendanceStatus(recordsByStudent.get(student.id)?.status);
+    const status = normalizeAttendanceStatus(
+      recordsByStudent.get(student.id)?.status,
+    );
     summary[status] += 1;
   });
 
   return summary;
 }
 
-function getSessionProgress(session: AttendanceSession, records: AttendanceRecordItem[]) {
+function getSessionProgress(
+  session: AttendanceSession,
+  records: AttendanceRecordItem[],
+) {
   const recordsByStudent = new Map(
     records
       .filter(
@@ -4749,7 +5165,10 @@ function getSessionProgress(session: AttendanceSession, records: AttendanceRecor
   };
 }
 
-function getSessionSummary(session: AttendanceSession, records: AttendanceRecordItem[]) {
+function getSessionSummary(
+  session: AttendanceSession,
+  records: AttendanceRecordItem[],
+) {
   const recordsByStudent = new Map(
     records
       .filter(
@@ -4799,7 +5218,10 @@ function buildAttendanceOverview(
 
   return {
     totalSessions: sessions.length,
-    totalStudents: sessions.reduce((total, session) => total + session.students.length, 0),
+    totalStudents: sessions.reduce(
+      (total, session) => total + session.students.length,
+      0,
+    ),
     counts,
   };
 }
@@ -4840,7 +5262,9 @@ function dayStatusFilterLabel(filter: AttendanceDayStatusFilter) {
   return labels[filter];
 }
 
-function normalizeAttendanceStatus(status: string | undefined): AttendanceStatus {
+function normalizeAttendanceStatus(
+  status: string | undefined,
+): AttendanceStatus {
   if (
     status === "present" ||
     status === "late" ||
@@ -4855,7 +5279,9 @@ function normalizeAttendanceStatus(status: string | undefined): AttendanceStatus
   return "pending";
 }
 
-function attendanceStatusForBulkReason(reason: BulkAttendanceReason): AttendanceStatus {
+function attendanceStatusForBulkReason(
+  reason: BulkAttendanceReason,
+): AttendanceStatus {
   return reason === "late" ? "late" : "absent";
 }
 
@@ -4983,7 +5409,9 @@ function getDayOfWeek(dateString: string) {
 
 function formatAttendanceDate(dateString: string) {
   const [year, month, day] = dateString.split("-");
-  const dayLabel = ["일", "월", "화", "수", "목", "금", "토"][getDayOfWeek(dateString)];
+  const dayLabel = ["일", "월", "화", "수", "목", "금", "토"][
+    getDayOfWeek(dateString)
+  ];
 
   return `${year}. ${month}. ${day}. ${dayLabel}`;
 }
@@ -5034,8 +5462,7 @@ function attendanceStatusClass(status: AttendanceStatus) {
     pending: "border-[#C9D7DC] bg-[#EEF4F6] text-[var(--clinic-muted)]",
     present:
       "border-[var(--console-status-success-border)] bg-[var(--console-status-success-bg)] text-[var(--console-status-success-text)]",
-    late:
-      "border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] text-[var(--console-status-pending-text)]",
+    late: "border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] text-[var(--console-status-pending-text)]",
     absent:
       "border-[var(--console-status-danger-border)] bg-[var(--console-status-danger-bg)] text-[var(--console-status-danger-text)]",
     makeup:
@@ -5050,7 +5477,9 @@ function attendanceStatusClass(status: AttendanceStatus) {
 }
 
 function reasonLabel(reasonId: FollowupReason) {
-  return followupReasons.find((reason) => reason.id === reasonId)?.label ?? reasonId;
+  return (
+    followupReasons.find((reason) => reason.id === reasonId)?.label ?? reasonId
+  );
 }
 
 function getRecentDuplicateWarning({
@@ -5157,7 +5586,9 @@ function buildDateSummary(
   dateString: string,
 ) {
   const dayOfWeek = getDayOfWeek(dateString);
-  const dateRecords = records.filter((record) => record.attendanceDate === dateString);
+  const dateRecords = records.filter(
+    (record) => record.attendanceDate === dateString,
+  );
   const sessions = buildAttendanceSessions(classes, dateRecords, dayOfWeek);
 
   return buildAttendanceOverview(sessions, dateRecords);
