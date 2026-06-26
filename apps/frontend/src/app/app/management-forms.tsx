@@ -466,6 +466,7 @@ export function StudentForm({
                 <select
                   value={form.status}
                   onChange={(event) => onChange({ ...form, status: event.target.value })}
+                  aria-describedby="student-status-help"
                   className={managementInputClass}
                 >
                   <option value="active">재원</option>
@@ -474,10 +475,17 @@ export function StudentForm({
                 </select>
               </label>
 
-              <p className="border border-[#E3E2E8] bg-[#FBFAF7] px-3 py-2 text-xs leading-5 text-[#62656f]">
-                학생 삭제는 제공하지 않습니다. 운영 기록 보존을 위해 다니지 않는 학생은 퇴원
-                상태로 관리합니다.
-              </p>
+              <div
+                id="student-status-help"
+                role="note"
+                className="border border-[#E3E2E8] bg-[#FBFAF7] px-3 py-2 text-xs leading-5 text-[#62656f]"
+              >
+                <p className="font-semibold text-[#2f3437]">퇴원 처리 안내</p>
+                <p className="mt-1">
+                  다니지 않는 학생은 상태를 <b className="text-[#17232B]">퇴원</b>으로
+                  바꾼 뒤 저장합니다. 학생과 과거 출석·연락 기록은 삭제하지 않고 보존합니다.
+                </p>
+              </div>
             </div>
           </section>
 
@@ -750,7 +758,7 @@ export function ScheduleForm({
             className="flex min-h-10 w-full min-w-0 items-center justify-center gap-2 rounded-sm border border-red-200 bg-[#FFFEFA] px-4 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             <Trash2 size={16} />
-            삭제
+            스케줄 삭제
           </button>
         ) : (
           <span className="hidden sm:block" />
