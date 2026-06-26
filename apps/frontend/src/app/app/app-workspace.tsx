@@ -99,7 +99,6 @@ type WorkspaceView =
   | "templates"
   | "settings"
   | "history"
-  | "fees"
   | "reports"
   | "management";
 
@@ -328,11 +327,6 @@ export function AppWorkspace({
               onRecordsChange={setWorkspaceAttendanceRecords}
               onNavigate={handleViewChange}
             />
-          ) : visibleView === "fees" ? (
-            <FeesPlaceholder
-              onOpenStudents={() => handleViewChange("students")}
-              onOpenReports={() => handleViewChange("reports")}
-            />
           ) : (
             <ManagementHome
               key={`${visibleView}:${managementResetKey}`}
@@ -364,7 +358,6 @@ function normalizeWorkspaceView(view: WorkspaceView, canManage: boolean): Worksp
       "templates",
       "settings",
       "history",
-      "fees",
       "reports",
       "management",
     ].includes(view)
@@ -422,7 +415,6 @@ function getWorkspaceViewLabel(view: WorkspaceView, canManage: boolean) {
   if (view === "settings") return "운영 정책";
   if (view === "history") return "변경 이력";
   if (view === "operations") return "문자";
-  if (view === "fees") return "교재/비용";
   if (view === "reports") return "리포트";
   if (view === "management") return "관리";
   return "오늘";
@@ -437,7 +429,6 @@ function getContextViewTitle(view: WorkspaceView, canManage: boolean) {
   if (view === "templates") return "문자 템플릿";
   if (view === "settings") return "운영 정책";
   if (view === "history") return "변경 이력";
-  if (view === "fees") return "교재/비용";
   if (view === "reports") return "리포트";
   if (view === "management") return "관리";
   return canManage ? "오늘 운영" : "오늘 수업";
@@ -506,50 +497,6 @@ function WorkspaceContextHeader({
           {teacherName} · {roleLabel}
         </span>
         <LogoutButton />
-      </div>
-    </section>
-  );
-}
-
-function FeesPlaceholder({
-  onOpenStudents,
-  onOpenReports,
-}: {
-  onOpenStudents: () => void;
-  onOpenReports: () => void;
-}) {
-  return (
-    <section className="border border-[#D8D6DE] bg-[#FFFEFA] p-6">
-      <div className="max-w-3xl">
-        <p className="text-xs font-semibold text-[#494d5a]">다음 단계 운영 영역</p>
-        <h2 className="mt-2 text-2xl font-semibold text-stone-950">교재/비용</h2>
-        <p className="mt-2 text-sm leading-6 text-stone-600">
-          교재비와 수강료는 결제/수납 시스템으로 바로 확장하지 않고, 학생별 금액 기록과
-          월말 안내 문자에 필요한 변수 관리부터 설계합니다.
-        </p>
-      </div>
-
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <button
-          type="button"
-          onClick={onOpenStudents}
-          className="min-h-12 border border-[#D8D6DE] bg-[#F4F4F1] px-4 text-left text-sm font-semibold text-[#2f3437] transition hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
-        >
-          학생별 기본 정보 확인
-          <span className="mt-1 block text-xs font-normal text-stone-500">
-            실제 비용 기능 전 학생 명단과 반 배정을 먼저 고정합니다.
-          </span>
-        </button>
-        <button
-          type="button"
-          onClick={onOpenReports}
-          className="min-h-12 border border-[#D8D6DE] bg-[#FFFEFA] px-4 text-left text-sm font-semibold text-stone-800 transition hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
-        >
-          운영 기록 리포트 확인
-          <span className="mt-1 block text-xs font-normal text-stone-500">
-            출석, 문자, 이력 CSV 보관 흐름은 기존 리포트에서 확인합니다.
-          </span>
-        </button>
       </div>
     </section>
   );
