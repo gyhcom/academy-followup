@@ -1656,7 +1656,7 @@ function MessageComposer({
               )}
               <p>
                 {followupSaveError ||
-                  "연락 기록을 저장했습니다. 다음 단계에서 테스트 발송을 이어갑니다."}
+                  "연락 기록을 저장했습니다. 필요하면 테스트 발송을 진행하세요."}
               </p>
             </div>
           </div>

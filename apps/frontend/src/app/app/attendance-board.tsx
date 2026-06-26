@@ -122,7 +122,7 @@ type AttendanceOverview = {
 };
 
 type AttendanceFilter = "all" | "unchecked" | "attention";
-type AttendanceBoardView = "calendar" | "today" | "ledger";
+type AttendanceBoardView = "calendar" | "today";
 type AttendanceDayDetailTab = "classes" | "students" | "attention";
 type AttendanceDayStatusFilter =
   | "all"
@@ -938,12 +938,6 @@ export function AttendanceBoard({
         />
       ) : null}
 
-      {effectiveAttendanceView === "ledger" && canUseCalendarView ? (
-        <AttendanceLedgerSkeleton
-          onOpenCalendar={() => setAttendanceView("calendar")}
-        />
-      ) : null}
-
       {effectiveAttendanceView === "today" ? (
         <>
           <div className="hidden lg:block">
@@ -1336,17 +1330,10 @@ function AttendanceViewTabs({
       label: "오늘 처리",
       description: "수업 직후 출석/문자",
     },
-    {
-      id: "ledger",
-      label: "학생별 장부",
-      description: "다음 단계",
-      ownerOnly: true,
-    },
   ];
   const actionableTabs = tabs.filter(
-    (tab) => (!tab.ownerOnly || canUseCalendarView) && tab.id !== "ledger",
+    (tab) => !tab.ownerOnly || canUseCalendarView,
   );
-  const showLedgerNotice = canUseCalendarView;
 
   return (
     <div className="border border-[#d8dde2] bg-[#fafafa] px-2 py-2">
@@ -1381,11 +1368,6 @@ function AttendanceViewTabs({
             </button>
           );
         })}
-        {showLedgerNotice ? (
-          <div className="ml-auto hidden min-h-10 shrink-0 items-center px-2 text-xs font-semibold text-[#858895] sm:flex">
-            학생별 장부는 후속 범위
-          </div>
-        ) : null}
       </div>
     </div>
   );
@@ -2583,35 +2565,6 @@ function InfoRow({ label, value }: { label: string; value: string }) {
         {value}
       </span>
     </div>
-  );
-}
-
-function AttendanceLedgerSkeleton({
-  onOpenCalendar,
-}: {
-  onOpenCalendar: () => void;
-}) {
-  return (
-    <section className="border border-[#D8D6DE] bg-[#FBFAF7] p-6">
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#62656f]">
-        Student Ledger
-      </p>
-      <h2 className="mt-2 text-2xl font-bold text-[#17232B]">
-        학생별 월간 출석 장부
-      </h2>
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-[#60717B]">
-        학생 row와 날짜 column을 사용하는 월간 matrix는 다음 단계에서
-        구현합니다. 학생명 column sticky, 날짜 column horizontal scroll, cell
-        상태 badge 기준으로 설계합니다.
-      </p>
-      <button
-        type="button"
-        onClick={onOpenCalendar}
-        className="mt-4 inline-flex min-h-10 items-center rounded-sm bg-[#17232B] px-4 text-sm font-bold text-white hover:bg-[#2f3437] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
-      >
-        달력 보기로 돌아가기
-      </button>
-    </section>
   );
 }
 

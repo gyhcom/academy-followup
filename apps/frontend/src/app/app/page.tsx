@@ -261,7 +261,7 @@ export default async function AppPage() {
       <AppShell email={user.email ?? ""}>
         <EmptyState
           title="학원 워크스페이스 연결 대기"
-          description="로그인은 완료됐지만 아직 학원 프로필이 연결되지 않았습니다. 다음 단계에서 학원 생성/초대 플로우를 붙입니다."
+          description="로그인은 완료됐지만 아직 학원 프로필이 연결되지 않았습니다. 관리자에게 학원 연결을 요청하세요."
         />
       </AppShell>
     );

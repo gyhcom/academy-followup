@@ -440,7 +440,7 @@ export function ManagementHome({
         status: "saved",
         message:
           studentForm.mode === "create"
-            ? "학생을 등록했습니다. 다음 단계에서 주간 스케줄을 이어서 입력합니다."
+            ? "학생을 등록했습니다. 이어서 주간 스케줄을 입력할 수 있습니다."
             : "학생 정보를 수정했습니다.",
       });
       setStudentForm(null);
