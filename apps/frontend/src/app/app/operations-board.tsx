@@ -153,6 +153,7 @@ export function OperationsBoard({
   const [selectedReason, setSelectedReason] = useState<FollowupReason>(
     initialSelection?.reason ?? "absence",
   );
+  const [studentSearchQuery, setStudentSearchQuery] = useState("");
   const [selectedRecipientType, setSelectedRecipientType] =
     useState<MessageRecipientType>("parent");
   const [hasMobileFollowupSelection, setHasMobileFollowupSelection] =
@@ -563,6 +564,7 @@ export function OperationsBoard({
     const nextClass = visibleClasses.find((classItem) => classItem.id === classId);
     setSelectedClassId(classId);
     setSelectedStudentId(nextClass?.students[0]?.id ?? "");
+    setStudentSearchQuery("");
     setHasMobileFollowupSelection(false);
     setIsMobileComposerOpen(false);
     setMakeupCandidateTime("");
@@ -1001,6 +1003,7 @@ export function OperationsBoard({
         selectedClass={selectedClass}
         selectedStudent={selectedStudent}
         selectedReason={selectedReason}
+        studentSearchQuery={studentSearchQuery}
         selectedMakeupCandidate={selectedMakeupCandidate}
         visibleFollowupHistory={visibleFollowupHistory}
         totalStudents={totalStudents}
@@ -1019,6 +1022,7 @@ export function OperationsBoard({
         isPreviewReady={isPreviewReady}
         onClassSelect={handleClassSelect}
         onStudentSelect={handleStudentSelect}
+        onStudentSearchChange={setStudentSearchQuery}
         onStudentReasonSelect={handleStudentReasonSelect}
         onDateMakeupCandidateSelect={handleDateMakeupCandidateSelect}
         onMakeupCandidateSelect={handleMakeupCandidateSelect}
@@ -1033,6 +1037,7 @@ export function OperationsBoard({
         selectedClass={selectedClass}
         selectedStudent={selectedStudent}
         selectedReason={selectedReason}
+        studentSearchQuery={studentSearchQuery}
         selectedMakeupCandidate={selectedMakeupCandidate}
         visibleFollowupHistory={visibleFollowupHistory}
         totalStudents={totalStudents}
@@ -1052,6 +1057,7 @@ export function OperationsBoard({
         isPreviewReady={isPreviewReady}
         onClassSelect={handleClassSelect}
         onStudentSelect={handleStudentSelect}
+        onStudentSearchChange={setStudentSearchQuery}
         onStudentReasonSelect={handleStudentReasonSelect}
         onDateMakeupCandidateSelect={handleDateMakeupCandidateSelect}
         onMakeupCandidateSelect={handleMakeupCandidateSelect}

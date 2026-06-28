@@ -1,7 +1,14 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { ArrowRight, CheckCircle2, MessageCircle, UsersRound } from "lucide-react";
+import { useMemo, type ReactNode } from "react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  MessageCircle,
+  Search,
+  UsersRound,
+  X,
+} from "lucide-react";
 import type { FollowupReason } from "@/lib/followup-templates";
 import type { FollowupHistoryState } from "@/app/app/operations-history";
 import { StudentFollowupHistory } from "@/app/app/operations-history";
@@ -24,6 +31,7 @@ type OperationsViewProps = {
   selectedClass: OperationsClass | undefined;
   selectedStudent: OperationsStudent | undefined;
   selectedReason: FollowupReason;
+  studentSearchQuery: string;
   selectedMakeupCandidate: MakeupCandidate | null;
   visibleFollowupHistory: FollowupHistoryState;
   totalStudents: number;
@@ -36,6 +44,7 @@ type OperationsViewProps = {
   isPreviewReady: boolean;
   onClassSelect: (classId: string) => void;
   onStudentSelect: (studentId: string) => void;
+  onStudentSearchChange: (value: string) => void;
   onStudentReasonSelect: (studentId: string, reasonId: FollowupReason) => void;
   onDateMakeupCandidateSelect: (candidate: MakeupCandidate) => void;
   onMakeupCandidateSelect: (schedule: OperationsStudentSchedule) => void;
@@ -66,6 +75,8 @@ export function OperationsDesktopView(props: OperationsViewProps) {
                 selectedClass={props.selectedClass}
                 selectedStudent={props.selectedStudent}
                 selectedReason={props.selectedReason}
+                searchQuery={props.studentSearchQuery}
+                onSearchChange={props.onStudentSearchChange}
                 onStudentSelect={props.onStudentSelect}
                 onStudentReasonSelect={props.onStudentReasonSelect}
               />
@@ -110,6 +121,8 @@ export function OperationsMobileView(props: OperationsViewProps) {
           selectedClass={props.selectedClass}
           selectedStudent={props.selectedStudent}
           selectedReason={props.selectedReason}
+          searchQuery={props.studentSearchQuery}
+          onSearchChange={props.onStudentSearchChange}
           onStudentSelect={props.onStudentSelect}
           onStudentReasonSelect={props.onStudentReasonSelect}
         />
@@ -245,18 +258,50 @@ function StudentSelectionList({
   selectedClass,
   selectedStudent,
   selectedReason,
+  searchQuery,
+  onSearchChange,
   onStudentSelect,
   onStudentReasonSelect,
 }: {
   selectedClass: OperationsClass | undefined;
   selectedStudent: OperationsStudent | undefined;
   selectedReason: FollowupReason;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
   onStudentSelect: (studentId: string) => void;
   onStudentReasonSelect: (studentId: string, reasonId: FollowupReason) => void;
 }) {
+  const filteredStudents = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const students = selectedClass?.students ?? [];
+
+    if (!normalizedQuery) {
+      return students;
+    }
+
+    return students.filter((student) =>
+      [
+        student.name,
+        student.schoolName,
+        student.gradeLabel,
+        student.parentName,
+        student.maskedParentPhone,
+        student.maskedStudentPhone,
+        ...student.schedules.map((schedule) => schedule.title),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedQuery),
+    );
+  }, [searchQuery, selectedClass?.students]);
+  const totalStudentCount = selectedClass?.students.length ?? 0;
+  const hasSearchQuery = searchQuery.trim().length > 0;
+
   return (
     <section aria-labelledby="student-flow-title" className="min-w-0 lg:order-1 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
-      <div className="message-zone-select flex items-end justify-between gap-3 border-b px-4 py-3">
+      <div className="message-zone-select border-b px-4 py-3">
+        <div className="flex items-end justify-between gap-3">
         <div>
           <h2 id="student-flow-title" className="inline-flex items-center gap-2 text-sm font-bold text-[#17232B]">
             <MessageCircle size={15} className="text-[#62656f]" aria-hidden="true" />
@@ -267,13 +312,38 @@ function StudentSelectionList({
           </p>
         </div>
         <span className="message-zone-select-panel shrink-0 border px-2 py-1 text-xs font-bold text-[#52697A]">
-          {selectedClass?.students.length ?? 0}명
+          {hasSearchQuery ? `${filteredStudents.length}/${totalStudentCount}명` : `${totalStudentCount}명`}
         </span>
+        </div>
+        <label className="relative mt-3 block">
+          <span className="sr-only">학생 이름 검색</span>
+          <Search
+            size={15}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#73777F]"
+            aria-hidden="true"
+          />
+          <input
+            value={searchQuery}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="학생 이름, 학교, 학부모 검색"
+            className="min-h-10 w-full border border-[#D8D6DE] bg-[#FFFEFA] pl-9 pr-10 text-sm font-semibold text-[#17232B] outline-none placeholder:text-[#9A9CA3] focus:border-[#BFC2C8] focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[#E1E4E8]"
+          />
+          {hasSearchQuery ? (
+            <button
+              type="button"
+              aria-label="학생 검색어 지우기"
+              onClick={() => onSearchChange("")}
+              className="absolute right-2 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center border border-[#D8D6DE] bg-[#F7F7FA] text-[#62656f] transition hover:bg-[#F0F0ED] focus:outline-none focus:ring-2 focus:ring-[#D8DAFA]"
+            >
+              <X size={13} aria-hidden="true" />
+            </button>
+          ) : null}
+        </label>
       </div>
 
       <div className="message-zone-select-panel overflow-y-auto lg:min-h-0 lg:flex-1">
-        {selectedClass?.students.length ? (
-          selectedClass.students.map((student) => {
+        {filteredStudents.length ? (
+          filteredStudents.map((student) => {
             const isSelected = student.id === selectedStudent?.id;
             const primarySchedule = getSortedActiveSchedules(student.schedules)[0];
             return (
@@ -378,7 +448,9 @@ function StudentSelectionList({
           })
         ) : (
           <div className="p-5 text-sm text-[#62656f]">
-            이 반에 등록된 학생이 없습니다.
+            {hasSearchQuery
+              ? "검색 결과가 없습니다. 학생 이름이나 학교명을 다시 확인해 주세요."
+              : "이 반에 등록된 학생이 없습니다."}
           </div>
         )}
       </div>

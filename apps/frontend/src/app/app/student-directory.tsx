@@ -284,6 +284,7 @@ export function StudentDirectoryToolbar({
     <div className="border-b border-[#D8D6DE] bg-[#FBFAF7]">
       <div className="grid gap-0 xl:grid-cols-[minmax(260px,1fr)_auto] xl:items-stretch">
         <label className="relative block">
+          <span className="sr-only">학생 이름 검색</span>
           <Search
             size={16}
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#73777F]"
@@ -291,7 +292,8 @@ export function StudentDirectoryToolbar({
           <input
             value={searchQuery}
             onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="학생명, 반, 학교, 학부모 검색"
+            aria-label="학생 이름 검색"
+            placeholder="학생 이름, 반, 학교, 학부모 검색"
             className="min-h-11 w-full border-0 border-b border-[#D8D6DE] bg-[#FFFEFA] pl-9 pr-3 text-sm font-medium text-[#17232B] outline-none placeholder:text-[#9A9CA3] focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[#E1E4E8] xl:border-b-0 xl:border-r"
           />
         </label>
