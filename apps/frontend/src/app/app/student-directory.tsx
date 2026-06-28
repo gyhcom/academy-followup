@@ -75,16 +75,16 @@ const staleStudentContextMessage =
   "현재 로그인한 학원과 선택한 학생 정보가 맞지 않습니다. 다른 학원 계정으로 로그인했거나 화면이 오래된 상태일 수 있습니다. 새로고침 후 다시 확인해 주세요.";
 
 const directoryInputClass =
-  "min-h-10 w-full min-w-0 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm text-[#17232B] outline-none transition placeholder:text-[#9A9CA3] focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#E1E4E8]";
+  "min-h-10 w-full min-w-0 rounded-sm border border-[var(--academy-border)] bg-white px-3 text-sm text-[var(--academy-ink)] outline-none transition placeholder:text-[#9A9CA3] focus:border-[var(--academy-accent)] focus:ring-2 focus:ring-[var(--academy-accent-soft)]";
 const directoryCompactInputClass =
-  "min-h-10 min-w-0 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-2 text-sm text-[#17232B] outline-none transition focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#E1E4E8]";
+  "min-h-10 min-w-0 rounded-sm border border-[var(--academy-border)] bg-white px-2 text-sm text-[var(--academy-ink)] outline-none transition focus:border-[var(--academy-accent)] focus:ring-2 focus:ring-[var(--academy-accent-soft)]";
 const directorySelectClass =
-  "min-h-10 border-0 border-r border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-semibold text-[#2f3437] outline-none transition focus:bg-[#FFFEFA] focus:ring-2 focus:ring-inset focus:ring-[#E1E4E8]";
+  "min-h-10 border-0 border-r border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 text-sm font-semibold text-[var(--academy-ink)] outline-none transition focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[var(--academy-accent-soft)]";
 const directorySecondaryButtonClass =
-  "flex min-h-10 items-center justify-center gap-1 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-xs font-bold text-[#4B4F58] transition hover:border-[#BFC2C8] hover:bg-[#F7F7FA]";
+  "flex min-h-10 items-center justify-center gap-1 rounded-sm border border-[var(--academy-border)] bg-white px-3 text-xs font-semibold text-[var(--academy-muted-strong)] transition hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]";
 const directoryPrimaryButtonClass =
-  "flex min-h-9 shrink-0 items-center gap-1 rounded-sm bg-[#17232B] px-2.5 text-[11px] font-semibold text-white transition hover:bg-[#0F171D] disabled:opacity-50";
-const directorySubtlePanelClass = "border border-[#D8D6DE] bg-[#FBFAF7]";
+  "flex min-h-9 shrink-0 items-center gap-1 rounded-sm bg-[var(--academy-accent)] px-2.5 text-[11px] font-semibold text-white transition hover:bg-[var(--academy-accent-strong)] disabled:opacity-50";
+const directorySubtlePanelClass = "border border-[var(--academy-border)] bg-[var(--academy-surface-muted)]";
 
 export function StudentDirectory({
   students,
@@ -184,7 +184,7 @@ export function StudentDirectory({
   }
 
   return (
-    <div className="min-w-0 overflow-hidden bg-transparent sm:border sm:border-[#D8D6DE] sm:bg-[#F4F4F1]">
+    <div className="min-w-0 overflow-hidden bg-transparent sm:border sm:border-[var(--academy-border)] sm:bg-white">
       <StudentDirectoryToolbar
         students={students}
         classes={classes}
@@ -210,7 +210,7 @@ export function StudentDirectory({
       </div>
       ) : (
         <div className="grid min-h-[620px] lg:grid-cols-[minmax(0,1fr)_420px]">
-          <div className="min-w-0 border-t border-[#D8D6DE] lg:border-r lg:border-[#D8D6DE]">
+          <div className="min-w-0 border-t border-[var(--academy-border)] lg:border-r lg:border-[var(--academy-border)]">
             <StudentResourceTable
               students={filteredStudents}
               selectedStudentId={selectedStudent?.id ?? null}
@@ -219,7 +219,7 @@ export function StudentDirectory({
             />
           </div>
 
-          <div className="hidden min-w-0 border-t border-[#D8D6DE] bg-[#F4F4F1] lg:block">
+          <div className="hidden min-w-0 border-t border-[var(--academy-border)] bg-[var(--academy-surface-muted)] lg:block">
             <StudentDetailPanel
               student={selectedStudent}
               onEditStudent={onEditStudent}
@@ -281,24 +281,24 @@ export function StudentDirectoryToolbar({
   ].filter(Boolean).length;
 
   return (
-    <div className="border-b border-[#D8D6DE] bg-[#FBFAF7]">
+      <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)]">
       <div className="grid gap-0 xl:grid-cols-[minmax(260px,1fr)_auto] xl:items-stretch">
         <label className="relative block">
           <span className="sr-only">학생 이름 검색</span>
           <Search
             size={16}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#73777F]"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--academy-muted)]"
           />
           <input
             value={searchQuery}
             onChange={(event) => onSearchChange(event.target.value)}
             aria-label="학생 이름 검색"
             placeholder="학생 이름, 반, 학교, 학부모 검색"
-            className="min-h-11 w-full border-0 border-b border-[#D8D6DE] bg-[#FFFEFA] pl-9 pr-3 text-sm font-medium text-[#17232B] outline-none placeholder:text-[#9A9CA3] focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[#E1E4E8] xl:border-b-0 xl:border-r"
+            className="min-h-11 w-full border-0 border-b border-[var(--academy-border)] bg-white pl-9 pr-3 text-sm font-medium text-[var(--academy-ink)] outline-none placeholder:text-[#9A9CA3] focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[var(--academy-accent-soft)] xl:border-b-0 xl:border-r"
           />
         </label>
 
-        <div className="flex items-center justify-between gap-2 border-b border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2 text-xs font-bold text-[#62656f] xl:min-h-11 xl:border-b-0">
+        <div className="flex items-center justify-between gap-2 border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-xs font-bold text-[var(--academy-muted)] xl:min-h-11 xl:border-b-0">
           <button
             type="button"
             onClick={() =>
@@ -309,8 +309,8 @@ export function StudentDirectoryToolbar({
             className={[
               "flex min-h-8 min-w-0 items-center gap-2 rounded-sm border px-2 text-left transition lg:hidden",
               scheduleFilter === "missing_schedule"
-                ? "border-[#17232B] bg-[#17232B] text-white"
-                : "border-[#D8D6DE] bg-[#FFFEFA] text-[#2f3437] hover:bg-[#F7F7FA]",
+                ? "border-[var(--academy-accent)] bg-[var(--academy-accent)] text-white"
+                : "border-[var(--academy-border)] bg-white text-[var(--academy-ink)] hover:bg-[var(--academy-surface-muted)]",
             ].join(" ")}
           >
             <CalendarDays size={13} className="shrink-0" />
@@ -318,8 +318,8 @@ export function StudentDirectoryToolbar({
               {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
             </span>
           </button>
-          <div className="hidden min-h-8 min-w-0 items-center gap-2 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-2 text-left text-[#2f3437] lg:flex">
-            <CalendarDays size={13} className="shrink-0 text-[#73777F]" aria-hidden="true" />
+          <div className="hidden min-h-8 min-w-0 items-center gap-2 rounded-sm border border-[var(--academy-border)] bg-white px-2 text-left text-[var(--academy-ink)] lg:flex">
+            <CalendarDays size={13} className="shrink-0 text-[var(--academy-muted)]" aria-hidden="true" />
             <span className="truncate">
               {visibleCount}명 표시 · 스케줄 미등록 {missingScheduleCount}명
             </span>
@@ -327,7 +327,7 @@ export function StudentDirectoryToolbar({
           <button
             type="button"
             onClick={() => setIsFilterOpen((current) => !current)}
-            className="flex min-h-8 shrink-0 items-center gap-1 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-2 text-xs font-bold text-[#2f3437] lg:hidden"
+            className="flex min-h-8 shrink-0 items-center gap-1 rounded-sm border border-[var(--academy-border)] bg-white px-2 text-xs font-bold text-[var(--academy-ink)] lg:hidden"
           >
             <SlidersHorizontal size={13} />
             필터{activeFilterCount > 0 ? ` ${activeFilterCount}` : ""}
@@ -336,7 +336,7 @@ export function StudentDirectoryToolbar({
       </div>
 
       {activeFilterCount > 0 ? (
-        <div className="flex flex-wrap gap-1.5 border-b border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2 lg:hidden">
+        <div className="flex flex-wrap gap-1.5 border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 lg:hidden">
           {classFilter !== "all" ? (
             <FilterChip label={classes.find((item) => item.id === classFilter)?.name ?? "반 필터"} />
           ) : null}
@@ -348,7 +348,7 @@ export function StudentDirectoryToolbar({
 
       <div
         className={[
-          "gap-0 border-b border-[#D8D6DE] bg-[#FBFAF7] sm:grid-cols-2 lg:grid lg:grid-cols-4",
+          "gap-0 border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] sm:grid-cols-2 lg:grid lg:grid-cols-4",
           isFilterOpen ? "grid" : "hidden",
         ].join(" ")}
       >
@@ -390,7 +390,7 @@ export function StudentDirectoryToolbar({
         <select
           value={sortMode}
           onChange={(event) => onSortModeChange(event.target.value as StudentSortMode)}
-          className="min-h-10 border-0 bg-[#FBFAF7] px-3 text-sm font-semibold text-[#2f3437] outline-none transition focus:bg-[#FFFEFA] focus:ring-2 focus:ring-inset focus:ring-[#E1E4E8]"
+          className="min-h-10 border-0 bg-[var(--academy-surface-muted)] px-3 text-sm font-semibold text-[var(--academy-ink)] outline-none transition focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[var(--academy-accent-soft)]"
         >
           <option value="time">요일·시간순</option>
           <option value="name">이름순</option>
@@ -425,7 +425,7 @@ function StudentResourceTable({
 
   return (
     <div className="min-w-0">
-      <div className="hidden grid-cols-[minmax(170px,1.15fr)_minmax(160px,0.95fr)_minmax(150px,0.9fr)_116px_88px] border-b border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2.5 text-xs font-black uppercase tracking-[0.08em] text-[#73777F] lg:grid">
+      <div className="hidden grid-cols-[minmax(170px,1.15fr)_minmax(160px,0.95fr)_minmax(150px,0.9fr)_116px_88px] border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-[var(--academy-muted)] lg:grid">
         <span>학생</span>
         <span>반·학년</span>
         <span>대표 일정</span>
@@ -433,7 +433,7 @@ function StudentResourceTable({
         <span className="text-right">상태</span>
       </div>
       <div
-        className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA] sm:max-h-[680px] sm:overflow-y-auto sm:border-0 sm:bg-transparent"
+        className="overflow-hidden border border-[var(--academy-border)] bg-white sm:max-h-[680px] sm:overflow-y-auto sm:border-0 sm:bg-transparent"
         role="listbox"
         aria-label="학생 명단"
       >
@@ -471,8 +471,8 @@ function StudentResourceRow({
   return (
     <div
       className={[
-        "border-b border-[#E3E2E8] transition last:border-b-0",
-        isSelected ? "bg-[#F7F7FA] ring-1 ring-inset ring-[#D8D6DE]" : "bg-[#FFFEFA] hover:bg-[#FBFAF7]",
+        "border-b border-[var(--academy-border)] transition last:border-b-0",
+        isSelected ? "bg-[var(--academy-accent-soft)] ring-1 ring-inset ring-[#dacbff]" : "bg-white hover:bg-[var(--academy-surface-muted)]",
       ].join(" ")}
     >
       <button
@@ -481,11 +481,11 @@ function StudentResourceRow({
         className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-3 px-4 py-4 text-left sm:px-3 sm:py-3 lg:hidden"
       >
         <span className="min-w-0">
-          <span className="block truncate text-sm font-semibold text-stone-950">{student.name}</span>
-          <span className="mt-1 block truncate text-xs text-stone-500">
+          <span className="block truncate text-sm font-semibold text-[var(--academy-ink)]">{student.name}</span>
+          <span className="mt-1 block truncate text-xs text-[var(--academy-muted)]">
             {student.className ?? "미배정"} · {student.gradeLabel ?? "학년 미지정"}
           </span>
-          <span className="mt-1 block truncate text-xs text-stone-500">
+          <span className="mt-1 block truncate text-xs text-[var(--academy-muted)]">
             {primarySchedule
               ? `${primarySchedule.scheduleDate ? formatShortDate(primarySchedule.scheduleDate) : weekDayShortLabel(primarySchedule.dayOfWeek)} ${primarySchedule.startTime}`
               : "스케줄 미등록"} · {student.maskedParentPhone}
@@ -493,7 +493,7 @@ function StudentResourceRow({
         </span>
         <span className="flex shrink-0 items-center gap-2">
           <StatusBadge status={student.status} />
-          <ChevronRight size={16} className="text-stone-400" />
+          <ChevronRight size={16} className="text-[#b7b4c2]" />
         </span>
       </button>
 
@@ -503,32 +503,32 @@ function StudentResourceRow({
         aria-selected={isSelected}
         aria-label={`${student.name} 학생 상세 보기, ${student.className ?? "미배정"}, ${student.gradeLabel ?? "학년 미지정"}, ${scheduleLabel}, 공유 동의 ${student.scheduleShareConsentConfirmed ? "완료" : "없음"}, 상태 ${studentStatusLabel(student.status)}`}
         onClick={onSelect}
-        className="hidden w-full grid-cols-[minmax(170px,1.15fr)_minmax(160px,0.95fr)_minmax(150px,0.9fr)_116px_88px] items-center gap-3 px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#E1E4E8] lg:grid"
+        className="hidden w-full grid-cols-[minmax(170px,1.15fr)_minmax(160px,0.95fr)_minmax(150px,0.9fr)_116px_88px] items-center gap-3 px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)] lg:grid"
       >
         <span className="min-w-0">
-          <span className="block truncate text-sm font-semibold text-stone-950">{student.name}</span>
-          <span className="mt-0.5 block truncate text-xs text-stone-500">
+          <span className="block truncate text-sm font-semibold text-[var(--academy-ink)]">{student.name}</span>
+          <span className="mt-0.5 block truncate text-xs text-[var(--academy-muted)]">
             {student.schoolName ?? "학교 미지정"}
           </span>
         </span>
         <span className="min-w-0">
-          <span className="block truncate text-sm text-stone-700">{student.className ?? "미배정"}</span>
-          <span className="mt-0.5 block truncate text-xs text-stone-500">
+          <span className="block truncate text-sm text-[var(--academy-muted-strong)]">{student.className ?? "미배정"}</span>
+          <span className="mt-0.5 block truncate text-xs text-[var(--academy-muted)]">
             {student.gradeLabel ?? "학년 미지정"} · {student.parentName ?? "학부모"}
           </span>
         </span>
         <span className="min-w-0">
-          <span className="block truncate text-sm text-stone-700">
+          <span className="block truncate text-sm text-[var(--academy-muted-strong)]">
             {scheduleLabel}
           </span>
-          <span className="mt-0.5 block truncate text-xs text-stone-500">{activeSchedules.length}개 일정</span>
+          <span className="mt-0.5 block truncate text-xs text-[var(--academy-muted)]">{activeSchedules.length}개 일정</span>
         </span>
         <span
           className={[
             "w-fit rounded-full px-2 py-1 text-[11px] font-semibold",
             student.scheduleShareConsentConfirmed
-              ? "border border-violet-200 bg-violet-50 text-violet-800"
-              : "border border-[#D8D6DE] bg-[#F7F7FA] text-[#62656f]",
+              ? "border border-[#d9c7ff] bg-[var(--academy-accent-soft)] text-[var(--academy-accent)]"
+              : "border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted)]",
           ].join(" ")}
         >
           {student.scheduleShareConsentConfirmed ? "공유 동의" : "미동의"}
@@ -543,7 +543,7 @@ function StudentResourceRow({
 
 function FilterChip({ label }: { label: string }) {
   return (
-    <span className="rounded-sm border border-[#D8D6DE] bg-[#F7F7FA] px-2 py-1 text-[11px] font-semibold text-[#4B4F58]">
+    <span className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2 py-1 text-[11px] font-semibold text-[var(--academy-muted-strong)]">
       {label}
     </span>
   );
@@ -676,16 +676,16 @@ function StudentDetailPanel({
   );
 
   return (
-    <aside className="bg-[#F4F4F1] lg:sticky lg:top-4">
-      <section className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
-        <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3 text-[#2f3437]">
+    <aside className="bg-[var(--academy-surface-muted)] lg:sticky lg:top-4">
+      <section className="overflow-hidden border border-[var(--academy-border)] bg-white">
+        <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-3 text-[var(--academy-ink)]">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#858895]">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--academy-muted)]">
                 Student File
               </p>
-              <h3 className="mt-1 truncate text-lg font-black text-[#17191f]">{student.name}</h3>
-              <p className="mt-1 truncate text-xs font-medium text-[#62656f]">
+              <h3 className="mt-1 truncate text-lg font-bold text-[var(--academy-ink)]">{student.name}</h3>
+              <p className="mt-1 truncate text-xs font-medium text-[var(--academy-muted)]">
                 {student.className ?? "미배정"} · {student.gradeLabel ?? "학년 미지정"} · {student.parentName ?? "학부모"}
               </p>
             </div>
@@ -693,13 +693,13 @@ function StudentDetailPanel({
           </div>
         </div>
 
-        <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3">
+        <div className="border-b border-[var(--academy-border)] bg-white px-4 py-3">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#40616B]">
+              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--academy-muted)]">
                 보호자 연락처
               </p>
-              <p className="mt-1 truncate text-sm font-bold text-[var(--clinic-text)]">
+              <p className="mt-1 truncate text-sm font-bold text-[var(--academy-ink)]">
                 {student.maskedParentPhone}
               </p>
             </div>
@@ -707,8 +707,8 @@ function StudentDetailPanel({
               className={[
                 "h-fit rounded-sm border px-2 py-1 text-[11px] font-black",
                 student.scheduleShareConsentConfirmed
-                  ? "border-violet-200 bg-violet-50 text-violet-800"
-                  : "border-[#D8D6DE] bg-[#F7F7FA] text-[#62656f]",
+                  ? "border-[#d9c7ff] bg-[var(--academy-accent-soft)] text-[var(--academy-accent)]"
+                  : "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted)]",
               ].join(" ")}
             >
               {student.scheduleShareConsentConfirmed ? "공유 동의" : "공유 미동의"}
@@ -735,15 +735,15 @@ function StudentDetailPanel({
           </div>
         </div>
 
-        <section className="border-b border-[#D8D6DE]">
+        <section className="border-b border-[var(--academy-border)]">
           <StudentFileSectionHeader
             title="우리 학원 일정"
             meta={`활성 ${activeScheduleCount(student)}개`}
           />
 
           {groupedSchedules.length === 0 ? (
-            <div className="border-t border-[#D8D6DE] bg-[#FFFEFA] px-4 py-4 text-sm text-[#62656f]">
-              <p className="font-bold text-[var(--clinic-text)]">등록된 스케줄이 없습니다.</p>
+            <div className="border-t border-[var(--academy-border)] bg-white px-4 py-4 text-sm text-[var(--academy-muted)]">
+              <p className="font-bold text-[var(--academy-ink)]">등록된 스케줄이 없습니다.</p>
               <p className="mt-1 leading-5">
                 출석부와 보강 후보에서 빠질 수 있습니다. 정규 수업 시간을 먼저 추가해 주세요.
               </p>
@@ -757,7 +757,7 @@ function StudentDetailPanel({
               </button>
             </div>
           ) : (
-            <div className="divide-y divide-[#E3E2E8] border-t border-[#D8D6DE]">
+            <div className="divide-y divide-[var(--academy-border)] border-t border-[var(--academy-border)]">
               {groupedSchedules.map(({ dayOfWeek, schedules }) => (
                 <div key={dayOfWeek} className="bg-[#FFFEFA]">
                   <p className="border-b border-[#E3E2E8] bg-[#FBFAF7] px-4 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#73777F]">

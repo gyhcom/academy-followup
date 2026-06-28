@@ -2285,17 +2285,17 @@ function ManagementCommandCenter({
   );
 
   return (
-    <section className="overflow-hidden border border-[var(--clinic-border)] bg-[#fffefa]">
-      <div className="border-b border-[var(--console-line)] px-4 py-3">
+    <section className="overflow-hidden border border-[var(--academy-border)] bg-white">
+      <div className="border-b border-[var(--academy-border)] px-4 py-3">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
           <div className="min-w-0">
-            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#6f737c]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--academy-muted)]">
               관리 콘솔
             </p>
-            <h2 className="mt-1 truncate text-base font-black leading-tight text-[var(--clinic-text)]">
+            <h2 className="mt-1 truncate text-base font-semibold leading-tight text-[var(--academy-ink)]">
               {academyName}
             </h2>
-            <p className="mt-1 text-xs leading-5 text-[var(--clinic-muted)]">
+            <p className="mt-1 text-xs leading-5 text-[var(--academy-muted)]">
               학생, 반, 직원, 문자 템플릿, 운영 정책을 업무 단위로 관리합니다. 리포트는 왼쪽 리포트 메뉴에서 확인합니다.
             </p>
           </div>
@@ -2304,23 +2304,23 @@ function ManagementCommandCenter({
             {summaryRows.map((row) => {
               const valueClass =
                 row.tone === "warning"
-                  ? "text-[#B65D00]"
+                    ? "text-[var(--academy-warning)]"
                   : row.tone === "success"
-                    ? "text-[#0F7A62]"
-                    : "text-[var(--clinic-text)]";
+                    ? "text-[var(--academy-success)]"
+                    : "text-[var(--academy-ink)]";
 
               return (
                 <button
                   key={row.label}
                   type="button"
                   onClick={row.onClick}
-                  className="group min-h-10 border border-[var(--console-line)] bg-[#f8f7f2] px-2.5 py-1.5 text-left text-xs text-[#494d5a] transition hover:border-[#c7ccd2] hover:bg-[#f5f4ef] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+                  className="group min-h-10 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2.5 py-1.5 text-left text-xs text-[var(--academy-muted-strong)] transition hover:border-[var(--academy-border-strong)] hover:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="font-bold">{row.label}</span>
                     <span className={`font-black tabular-nums ${valueClass}`}>{row.value}</span>
                   </span>
-                  <span className="mt-0.5 block truncate text-[11px] font-semibold text-[var(--clinic-muted)]">
+                  <span className="mt-0.5 block truncate text-[11px] font-semibold text-[var(--academy-muted)]">
                     {row.detail}
                   </span>
                 </button>
@@ -2330,16 +2330,16 @@ function ManagementCommandCenter({
         </div>
       </div>
 
-      <div className="grid border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-2 sm:grid-cols-[9rem_minmax(0,1fr)] sm:items-center sm:gap-3">
-        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#6f737c]">
+      <div className="grid border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-2 sm:grid-cols-[9rem_minmax(0,1fr)] sm:items-center sm:gap-3">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--academy-muted)]">
           관리 설정
         </p>
-        <p className="mt-1 text-xs font-semibold text-[var(--clinic-muted)] sm:mt-0">
+        <p className="mt-1 text-xs font-semibold text-[var(--academy-muted)] sm:mt-0">
           자주 바꾸는 운영 설정을 먼저 표시합니다. 학생 명단은 왼쪽 관리 하위 메뉴에서 바로 열 수 있습니다.
         </p>
       </div>
 
-      <div className="divide-y divide-[var(--console-line)]">
+      <div className="divide-y divide-[var(--academy-border)]">
         {settingSections.map((section) => {
           const isActive = activeSection === section.id;
 
@@ -2351,10 +2351,10 @@ function ManagementCommandCenter({
               aria-current={isActive ? "page" : undefined}
               onClick={() => onSelectSection(section.id)}
               className={[
-                "group grid min-h-13 w-full grid-cols-[7.5rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa] sm:grid-cols-[9rem_minmax(0,1fr)_7rem_auto]",
+                "group grid min-h-13 w-full grid-cols-[7.5rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)] sm:grid-cols-[9rem_minmax(0,1fr)_7rem_auto]",
                 isActive
-                  ? "bg-[#f6f7f8] text-[var(--clinic-text)]"
-                  : "bg-[#fffefa] text-[var(--clinic-text)] hover:bg-[#f8f9fa]",
+                  ? "bg-[var(--academy-accent-soft)] text-[var(--academy-ink)]"
+                  : "bg-white text-[var(--academy-ink)] hover:bg-[var(--academy-surface-muted)]",
               ].join(" ")}
             >
               <span className="min-w-0">
@@ -2364,28 +2364,28 @@ function ManagementCommandCenter({
                     className={[
                       "inline-flex shrink-0 border px-1.5 py-0.5 text-[10px] font-black tabular-nums sm:hidden",
                       isActive
-                        ? "border-[#d7dbe0] bg-[#fffefa] text-[#2f3437]"
-                        : "border-[var(--console-line)] bg-[#f3f1ec] text-[var(--clinic-muted)]",
+                        ? "border-[#d9c7ff] bg-white text-[var(--academy-accent)]"
+                        : "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted)]",
                     ].join(" ")}
                   >
                     {section.count}
                   </span>
                 </span>
-                <span className="mt-0.5 block truncate text-[11px] font-semibold text-[var(--clinic-muted)]">
+                <span className="mt-0.5 block truncate text-[11px] font-semibold text-[var(--academy-muted)]">
                   {section.group}
                 </span>
               </span>
 
               <span className="min-w-0">
-                <span className="block truncate text-xs font-semibold text-[#494d5a]">
+                <span className="block truncate text-xs font-semibold text-[var(--academy-muted-strong)]">
                   {section.detail}
                 </span>
-                <span className="mt-0.5 block truncate text-[11px] font-semibold text-[#858895]">
+                <span className="mt-0.5 block truncate text-[11px] font-semibold text-[var(--academy-muted)]">
                   {section.status}
                 </span>
               </span>
 
-              <span className="hidden justify-self-end border border-[var(--console-line)] bg-[#f8f7f2] px-2 py-1 text-[11px] font-black text-[var(--clinic-muted)] sm:inline-flex">
+              <span className="hidden justify-self-end border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2 py-1 text-[11px] font-bold text-[var(--academy-muted)] sm:inline-flex">
                 {section.count}
               </span>
 
@@ -2393,9 +2393,9 @@ function ManagementCommandCenter({
                 size={14}
                 className={[
                   "justify-self-end transition",
-                  isActive
-                    ? "text-[#2f3437]"
-                    : "text-[#b6b3aa] group-hover:text-[var(--clinic-muted)]",
+                isActive
+                    ? "text-[var(--academy-accent)]"
+                    : "text-[#b7b4c2] group-hover:text-[var(--academy-muted)]",
                 ].join(" ")}
                 aria-hidden="true"
               />

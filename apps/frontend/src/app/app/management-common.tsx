@@ -14,14 +14,14 @@ export function SummaryCard({
 }) {
   return (
     <article className="console-row grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 px-3 py-3 sm:px-4">
-      <div className="flex size-9 shrink-0 items-center justify-center border border-[#d7dbe0] bg-[#f6f7f8] text-[#494d5a]">
+      <div className="flex size-9 shrink-0 items-center justify-center border border-[var(--academy-border)] bg-[var(--academy-accent-soft)] text-[var(--academy-accent)]">
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="truncate text-sm font-extrabold text-[var(--clinic-text)]">{label}</p>
-        <p className="mt-0.5 truncate text-xs leading-5 text-[var(--clinic-muted)]">{detail}</p>
+        <p className="truncate text-sm font-semibold text-[var(--academy-ink)]">{label}</p>
+        <p className="mt-0.5 truncate text-xs leading-5 text-[var(--academy-muted)]">{detail}</p>
       </div>
-      <p className="shrink-0 text-xl font-black tabular-nums text-[var(--clinic-text)]">{value}</p>
+      <p className="shrink-0 text-xl font-bold tabular-nums text-[var(--academy-ink)]">{value}</p>
     </article>
   );
 }
@@ -42,11 +42,11 @@ export function ManagementPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="console-surface min-w-0 bg-transparent sm:bg-[#F4F4F1]">
+    <section className="console-surface min-w-0 bg-transparent sm:bg-white">
       <div className="console-header-row flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-lg font-extrabold text-[var(--clinic-text)] sm:text-base">{title}</h3>
-          <p className="mt-1 hidden max-w-3xl text-sm leading-6 text-[var(--clinic-muted)] sm:block">{description}</p>
+          <h3 className="text-lg font-semibold text-[var(--academy-ink)] sm:text-base">{title}</h3>
+          <p className="mt-1 hidden max-w-3xl text-sm leading-6 text-[var(--academy-muted)] sm:block">{description}</p>
         </div>
         {actionLabel ? (
           <button
@@ -56,8 +56,8 @@ export function ManagementPanel({
             className={[
               "flex min-h-9 w-auto shrink-0 items-center justify-center gap-1 rounded-sm border px-3 text-xs font-semibold sm:min-h-10",
               onAction
-                ? "border-[#c9cdd2] bg-[#fffefa] text-[#2f3437] transition hover:border-[#aeb5bf] hover:bg-[#f6f7f8]"
-                : "cursor-not-allowed border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-muted)]",
+                ? "border-[var(--academy-border)] bg-white text-[var(--academy-ink)] transition hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]"
+                : "cursor-not-allowed border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted)]",
             ].join(" ")}
           >
             {actionIcon}
@@ -84,14 +84,14 @@ export function StatusBadge({ status }: { status: string }) {
     paused:
       "border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] text-[var(--console-status-pending-text)]",
     left:
-      "border-[#D8D6DE] bg-[#F4F4F1] text-[#494d5a]",
+      "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted-strong)]",
   };
 
   return (
     <span
       className={[
         "shrink-0 border px-2 py-1 text-xs font-bold",
-        styles[status] ?? "border-[#D8D6DE] bg-[#F4F4F1] text-[#494d5a]",
+        styles[status] ?? "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted-strong)]",
       ].join(" ")}
     >
       {labels[status] ?? status}

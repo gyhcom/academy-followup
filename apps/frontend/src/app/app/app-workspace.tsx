@@ -451,23 +451,23 @@ function WorkspaceContextHeader({
 }) {
   if (activeView === "attendance") {
     return (
-      <section className="hidden min-h-12 border border-[var(--clinic-border)] bg-[#fffefa] px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
+      <section className="hidden min-h-12 border border-[var(--academy-border)] bg-white px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="text-sm font-semibold text-[var(--clinic-muted)]">운영 기준일</span>
-          <span className="text-lg font-bold tabular-nums text-[var(--clinic-text)]">
+          <span className="text-sm font-semibold text-[var(--academy-muted)]">운영 기준일</span>
+          <span className="text-lg font-bold tabular-nums text-[var(--academy-ink)]">
             {formatContextDate(selectedDate)}
           </span>
-          <CalendarDays size={18} className="shrink-0 text-[var(--clinic-primary)]" aria-hidden="true" />
+          <CalendarDays size={18} className="shrink-0 text-[var(--academy-accent)]" aria-hidden="true" />
         </div>
 
-        <div className="flex shrink-0 items-center gap-4 text-sm text-[var(--clinic-muted)]">
+        <div className="flex shrink-0 items-center gap-4 text-sm text-[var(--academy-muted)]">
           <div className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center border border-[var(--clinic-border)] bg-[#f1f0ea] text-[var(--clinic-primary)]">
+            <span className="flex size-9 items-center justify-center border border-[var(--academy-border)] bg-[var(--academy-accent-soft)] text-[var(--academy-accent)]">
               <User size={17} aria-hidden="true" />
             </span>
             <span className="leading-tight">
-              <span className="block font-bold text-[var(--clinic-text)]">{teacherName}</span>
-              <span className="block text-xs font-semibold text-[var(--clinic-muted)]">{roleLabel}</span>
+              <span className="block font-bold text-[var(--academy-ink)]">{teacherName}</span>
+              <span className="block text-xs font-semibold text-[var(--academy-muted)]">{roleLabel}</span>
             </span>
           </div>
           <LogoutButton />
@@ -477,23 +477,23 @@ function WorkspaceContextHeader({
   }
 
   return (
-    <section className="hidden min-h-12 border border-[var(--clinic-border)] bg-[#fffefa] px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
+    <section className="hidden min-h-12 border border-[var(--academy-border)] bg-white px-4 py-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
       <div className="flex min-w-0 items-center gap-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium text-[var(--clinic-muted)]">
+          <p className="text-[11px] font-medium text-[var(--academy-muted)]">
             {getWorkspaceViewLabel(activeView, canManage)}
           </p>
-          <h2 className="mt-0.5 truncate text-base font-semibold text-[var(--clinic-text)]">
+          <h2 className="mt-0.5 truncate text-base font-semibold text-[var(--academy-ink)]">
             {getContextViewTitle(activeView, canManage)} · {academyName}
           </h2>
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2 text-xs text-[var(--clinic-muted)]">
-        <span className="border border-[var(--clinic-border)] bg-[#f6f5ef] px-3 py-1.5 font-semibold text-[var(--clinic-text)]">
+      <div className="flex shrink-0 items-center gap-2 text-xs text-[var(--academy-muted)]">
+        <span className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-1.5 font-semibold text-[var(--academy-ink)]">
           운영 기준 {formatContextDate(selectedDate)}
         </span>
-        <span className="border border-[var(--clinic-border)] bg-[#fffefa] px-3 py-1.5">
+        <span className="border border-[var(--academy-border)] bg-white px-3 py-1.5">
           {teacherName} · {roleLabel}
         </span>
         <LogoutButton />
@@ -576,11 +576,11 @@ function WorkspaceNavigation({
   return (
     <>
       <aside className="hidden sm:sticky sm:top-0 sm:block sm:h-screen sm:self-start">
-        <section className="flex h-full flex-col overflow-hidden border-r border-[var(--clinic-border)] bg-[#fbfaf7] text-[var(--clinic-text)]">
-          <div className="border-b border-[var(--console-line)] px-4 py-3">
+        <section className="flex h-full flex-col overflow-hidden border-r border-[var(--academy-border)] bg-white text-[var(--academy-ink)]">
+          <div className="border-b border-[var(--academy-border)] px-4 py-3">
             <div className="min-w-0">
-              <p className="max-w-[11rem] truncate text-sm font-semibold leading-tight text-[var(--clinic-text)]">{academyName}</p>
-              <p className="mt-1 text-[11px] font-medium text-[var(--clinic-muted)]">{shellLabel}</p>
+              <p className="max-w-[11rem] truncate text-sm font-semibold leading-tight text-[var(--academy-ink)]">{academyName}</p>
+              <p className="mt-1 text-[11px] font-medium text-[var(--academy-muted)]">{shellLabel}</p>
             </div>
           </div>
           <nav
@@ -617,9 +617,9 @@ function WorkspaceNavigation({
                       id={managementSubmenuId}
                       role="group"
                       aria-label="관리 하위 메뉴"
-                      className="mt-1 rounded-md border border-[#e1dfd7] bg-[#f3f2ed] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]"
+                      className="mt-1 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] p-1"
                     >
-                      <p className="px-2 pb-1 pt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#858895]">
+                      <p className="px-2 pb-1 pt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--academy-muted)]">
                         관리 하위 메뉴
                       </p>
                       <div className="space-y-0.5">
@@ -666,13 +666,13 @@ function WorkspaceNavigation({
               );
             })}
           </nav>
-          <div className="border-t border-[var(--console-line)] px-4 py-3">
-            <p className="truncate text-xs font-medium text-[var(--clinic-muted)]">{roleLabel}</p>
+          <div className="border-t border-[var(--academy-border)] px-4 py-3">
+            <p className="truncate text-xs font-medium text-[var(--academy-muted)]">{roleLabel}</p>
           </div>
         </section>
       </aside>
 
-      <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[var(--clinic-border)] bg-[#fbfaf7]/96 px-3 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur sm:hidden">
+      <section className="fixed left-0 top-[calc(var(--app-vvh,100vh)-3.5rem-env(safe-area-inset-bottom))] z-40 w-[100dvw] max-w-[100dvw] overflow-hidden border-t border-[var(--academy-border)] bg-white/96 px-3 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur sm:hidden">
         <nav
           aria-label={shellLabel}
           className={["grid gap-1.5", getMobileGridClass(mobileItems.length)].join(" ")}
@@ -811,10 +811,10 @@ function WorkspaceManagementSubButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "grid min-h-8 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 py-1.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
+        "grid min-h-8 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 py-1.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--academy-focus)]",
         isActive
-          ? "border border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
-          : "border border-transparent text-[var(--clinic-muted)] hover:bg-[#f8f9fa] hover:text-[var(--clinic-text)]",
+          ? "border border-[#dacbff] bg-[var(--academy-accent-soft)] text-[var(--academy-ink)]"
+          : "border border-transparent text-[var(--academy-muted)] hover:bg-white hover:text-[var(--academy-ink)]",
       ].join(" ")}
     >
       <span className="min-w-0">
@@ -825,7 +825,7 @@ function WorkspaceManagementSubButton({
       </span>
       <span
         aria-hidden="true"
-        className={isActive ? "text-[#2f3437]" : "text-[#b6b3aa]"}
+        className={isActive ? "text-[var(--academy-accent)]" : "text-[#b7b4c2]"}
       >
         ›
       </span>
@@ -869,10 +869,10 @@ function WorkspaceNavButton({
         aria-controls={controlsId}
         onClick={onClick}
         className={[
-          "group relative grid min-h-9 w-full grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 px-2.5 py-1.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
+          "group relative grid min-h-9 w-full grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-2 px-2.5 py-1.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--academy-focus)]",
           isActive
-            ? "bg-[#f1f2f2] text-[var(--clinic-text)]"
-            : "text-[var(--clinic-muted)] hover:bg-[#f8f9fa] hover:text-[var(--clinic-text)]",
+            ? "border border-[#dacbff] bg-[var(--academy-accent-soft)] text-[var(--academy-ink)]"
+            : "border border-transparent text-[var(--academy-muted)] hover:bg-[var(--academy-surface-muted)] hover:text-[var(--academy-ink)]",
           disabled ? "cursor-not-allowed opacity-55" : "",
         ].join(" ")}
       >
@@ -881,8 +881,8 @@ function WorkspaceNavButton({
           className={[
             "flex size-7 shrink-0 items-center justify-center",
             isActive
-              ? "text-[#2f3437]"
-              : "text-[#858895] group-hover:text-[#2f3437]",
+              ? "text-[var(--academy-accent)]"
+              : "text-[#8b8f9b] group-hover:text-[var(--academy-ink)]",
           ].join(" ")}
         >
           {icon}
@@ -895,10 +895,10 @@ function WorkspaceNavButton({
           className={[
             "flex min-w-5 items-center justify-center text-[11px] font-medium",
             disabled
-              ? "border border-[var(--clinic-border)] px-1.5 py-0.5 text-[10px] text-[var(--clinic-muted)]"
+              ? "border border-[var(--academy-border)] px-1.5 py-0.5 text-[10px] text-[var(--academy-muted)]"
               : isActive
-                ? "text-[#2f3437]"
-                : "text-[#a3a5ad] group-hover:text-[#2f3437]",
+                ? "text-[var(--academy-accent)]"
+                : "text-[#a3a5ad] group-hover:text-[var(--academy-ink)]",
           ].join(" ")}
         >
           {disabled ? (
@@ -921,10 +921,10 @@ function WorkspaceNavButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "flex min-h-12 flex-col items-center justify-center gap-1 border px-1.5 text-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9cdfa]",
+        "flex min-h-12 flex-col items-center justify-center gap-1 border px-1.5 text-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--academy-focus)]",
         isActive
-          ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
-          : "border-transparent bg-transparent text-stone-700 hover:bg-[#f8f9fa]",
+          ? "border-[#dacbff] bg-[var(--academy-accent-soft)] text-[var(--academy-accent)]"
+          : "border-transparent bg-transparent text-[#5f6472] hover:bg-[var(--academy-surface-muted)]",
         disabled ? "cursor-not-allowed opacity-55" : "",
       ].join(" ")}
     >
@@ -932,7 +932,7 @@ function WorkspaceNavButton({
         aria-hidden="true"
         className={[
           "flex size-6 shrink-0 items-center justify-center",
-          isActive ? "text-[#2f3437]" : "text-stone-500",
+          isActive ? "text-[var(--academy-accent)]" : "text-[#858895]",
         ].join(" ")}
       >
         {icon}

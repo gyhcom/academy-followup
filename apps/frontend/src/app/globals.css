@@ -1,49 +1,66 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f4ef;
-  --foreground: #17191f;
-  --clinic-page: #f5f4ef;
-  --clinic-panel: #fbfaf7;
-  --clinic-panel-muted: #f1f0ea;
-  --clinic-panel-strong: #e7e6de;
-  --clinic-border: #d8d6cb;
-  --clinic-border-strong: #b8b5a8;
-  --clinic-primary: #2f3437;
-  --clinic-primary-dark: #17191f;
-  --clinic-navy: #1b1d2a;
-  --clinic-navy-2: #292d45;
-  --clinic-accent: #8f959e;
-  --clinic-text: #17191f;
-  --clinic-muted: #62656f;
-  --clinic-rail: #8f959e;
-  --clinic-warning: #9a5b05;
-  --clinic-danger: #b92b2b;
-  --clinic-success: #147154;
-  --clinic-violet: #6458b7;
-  --console-radius: 4px;
+  --academy-page: #f6f5f8;
+  --academy-surface: #ffffff;
+  --academy-surface-muted: #fafafc;
+  --academy-surface-strong: #f1f0f6;
+  --academy-border: #e4e2ea;
+  --academy-border-strong: #d4d1de;
+  --academy-ink: #1e1f28;
+  --academy-muted: #6f7280;
+  --academy-muted-strong: #505463;
+  --academy-accent: #7c3aed;
+  --academy-accent-strong: #6d28d9;
+  --academy-accent-soft: #f1eaff;
+  --academy-focus: #a78bfa;
+  --academy-warning: #a15c07;
+  --academy-danger: #b42318;
+  --academy-success: #167456;
+  --academy-info: #2563eb;
+  --background: var(--academy-page);
+  --foreground: var(--academy-ink);
+  --clinic-page: var(--academy-page);
+  --clinic-panel: var(--academy-surface);
+  --clinic-panel-muted: var(--academy-surface-muted);
+  --clinic-panel-strong: var(--academy-surface-strong);
+  --clinic-border: var(--academy-border);
+  --clinic-border-strong: var(--academy-border-strong);
+  --clinic-primary: var(--academy-accent);
+  --clinic-primary-dark: var(--academy-accent-strong);
+  --clinic-navy: #202235;
+  --clinic-navy-2: #292943;
+  --clinic-accent: var(--academy-accent);
+  --clinic-text: var(--academy-ink);
+  --clinic-muted: var(--academy-muted);
+  --clinic-rail: var(--academy-accent);
+  --clinic-warning: var(--academy-warning);
+  --clinic-danger: var(--academy-danger);
+  --clinic-success: var(--academy-success);
+  --clinic-violet: var(--academy-accent);
+  --console-radius: 8px;
   --console-shadow: none;
-  --console-row: #fffefa;
-  --console-row-hover: #f7f7f5;
-  --console-row-selected: #f1f2f2;
-  --console-line: #e4e1d7;
-  --console-line-strong: #c8c4b7;
-  --console-ink-soft: #494d5a;
-  --console-status-pending-bg: #fff4dc;
-  --console-status-pending-border: #e1a848;
-  --console-status-pending-text: #8a4f02;
-  --console-status-danger-bg: #fff0ee;
-  --console-status-danger-border: #ea8e86;
+  --console-row: var(--academy-surface);
+  --console-row-hover: #fbfaff;
+  --console-row-selected: var(--academy-accent-soft);
+  --console-line: var(--academy-border);
+  --console-line-strong: var(--academy-border-strong);
+  --console-ink-soft: var(--academy-muted-strong);
+  --console-status-pending-bg: #fff7e8;
+  --console-status-pending-border: #f4c26b;
+  --console-status-pending-text: #9a5b05;
+  --console-status-danger-bg: #fff1f0;
+  --console-status-danger-border: #f3a19b;
   --console-status-danger-text: #a32121;
-  --console-status-success-bg: #e9f7ef;
-  --console-status-success-border: #8bd4b7;
+  --console-status-success-bg: #edf8f3;
+  --console-status-success-border: #9bd9c1;
   --console-status-success-text: #106c50;
-  --console-status-info-bg: #f1f4f6;
-  --console-status-info-border: #c9d1d7;
-  --console-status-info-text: #40515d;
-  --console-status-violet-bg: #f4f3f1;
-  --console-status-violet-border: #d2cec7;
-  --console-status-violet-text: #5c574f;
+  --console-status-info-bg: #eff6ff;
+  --console-status-info-border: #b9d4ff;
+  --console-status-info-text: #1d4ed8;
+  --console-status-violet-bg: var(--academy-accent-soft);
+  --console-status-violet-border: #d9c7ff;
+  --console-status-violet-text: #6d28d9;
 }
 
 @theme inline {
@@ -69,7 +86,7 @@ button:not(:disabled) {
 }
 
 :where(a, button, input, textarea, select):focus-visible {
-  outline: 2px solid #0f8f87;
+  outline: 2px solid var(--academy-focus);
   outline-offset: 2px;
 }
 
@@ -139,7 +156,7 @@ button:not(:disabled) {
   }
 
   .academy-console .bg-white {
-    background-color: #fffefa !important;
+    background-color: var(--academy-surface) !important;
   }
 
   .academy-console :where(button, a, input, select, textarea) {
@@ -162,7 +179,7 @@ button:not(:disabled) {
     [class*="bg-stone-50"],
     [class*="bg-slate-50"]
   ) {
-    background-color: #f8f7f2 !important;
+    background-color: var(--academy-surface-muted) !important;
   }
 
   .academy-console :where(
@@ -171,7 +188,7 @@ button:not(:disabled) {
     [class*="bg-[#F2F6"],
     [class*="bg-[#F1F5"]
   ) {
-    background-color: #eeeeE6 !important;
+    background-color: var(--academy-surface-strong) !important;
   }
 
   .academy-console :where([class*="bg-amber-50"], [class*="bg-[#FFF7"], [class*="bg-[#FFE"]) {
@@ -227,7 +244,7 @@ button:not(:disabled) {
 
   .academy-console .console-header-row {
     border-bottom: 1px solid var(--console-line);
-    background: #f3f1ec;
+    background: var(--academy-surface-muted);
     padding: 0.75rem 1rem;
   }
 
@@ -251,7 +268,7 @@ button:not(:disabled) {
 
   .academy-console .console-work-panel {
     border: 1px solid var(--clinic-border);
-    background: #fffefa;
+    background: var(--academy-surface);
     box-shadow: var(--console-shadow);
   }
 
@@ -274,23 +291,23 @@ button:not(:disabled) {
 
   .academy-console .console-action-dock {
     border-top: 1px solid var(--console-line);
-    background: #fffefa;
+    background: var(--academy-surface);
   }
 
   .academy-console .message-workbench {
-    --message-select-surface: #f4f4f1;
-    --message-select-panel: #fffefa;
-    --message-select-line: #d8d6de;
-    --message-select-accent: #62656f;
-    --message-plan-surface: #f7f6f2;
-    --message-plan-panel: #fffefa;
-    --message-plan-line: #ded8cf;
-    --message-plan-accent: #62656f;
-    --message-compose-surface: #f4f4f1;
-    --message-compose-panel: #fffefa;
-    --message-compose-line: #d8d6de;
-    --message-compose-accent: #17232b;
-    --message-compose-ink: #1f2328;
+    --message-select-surface: #fafafc;
+    --message-select-panel: #ffffff;
+    --message-select-line: #e4e2ea;
+    --message-select-accent: #6f7280;
+    --message-plan-surface: #fbfaff;
+    --message-plan-panel: #ffffff;
+    --message-plan-line: #ded7f4;
+    --message-plan-accent: #7c3aed;
+    --message-compose-surface: #fffaf2;
+    --message-compose-panel: #ffffff;
+    --message-compose-line: #eed7ab;
+    --message-compose-accent: #7c3aed;
+    --message-compose-ink: #1e1f28;
   }
 
   .academy-console .message-zone-select {
