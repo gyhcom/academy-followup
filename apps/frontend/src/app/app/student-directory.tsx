@@ -202,7 +202,7 @@ export function StudentDirectory({
       />
 
       {students.length === 0 ? (
-      <div className="border-t border-[#D8D6DE] px-4 py-12 text-center">
+      <div className="border-t border-[var(--academy-border)] px-4 py-12 text-center">
         <p className="text-sm font-semibold text-stone-900">아직 등록된 학생이 없습니다.</p>
         <p className="mt-1 text-sm text-stone-500">
           CSV 일괄 등록 또는 학생 등록으로 시작하면 출석부와 문자 대상 목록을 바로 만들 수 있습니다.
@@ -759,7 +759,7 @@ function StudentDetailPanel({
           ) : (
             <div className="divide-y divide-[var(--academy-border)] border-t border-[var(--academy-border)]">
               {groupedSchedules.map(({ dayOfWeek, schedules }) => (
-                <div key={dayOfWeek} className="bg-[#FFFEFA]">
+                <div key={dayOfWeek} className="bg-[var(--academy-surface)]">
                   <p className="border-b border-[#E3E2E8] bg-[#FBFAF7] px-4 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#73777F]">
                     {weekDayLabel(dayOfWeek)}
                   </p>
@@ -777,7 +777,7 @@ function StudentDetailPanel({
                           {[schedule.subject, schedule.memo].filter(Boolean).join(" · ") || "메모 없음"}
                         </span>
                       </span>
-                      <span className="rounded-sm border border-[#D8D6DE] bg-[#F7F7FA] px-1.5 py-0.5 text-center text-[11px] font-bold text-[#62656f]">
+                      <span className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-1.5 py-0.5 text-center text-[11px] font-bold text-[var(--academy-muted)]">
                         {scheduleTypeLabel(schedule.scheduleType)}
                       </span>
                     </button>
@@ -788,15 +788,15 @@ function StudentDetailPanel({
           )}
         </section>
 
-        <section className="border-b border-[#D8D6DE] bg-[#FFFEFA] p-3">
+        <section className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] p-3">
           <StudentFollowupHistory selectedStudentName={student.name} history={history} compact />
         </section>
 
-        <section className="border-b border-[#D8D6DE] bg-[#FFFEFA] p-3">
+        <section className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] p-3">
           <ExternalClassPanel student={student} />
         </section>
 
-        <section className="bg-[#FFFEFA] p-3">
+        <section className="bg-[var(--academy-surface)] p-3">
           <SharedSchedulePanel
             student={student}
             state={sharedSchedules}
@@ -813,7 +813,7 @@ function StudentDetailPanel({
 function StudentFileSectionHeader({ title, meta }: { title: string; meta?: string }) {
   return (
     <div className="flex items-center justify-between gap-3 bg-[#FBFAF7] px-4 py-3">
-      <p className="text-sm font-black text-[#17232B]">{title}</p>
+      <p className="text-sm font-black text-[var(--academy-ink)]">{title}</p>
       {meta ? (
         <p className="text-xs font-bold text-[#62656f]">{meta}</p>
       ) : null}
@@ -947,7 +947,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
       </div>
 
       {activeEnrollments.length === 0 ? (
-        <div className="mt-3 border border-dashed border-[#D8D6DE] bg-[#FBFAF7] p-3 text-xs leading-5 text-[#62656f]">
+        <div className="mt-3 border border-dashed border-[var(--academy-border)] bg-[var(--academy-surface-muted)] p-3 text-xs leading-5 text-[var(--academy-muted)]">
           등록된 타 학원 수업이 없습니다. 예: 논술학원 화/목 19:30-20:30.
         </div>
       ) : (
@@ -955,7 +955,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
           {activeEnrollments.map((enrollment) => (
             <div
               key={enrollment.id}
-              className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 border border-[#D8D6DE] bg-[#FBFAF7] px-2 py-2"
+              className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2 py-2"
             >
               <span className="text-xs font-semibold tabular-nums text-stone-950">
                 {enrollment.startTime}
@@ -974,7 +974,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
                 type="button"
                 disabled={isSaving}
                 onClick={() => deactivateEnrollment(enrollment.id)}
-                className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-red-200 bg-[#FFF7F7] text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-red-200 bg-red-50 text-red-700 transition hover:bg-red-100 disabled:opacity-50"
                 aria-label={`${enrollment.title} 연결 해제`}
               >
                 <Trash2 size={13} />
@@ -1081,7 +1081,7 @@ function ExternalClassPanel({ student }: { student: ManagementStudent }) {
             type="button"
             disabled={isSaving}
             onClick={saveExternalClass}
-            className="min-h-10 w-full rounded-sm bg-[#17232B] px-3 text-xs font-semibold text-white transition hover:bg-[#0F171D] disabled:opacity-50"
+            className="min-h-10 w-full rounded-sm bg-[var(--academy-accent)] px-3 text-xs font-semibold text-white transition hover:bg-[var(--academy-accent-strong)] disabled:opacity-50"
           >
             {isSaving ? "저장 중" : "학생에게 연결"}
           </button>
@@ -1154,14 +1154,14 @@ function SharedSchedulePanel({
           `타 학원 스케줄 공유 동의 확인`을 체크해 주세요.
         </div>
       ) : (
-        <div className="mt-3 border border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2 text-xs leading-5 text-[#4B4F58]">
+        <div className="mt-3 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-xs leading-5 text-[var(--academy-muted-strong)]">
           같은 학생으로 확인되는 다른 학원 일정은 자동으로 연결됩니다. 연결 기준은
           이름·학교·학년·전화번호이며, 상대 학원명과 전화번호는 공개되지 않습니다.
         </div>
       )}
 
       {state.status === "loading" ? (
-        <p className="mt-3 border border-[#D8D6DE] bg-[#F7F7FA] px-3 py-2 text-xs font-medium text-[#73777F]">
+        <p className="mt-3 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-xs font-medium text-[var(--academy-muted)]">
           공유 스케줄을 불러오는 중입니다.
         </p>
       ) : null}
@@ -1173,7 +1173,7 @@ function SharedSchedulePanel({
       ) : null}
 
       {state.links.length === 0 && state.status !== "loading" ? (
-        <div className="mt-3 border border-dashed border-[#D8D6DE] bg-[#FBFAF7] p-3 text-xs leading-5 text-[#62656f]">
+        <div className="mt-3 border border-dashed border-[var(--academy-border)] bg-[var(--academy-surface-muted)] p-3 text-xs leading-5 text-[var(--academy-muted)]">
           {hasShareConsent
             ? "동의 확인된 같은 학생이 다른 학원에 등록되면 자동으로 바쁜 시간이 연결됩니다."
             : "동의 확인 전에는 공유 연결을 만들지 않습니다."}
@@ -1181,7 +1181,7 @@ function SharedSchedulePanel({
       ) : (
         <div className="mt-3 space-y-2">
           {state.links.map((link) => (
-            <div key={link.id} className="border border-[#D8D6DE] bg-[#FBFAF7] p-3">
+            <div key={link.id} className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] p-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-stone-950">
@@ -1196,7 +1196,7 @@ function SharedSchedulePanel({
                     type="button"
                     disabled={isSaving}
                     onClick={() => onRevoke(link.id)}
-                    className="shrink-0 rounded-sm border border-red-200 bg-[#FFF7F7] px-2 py-1 text-[11px] font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50"
+                    className="shrink-0 rounded-sm border border-red-200 bg-red-50 px-2 py-1 text-[11px] font-semibold text-red-700 transition hover:bg-red-100 disabled:opacity-50"
                   >
                     공유 해제
                   </button>
@@ -1210,7 +1210,7 @@ function SharedSchedulePanel({
                 {["동의 확인", "이름·학교·학년·전화번호 기준", "상대 학원명 비공개"].map((label) => (
                   <span
                     key={label}
-                    className="rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-1.5 py-0.5 text-[11px] font-semibold text-[#62656f]"
+                    className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--academy-muted)]"
                   >
                     {label}
                   </span>
@@ -1221,7 +1221,7 @@ function SharedSchedulePanel({
                   {link.schedules.slice(0, 4).map((schedule) => (
                     <div
                       key={`${link.id}:${schedule.id}`}
-                      className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 border border-[#E3E2E8] bg-[#FFFEFA] px-2 py-1.5"
+                      className="grid grid-cols-[66px_minmax(0,1fr)_auto] items-center gap-2 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2 py-1.5"
                     >
                       <span className="text-xs font-semibold tabular-nums text-stone-900">
                         {schedule.startTime}
@@ -1231,7 +1231,7 @@ function SharedSchedulePanel({
                           ? `${schedule.scheduleDate} · ${schedule.title}`
                           : `${weekDayShortLabel(schedule.dayOfWeek)} · ${schedule.title}`}
                       </span>
-                      <span className="rounded-sm border border-[#D8D6DE] bg-[#F7F7FA] px-1.5 py-0.5 text-[11px] font-semibold text-[#4B4F58]">
+                      <span className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--academy-muted-strong)]">
                         {scheduleTypeLabel(schedule.scheduleType)}
                       </span>
                     </div>
@@ -1243,7 +1243,7 @@ function SharedSchedulePanel({
                   ) : null}
                 </div>
               ) : (
-                <p className="mt-2 border border-[#E3E2E8] bg-[#FFFEFA] px-2 py-1.5 text-xs text-[#73777F]">
+                <p className="mt-2 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2 py-1.5 text-xs text-[var(--academy-muted)]">
                   연결된 학생의 활성 스케줄이 없습니다.
                 </p>
               )}
@@ -1254,7 +1254,7 @@ function SharedSchedulePanel({
 
       {state.canManage ? (
         <div className="mt-3 space-y-2 border-t border-stone-100 pt-3">
-          <p className="border border-[#E3E2E8] bg-[#FBFAF7] px-3 py-2 text-[11px] leading-4 text-[#62656f]">
+          <p className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-[11px] leading-4 text-[var(--academy-muted)]">
             자동 연결이 되지 않는 경우에만 공유 코드를 만들어 상대 학원에 전달하거나, 상대
             학원에서 받은 코드를 아래에 입력합니다.
           </p>
@@ -1262,13 +1262,13 @@ function SharedSchedulePanel({
             type="button"
             disabled={isSaving || !hasShareConsent}
             onClick={onCreateCode}
-            className="flex min-h-9 w-full items-center justify-center rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-xs font-semibold text-[#2f3437] transition hover:border-[#BFC2C8] hover:bg-[#F7F7FA] disabled:opacity-50"
+            className="flex min-h-9 w-full items-center justify-center rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 text-xs font-semibold text-[var(--academy-ink)] transition hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)] disabled:opacity-50"
           >
             공유 코드 만들기
           </button>
           {state.generatedCode ? (
-            <div className="border border-[#D8D6DE] bg-[#F7F7FA] p-3">
-              <p className="text-xs font-semibold text-[#494d5a]">
+            <div className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] p-3">
+              <p className="text-xs font-semibold text-[var(--academy-muted-strong)]">
                 {student.name} 학생 공유 코드
               </p>
               <p className="mt-1 break-all font-mono text-lg font-bold tracking-wide text-stone-950">
@@ -1291,7 +1291,7 @@ function SharedSchedulePanel({
               type="button"
               disabled={isSaving || !hasShareConsent || !codeInput.trim()}
               onClick={handleConnect}
-              className="min-h-10 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-xs font-semibold text-[#4B4F58] transition hover:border-[#BFC2C8] hover:bg-[#F7F7FA] disabled:border-stone-200 disabled:text-stone-400"
+              className="min-h-10 rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 text-xs font-semibold text-[var(--academy-muted-strong)] transition hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)] disabled:border-stone-200 disabled:text-stone-400"
             >
               코드로 연결
             </button>
@@ -1316,7 +1316,7 @@ function SharedSchedulePanel({
           ) : null}
         </div>
       ) : (
-        <p className="mt-3 border border-[#D8D6DE] bg-[#F7F7FA] px-3 py-2 text-xs leading-5 text-[#73777F]">
+        <p className="mt-3 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-xs leading-5 text-[var(--academy-muted)]">
           공유 코드 발급과 연결 해제는 원장/관리자만 가능합니다.
         </p>
       )}

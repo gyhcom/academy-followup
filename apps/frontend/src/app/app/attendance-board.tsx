@@ -2042,7 +2042,7 @@ function SummaryFilterButton({
   isActive: boolean;
   onClick: () => void;
 }) {
-  const isDisabled = value === 0 && !isActive;
+  const isDisabled = value === 0;
   const toneClass =
     tone === "success"
       ? "text-emerald-800"
@@ -2058,20 +2058,20 @@ function SummaryFilterButton({
       aria-pressed={isActive}
       disabled={isDisabled}
       onClick={onClick}
-      title={`${label} 목록 보기`}
+      title={isDisabled ? `${label} 항목 없음` : `${label} 목록 보기`}
       className={[
         "group relative grid min-h-10 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-l border-l-transparent px-3 py-2 text-left font-extrabold transition last:border-b-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
         isDisabled
-          ? "cursor-not-allowed bg-[#f1f0ea] text-[#aaa8a0]"
+          ? "cursor-not-allowed bg-[var(--academy-surface-strong)] text-[var(--academy-muted)] opacity-70"
           : isActive
-            ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
-            : `cursor-pointer bg-[#fffefa] hover:bg-[#f8f9fa] ${toneClass}`,
+            ? "border-[var(--academy-border-strong)] bg-[var(--academy-surface-muted)] text-[var(--academy-ink)]"
+            : `cursor-pointer bg-[var(--academy-surface)] hover:bg-[var(--academy-surface-muted)] ${toneClass}`,
       ].join(" ")}
     >
       <span
         className={[
           "block truncate text-[11px] font-black uppercase tracking-[0.08em]",
-          isActive ? "text-[#2f3437]" : "opacity-75",
+          isActive && !isDisabled ? "text-[var(--academy-ink)]" : "opacity-75",
         ].join(" ")}
       >
         {label}
@@ -2081,14 +2081,14 @@ function SummaryFilterButton({
         className={[
           "inline-flex items-center gap-0.5 text-[10px] font-black uppercase tracking-[0.08em] transition-transform group-hover:translate-x-0.5",
           isDisabled
-            ? "text-[#b6b3aa]"
+            ? "text-[var(--academy-muted)]"
             : isActive
-              ? "text-[#2f3437]"
+              ? "text-[var(--academy-ink)]"
               : "text-[var(--clinic-muted)]",
         ].join(" ")}
       >
-        보기
-        <ChevronRight size={13} aria-hidden="true" />
+        {isDisabled ? "없음" : "보기"}
+        {isDisabled ? null : <ChevronRight size={13} aria-hidden="true" />}
       </span>
     </button>
   );
