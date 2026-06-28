@@ -91,19 +91,19 @@ button:not(:disabled) {
 }
 
 .academy-console .message-workbench {
-  --message-select-surface: #f6f6f2;
-  --message-select-panel: #fffefa;
-  --message-select-line: #dedbd1;
-  --message-select-accent: #5f6368;
-  --message-plan-surface: #f2f4f5;
-  --message-plan-panel: #fffefa;
-  --message-plan-line: #d5d9dd;
-  --message-plan-accent: #58616a;
-  --message-compose-surface: #fbf7ef;
-  --message-compose-panel: #fffefa;
-  --message-compose-line: #ded4c5;
-  --message-compose-accent: #17232b;
-  --message-compose-ink: #1f2328;
+  --message-select-surface: var(--academy-surface-muted);
+  --message-select-panel: var(--academy-surface);
+  --message-select-line: var(--academy-border);
+  --message-select-accent: var(--academy-muted);
+  --message-plan-surface: #fbfaff;
+  --message-plan-panel: var(--academy-surface);
+  --message-plan-line: #ded7f4;
+  --message-plan-accent: var(--academy-accent);
+  --message-compose-surface: var(--academy-surface);
+  --message-compose-panel: var(--academy-surface);
+  --message-compose-line: var(--academy-border);
+  --message-compose-accent: var(--academy-accent);
+  --message-compose-ink: var(--academy-ink);
 }
 
 .academy-console .message-zone-select {
@@ -177,7 +177,10 @@ button:not(:disabled) {
     [class*="bg-[#F5F9"],
     [class*="bg-[#F4F9"],
     [class*="bg-stone-50"],
-    [class*="bg-slate-50"]
+    [class*="bg-slate-50"],
+    [class*="bg-[#FBFAF7]"],
+    [class*="bg-[#F7F7FA]"],
+    [class*="bg-[#F8F8FC]"]
   ) {
     background-color: var(--academy-surface-muted) !important;
   }
@@ -186,9 +189,36 @@ button:not(:disabled) {
     [class*="bg-stone-100"],
     [class*="bg-slate-100"],
     [class*="bg-[#F2F6"],
-    [class*="bg-[#F1F5"]
+    [class*="bg-[#F1F5"],
+    [class*="bg-[#F4F4F1]"],
+    [class*="bg-[#F4F4F7]"],
+    [class*="bg-[#F4F4F8]"],
+    [class*="bg-[#F0F0ED]"],
+    [class*="bg-[#F0F0EC]"],
+    [class*="bg-[#F0EEE8]"],
+    [class*="bg-[#E9E7E1]"]
   ) {
     background-color: var(--academy-surface-strong) !important;
+  }
+
+  .academy-console :where([class*="bg-[#FFFEFA]"], [class*="bg-[#FFFFFF]"], [class*="bg-[#FFFCF7]"], [class*="bg-[#FFF9F0]"]) {
+    background-color: var(--academy-surface) !important;
+  }
+
+  .academy-console :where([class*="border-[#D8D6DE]"], [class*="border-[#DEDEE4]"], [class*="border-[#DEDDE5]"], [class*="border-[#E3E2E8]"], [class*="border-[#E4E3E8]"], [class*="border-[#E4E1DC]"], [class*="border-[#DED8CF]"], [class*="border-[#DED4C5]"], [class*="border-stone-200"]) {
+    border-color: var(--academy-border) !important;
+  }
+
+  .academy-console :where([class*="text-[#17232B]"], [class*="text-[#1F2328]"], [class*="text-[#2f3437]"], [class*="text-stone-950"], [class*="text-stone-900"]) {
+    color: var(--academy-ink) !important;
+  }
+
+  .academy-console :where([class*="text-[#62656f]"], [class*="text-[#5F6368]"], [class*="text-[#73777F]"], [class*="text-[#6F737C]"], [class*="text-[#858895]"], [class*="text-stone-600"], [class*="text-stone-500"]) {
+    color: var(--academy-muted) !important;
+  }
+
+  .academy-console :where([class*="bg-[#17232B]"], [class*="bg-[#2f3437]"], [class*="bg-[#1F2328]"], [class*="bg-[#494d5a]"]) {
+    background-color: var(--academy-accent) !important;
   }
 
   .academy-console :where([class*="bg-amber-50"], [class*="bg-[#FFF7"], [class*="bg-[#FFE"]) {
@@ -303,9 +333,9 @@ button:not(:disabled) {
     --message-plan-panel: #ffffff;
     --message-plan-line: #ded7f4;
     --message-plan-accent: #7c3aed;
-    --message-compose-surface: #fffaf2;
+    --message-compose-surface: #ffffff;
     --message-compose-panel: #ffffff;
-    --message-compose-line: #eed7ab;
+    --message-compose-line: #e4e2ea;
     --message-compose-accent: #7c3aed;
     --message-compose-ink: #1e1f28;
   }

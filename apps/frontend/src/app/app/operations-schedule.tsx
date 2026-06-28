@@ -61,19 +61,19 @@ export function WeeklySchedulePanel({
       aria-labelledby="weekly-schedule-title"
       className="message-zone-plan overflow-hidden border"
     >
-      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3">
+      <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-3">
         <div className="flex items-center gap-2">
-          <CalendarDays className="text-[#62656f]" size={18} />
-          <h2 id="weekly-schedule-title" className="text-sm font-semibold text-stone-950">
+          <CalendarDays className="text-[var(--academy-muted)]" size={18} />
+          <h2 id="weekly-schedule-title" className="text-sm font-semibold text-[var(--academy-ink)]">
             주간 스케줄
           </h2>
           {activeSchedules.length > 0 ? (
-            <span className="ml-auto border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-0.5 text-xs font-bold text-[#62656f]">
+            <span className="ml-auto border border-[var(--academy-border)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--academy-muted-strong)]">
               {activeSchedules.length}개
             </span>
           ) : null}
         </div>
-        <p className="mt-1 text-xs text-[#73777F]">
+        <p className="mt-1 text-xs text-[var(--academy-muted)]">
           {selectedStudent
             ? `${selectedStudent.name} · ${selectedClassName ?? "반 미지정"} 기준으로 보강 가능 시간을 확인합니다.`
             : "학생을 선택하면 스케줄이 표시됩니다."}
@@ -82,17 +82,17 @@ export function WeeklySchedulePanel({
 
       <div>
         {selectedStudent && activeSchedules.length === 0 ? (
-          <div className="border-t border-[#D8D6DE] px-4 py-4 text-sm leading-6 text-[#62656f]">
+          <div className="border-t border-[var(--academy-border)] px-4 py-4 text-sm leading-6 text-[var(--academy-muted)]">
             등록된 스케줄이 없습니다. 관리 탭에서 정규 수업이나 개인/기타 일정을 먼저
             입력해 주세요.
           </div>
         ) : null}
 
         {selectedStudent ? (
-          <div className="divide-y divide-[#D8D6DE]">
+          <div className="divide-y divide-[var(--academy-border)]">
             {activeSchedules.length > 0 ? (
               <>
-                <div className="grid grid-cols-[3.5rem_7rem_minmax(0,1fr)_auto] gap-3 bg-[#F4F4F1] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#62656f]">
+                <div className="grid grid-cols-[3.5rem_7rem_minmax(0,1fr)_auto] gap-3 bg-[var(--academy-surface-muted)] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--academy-muted)]">
                   <span>요일</span>
                   <span>시간</span>
                   <span>수업</span>
@@ -109,7 +109,7 @@ export function WeeklySchedulePanel({
             ) : null}
           </div>
         ) : (
-          <div className="px-4 py-4 text-sm leading-6 text-[#62656f]">
+          <div className="px-4 py-4 text-sm leading-6 text-[var(--academy-muted)]">
             왼쪽 학생 목록에서 학생을 선택하면 주간 시간표가 여기에 표시됩니다.
           </div>
         )}
@@ -129,30 +129,30 @@ function ScheduleRow({
     <button
       type="button"
       onClick={() => onMakeupCandidateSelect(schedule)}
-      className="grid w-full grid-cols-[3.5rem_7rem_minmax(0,1fr)_auto] items-center gap-3 bg-[#FFFEFA] px-4 py-2.5 text-left transition hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#D8DAFA]"
+      className="grid w-full grid-cols-[3.5rem_7rem_minmax(0,1fr)_auto] items-center gap-3 bg-white px-4 py-2.5 text-left transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]"
       aria-label={`${weekDayShortLabel(schedule.dayOfWeek)} ${schedule.startTime}-${schedule.endTime} 스케줄을 보강 후보로 적용`}
     >
       <div className="flex items-center gap-2">
-        <span className="flex size-7 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-xs font-black text-[#62656f]">
+        <span className="flex size-7 items-center justify-center border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-xs font-semibold text-[var(--academy-muted-strong)]">
           {weekDayShortLabel(schedule.dayOfWeek)}
         </span>
       </div>
 
       <div className="min-w-0">
-        <p className="flex items-center gap-1 text-sm font-black tabular-nums text-stone-950">
-          <Clock3 className="shrink-0 text-[#858895]" size={14} />
+        <p className="flex items-center gap-1 text-sm font-semibold tabular-nums text-[var(--academy-ink)]">
+          <Clock3 className="shrink-0 text-[var(--academy-muted)]" size={14} />
           {schedule.startTime}
         </p>
-        <p className="mt-0.5 text-[11px] font-medium tabular-nums text-[#73777F]">
+        <p className="mt-0.5 text-[11px] font-medium tabular-nums text-[var(--academy-muted)]">
           {schedule.endTime}까지
         </p>
       </div>
 
       <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-[#4B4F58]">
+        <p className="truncate text-sm font-semibold text-[var(--academy-muted-strong)]">
           {schedule.title}
         </p>
-        <p className="mt-1 truncate text-[11px] font-medium text-[#73777F]">
+        <p className="mt-1 truncate text-[11px] font-medium text-[var(--academy-muted)]">
           {[schedule.scheduleDate ? `${schedule.scheduleDate} 1회 일정` : null, schedule.subject, schedule.memo]
             .filter(Boolean)
             .join(" · ") || "반복 수업"}

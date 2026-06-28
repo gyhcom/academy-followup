@@ -99,14 +99,14 @@ export function MakeupCalendarPanel({
       aria-labelledby="makeup-calendar-title"
       className="message-zone-plan overflow-hidden border"
     >
-      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3">
+      <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-3">
         <div className="flex items-center gap-2">
-          <CalendarDays className="text-[#62656f]" size={18} />
-          <h2 id="makeup-calendar-title" className="text-sm font-semibold text-stone-950">
+          <CalendarDays className="text-[var(--academy-muted)]" size={18} />
+          <h2 id="makeup-calendar-title" className="text-sm font-semibold text-[var(--academy-ink)]">
             보강 달력
           </h2>
         </div>
-        <p className="mt-1 text-xs leading-5 text-[#73777F]">
+        <p className="mt-1 text-xs leading-5 text-[var(--academy-muted)]">
           날짜를 누르고 그날의 수업·보강 불가 시간을 보면서 보강 시간을 정합니다.
         </p>
       </div>
@@ -121,11 +121,11 @@ export function MakeupCalendarPanel({
                   aria-label="이전 달"
                   title="이전 달"
                   onClick={() => moveMonth(-1)}
-                  className="flex size-8 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#FFFEFA] text-[#62656f] transition hover:border-[#BFC2C8] hover:text-[#2f3437]"
+                  className="flex size-8 shrink-0 items-center justify-center border border-[var(--academy-border)] bg-white text-[var(--academy-muted)] transition hover:border-[var(--academy-border-strong)] hover:text-[var(--academy-ink)]"
                 >
                   <ChevronLeft size={16} />
                 </button>
-                <p className="text-sm font-semibold text-stone-950">
+                <p className="text-sm font-semibold text-[var(--academy-ink)]">
                   {MakeupSchedulePlanner.getMonthLabel(displayMonth)}
                 </p>
                 <button
@@ -133,7 +133,7 @@ export function MakeupCalendarPanel({
                   aria-label="다음 달"
                   title="다음 달"
                   onClick={() => moveMonth(1)}
-                  className="flex size-8 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#FFFEFA] text-[#62656f] transition hover:border-[#BFC2C8] hover:text-[#2f3437]"
+                  className="flex size-8 shrink-0 items-center justify-center border border-[var(--academy-border)] bg-white text-[var(--academy-muted)] transition hover:border-[var(--academy-border-strong)] hover:text-[var(--academy-ink)]"
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -143,7 +143,7 @@ export function MakeupCalendarPanel({
                 {weekDayHeaders.map((dayOfWeek) => (
                   <div
                     key={dayOfWeek}
-                    className="py-1 text-[11px] font-semibold text-stone-500"
+                    className="py-1 text-[11px] font-semibold text-[var(--academy-muted)]"
                   >
                     {weekDayShortLabel(dayOfWeek)}
                   </div>
@@ -157,12 +157,12 @@ export function MakeupCalendarPanel({
                       aria-pressed={isActive}
                       onClick={() => selectDate(day.date)}
                       className={[
-                        "relative flex aspect-square min-h-0 items-center justify-center rounded-sm border px-1 text-center transition focus:outline-none focus:ring-2 focus:ring-[#D8DAFA]",
+                        "relative flex aspect-square min-h-0 items-center justify-center rounded-sm border px-1 text-center transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
                         isActive
-                            ? "border-[#2f3437] bg-[#2f3437] text-white"
+                            ? "border-[var(--academy-accent)] bg-[var(--academy-accent)] text-white"
                           : day.isCurrentMonth
-                            ? "border-[#D8D6DE] bg-[#FFFEFA] text-stone-900 hover:border-[#BFC2C8] hover:bg-[#F7F7FA]"
-                            : "border-[#E3E2E8] bg-[#F0F0EC] text-stone-400",
+                            ? "border-[var(--academy-border)] bg-white text-[var(--academy-ink)] hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]"
+                            : "border-[var(--academy-border)] bg-[var(--academy-surface-strong)] text-[#b7b4c2]",
                       ].join(" ")}
                     >
                       <span className="text-xs font-bold leading-none tabular-nums">
@@ -178,7 +178,7 @@ export function MakeupCalendarPanel({
                                 ? "bg-amber-400"
                                 : isActive
                                   ? "bg-white"
-                                  : "bg-[#2f3437]",
+                                  : "bg-[var(--academy-accent)]",
                             ].join(" ")}
                           />
                         ) : null}
@@ -187,7 +187,7 @@ export function MakeupCalendarPanel({
                             aria-label="오늘"
                             className={[
                               "h-1.5 w-1.5 rounded-full",
-                              isActive ? "bg-white" : "bg-[#62656f]",
+                              isActive ? "bg-white" : "bg-[var(--academy-muted)]",
                             ].join(" ")}
                           />
                         ) : null}
@@ -215,29 +215,29 @@ export function MakeupCalendarPanel({
 
             <div className="message-zone-plan-panel border">
               <div className="border-b border-[#D8D6DE] px-3 py-2">
-                <p className="text-xs font-semibold text-[#62656f]">선택 날짜 / 보강 시간</p>
-                <p className="mt-1 text-sm font-semibold text-stone-950">
+                <p className="text-xs font-semibold text-[var(--academy-muted)]">선택 날짜 / 보강 시간</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--academy-ink)]">
                   {formatDateForCandidate(selectedDate)}
                 </p>
               </div>
               <div className="px-3 py-3">
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
+                  <label className="grid gap-1.5 text-xs font-semibold text-[var(--academy-muted)]">
                     시작 시간
                     <input
                       type="time"
                       value={startTime}
                       onChange={(event) => setStartTime(event.target.value)}
-                      className="min-h-11 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#e1e4e8]"
+                      className="min-h-11 border border-[var(--academy-border)] bg-white px-3 text-sm font-medium text-[var(--academy-ink)] outline-none focus:border-[var(--academy-accent)] focus:ring-2 focus:ring-[var(--academy-accent-soft)]"
                     />
                   </label>
-                  <label className="grid gap-1.5 text-xs font-semibold text-stone-600">
+                  <label className="grid gap-1.5 text-xs font-semibold text-[var(--academy-muted)]">
                     종료 시간
                     <input
                       type="time"
                       value={endTime}
                       onChange={(event) => setEndTime(event.target.value)}
-                      className="min-h-11 border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-medium text-stone-950 outline-none focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#e1e4e8]"
+                      className="min-h-11 border border-[var(--academy-border)] bg-white px-3 text-sm font-medium text-[var(--academy-ink)] outline-none focus:border-[var(--academy-accent)] focus:ring-2 focus:ring-[var(--academy-accent-soft)]"
                     />
                   </label>
                 </div>
@@ -258,9 +258,9 @@ export function MakeupCalendarPanel({
             "flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition",
             selectedStudent && isTimeRangeValid && !hasConflicts
               ? isSelected
-                ? "bg-[#2f3437] text-white"
-                : "bg-[#2f3437] text-white hover:bg-[#17191f]"
-              : "bg-[#D8DDE8] text-[#6B7280]",
+                ? "bg-[var(--academy-accent)] text-white"
+                : "bg-[var(--academy-accent)] text-white hover:bg-[var(--academy-accent-strong)]"
+              : "bg-[var(--academy-surface-strong)] text-[var(--academy-muted)]",
           ].join(" ")}
         >
           <Clock3 size={16} />
@@ -270,7 +270,7 @@ export function MakeupCalendarPanel({
               ? "보강 후보 적용됨"
               : "보강 문자 초안에 적용"}
         </button>
-        <p className="text-xs leading-5 text-[#73777F]">
+        <p className="text-xs leading-5 text-[var(--academy-muted)]">
           선택하면 오른쪽 문자 초안의 사유와 보강 시간이 바뀝니다. 실제 발송은 초안 저장 후 따로 진행합니다.
         </p>
 
@@ -352,28 +352,28 @@ function SelectedDateSchedule({
   sharedError: string;
 }) {
   return (
-    <div className="border-y border-[#D8D6DE] bg-[#FBFAF7] px-3 py-3">
+    <div className="border-y border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-semibold text-[#62656f]">
+        <p className="text-xs font-semibold text-[var(--academy-muted)]">
           {formatDateForCandidate(date)} 일정
         </p>
-        <span className="border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-0.5 text-xs font-semibold text-[#62656f]">
+        <span className="border border-[var(--academy-border)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--academy-muted-strong)]">
           {schedules.length}개
         </span>
       </div>
 
       {schedules.length > 0 ? (
-        <div className="mt-2 divide-y divide-[#D8D6DE] overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
+        <div className="mt-2 divide-y divide-[var(--academy-border)] overflow-hidden border border-[var(--academy-border)] bg-white">
           {schedules.map((schedule) => (
             <div
               key={`${schedule.id}:${schedule.scheduleDate ?? "weekly"}`}
-                className="grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-2 px-2 py-2"
+              className="grid grid-cols-[86px_minmax(0,1fr)_auto] items-center gap-2 px-2 py-2"
             >
-              <span className="flex items-center gap-1 text-xs font-semibold tabular-nums text-stone-900">
-                <Clock3 size={13} className="text-[#858895]" />
+              <span className="flex items-center gap-1 text-xs font-semibold tabular-nums text-[var(--academy-ink)]">
+                <Clock3 size={13} className="text-[var(--academy-muted)]" />
                 {schedule.startTime}
               </span>
-              <span className="min-w-0 truncate text-xs font-medium text-[#4B4F58]">
+              <span className="min-w-0 truncate text-xs font-medium text-[var(--academy-muted-strong)]">
                 {schedule.isShared && schedule.sharedAcademyName
                   ? `${schedule.sharedAcademyName} · ${schedule.title}`
                   : schedule.title}
@@ -390,12 +390,12 @@ function SelectedDateSchedule({
           ))}
         </div>
       ) : (
-        <p className="mt-2 border border-dashed border-[#D8D6DE] bg-[#FFFEFA] px-3 py-2 text-xs leading-5 text-[#62656f]">
+        <p className="mt-2 border border-dashed border-[var(--academy-border)] bg-white px-3 py-2 text-xs leading-5 text-[var(--academy-muted)]">
           이 날짜에 겹치는 등록 일정이 없습니다.
         </p>
       )}
       {isSharedLoading ? (
-        <p className="mt-2 border border-[#D8D6DE] bg-[#FFFEFA] px-3 py-2 text-[11px] font-medium text-[#62656f]">
+        <p className="mt-2 border border-[var(--academy-border)] bg-white px-3 py-2 text-[11px] font-medium text-[var(--academy-muted)]">
           연결 학원 일정을 불러오는 중입니다.
         </p>
       ) : null}

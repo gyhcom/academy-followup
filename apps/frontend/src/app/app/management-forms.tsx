@@ -18,36 +18,36 @@ const dayGroupOptions = [
   { label: "월수", values: [1, 3] },
 ];
 
-const managementFieldClass = "grid min-w-0 gap-1.5 text-sm font-medium text-[#2f3437]";
+const managementFieldClass = "grid min-w-0 gap-1.5 text-sm font-medium text-[var(--academy-ink)]";
 const managementInputClass =
-  "min-h-10 w-full min-w-0 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm text-[#17232B] outline-none transition placeholder:text-[#9A9CA3] focus:border-[#BFC2C8] focus:ring-2 focus:ring-[#E1E4E8]";
+  "min-h-10 w-full min-w-0 rounded-sm border border-[var(--academy-border)] bg-white px-3 text-sm text-[var(--academy-ink)] outline-none transition placeholder:text-[#9A9CA3] focus:border-[var(--academy-accent)] focus:ring-2 focus:ring-[var(--academy-accent-soft)]";
 const managementReadonlyInputClass =
-  "min-h-10 w-full min-w-0 rounded-sm border border-[#E3E2E8] bg-[#F0F0ED] px-3 text-sm text-[#73777F] outline-none";
+  "min-h-10 w-full min-w-0 rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-strong)] px-3 text-sm text-[var(--academy-muted)] outline-none";
 const managementFormShellClass =
-  "mb-4 min-w-0 overflow-hidden rounded-sm border border-[#D8D6DE] bg-[#F4F4F1]";
+  "mb-4 min-w-0 overflow-hidden rounded-sm border border-[var(--academy-border)] bg-white";
 const managementFormHeaderClass =
-  "flex items-start justify-between gap-3 border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3";
+  "flex items-start justify-between gap-3 border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-3";
 const managementCloseButtonClass =
-  "flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] text-[#62656f] transition hover:border-[#BFC2C8] hover:bg-[#F7F7FA]";
+  "flex size-8 shrink-0 items-center justify-center rounded-sm border border-[var(--academy-border)] bg-white text-[var(--academy-muted)] transition hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]";
 const managementFormBodyClass = "grid min-w-0 gap-3 p-4 sm:grid-cols-2";
 const managementWideFormBodyClass = "grid min-w-0 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4";
 const managementActionsClass =
-  "flex flex-col gap-2 border-t border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3 sm:flex-row sm:justify-end";
+  "flex flex-col gap-2 border-t border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-3 sm:flex-row sm:justify-end";
 const managementSecondaryButtonClass =
-  "min-h-10 w-full min-w-0 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-4 text-sm font-semibold text-[#4B4F58] transition hover:border-[#BFC2C8] hover:bg-[#F7F7FA] sm:w-auto";
+  "min-h-10 w-full min-w-0 rounded-sm border border-[var(--academy-border)] bg-white px-4 text-sm font-semibold text-[var(--academy-muted-strong)] transition hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)] sm:w-auto";
 const managementPrimaryButtonBaseClass =
   "flex min-h-10 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition sm:w-auto";
-const managementSectionClass = "border border-[#D8D6DE] bg-[#FFFEFA]";
+const managementSectionClass = "border border-[var(--academy-border)] bg-white";
 const managementSectionHeaderClass =
-  "border-b border-[#E3E2E8] bg-[#FBFAF7] px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] text-[#62656f]";
-const managementHintClass = "text-xs leading-5 text-[#62656f]";
+  "border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] text-[var(--academy-muted)]";
+const managementHintClass = "text-xs leading-5 text-[var(--academy-muted)]";
 
 function managementPrimaryButtonClass(canSave: boolean) {
   return [
     managementPrimaryButtonBaseClass,
     canSave
-      ? "bg-[#17232B] text-white hover:bg-[#0F171D]"
-      : "cursor-not-allowed bg-[#D8D6DE] text-[#62656f]",
+      ? "bg-[var(--academy-accent)] text-white hover:bg-[var(--academy-accent-strong)]"
+      : "cursor-not-allowed bg-[var(--academy-surface-strong)] text-[var(--academy-muted)]",
   ].join(" ");
 }
 

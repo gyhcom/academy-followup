@@ -61,7 +61,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
         totalStudents={props.totalStudents}
       />
 
-      <section className="grid min-h-[42rem] min-w-0 overflow-hidden border border-[#D8D6DE] bg-[#F4F4F1] lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_21rem]">
+      <section className="grid min-h-[42rem] min-w-0 overflow-hidden border border-[var(--academy-border)] bg-white lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_21rem]">
         <div className="flex min-h-0 min-w-0 flex-col">
           <ClassPicker
             classes={props.classes}
@@ -70,7 +70,7 @@ export function OperationsDesktopView(props: OperationsViewProps) {
           />
 
           <div className="grid min-h-0 min-w-0 flex-1 lg:grid-cols-[17rem_minmax(0,1fr)] 2xl:grid-cols-[18.5rem_minmax(0,1fr)]">
-            <div className="min-h-0 min-w-0 border-r border-[#D8D6DE]">
+            <div className="min-h-0 min-w-0 border-r border-[var(--academy-border)] bg-white">
               <StudentSelectionList
                 selectedClass={props.selectedClass}
                 selectedStudent={props.selectedStudent}
@@ -174,23 +174,23 @@ function OperationsHeader({
   totalStudents: number;
 }) {
   return (
-    <section className="mb-3 border border-[#D8D6DE] bg-[#FBFAF7] px-4 py-2.5 sm:mb-4">
+    <section className="mb-3 border border-[var(--academy-border)] bg-white px-4 py-2.5 sm:mb-4">
       <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
-            <h2 className="text-lg font-black leading-tight text-[#17232B]">
+            <h2 className="text-lg font-semibold leading-tight text-[var(--academy-ink)]">
               수업 후 연락
             </h2>
-            <span className="truncate text-sm font-semibold text-[#62656f]">
+            <span className="truncate text-sm font-semibold text-[var(--academy-muted)]">
               {academyName}
             </span>
           </div>
-          <p className="mt-1 text-xs leading-5 text-[#73777F]">
+          <p className="mt-1 text-xs leading-5 text-[var(--academy-muted)]">
             학생 row를 선택한 뒤 기록 저장과 테스트 발송을 단계별로 처리합니다.
           </p>
         </div>
 
-        <dl className="flex flex-wrap items-center gap-3 text-xs font-semibold text-[#62656f]">
+        <dl className="flex flex-wrap items-center gap-3 text-xs font-semibold text-[var(--academy-muted)]">
           <StatusItem label="반" value={`${classCount}개`} />
           <StatusItem label="학생" value={`${totalStudents}명`} />
         </dl>
@@ -211,12 +211,12 @@ function ClassPicker({
   return (
     <section aria-label="반 선택" className="message-zone-select shrink-0 border-b px-4 py-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.1em] text-[#62656f]">
+        <p className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.1em] text-[var(--academy-muted)]">
           <UsersRound size={14} aria-hidden="true" />
           반 선택
         </p>
         {selectedClass ? (
-          <p className="truncate text-xs font-semibold text-[#52697A]">
+          <p className="truncate text-xs font-semibold text-[var(--academy-muted)]">
             {selectedClass.name} · {selectedClass.students.length}명
           </p>
         ) : null}
@@ -231,17 +231,17 @@ function ClassPicker({
               aria-pressed={isSelected}
               onClick={() => onClassSelect(classItem.id)}
               className={[
-                "min-h-10 w-[12.5rem] shrink-0 border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#D8DAFA]",
+                "min-h-10 w-[12.5rem] shrink-0 border px-3 py-2 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]",
                 isSelected
-                  ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B]"
-                  : "border-[#DEDDE5] bg-[#F7F7F4] text-[#30343B] hover:border-[#C9C7D2] hover:bg-[#FFFFFF]",
+                  ? "border-[var(--academy-accent)] bg-[var(--academy-surface)] text-[var(--academy-ink)] ring-1 ring-inset ring-[var(--academy-accent-soft)]"
+                  : "border-[var(--academy-border)] bg-white text-[var(--academy-muted-strong)] hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]",
               ].join(" ")}
             >
               <span className="block truncate text-sm font-bold">{classItem.name}</span>
               <span
                 className={[
                   "mt-0.5 block truncate text-xs",
-                isSelected ? "text-[#4B4F58]" : "text-[#73777F]",
+                isSelected ? "text-[var(--academy-muted-strong)]" : "text-[var(--academy-muted)]",
                 ].join(" ")}
               >
                 {classItem.subject ?? "과목 미지정"} · {classItem.students.length}명
@@ -303,15 +303,15 @@ function StudentSelectionList({
       <div className="message-zone-select border-b px-4 py-3">
         <div className="flex items-end justify-between gap-3">
         <div>
-          <h2 id="student-flow-title" className="inline-flex items-center gap-2 text-sm font-bold text-[#17232B]">
-            <MessageCircle size={15} className="text-[#62656f]" aria-hidden="true" />
+          <h2 id="student-flow-title" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--academy-ink)]">
+            <MessageCircle size={15} className="text-[var(--academy-muted)]" aria-hidden="true" />
             학생 확인 목록
           </h2>
-          <p className="mt-1 text-xs text-[#73777F]">
+          <p className="mt-1 text-xs text-[var(--academy-muted)]">
             학생을 확인하고 필요한 연락 사유를 바로 선택합니다.
           </p>
         </div>
-        <span className="message-zone-select-panel shrink-0 border px-2 py-1 text-xs font-bold text-[#52697A]">
+        <span className="message-zone-select-panel shrink-0 border px-2 py-1 text-xs font-semibold text-[var(--academy-muted-strong)]">
           {hasSearchQuery ? `${filteredStudents.length}/${totalStudentCount}명` : `${totalStudentCount}명`}
         </span>
         </div>
@@ -319,21 +319,21 @@ function StudentSelectionList({
           <span className="sr-only">학생 이름 검색</span>
           <Search
             size={15}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#73777F]"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--academy-muted)]"
             aria-hidden="true"
           />
           <input
             value={searchQuery}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="학생 이름, 학교, 학부모 검색"
-            className="min-h-10 w-full border border-[#D8D6DE] bg-[#FFFEFA] pl-9 pr-10 text-sm font-semibold text-[#17232B] outline-none placeholder:text-[#9A9CA3] focus:border-[#BFC2C8] focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[#E1E4E8]"
+            className="min-h-10 w-full border border-[var(--academy-border)] bg-white pl-9 pr-10 text-sm font-medium text-[var(--academy-ink)] outline-none placeholder:text-[#9A9CA3] focus:border-[var(--academy-accent)] focus:bg-white focus:ring-2 focus:ring-inset focus:ring-[var(--academy-accent-soft)]"
           />
           {hasSearchQuery ? (
             <button
               type="button"
               aria-label="학생 검색어 지우기"
               onClick={() => onSearchChange("")}
-              className="absolute right-2 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center border border-[#D8D6DE] bg-[#F7F7FA] text-[#62656f] transition hover:bg-[#F0F0ED] focus:outline-none focus:ring-2 focus:ring-[#D8DAFA]"
+              className="absolute right-2 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted)] transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
             >
               <X size={13} aria-hidden="true" />
             </button>
@@ -352,29 +352,29 @@ function StudentSelectionList({
                 className={[
                   "border-b px-3 py-2.5 outline outline-1 outline-offset-[-1px] last:border-b-0",
                   isSelected
-                    ? "border-[#DEDEE4] bg-[#F4F4F7] outline-[#D3D2DD]"
-                    : "border-[#E4E3E8] bg-[#FFFEFA] outline-transparent hover:bg-[#F7F7FA]",
+                    ? "border-[var(--academy-accent)] bg-[var(--academy-surface)] outline-[var(--academy-accent)] ring-1 ring-inset ring-[var(--academy-accent-soft)]"
+                    : "border-[var(--academy-border)] bg-white outline-transparent hover:bg-[var(--academy-surface-muted)]",
                 ].join(" ")}
               >
                 <div className="grid gap-2">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <p className="text-sm font-bold text-[#17232B]">
+                        <p className="text-sm font-semibold text-[var(--academy-ink)]">
                           {student.name}
                         </p>
                         {isSelected ? (
-                          <span className="inline-flex shrink-0 items-center gap-1 border border-[#D3D2DD] bg-[#FFFEFA] px-2 py-0.5 text-xs font-bold text-[#4B4F58]">
+                          <span className="inline-flex shrink-0 items-center gap-1 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2 py-0.5 text-xs font-semibold text-[var(--academy-accent)]">
                             <CheckCircle2 size={12} aria-hidden="true" />
                             선택됨
                           </span>
                         ) : null}
                       </div>
-                      <p className="mt-1 truncate text-xs text-[#60717B]">
+                      <p className="mt-1 truncate text-xs text-[var(--academy-muted)]">
                         {[student.schoolName, student.gradeLabel].filter(Boolean).join(" · ") ||
                           "학년 정보 없음"}
                       </p>
-                      <p className="mt-1 truncate text-xs text-[#60717B]">
+                      <p className="mt-1 truncate text-xs text-[var(--academy-muted)]">
                         {student.parentName ?? "학부모"} · {student.maskedParentPhone}
                       </p>
                     </div>
@@ -382,8 +382,8 @@ function StudentSelectionList({
                       className={[
                         "shrink-0 rounded-sm border px-2 py-1 text-xs font-bold",
                         primarySchedule
-                          ? "border-[#D3D2DD] bg-[#F7F7FA] text-[#4B4F58]"
-                          : "border-[#DEDEE4] bg-[#F2F1EE] text-[#6F737C]",
+                          ? "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted-strong)]"
+                          : "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted)]",
                       ].join(" ")}
                     >
                       {primarySchedule
@@ -406,10 +406,10 @@ function StudentSelectionList({
                     type="button"
                     onClick={() => onStudentSelect(student.id)}
                     className={[
-                      "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D8DAFA]",
+                      "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
                       isSelected
-                        ? "border-[#C9C7D2] bg-[#F4F4F8] text-[#30343B]"
-                        : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:bg-[#F7F7FA]",
+                        ? "border-[var(--academy-accent)] bg-white text-[var(--academy-accent)]"
+                        : "border-[var(--academy-border)] bg-white text-[var(--academy-muted-strong)] hover:bg-[var(--academy-surface-muted)]",
                     ].join(" ")}
                   >
                     문자 작성
@@ -417,7 +417,7 @@ function StudentSelectionList({
                   </button>
                   {isSelected ? (
                     <>
-                      <span className="inline-flex min-h-8 shrink-0 items-center px-1 text-[11px] font-bold text-[#78909A]">
+                      <span className="inline-flex min-h-8 shrink-0 items-center px-1 text-[11px] font-semibold text-[var(--academy-muted)]">
                         사유:
                       </span>
                       {quickReasonIds.map((reasonId) => {
@@ -429,10 +429,10 @@ function StudentSelectionList({
                             aria-pressed={isReasonSelected}
                             onClick={() => onStudentReasonSelect(student.id, reasonId)}
                             className={[
-                              "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D8DAFA]",
-                            isReasonSelected
-                                ? "border-[#BFC2C8] bg-[#FFFFFF] text-[#17232B] shadow-[inset_0_0_0_1px_rgba(23,35,43,0.06)]"
-                                : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:border-[#C9C7D2] hover:bg-[#F7F7FA]",
+                              "min-h-8 shrink-0 rounded-sm border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
+                              isReasonSelected
+                                ? "border-[var(--academy-accent)] bg-white text-[var(--academy-accent)]"
+                                : "border-[var(--academy-border)] bg-white text-[var(--academy-muted-strong)] hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]",
                             ].join(" ")}
                           >
                             {isReasonSelected ? "선택됨 · " : ""}
