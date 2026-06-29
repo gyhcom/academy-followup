@@ -1039,7 +1039,7 @@ export function AttendanceBoard({
             <section className="border-b border-[#DED8CE] bg-transparent px-1 pb-2 sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-4 sm:shadow-sm">
               <div className="flex flex-col gap-2.5 lg:flex-row lg:items-end lg:justify-between">
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-[#494d5a] sm:text-sm">
+                  <p className="text-xs font-semibold text-[var(--academy-muted-strong)] sm:text-sm">
                     {academyName}
                   </p>
                   <h2 className="mt-0.5 text-xl font-semibold leading-tight text-stone-950 sm:mt-1 sm:text-3xl">
@@ -1086,7 +1086,7 @@ export function AttendanceBoard({
                       <div className="flex items-center gap-2">
                         <UserCheck
                           size={16}
-                          className="text-[#494d5a] sm:size-[18px]"
+                          className="text-[var(--academy-muted-strong)] sm:size-[18px]"
                         />
                         <h3 className="text-sm font-semibold text-stone-950 sm:text-base">
                           {selectedSession?.className ?? "선택된 수업 없음"}
@@ -1336,7 +1336,7 @@ function AttendanceViewTabs({
   );
 
   return (
-    <div className="border border-[#d8dde2] bg-[#fafafa] px-2 py-2">
+    <div className="border border-[#d8dde2] bg-[var(--academy-surface-muted)] px-2 py-2">
       <div
         className="flex gap-1 overflow-x-auto"
         role="tablist"
@@ -1355,10 +1355,10 @@ function AttendanceViewTabs({
                 onChange(tab.id);
               }}
               className={[
-                "min-h-10 shrink-0 rounded-sm border px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+                "min-h-10 shrink-0 rounded-sm border px-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
                 isActive
-                  ? "border-[#d7dbe0] bg-[#f6f7f8] text-[#2f3437]"
-                  : "border-transparent bg-[#fafafa] text-[#62656f] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
+                  ? "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-ink)]"
+                  : "border-transparent bg-[var(--academy-surface-muted)] text-[var(--academy-muted)] hover:border-[var(--academy-border)] hover:bg-[var(--academy-surface-muted)]",
               ].join(" ")}
             >
               <span className="block text-sm font-bold">{tab.label}</span>
@@ -1422,7 +1422,7 @@ function AttendanceCalendarView({
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
-              <h2 className="text-lg font-extrabold tracking-[-0.02em] text-[#17232B] sm:text-xl">
+              <h2 className="text-lg font-extrabold tracking-[-0.02em] text-[var(--academy-accent)] sm:text-xl">
                 출석부
               </h2>
               <span className="text-sm font-bold text-[#4B4F58]">
@@ -1432,7 +1432,7 @@ function AttendanceCalendarView({
                 날짜 선택 후 수업과 학생 목록을 확인합니다.
               </span>
             </div>
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-[#62656f]">
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-[var(--academy-muted)]">
               <CompactScopeLabel label="조회 반" value="전체 반" />
               <CompactScopeLabel label="담당" value="전체 선생님" />
               <CompactScopeLabel label="상태" value="전체 상태" />
@@ -1440,18 +1440,18 @@ function AttendanceCalendarView({
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="inline-flex min-h-9 items-center gap-2 border border-[#D8D6DE] bg-[#F4F4F1] px-3 text-sm text-[#62656f]">
+            <div className="inline-flex min-h-9 items-center gap-2 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 text-sm text-[var(--academy-muted)]">
               <CalendarDays size={15} aria-hidden="true" />
               <span className="text-xs font-bold text-[#73777F]">선택</span>
-              <b className="font-extrabold text-[#17232B]">
+              <b className="font-extrabold text-[var(--academy-accent)]">
                 {formatDateKoreanShort(selectedDate)}
               </b>
             </div>
-            <div className="inline-flex border border-[#D8D6DE] bg-[#FFFEFA] p-0.5">
+            <div className="inline-flex border border-[var(--academy-border)] bg-[var(--academy-surface)] p-0.5">
               <button
                 type="button"
                 onClick={() => onMonthChange(shiftMonth(selectedMonth, -1))}
-                className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[#62656f] hover:bg-[#F6F6F3] focus:outline-none focus:ring-2 focus:ring-[#d7dbe0]"
+                className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[var(--academy-muted)] hover:bg-[#F6F6F3] focus:outline-none focus:ring-2 focus:ring-[var(--academy-border)]"
               >
                 <ChevronLeft size={16} aria-hidden="true" />
                 이전 달
@@ -1459,14 +1459,14 @@ function AttendanceCalendarView({
               <button
                 type="button"
                 onClick={onTodaySelect}
-                className="inline-flex min-h-8 items-center border border-[#D8D6DE] bg-[#F4F4F1] px-3 text-sm font-bold text-[#2f3437] hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-[#d7dbe0]"
+                className="inline-flex min-h-8 items-center border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 text-sm font-bold text-[var(--academy-ink)] hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-border)]"
               >
                 오늘
               </button>
               <button
                 type="button"
                 onClick={() => onMonthChange(shiftMonth(selectedMonth, 1))}
-                className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[#62656f] hover:bg-[#F6F6F3] focus:outline-none focus:ring-2 focus:ring-[#d7dbe0]"
+                className="inline-flex min-h-8 items-center gap-1 px-2.5 text-sm font-semibold text-[var(--academy-muted)] hover:bg-[#F6F6F3] focus:outline-none focus:ring-2 focus:ring-[var(--academy-border)]"
               >
                 다음 달
                 <ChevronRight size={16} aria-hidden="true" />
@@ -1518,7 +1518,7 @@ function CompactScopeLabel({ label, value }: { label: string; value: string }) {
   return (
     <div className="inline-flex items-center gap-1.5">
       <span className="text-[#858895]">{label}</span>
-      <span className="text-[#2f3437]">{value}</span>
+      <span className="text-[var(--academy-ink)]">{value}</span>
     </div>
   );
 }
@@ -1665,7 +1665,7 @@ function AttendanceCalendarDayCell({
       onClick={() => onSelect(date)}
       aria-pressed={isSelected}
       className={[
-        "group relative min-h-[7rem] overflow-hidden border-b border-r border-[var(--console-line)] p-2 text-left transition duration-150 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa] sm:min-h-[8.25rem] sm:p-2.5",
+        "group relative min-h-[7rem] overflow-hidden border-b border-r border-[var(--console-line)] p-2 text-left transition duration-150 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)] sm:min-h-[8.25rem] sm:p-2.5",
         !isCurrentMonth
           ? "bg-[var(--academy-surface-strong)] text-[var(--academy-muted)] opacity-70 hover:bg-[var(--academy-surface-strong)]"
           : selectedClassName,
@@ -1750,7 +1750,7 @@ function AttendanceCalendarDayCell({
               ))
             : null}
           {hiddenStatusCount > 0 ? (
-            <span className="truncate text-[11px] font-bold text-[#60717B]">
+            <span className="truncate text-[11px] font-bold text-[var(--academy-muted)]">
               외 {hiddenStatusCount}개 상태
             </span>
           ) : null}
@@ -1778,7 +1778,7 @@ function MetricLine({
           ? "text-blue-700"
           : tone === "muted"
             ? "text-[#8CA0A8]"
-            : "text-[#17232B]";
+            : "text-[var(--academy-accent)]";
   const dotClass =
     tone === "warning"
       ? "bg-amber-400"
@@ -1788,7 +1788,7 @@ function MetricLine({
           ? "bg-[#4f5be7]"
           : tone === "muted"
             ? "bg-[#B8C6CB]"
-            : "bg-[#9f9da5]";
+            : "bg-[var(--academy-muted)]";
 
   return (
     <span className="flex min-w-0 items-center justify-between gap-2">
@@ -1971,9 +1971,9 @@ function AttendanceDayDetailPanel({
               aria-selected={activeTab === tab.id}
               onClick={() => openTab(tab.id)}
               className={[
-                "min-h-9 flex-1 px-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+                "min-h-9 flex-1 px-2 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
                 activeTab === tab.id
-                  ? "bg-[#fffefa] text-[#2f3437]"
+                  ? "bg-[#fffefa] text-[var(--academy-ink)]"
                   : "text-[var(--clinic-muted)] hover:bg-[#fffefa]/80",
               ].join(" ")}
             >
@@ -1994,7 +1994,7 @@ function AttendanceDayDetailPanel({
           {activeTab === "students" ? (
             <>
               {studentStatusFilter !== "all" ? (
-                <div className="mb-2 flex items-center justify-between gap-2 border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-2 text-xs font-bold text-[#494d5a]">
+                <div className="mb-2 flex items-center justify-between gap-2 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-xs font-bold text-[var(--academy-muted-strong)]">
                   <span>
                     {activeStudentFilterLabel} {activeStudentFilterCount}명 표시
                     중
@@ -2002,7 +2002,7 @@ function AttendanceDayDetailPanel({
                   <button
                     type="button"
                     onClick={() => setStudentStatusFilter("all")}
-                    className="text-[#2f3437] underline-offset-2 hover:underline"
+                    className="text-[var(--academy-ink)] underline-offset-2 hover:underline"
                   >
                     전체 보기
                   </button>
@@ -2050,7 +2050,7 @@ function SummaryFilterButton({
         ? "text-amber-800"
         : tone === "danger"
           ? "text-red-800"
-          : "text-[#494d5a]";
+          : "text-[var(--academy-muted-strong)]";
 
   return (
     <button
@@ -2060,7 +2060,7 @@ function SummaryFilterButton({
       onClick={onClick}
       title={isDisabled ? `${label} 항목 없음` : `${label} 목록 보기`}
       className={[
-        "group relative grid min-h-10 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-l border-l-transparent px-3 py-2 text-left font-extrabold transition last:border-b-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
+        "group relative grid min-h-10 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-l border-l-transparent px-3 py-2 text-left font-extrabold transition last:border-b-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]",
         isDisabled
           ? "cursor-not-allowed bg-[var(--academy-surface-strong)] text-[var(--academy-muted)] opacity-70"
           : isActive
@@ -2123,16 +2123,16 @@ function AttendanceClassSummaryList({
             key={session.key}
             type="button"
             onClick={() => onOpenSession(session.key)}
-            className="group w-full border-b border-[var(--console-line)] bg-[#fffefa] p-3 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+            className="group w-full border-b border-[var(--console-line)] bg-[#fffefa] p-3 text-left transition last:border-b-0 hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]"
             aria-label={`${session.className} ${session.startTime} 수업 오늘 처리에서 열기`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="border border-[var(--console-line)] bg-[#f7f6f1] px-1.5 py-0.5 text-[11px] font-extrabold text-[#494d5a] tabular-nums">
+                  <span className="border border-[var(--console-line)] bg-[#f7f6f1] px-1.5 py-0.5 text-[11px] font-extrabold text-[var(--academy-muted-strong)] tabular-nums">
                     {session.startTime}
                   </span>
-                  <p className="text-sm font-extrabold text-[#17232B]">
+                  <p className="text-sm font-extrabold text-[var(--academy-accent)]">
                     {session.className}
                   </p>
                 </div>
@@ -2155,7 +2155,7 @@ function AttendanceClassSummaryList({
             </div>
             <div className="mt-3 flex items-center justify-between border-t border-[var(--console-line)] pt-2 text-[11px] font-extrabold text-[var(--clinic-muted)]">
               <span>수업별 출석 체크로 이동</span>
-              <span className="inline-flex items-center gap-1 text-[#494d5a]">
+              <span className="inline-flex items-center gap-1 text-[var(--academy-muted-strong)]">
                 열기
                 <ChevronRight
                   size={13}
@@ -2187,7 +2187,7 @@ function MiniStat({
         ? "text-amber-700"
         : tone === "danger"
           ? "text-red-700"
-          : "text-[#60717B]";
+          : "text-[var(--academy-muted)]";
 
   return (
     <span className="border-r border-[var(--console-line)] bg-[#f7f6f1] px-1.5 py-1 last:border-r-0">
@@ -2223,7 +2223,7 @@ function AttendanceDayStudentList({
           key={row.id}
           type="button"
           onClick={() => onOpenStudent(row)}
-          className="group w-full border-b border-[var(--console-line)] bg-[#fffefa] px-3 py-2.5 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+          className="group w-full border-b border-[var(--console-line)] bg-[#fffefa] px-3 py-2.5 text-left transition last:border-b-0 hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]"
         >
           <div className="flex items-start gap-2.5">
             {selectable ? (
@@ -2236,7 +2236,7 @@ function AttendanceDayStudentList({
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
                 <div className="min-w-0">
                   <div className="flex min-w-0 items-center gap-1.5">
-                    <p className="truncate text-sm font-extrabold text-[#17232B]">
+                    <p className="truncate text-sm font-extrabold text-[var(--academy-accent)]">
                       {row.student.name}
                     </p>
                     {row.record?.note ? (
@@ -2255,14 +2255,14 @@ function AttendanceDayStudentList({
                 <StatusLozenge status={row.status} />
               </div>
               <div className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
-                <span className="border border-[var(--console-line)] bg-[#f7f6f1] px-1.5 py-0.5 text-[11px] font-extrabold text-[#494d5a] tabular-nums">
+                <span className="border border-[var(--console-line)] bg-[#f7f6f1] px-1.5 py-0.5 text-[11px] font-extrabold text-[var(--academy-muted-strong)] tabular-nums">
                   {row.session.startTime}-{row.session.endTime}
                 </span>
                 <div className="flex min-w-0 items-center justify-end gap-1.5">
                   <ContactLozenge record={row.record} status={row.status} />
                   <ChevronRight
                     size={14}
-                    className="shrink-0 text-[#9f9da5] transition group-hover:translate-x-0.5 group-hover:text-[#2f3437]"
+                    className="shrink-0 text-[var(--academy-muted)] transition group-hover:translate-x-0.5 group-hover:text-[var(--academy-ink)]"
                     aria-hidden="true"
                   />
                 </div>
@@ -2358,19 +2358,19 @@ function StudentScheduleDrawer({
           </button>
         </div>
 
-        <div className="border-x border-[#D8D6DE] bg-[#FBFAF7]">
-          <section className="border-b border-[#D8D6DE] bg-[#F7F7F5] px-4 py-4">
+        <div className="border-x border-[var(--academy-border)] bg-[var(--academy-surface)]">
+          <section className="border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xl font-bold text-[#17232B]">
+                <p className="text-xl font-bold text-[var(--academy-accent)]">
                   {row.student.name}
                 </p>
-                <p className="mt-1 text-sm text-[#60717B]">
+                <p className="mt-1 text-sm text-[var(--academy-muted)]">
                   {[row.student.schoolName, row.student.gradeLabel]
                     .filter(Boolean)
                     .join(" · ") || "학교/학년 미등록"}
                 </p>
-                <p className="mt-2 text-sm font-semibold tabular-nums text-[#494d5a]">
+                <p className="mt-2 text-sm font-semibold tabular-nums text-[var(--academy-muted-strong)]">
                   {row.student.maskedStudentPhone ??
                     row.student.maskedParentPhone}
                 </p>
@@ -2401,18 +2401,18 @@ function StudentScheduleDrawer({
                   .map((schedule) => (
                     <div
                       key={`${schedule.dayOfWeek}:${schedule.startTime}:${schedule.title}`}
-                      className="flex items-center justify-between gap-3 border-b border-[#E4E1DC] pb-2 text-sm last:border-b-0 last:pb-0"
+                      className="flex items-center justify-between gap-3 border-b border-[var(--academy-border)] pb-2 text-sm last:border-b-0 last:pb-0"
                     >
-                      <span className="font-bold text-[#494d5a]">
+                      <span className="font-bold text-[var(--academy-muted-strong)]">
                         {weekdayShortLabel(schedule.dayOfWeek)}
                       </span>
-                      <span className="min-w-0 flex-1 truncate text-[#62656f]">
+                      <span className="min-w-0 flex-1 truncate text-[var(--academy-muted)]">
                         {schedule.startTime} {schedule.title}
                       </span>
                     </div>
                   ))
               ) : (
-                <p className="text-sm text-[#60717B]">
+                <p className="text-sm text-[var(--academy-muted)]">
                   등록된 주간 스케줄이 없습니다.
                 </p>
               )}
@@ -2420,7 +2420,7 @@ function StudentScheduleDrawer({
           </DrawerSection>
 
           <DrawerSection title="이번 달 출석 이력">
-            <div className="overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7] text-xs">
+            <div className="overflow-hidden border border-[var(--academy-border)] bg-[var(--academy-surface)] text-xs">
               <DrawerMetricRow
                 label="출석"
                 value={monthlySummary.present}
@@ -2445,7 +2445,7 @@ function StudentScheduleDrawer({
 
           <DrawerSection title="최근 연락 기록">
             {historyState.status === "loading" ? (
-              <p className="text-sm text-[#60717B]">
+              <p className="text-sm text-[var(--academy-muted)]">
                 연락 기록을 불러오는 중입니다.
               </p>
             ) : historyState.items.length > 0 ? (
@@ -2453,12 +2453,12 @@ function StudentScheduleDrawer({
                 {historyState.items.map((item) => (
                   <div
                     key={item.id}
-                    className="border-b border-[#E4E1DC] pb-2 text-sm last:border-b-0 last:pb-0"
+                    className="border-b border-[var(--academy-border)] pb-2 text-sm last:border-b-0 last:pb-0"
                   >
-                    <p className="font-semibold text-[#494d5a]">
+                    <p className="font-semibold text-[var(--academy-muted-strong)]">
                       {formatCompactDateTime(item.sentAt ?? item.createdAt)}
                     </p>
-                    <p className="text-xs text-[#60717B]">
+                    <p className="text-xs text-[var(--academy-muted)]">
                       {reasonLabel(item.reason as FollowupReason)} ·{" "}
                       {item.status}
                     </p>
@@ -2466,24 +2466,24 @@ function StudentScheduleDrawer({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[#60717B]">
+              <p className="text-sm text-[var(--academy-muted)]">
                 최근 연락 기록이 없습니다.
               </p>
             )}
           </DrawerSection>
 
-          <section className="sticky bottom-0 border-t border-[#D8D6DE] bg-[#FBFAF7] p-3">
-            <h4 className="mb-2 text-sm font-bold text-[#17232B]">작업</h4>
+          <section className="sticky bottom-0 border-t border-[var(--academy-border)] bg-[var(--academy-surface)] p-3">
+            <h4 className="mb-2 text-sm font-bold text-[var(--academy-accent)]">작업</h4>
             <div className="space-y-2">
               <button
                 type="button"
                 onClick={onOpenMessages}
-                className="inline-flex min-h-10 w-full items-center justify-center gap-2 border border-[#c9cdd2] bg-[#fffefa] px-3 text-sm font-bold text-[#2f3437] hover:border-[#aeb5bf] hover:bg-[#f6f7f8] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+                className="inline-flex min-h-10 w-full items-center justify-center gap-2 border border-[#c9cdd2] bg-[#fffefa] px-3 text-sm font-bold text-[var(--academy-ink)] hover:border-[#aeb5bf] hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
               >
                 <Send size={16} aria-hidden="true" />
                 문자 작성
               </button>
-              <div className="grid gap-2 border border-[#D8D6DE] bg-[#F4F4F1] p-3 text-xs leading-5 text-[#62656f]">
+              <div className="grid gap-2 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] p-3 text-xs leading-5 text-[var(--academy-muted)]">
                 <div className="flex items-start gap-2">
                   <Pencil
                     className="mt-0.5 shrink-0 text-[#8CA0A8]"
@@ -2522,8 +2522,8 @@ function DrawerSection({
   children: ReactNode;
 }) {
   return (
-    <section className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3">
-      <h4 className="mb-2 text-sm font-bold text-[#17232B]">{title}</h4>
+    <section className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] px-4 py-3">
+      <h4 className="mb-2 text-sm font-bold text-[var(--academy-accent)]">{title}</h4>
       {children}
     </section>
   );
@@ -2545,11 +2545,11 @@ function DrawerMetricRow({
         ? "text-amber-700"
         : tone === "danger"
           ? "text-red-700"
-          : "text-[#60717B]";
+          : "text-[var(--academy-muted)]";
 
   return (
-    <div className="grid min-h-9 grid-cols-[minmax(0,1fr)_auto] items-center border-b border-[#E4E1DC] px-3 py-1.5 last:border-b-0">
-      <span className="text-xs font-bold text-[#62656f]">{label}</span>
+    <div className="grid min-h-9 grid-cols-[minmax(0,1fr)_auto] items-center border-b border-[var(--academy-border)] px-3 py-1.5 last:border-b-0">
+      <span className="text-xs font-bold text-[var(--academy-muted)]">{label}</span>
       <b className={["text-sm font-black tabular-nums", toneClass].join(" ")}>
         {value}
       </b>
@@ -2559,9 +2559,9 @@ function DrawerMetricRow({
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-[#E4E1DC] py-2 text-sm last:border-b-0">
-      <span className="font-semibold text-[#62656f]">{label}</span>
-      <span className="min-w-0 truncate text-right font-bold text-[#494d5a]">
+    <div className="flex items-center justify-between gap-3 border-b border-[var(--academy-border)] py-2 text-sm last:border-b-0">
+      <span className="font-semibold text-[var(--academy-muted)]">{label}</span>
+      <span className="min-w-0 truncate text-right font-bold text-[var(--academy-muted-strong)]">
         {value}
       </span>
     </div>
@@ -2705,9 +2705,9 @@ function AttendanceWorkbench({
   const selectedStatus = normalizeAttendanceStatus(selectedRecord?.status);
 
   return (
-    <section className="rounded-none bg-[#F4F4F1]">
-      <div className="grid min-h-[calc(100vh-7.25rem)] gap-0 overflow-hidden border border-[#D8D6DE] bg-[#F4F4F1] lg:grid-cols-[15.5rem_minmax(0,1fr)_17.25rem] xl:grid-cols-[16rem_minmax(0,1fr)_18rem] 2xl:grid-cols-[19.5rem_minmax(0,1fr)_22rem]">
-        <aside className="min-w-0 border-r border-[#D8D6DE] bg-[#FBFAF7]">
+    <section className="rounded-none bg-[var(--academy-surface-muted)]">
+      <div className="grid min-h-[calc(100vh-7.25rem)] gap-0 overflow-hidden border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] lg:grid-cols-[15.5rem_minmax(0,1fr)_17.25rem] xl:grid-cols-[16rem_minmax(0,1fr)_18rem] 2xl:grid-cols-[19.5rem_minmax(0,1fr)_22rem]">
+        <aside className="min-w-0 border-r border-[var(--academy-border)] bg-[var(--academy-surface)]">
           <SessionList
             sessions={sessions}
             selectedSessionKey={selectedSessionKey}
@@ -2723,20 +2723,20 @@ function AttendanceWorkbench({
           />
         </aside>
 
-        <section className="min-w-0 overflow-hidden bg-[#F7F7F5]">
-          <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-4">
+        <section className="min-w-0 overflow-hidden bg-[var(--academy-surface-muted)]">
+          <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] px-4 py-4">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <h2 className="truncate text-2xl font-bold tracking-[-0.02em] text-[#17232B]">
+                <h2 className="truncate text-2xl font-bold tracking-[-0.02em] text-[var(--academy-accent)]">
                   출석부 장부
                 </h2>
                 {selectedSession ? (
-                  <p className="mt-1 text-sm font-medium text-[#60717B]">
+                  <p className="mt-1 text-sm font-medium text-[var(--academy-muted)]">
                     {selectedSession.className} ({selectedSession.startTime} -{" "}
                     {selectedSession.endTime}) · {teacherName} 선생님
                   </p>
                 ) : (
-                  <p className="mt-1 text-sm text-[#60717B]">
+                  <p className="mt-1 text-sm text-[var(--academy-muted)]">
                     이 날짜에 수업이 없습니다. 날짜나 수업 시간 등록 상태를
                     확인해 주세요.
                   </p>
@@ -2746,7 +2746,7 @@ function AttendanceWorkbench({
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex min-h-9 items-center gap-2 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-semibold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+                  className="inline-flex min-h-9 items-center gap-2 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 text-sm font-semibold text-[var(--academy-muted-strong)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
                 >
                   <Printer size={16} aria-hidden="true" />
                   출석부 인쇄
@@ -2754,7 +2754,7 @@ function AttendanceWorkbench({
                 <button
                   type="button"
                   onClick={onRefresh}
-                  className="inline-flex min-h-9 items-center gap-2 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-semibold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+                  className="inline-flex min-h-9 items-center gap-2 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 text-sm font-semibold text-[var(--academy-muted-strong)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
                 >
                   <RefreshCw size={16} aria-hidden="true" />
                   새로고침
@@ -2811,7 +2811,7 @@ function AttendanceWorkbench({
           )}
         </section>
 
-        <aside className="min-w-0 border-l border-[#D8D6DE] bg-[#FBFAF7]">
+        <aside className="min-w-0 border-l border-[var(--academy-border)] bg-[var(--academy-surface)]">
           {bulkTarget ? (
             <BulkAttendanceFollowupPanel
               bulkTarget={bulkTarget}
@@ -2925,33 +2925,33 @@ function AttendanceLedgerTable({
   ].filter((item) => item.value > 0);
 
   return (
-    <div className="overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7]">
+    <div className="overflow-hidden border border-[var(--academy-border)] bg-[var(--academy-surface)]">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[47rem] table-fixed border-separate border-spacing-0 text-left">
-          <thead className="bg-[#F0F0EC] text-[12px] font-bold text-[#62656f]">
+          <thead className="bg-[#F0F0EC] text-[12px] font-bold text-[var(--academy-muted)]">
             <tr>
-              <th className="w-8 border-b border-r border-[#D8D6DE] px-2 py-3">
+              <th className="w-8 border-b border-r border-[var(--academy-border)] px-2 py-3">
                 <span className="sr-only">선택</span>
               </th>
-              <th className="w-[23%] border-b border-r border-[#D8D6DE] px-2 py-3">
+              <th className="w-[23%] border-b border-r border-[var(--academy-border)] px-2 py-3">
                 학생명
               </th>
-              <th className="w-[16%] border-b border-r border-[#D8D6DE] px-2 py-3">
+              <th className="w-[16%] border-b border-r border-[var(--academy-border)] px-2 py-3">
                 학교 / 학년
               </th>
-              <th className="w-[13%] border-b border-r border-[#D8D6DE] px-2 py-3">
+              <th className="w-[13%] border-b border-r border-[var(--academy-border)] px-2 py-3">
                 휴대폰
               </th>
-              <th className="w-[13%] border-b border-r border-[#D8D6DE] px-2 py-3">
+              <th className="w-[13%] border-b border-r border-[var(--academy-border)] px-2 py-3">
                 수업시간
               </th>
-              <th className="w-[12%] border-b border-r border-[#D8D6DE] px-2 py-3">
+              <th className="w-[12%] border-b border-r border-[var(--academy-border)] px-2 py-3">
                 출석 상태
               </th>
-              <th className="w-[12%] border-b border-r border-[#D8D6DE] px-2 py-3">
+              <th className="w-[12%] border-b border-r border-[var(--academy-border)] px-2 py-3">
                 연락 상태
               </th>
-              <th className="w-[8%] border-b border-[#D8D6DE] px-2 py-3">
+              <th className="w-[8%] border-b border-[var(--academy-border)] px-2 py-3">
                 메모
               </th>
             </tr>
@@ -2990,27 +2990,27 @@ function AttendanceLedgerTable({
                     }
                   }}
                   className={[
-                    "group cursor-pointer border-b border-[#D8D6DE] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
+                    "group cursor-pointer border-b border-[var(--academy-border)] transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]",
                     isSelected
-                      ? "bg-[#f6f7f8] ring-1 ring-inset ring-[#d7dbe0]"
-                      : "bg-[#FBFAF7] hover:bg-[#f8f9fa]",
+                      ? "bg-[var(--academy-surface-muted)] ring-1 ring-inset ring-[var(--academy-border)]"
+                      : "bg-[var(--academy-surface)] hover:bg-[var(--academy-surface-muted)]",
                     isSaving ? "opacity-70" : "",
                   ].join(" ")}
                 >
-                  <td className="border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle">
+                  <td className="border-b border-r border-[var(--academy-border)] px-2 py-2.5 align-middle">
                     <input
                       type="checkbox"
                       checked={isBulkSelected}
                       disabled={!isBulkSelectable}
                       onClick={(event) => event.stopPropagation()}
                       onChange={() => onToggleBulkStudent(student.id)}
-                      className="size-4 accent-[#17232B] disabled:opacity-30"
+                      className="size-4 accent-[var(--academy-accent)] disabled:opacity-30"
                       aria-label={`${student.name} 일괄 문자 대상 선택`}
                     />
                   </td>
-                  <td className="border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle">
+                  <td className="border-b border-r border-[var(--academy-border)] px-2 py-2.5 align-middle">
                     <div className="flex items-center gap-2">
-                      <span className="flex size-7 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-xs font-bold text-[#494d5a]">
+                      <span className="flex size-7 shrink-0 items-center justify-center border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-xs font-bold text-[var(--academy-muted-strong)]">
                         {getStudentInitial(student.name)}
                       </span>
                       <div className="min-w-0">
@@ -3023,25 +3023,25 @@ function AttendanceLedgerTable({
                       </div>
                     </div>
                   </td>
-                  <td className="truncate border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle text-xs text-[#494d5a]">
+                  <td className="truncate border-b border-r border-[var(--academy-border)] px-2 py-2.5 align-middle text-xs text-[var(--academy-muted-strong)]">
                     {[student.schoolName, student.gradeLabel]
                       .filter(Boolean)
                       .join(" · ") || "학교/학년 미등록"}
                   </td>
-                  <td className="truncate border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle text-xs tabular-nums text-[#494d5a]">
+                  <td className="truncate border-b border-r border-[var(--academy-border)] px-2 py-2.5 align-middle text-xs tabular-nums text-[var(--academy-muted-strong)]">
                     {student.maskedStudentPhone ?? student.maskedParentPhone}
                   </td>
-                  <td className="truncate border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle text-xs tabular-nums text-[#494d5a]">
+                  <td className="truncate border-b border-r border-[var(--academy-border)] px-2 py-2.5 align-middle text-xs tabular-nums text-[var(--academy-muted-strong)]">
                     {session.startTime}-{session.endTime}
                   </td>
-                  <td className="border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle">
+                  <td className="border-b border-r border-[var(--academy-border)] px-2 py-2.5 align-middle">
                     <StatusLozenge status={status} />
                   </td>
-                  <td className="border-b border-r border-[#E4E1DC] px-2 py-2.5 align-middle">
+                  <td className="border-b border-r border-[var(--academy-border)] px-2 py-2.5 align-middle">
                     <ContactLozenge record={record} status={status} />
                   </td>
-                  <td className="border-b border-[#E4E1DC] px-2 py-2.5 align-middle">
-                    <span className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-1.5 py-1 text-[11px] font-semibold text-[#62656f]">
+                  <td className="border-b border-[var(--academy-border)] px-2 py-2.5 align-middle">
+                    <span className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-1.5 py-1 text-[11px] font-semibold text-[var(--academy-muted)]">
                       {record?.note ? "있음" : "-"}
                     </span>
                   </td>
@@ -3051,7 +3051,7 @@ function AttendanceLedgerTable({
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between gap-3 border-t border-[#D8D6DE] bg-[#F4F4F1] px-4 py-3 text-sm text-[#494d5a]">
+      <div className="flex items-center justify-between gap-3 border-t border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-3 text-sm text-[var(--academy-muted-strong)]">
         <div className="flex flex-wrap items-center gap-4">
           <span className="font-semibold">전체 {students.length}명</span>
           {footerSummaryItems.map((item) => (
@@ -3113,7 +3113,7 @@ function ContactLozenge({
   }
 
   return (
-    <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-[#D8D6DE] bg-[#F4F4F1] px-2 text-[11px] font-bold text-[#62656f]">
+    <span className="inline-flex min-h-6 items-center whitespace-nowrap border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2 text-[11px] font-bold text-[var(--academy-muted)]">
       대기
     </span>
   );
@@ -3193,8 +3193,8 @@ function WorkbenchStudentPanel({
     .join(" · ");
 
   return (
-    <section className="sticky top-4 flex h-[calc(100vh-9rem)] flex-col overflow-hidden border-l border-[#D8D6DE] bg-[#F4F4F1]">
-      <div className="flex items-center justify-between border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3 text-[#2f3437]">
+    <section className="sticky top-4 flex h-[calc(100vh-9rem)] flex-col overflow-hidden border-l border-[var(--academy-border)] bg-[var(--academy-surface-muted)]">
+      <div className="flex items-center justify-between border-b border-[var(--academy-border)] bg-[var(--academy-surface)] px-4 py-3 text-[var(--academy-ink)]">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#858895]">
             student case
@@ -3209,31 +3209,31 @@ function WorkbenchStudentPanel({
       </div>
 
       {!student ? (
-        <div className="m-3 border border-dashed border-[#D8D6DE] bg-[#FBFAF7] p-4 text-sm leading-6 text-[#62656f]">
+        <div className="m-3 border border-dashed border-[var(--academy-border)] bg-[var(--academy-surface)] p-4 text-sm leading-6 text-[var(--academy-muted)]">
           학생을 선택하면 오늘 처리 상태와 연락 작업이 표시됩니다.
         </div>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 overflow-y-auto">
-            <section className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-4">
+            <section className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] px-4 py-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex min-w-0 items-center gap-2">
-                    <h4 className="truncate text-2xl font-black tracking-[-0.03em] text-[#17232B]">
+                    <h4 className="truncate text-2xl font-black tracking-[-0.03em] text-[var(--academy-accent)]">
                       {student.name}
                     </h4>
-                    <span className="flex size-6 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-[11px] font-bold text-[#494d5a]">
+                    <span className="flex size-6 shrink-0 items-center justify-center border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[11px] font-bold text-[var(--academy-muted-strong)]">
                       {getStudentInitial(student.name)}
                     </span>
                   </div>
-                  <p className="mt-1 truncate text-sm font-semibold text-[#62656f]">
+                  <p className="mt-1 truncate text-sm font-semibold text-[var(--academy-muted)]">
                     {classDescriptor || "학교/학년 미등록"}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={onOpenStudentProfile}
-                  className="min-h-8 shrink-0 border border-[#D8D6DE] bg-[#FBFAF7] px-2.5 text-xs font-bold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+                  className="min-h-8 shrink-0 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2.5 text-xs font-bold text-[var(--academy-muted-strong)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
                 >
                   프로필
                 </button>
@@ -3242,7 +3242,7 @@ function WorkbenchStudentPanel({
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <StatusLozenge status={status} />
                 <ContactLozenge record={record} status={status} />
-                <span className="inline-flex min-h-6 items-center border border-[#D8D6DE] bg-[#F4F4F1] px-2 text-[11px] font-bold tabular-nums text-[#62656f]">
+                <span className="inline-flex min-h-6 items-center border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2 text-[11px] font-bold tabular-nums text-[var(--academy-muted)]">
                   {student.maskedStudentPhone ?? student.maskedParentPhone}
                   <span className="ml-1 font-medium text-[#78909A]">
                     (학생)
@@ -3251,17 +3251,17 @@ function WorkbenchStudentPanel({
               </div>
             </section>
 
-            <section className="border-b border-[#D8D6DE] bg-[#F7F7F5] px-4 py-3">
-              <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#62656f]">
+            <section className="border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-3">
+              <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--academy-muted)]">
                 <CheckCircle2 size={14} aria-hidden="true" />
                 오늘 처리
               </div>
-              <p className="mt-1 text-sm font-bold text-[#17232B]">
+              <p className="mt-1 text-sm font-bold text-[var(--academy-accent)]">
                 {session
                   ? `${session.className} · ${session.startTime}-${session.endTime}`
                   : "선택된 수업 없음"}
               </p>
-              <p className="mt-1 text-xs font-medium text-[#62656f]">
+              <p className="mt-1 text-xs font-medium text-[var(--academy-muted)]">
                 {processedAt
                   ? `${formatCompactDateTime(processedAt)} 처리 기록`
                   : "아직 처리 시각이 없습니다."}
@@ -3291,35 +3291,35 @@ function WorkbenchStudentPanel({
                 <button
                   type="button"
                   onClick={onOpenMessages}
-                  className="text-xs font-bold text-[#494d5a] hover:underline"
+                  className="text-xs font-bold text-[var(--academy-muted-strong)] hover:underline"
                 >
                   전체 보기
                 </button>
               }
             >
               {historyState.status === "loading" ? (
-                <p className="px-4 py-3 text-sm text-[#60717B]">
+                <p className="px-4 py-3 text-sm text-[var(--academy-muted)]">
                   연락 기록을 불러오는 중입니다.
                 </p>
               ) : historyState.items.length > 0 ? (
                 historyState.items.map((item) => (
                   <div
                     key={item.id}
-                    className="grid min-h-10 grid-cols-[5.8rem_minmax(0,1fr)_auto] items-center gap-2 border-b border-[#E4E1DC] px-4 py-2 text-xs text-[#494d5a] last:border-b-0"
+                    className="grid min-h-10 grid-cols-[5.8rem_minmax(0,1fr)_auto] items-center gap-2 border-b border-[var(--academy-border)] px-4 py-2 text-xs text-[var(--academy-muted-strong)] last:border-b-0"
                   >
-                    <span className="tabular-nums text-[#60717B]">
+                    <span className="tabular-nums text-[var(--academy-muted)]">
                       {formatCompactDateTime(item.createdAt)}
                     </span>
                     <span className="truncate font-bold">
                       {reasonLabel(item.reason as FollowupReason)}
                     </span>
-                    <span className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-1.5 py-0.5 text-[10px] font-black text-[#62656f]">
+                    <span className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-1.5 py-0.5 text-[10px] font-black text-[var(--academy-muted)]">
                       {item.status === "sent" ? "발송" : "기록"}
                     </span>
                   </div>
                 ))
               ) : (
-                <p className="px-4 py-3 text-sm text-[#60717B]">
+                <p className="px-4 py-3 text-sm text-[var(--academy-muted)]">
                   아직 연락 기록이 없습니다.
                 </p>
               )}
@@ -3331,7 +3331,7 @@ function WorkbenchStudentPanel({
                 <button
                   type="button"
                   onClick={onOpenStudentProfile}
-                  className="text-xs font-bold text-[#494d5a] hover:underline"
+                  className="text-xs font-bold text-[var(--academy-muted-strong)] hover:underline"
                 >
                   관리
                 </button>
@@ -3341,9 +3341,9 @@ function WorkbenchStudentPanel({
                 weeklySchedules.map((schedule) => (
                   <div
                     key={schedule.id}
-                    className="grid min-h-10 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 border-b border-[#E4E1DC] px-4 py-2 text-sm text-[#494d5a] last:border-b-0"
+                    className="grid min-h-10 grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 border-b border-[var(--academy-border)] px-4 py-2 text-sm text-[var(--academy-muted-strong)] last:border-b-0"
                   >
-                    <span className="font-black text-[#494d5a]">
+                    <span className="font-black text-[var(--academy-muted-strong)]">
                       {weekdayShortLabel(schedule.dayOfWeek)}
                     </span>
                     <span className="truncate tabular-nums">
@@ -3353,23 +3353,23 @@ function WorkbenchStudentPanel({
                   </div>
                 ))
               ) : (
-                <p className="px-4 py-3 text-sm text-[#60717B]">
+                <p className="px-4 py-3 text-sm text-[var(--academy-muted)]">
                   등록된 주간 스케줄이 없습니다.
                 </p>
               )}
             </PanelBlock>
           </div>
 
-          <div className="border-t border-[#D8D6DE] bg-[#FBFAF7] p-3 shadow-[0_-8px_18px_rgba(23,35,43,0.04)]">
+          <div className="border-t border-[var(--academy-border)] bg-[var(--academy-surface)] p-3 shadow-[0_-8px_18px_rgba(23,35,43,0.04)]">
             <button
               type="button"
               disabled={!canOpenFollowup}
               onClick={() => onOpenFollowup(student)}
               className={[
-                "flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+                "flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
                 canOpenFollowup
-                  ? "border border-[#17232B] bg-[#17232B] text-white hover:bg-[#2f3437]"
-                  : "bg-[#E9E7E1] text-[#9f9da5]",
+                  ? "border border-[var(--academy-accent)] bg-[var(--academy-accent)] text-white hover:bg-[var(--academy-ink)]"
+                  : "bg-[var(--academy-surface-strong)] text-[var(--academy-muted)]",
               ].join(" ")}
             >
               <Send size={17} aria-hidden="true" />
@@ -3380,7 +3380,7 @@ function WorkbenchStudentPanel({
                 type="button"
                 disabled={!canOpenFollowup}
                 onClick={() => onOpenFollowup(student)}
-                className="flex min-h-10 items-center justify-center gap-2 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-bold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] disabled:cursor-not-allowed disabled:bg-[#E9E7E1] disabled:text-[#9f9da5]"
+                className="flex min-h-10 items-center justify-center gap-2 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 text-sm font-bold text-[var(--academy-muted-strong)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)] disabled:cursor-not-allowed disabled:bg-[var(--academy-surface-strong)] disabled:text-[var(--academy-muted)]"
               >
                 <Pencil size={16} aria-hidden="true" />
                 기록 작성
@@ -3388,7 +3388,7 @@ function WorkbenchStudentPanel({
               <button
                 type="button"
                 onClick={onOpenMessages}
-                className="flex min-h-10 items-center justify-center gap-2 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-bold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+                className="flex min-h-10 items-center justify-center gap-2 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 text-sm font-bold text-[var(--academy-muted-strong)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
               >
                 <List size={16} aria-hidden="true" />
                 이력
@@ -3411,9 +3411,9 @@ function PanelBlock({
   children: ReactNode;
 }) {
   return (
-    <section className="border-b border-[#D8D6DE] bg-[#FBFAF7]">
-      <div className="flex min-h-10 items-center justify-between gap-2 border-b border-[#E4E1DC] bg-[#F4F4F1] px-4">
-        <h4 className="text-[12px] font-black uppercase tracking-[0.14em] text-[#494d5a]">
+    <section className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)]">
+      <div className="flex min-h-10 items-center justify-between gap-2 border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4">
+        <h4 className="text-[12px] font-black uppercase tracking-[0.14em] text-[var(--academy-muted-strong)]">
           {title}
         </h4>
         {action}
@@ -3435,13 +3435,13 @@ function PanelDataRow({
   mono?: boolean;
 }) {
   return (
-    <div className="grid min-h-11 grid-cols-[1.25rem_5rem_minmax(0,1fr)] items-center gap-2 border-b border-[#E4E1DC] px-4 py-2 last:border-b-0">
+    <div className="grid min-h-11 grid-cols-[1.25rem_5rem_minmax(0,1fr)] items-center gap-2 border-b border-[var(--academy-border)] px-4 py-2 last:border-b-0">
       <span className="text-[#858895]" aria-hidden="true">
         {icon}
       </span>
-      <span className="text-xs font-bold text-[#62656f]">{label}</span>
+      <span className="text-xs font-bold text-[var(--academy-muted)]">{label}</span>
       <span
-        className={`min-w-0 truncate text-sm font-bold text-[#17232B] ${mono ? "tabular-nums" : ""}`}
+        className={`min-w-0 truncate text-sm font-bold text-[var(--academy-accent)] ${mono ? "tabular-nums" : ""}`}
       >
         {children}
       </span>
@@ -3488,7 +3488,7 @@ function AttendanceDateControl({
           type="button"
           aria-label="전날 출석부 보기"
           onClick={() => onChange(shiftDate(value, -1))}
-          className="flex min-h-10 items-center justify-center rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] text-[#62656f] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-11"
+          className="flex min-h-10 items-center justify-center rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-muted)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)] sm:min-h-11"
         >
           <ChevronLeft size={18} />
         </button>
@@ -3510,7 +3510,7 @@ function AttendanceDateControl({
           <button
             type="button"
             onClick={openCalendar}
-            className="flex min-h-10 w-full items-center gap-2 rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2.5 text-left text-sm font-semibold text-[var(--clinic-text)] transition hover:bg-[#F4F4F1] focus:border-[#9f9da5] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-11 sm:px-3"
+            className="flex min-h-10 w-full items-center gap-2 rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2.5 text-left text-sm font-semibold text-[var(--clinic-text)] transition hover:bg-[var(--academy-surface-muted)] focus:border-[var(--academy-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)] sm:min-h-11 sm:px-3"
           >
             <CalendarDays size={17} className="shrink-0 text-stone-500" />
             <span className="min-w-0 flex-1 truncate tabular-nums">
@@ -3524,7 +3524,7 @@ function AttendanceDateControl({
           type="button"
           aria-label="다음날 출석부 보기"
           onClick={() => onChange(shiftDate(value, 1))}
-          className="flex min-h-10 items-center justify-center rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] text-[#62656f] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-11"
+          className="flex min-h-10 items-center justify-center rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-muted)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)] sm:min-h-11"
         >
           <ChevronRight size={18} />
         </button>
@@ -3564,7 +3564,7 @@ function DateShortcutButton({
     <button
       type="button"
       onClick={() => onChange(date)}
-      className="min-h-8 rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2 text-xs font-semibold text-[#62656f] transition hover:bg-[#F4F4F1] hover:text-[#2f3437] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-9"
+      className="min-h-8 rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2 text-xs font-semibold text-[var(--academy-muted)] transition hover:bg-[var(--academy-surface-muted)] hover:text-[var(--academy-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)] sm:min-h-9"
     >
       {label}
     </button>
@@ -3581,7 +3581,7 @@ function AttendanceOverviewStrip({
     overview.counts.absent + overview.counts.late + overview.counts.needs_check;
 
   return (
-    <section className="grid grid-cols-4 overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7] text-center">
+    <section className="grid grid-cols-4 overflow-hidden border border-[var(--academy-border)] bg-[var(--academy-surface)] text-center">
       <CompactOverviewItem label="수업" value={`${overview.totalSessions}개`} />
       <CompactOverviewItem label="학생" value={`${overview.totalStudents}명`} />
       <CompactOverviewItem label="체크 필요" value={`${uncheckedCount}명`} />
@@ -3605,7 +3605,7 @@ function CompactOverviewItem({
   return (
     <div
       className={[
-        "border-r border-[#E4E1DC] px-2 py-2 last:border-r-0 sm:px-3 sm:py-3",
+        "border-r border-[var(--academy-border)] px-2 py-2 last:border-r-0 sm:px-3 sm:py-3",
         className,
       ].join(" ")}
     >
@@ -3646,8 +3646,8 @@ function SessionList({
 }) {
   if (variant === "mobile") {
     return (
-      <section className="overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7]">
-        <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2.5 sm:px-4 sm:py-3">
+      <section className="overflow-hidden border border-[var(--academy-border)] bg-[var(--academy-surface)]">
+        <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 py-2.5 sm:px-4 sm:py-3">
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-sm font-semibold text-[var(--clinic-text)]">
               오늘 수업
@@ -3665,7 +3665,7 @@ function SessionList({
           </div>
         </div>
 
-        <div className="max-h-40 divide-y divide-[#E4E1DC] overflow-y-auto overscroll-contain sm:max-h-none">
+        <div className="max-h-40 divide-y divide-[var(--academy-border)] overflow-y-auto overscroll-contain sm:max-h-none">
           {sessions.length > 0 ? (
             sessions.map((session) => {
               const isSelected = session.key === selectedSessionKey;
@@ -3680,16 +3680,16 @@ function SessionList({
                   className={[
                     "grid min-h-[3.55rem] w-full grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2 border border-transparent px-2.5 py-2 text-left transition sm:min-h-[4.25rem] sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:gap-3 sm:px-4 sm:py-3",
                     isSelected
-                      ? "border-[#D8D6DE] bg-[#F6F7F8] text-[var(--clinic-text)]"
-                      : "bg-[#FBFAF7] text-[var(--clinic-text)] hover:border-[#E4E1DC] hover:bg-[#F7F7F5]",
+                      ? "border-[var(--academy-border)] bg-[#F6F7F8] text-[var(--clinic-text)]"
+                      : "bg-[var(--academy-surface)] text-[var(--clinic-text)] hover:border-[var(--academy-border)] hover:bg-[var(--academy-surface-muted)]",
                   ].join(" ")}
                 >
                   <span
                     className={[
                       "flex size-8 items-center justify-center rounded-md text-xs font-semibold sm:size-9 sm:text-sm",
                       isSelected
-                        ? "border border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437]"
-                        : "bg-[#F4F4F1] text-[var(--clinic-muted)]",
+                        ? "border border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-ink)]"
+                        : "bg-[var(--academy-surface-muted)] text-[var(--clinic-muted)]",
                     ].join(" ")}
                   >
                     {getClassInitial(session.className)}
@@ -3702,7 +3702,7 @@ function SessionList({
                       className={[
                         "mt-0.5 flex items-center gap-1 truncate text-[11px] sm:text-xs",
                         isSelected
-                          ? "text-[#2f3437]"
+                          ? "text-[var(--academy-ink)]"
                           : "text-[var(--clinic-muted)]",
                       ].join(" ")}
                     >
@@ -3716,8 +3716,8 @@ function SessionList({
                       className={[
                         "rounded-full px-1.5 py-0.5 text-[11px] font-semibold sm:px-2 sm:py-1 sm:text-xs",
                         progress.pending > 0
-                          ? "border border-[#D8D6DE] bg-[#F4F4F1] text-[#2f3437]"
-                          : "border border-[#E4E1DC] bg-[#F4F4F1] text-[var(--clinic-muted)]",
+                          ? "border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-ink)]"
+                          : "border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--clinic-muted)]",
                       ].join(" ")}
                     >
                       {progress.pending} 체크 필요
@@ -3743,11 +3743,11 @@ function SessionList({
   }
 
   return (
-    <section className="h-full overflow-hidden bg-[#FBFAF7]">
-      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-4 py-4">
+    <section className="h-full overflow-hidden bg-[var(--academy-surface)]">
+      <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] px-4 py-4">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <h3 className="text-xl font-bold tracking-[-0.02em] text-[#17232B]">
+            <h3 className="text-xl font-bold tracking-[-0.02em] text-[var(--academy-accent)]">
               오늘 수업
             </h3>
             <RefreshCw
@@ -3759,16 +3759,16 @@ function SessionList({
           <button
             type="button"
             onClick={onOpenClassManagement}
-            className="inline-flex min-h-9 items-center gap-1.5 border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-semibold text-[#494d5a] transition hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+            className="inline-flex min-h-9 items-center gap-1.5 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 text-sm font-semibold text-[var(--academy-muted-strong)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
           >
             <Plus size={15} aria-hidden="true" />
             수업 추가
           </button>
         </div>
-        <p className="mt-5 text-base font-bold text-[#17232B]">
+        <p className="mt-5 text-base font-bold text-[var(--academy-accent)]">
           {formatAttendanceDate(selectedDate)}
         </p>
-        <p className="mt-1 text-sm font-medium text-[#60717B]">
+        <p className="mt-1 text-sm font-medium text-[var(--academy-muted)]">
           총 {overview.totalSessions}개 수업 · {overview.totalStudents}명
           {loadState === "loading" ? (
             <span className="ml-2 inline-flex items-center gap-1 text-xs text-[#78909A]">
@@ -3779,7 +3779,7 @@ function SessionList({
         </p>
       </div>
 
-      <div className="max-h-[calc(100vh-18rem)] divide-y divide-[#E4E1DC] overflow-y-auto overscroll-contain">
+      <div className="max-h-[calc(100vh-18rem)] divide-y divide-[var(--academy-border)] overflow-y-auto overscroll-contain">
         {sessions.length > 0 ? (
           sessions.map((session) => {
             const isSelected = session.key === selectedSessionKey;
@@ -3793,10 +3793,10 @@ function SessionList({
                 aria-pressed={isSelected}
                 onClick={() => onSelect(session.key)}
                 className={[
-                  "w-full border-l-2 px-4 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
+                  "w-full border-l-2 px-4 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]",
                   isSelected
-                    ? "border-l-[#17232B] bg-[#F6F7F8]"
-                    : "border-l-transparent bg-[#FBFAF7] hover:bg-[#F7F7F5]",
+                    ? "border-l-[var(--academy-accent)] bg-[#F6F7F8]"
+                    : "border-l-transparent bg-[var(--academy-surface)] hover:bg-[var(--academy-surface-muted)]",
                 ].join(" ")}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -3804,15 +3804,15 @@ function SessionList({
                     <p className="text-sm font-semibold tabular-nums text-[#334B58]">
                       {session.startTime} - {session.endTime}
                     </p>
-                    <p className="mt-1 truncate text-[15px] font-bold text-[#17232B]">
+                    <p className="mt-1 truncate text-[15px] font-bold text-[var(--academy-accent)]">
                       {session.className}
                     </p>
-                    <p className="mt-0.5 truncate text-xs font-medium text-[#60717B]">
+                    <p className="mt-0.5 truncate text-xs font-medium text-[var(--academy-muted)]">
                       {teacherName} 선생님
                     </p>
                   </div>
                   <div className="shrink-0 text-right text-sm">
-                    <p className="font-bold text-[#17232B]">
+                    <p className="font-bold text-[var(--academy-accent)]">
                       {session.students.length}명
                     </p>
                     <p className="mt-0.5 text-xs text-[#78909A]">정원</p>
@@ -3836,22 +3836,22 @@ function SessionList({
             );
           })
         ) : (
-          <p className="m-3 border border-dashed border-[#D8D6DE] bg-[#FBFAF7] px-3 py-4 text-sm leading-6 text-stone-500">
+          <p className="m-3 border border-dashed border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 py-4 text-sm leading-6 text-stone-500">
             이 날짜에 표시할 수업이 없습니다. 다른 날짜를 선택하거나 수업 시간
             등록 상태를 확인해 주세요.
           </p>
         )}
       </div>
-      <div className="border-t border-[#D8D6DE] bg-[#FBFAF7] p-3">
+      <div className="border-t border-[var(--academy-border)] bg-[var(--academy-surface)] p-3">
         <button
           type="button"
           disabled={sessions.length === 0}
           onClick={onOpenMessages}
           className={[
-            "inline-flex min-h-11 w-full items-center justify-center gap-2 border px-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+            "inline-flex min-h-11 w-full items-center justify-center gap-2 border px-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
             sessions.length === 0
-              ? "cursor-not-allowed border-[#D8D6DE] bg-[#E9E7E1] text-[#9f9da5]"
-              : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:bg-[#F4F4F1]",
+              ? "cursor-not-allowed border-[var(--academy-border)] bg-[var(--academy-surface-strong)] text-[var(--academy-muted)]"
+              : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-ink)] hover:bg-[var(--academy-surface-muted)]",
           ].join(" ")}
         >
           <Send size={16} aria-hidden="true" />
@@ -3898,10 +3898,10 @@ function AttendanceFilterBar({
               aria-pressed={isSelected}
               onClick={() => onChange(filter)}
               className={[
-                "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa] sm:min-h-9 sm:px-3",
+                "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)] sm:min-h-9 sm:px-3",
                 isSelected
-                  ? "border-[#17232B] bg-[#17232B] text-white"
-                  : "border-[#D8D6DE] bg-[#FBFAF7] text-[#62656f] hover:bg-[#F4F4F1]",
+                  ? "border-[var(--academy-accent)] bg-[var(--academy-accent)] text-white"
+                  : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-muted)] hover:bg-[var(--academy-surface-muted)]",
               ].join(" ")}
             >
               {attendanceFilterLabels[filter]}
@@ -3910,7 +3910,7 @@ function AttendanceFilterBar({
                   "rounded-full px-1.5 py-0.5 tabular-nums",
                   isSelected
                     ? "bg-white/15 text-white"
-                    : "bg-[#F4F4F1] text-[#62656f]",
+                    : "bg-[var(--academy-surface-muted)] text-[var(--academy-muted)]",
                 ].join(" ")}
               >
                 {counts[filter]}
@@ -3943,9 +3943,9 @@ function AttendanceBulkActionBar({
   }
 
   return (
-    <div className="mt-4 border border-[#D8D6DE] bg-[#FBFAF7] px-3 py-3">
+    <div className="mt-4 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 py-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-2 text-sm font-bold text-[#2f3437]">
+        <span className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-sm font-bold text-[var(--academy-ink)]">
           {activeReason ? `${selectedCount}명 선택됨` : "일괄 처리"}
         </span>
         <button
@@ -3954,10 +3954,10 @@ function AttendanceBulkActionBar({
           aria-pressed={activeReason === "late"}
           onClick={() => onStart("late")}
           className={[
-            "min-h-9 rounded-sm border px-4 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+            "min-h-9 rounded-sm border px-4 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
             activeReason === "late"
               ? "border-amber-300 bg-amber-50 text-[var(--clinic-warning)]"
-              : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:border-amber-200 hover:bg-amber-50",
+              : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-ink)] hover:border-amber-200 hover:bg-amber-50",
             lateCount === 0 ? "cursor-not-allowed opacity-45" : "",
           ].join(" ")}
         >
@@ -3969,10 +3969,10 @@ function AttendanceBulkActionBar({
           aria-pressed={activeReason === "absence"}
           onClick={() => onStart("absence")}
           className={[
-            "min-h-9 rounded-sm border px-4 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+            "min-h-9 rounded-sm border px-4 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
             activeReason === "absence"
               ? "border-red-200 bg-red-50 text-[var(--clinic-danger)]"
-              : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:border-red-200 hover:bg-red-50",
+              : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-ink)] hover:border-red-200 hover:bg-red-50",
             absentCount === 0 ? "cursor-not-allowed opacity-45" : "",
           ].join(" ")}
         >
@@ -3980,11 +3980,11 @@ function AttendanceBulkActionBar({
         </button>
         {activeReason ? (
           <>
-            <span className="ml-auto hidden text-xs font-semibold text-[#60717B] xl:inline">
+            <span className="ml-auto hidden text-xs font-semibold text-[var(--academy-muted)] xl:inline">
               우측 패널에서 선택 학생 문자 내용을 확인합니다.
             </span>
             <span
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] px-4 text-sm font-bold text-[#2f3437]"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 text-sm font-bold text-[var(--academy-ink)]"
               aria-label="선택 학생 문자 패널이 우측에 열려 있습니다"
             >
               <Send size={15} aria-hidden="true" />
@@ -3993,7 +3993,7 @@ function AttendanceBulkActionBar({
             <button
               type="button"
               onClick={onClear}
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-3 text-sm font-semibold text-[#62656f] hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 text-sm font-semibold text-[var(--academy-muted)] hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
             >
               <X size={15} aria-hidden="true" />
               선택 해제
@@ -4011,7 +4011,7 @@ function AttendanceSummary({
   summary: Record<AttendanceStatus, number>;
 }) {
   return (
-    <dl className="grid grid-cols-5 divide-x divide-[#E4E1DC] border border-[#D8D6DE] bg-[#FBFAF7] text-center text-[11px] sm:text-xs">
+    <dl className="grid grid-cols-5 divide-x divide-[var(--academy-border)] border border-[var(--academy-border)] bg-[var(--academy-surface)] text-center text-[11px] sm:text-xs">
       {editableStatuses.map((status) => (
         <div key={status} className="min-w-0 px-1.5 py-1.5 sm:px-2 sm:py-2">
           <dt className="truncate font-medium text-[var(--clinic-muted)]">
@@ -4073,12 +4073,12 @@ function AttendanceStudentRow({
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 sm:gap-3">
         <div className="flex items-center gap-1.5">
           {isBulkSelectable ? (
-            <label className="flex size-8 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-700 transition hover:border-[#494d5a] hover:bg-[#f6f7f8]">
+            <label className="flex size-8 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-700 transition hover:border-[var(--academy-muted-strong)] hover:bg-[var(--academy-surface-muted)]">
               <input
                 type="checkbox"
                 checked={isBulkSelected}
                 onChange={onToggleBulkSelection}
-                className="size-4 accent-[#494d5a]"
+                className="size-4 accent-[var(--academy-muted-strong)]"
                 aria-label={`${student.name} ${bulkReason === "late" ? "지각" : "결석"} 문자 대상 선택`}
               />
             </label>
@@ -4132,7 +4132,7 @@ function AttendanceStudentRow({
             aria-pressed={isLate}
             onClick={() => onStatusChange(isLate ? "pending" : "late")}
             className={[
-              "inline-flex min-h-8 items-center rounded-full border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+              "inline-flex min-h-8 items-center rounded-full border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-border-strong)]",
               isLate
                 ? "border-amber-300 bg-amber-50 text-amber-900"
                 : "border-stone-200 bg-white text-stone-600 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900",
@@ -4147,7 +4147,7 @@ function AttendanceStudentRow({
             aria-expanded={isExceptionOpen}
             onClick={onToggleException}
             className={[
-              "inline-flex min-h-8 items-center rounded-full border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+              "inline-flex min-h-8 items-center rounded-full border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-border-strong)]",
               isExceptionOpen
                 ? "border-stone-950 bg-stone-950 text-white"
                 : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50",
@@ -4176,10 +4176,10 @@ function AttendanceStudentRow({
                 aria-pressed={isSelected}
                 onClick={() => onStatusChange(nextStatus)}
                 className={[
-                  "flex min-h-7 shrink-0 items-center gap-1 rounded-md border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2] sm:min-h-8 sm:px-2.5",
+                  "flex min-h-7 shrink-0 items-center gap-1 rounded-md border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-border-strong)] sm:min-h-8 sm:px-2.5",
                   isSelected
-                    ? "border-[#494d5a] bg-[#494d5a] text-white"
-                    : "border-stone-200 bg-white text-stone-700 hover:border-[#C9D6E2] hover:bg-[#f6f7f8]",
+                    ? "border-[var(--academy-muted-strong)] bg-[var(--academy-muted-strong)] text-white"
+                    : "border-stone-200 bg-white text-stone-700 hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]",
                   isSaving ? "cursor-wait opacity-60" : "",
                 ].join(" ")}
               >
@@ -4218,10 +4218,10 @@ function AttendanceArrivalToggle({
       disabled={isSaving}
       onClick={onToggle}
       className={[
-        "inline-flex min-h-8 w-12 items-center rounded-full border p-0.5 transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+        "inline-flex min-h-8 w-12 items-center rounded-full border p-0.5 transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
         isPresent
-          ? "justify-end border-[#17232B] bg-[#17232B]"
-          : "justify-start border-[#D8D6DE] bg-[#F4F4F1] hover:bg-[#F7F7F5]",
+          ? "justify-end border-[var(--academy-accent)] bg-[var(--academy-accent)]"
+          : "justify-start border-[var(--academy-border)] bg-[var(--academy-surface-muted)] hover:bg-[var(--academy-surface-muted)]",
         isSaving ? "cursor-wait opacity-60" : "",
       ].join(" ")}
     >
@@ -4231,7 +4231,7 @@ function AttendanceArrivalToggle({
       <span
         className={[
           "flex size-6 items-center justify-center rounded-full bg-white shadow-sm transition",
-          isPresent ? "text-[#17232B]" : "text-[var(--clinic-muted)]",
+          isPresent ? "text-[var(--academy-accent)]" : "text-[var(--clinic-muted)]",
         ].join(" ")}
       >
         {isPresent ? <Check size={14} /> : null}
@@ -4254,7 +4254,7 @@ function AttendanceSaveStatus({
   }
 
   if (isSaved) {
-    return <p className="text-[11px] font-medium text-[#62656f]">저장됨</p>;
+    return <p className="text-[11px] font-medium text-[var(--academy-muted)]">저장됨</p>;
   }
 
   if (checkedAt) {
@@ -4311,14 +4311,14 @@ function BulkAttendanceFollowupPanel({
   return (
     <section
       className={[
-        "overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7] xl:sticky xl:top-5",
+        "overflow-hidden border border-[var(--academy-border)] bg-[var(--academy-surface)] xl:sticky xl:top-5",
         className,
       ].join(" ")}
     >
-      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2.5 sm:px-4 sm:py-3">
+      <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
           <MessageSquareText
-            className="text-[#62656f]"
+            className="text-[var(--academy-muted)]"
             size={18}
             aria-hidden="true"
           />
@@ -4328,7 +4328,7 @@ function BulkAttendanceFollowupPanel({
           <button
             type="button"
             onClick={onDismiss}
-            className="ml-auto rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2 py-1 text-xs font-semibold text-[#62656f] hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+            className="ml-auto rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2 py-1 text-xs font-semibold text-[var(--academy-muted)] hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
           >
             닫기
           </button>
@@ -4340,7 +4340,7 @@ function BulkAttendanceFollowupPanel({
       </div>
 
       <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-        <div className="border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-3">
+        <div className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-3">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-[var(--clinic-text)]">
               선택 학생 {selectedStudents.length}명
@@ -4365,7 +4365,7 @@ function BulkAttendanceFollowupPanel({
               selectedStudents.map((student) => (
                 <span
                   key={student.id}
-                  className="rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2 py-1 text-xs font-semibold text-[#2f3437]"
+                  className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2 py-1 text-xs font-semibold text-[var(--academy-ink)]"
                 >
                   {student.name}
                 </span>
@@ -4397,10 +4397,10 @@ function BulkAttendanceFollowupPanel({
                   aria-pressed={isSelected}
                   onClick={() => onRecipientTypeChange(recipientType)}
                   className={[
-                    "min-h-10 rounded-sm border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+                    "min-h-10 rounded-sm border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
                     isSelected
-                      ? "border-[#17232B] bg-[#17232B] text-white"
-                      : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:bg-[#F4F4F1]",
+                      ? "border-[var(--academy-accent)] bg-[var(--academy-accent)] text-white"
+                      : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-ink)] hover:bg-[var(--academy-surface-muted)]",
                     isDisabled ? "cursor-not-allowed opacity-45" : "",
                   ].join(" ")}
                 >
@@ -4428,7 +4428,7 @@ function BulkAttendanceFollowupPanel({
             value={messageTemplate}
             onChange={(event) => onMessageTemplateChange(event.target.value)}
             rows={8}
-            className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition focus:border-[#9f9da5] focus:ring-2 focus:ring-[#c9cdfa]"
+            className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition focus:border-[var(--academy-muted)] focus:ring-2 focus:ring-[var(--academy-focus)]"
           />
           <p
             className={[
@@ -4452,10 +4452,10 @@ function BulkAttendanceFollowupPanel({
           </p>
         </div>
 
-        <div className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] p-3 text-sm leading-6 text-[var(--clinic-text)]">
+        <div className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] p-3 text-sm leading-6 text-[var(--clinic-text)]">
           <div className="flex items-start gap-2">
             <CheckCircle2
-              className="mt-0.5 shrink-0 text-[#494d5a]"
+              className="mt-0.5 shrink-0 text-[var(--academy-muted-strong)]"
               size={17}
             />
             <p>
@@ -4517,10 +4517,10 @@ function BulkAttendanceFollowupPanel({
             disabled={!canSave}
             onClick={() => onSubmit(false)}
             className={[
-              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
               canSave
-                ? "bg-[#17232B] text-white hover:bg-[#2f3437]"
-                : "bg-[#E9E7E1] text-[#9f9da5]",
+                ? "bg-[var(--academy-accent)] text-white hover:bg-[var(--academy-ink)]"
+                : "bg-[var(--academy-surface-strong)] text-[var(--academy-muted)]",
             ].join(" ")}
           >
             <Send size={17} />
@@ -4535,10 +4535,10 @@ function BulkAttendanceFollowupPanel({
             disabled={!canSend}
             onClick={() => onSubmit(true)}
             className={[
-              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+              "flex min-h-12 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
               canSend
-                ? "bg-[#2f3437] text-white hover:bg-[#17232B]"
-                : "bg-[#E9E7E1] text-[#62656f]",
+                ? "bg-[var(--academy-ink)] text-white hover:bg-[var(--academy-accent)]"
+                : "bg-[var(--academy-surface-strong)] text-[var(--academy-muted)]",
             ].join(" ")}
           >
             <Send size={17} />
@@ -4625,14 +4625,14 @@ function AttendanceFollowupPanel({
   return (
     <section
       className={[
-        "overflow-hidden border border-[#D8D6DE] bg-[#FBFAF7] xl:sticky xl:top-5",
+        "overflow-hidden border border-[var(--academy-border)] bg-[var(--academy-surface)] xl:sticky xl:top-5",
         className,
       ].join(" ")}
     >
-      <div className="border-b border-[#D8D6DE] bg-[#FBFAF7] px-3 py-2.5 sm:px-4 sm:py-3">
+      <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
           <MessageSquareText
-            className="text-[#62656f]"
+            className="text-[var(--academy-muted)]"
             size={18}
             aria-hidden="true"
           />
@@ -4643,7 +4643,7 @@ function AttendanceFollowupPanel({
             <button
               type="button"
               onClick={onDismiss}
-              className="ml-auto rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] px-2 py-1 text-xs font-semibold text-[#62656f] hover:bg-[#F4F4F1] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+              className="ml-auto rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2 py-1 text-xs font-semibold text-[var(--academy-muted)] hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
             >
               닫기
             </button>
@@ -4656,7 +4656,7 @@ function AttendanceFollowupPanel({
 
       {!followupTarget ? (
         <div className="space-y-3 p-3 sm:p-4">
-          <div className="rounded-sm border border-[#D8D6DE] bg-[#F4F4F1] p-3 text-sm leading-6 text-[var(--clinic-muted)]">
+          <div className="rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] p-3 text-sm leading-6 text-[var(--clinic-muted)]">
             <p className="font-semibold text-[var(--clinic-text)]">대기 상태</p>
             <p className="mt-1">
               `확인 필요`는 바로 문자를 만들지 않습니다. 미도착 학생을 잠시
@@ -4684,8 +4684,8 @@ function AttendanceFollowupPanel({
         </div>
       ) : (
         <div className="space-y-3 p-3 sm:space-y-4 sm:p-4">
-          <div className="border border-[#D8D6DE] bg-[#F4F4F1] px-3 py-3">
-            <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#62656f]">
+          <div className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-3">
+            <p className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--academy-muted)]">
               선택 학생
             </p>
             <p className="mt-1 text-base font-semibold text-[var(--clinic-text)]">
@@ -4721,10 +4721,10 @@ function AttendanceFollowupPanel({
                     aria-pressed={isSelected}
                     onClick={() => onRecipientTypeChange(recipientType)}
                     className={[
-                      "min-h-10 rounded-sm border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+                      "min-h-10 rounded-sm border px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
                       isSelected
-                        ? "border-[#17232B] bg-[#17232B] text-white"
-                        : "border-[#D8D6DE] bg-[#FBFAF7] text-[#2f3437] hover:bg-[#F4F4F1]",
+                        ? "border-[var(--academy-accent)] bg-[var(--academy-accent)] text-white"
+                        : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-ink)] hover:bg-[var(--academy-surface-muted)]",
                       isDisabled ? "cursor-not-allowed opacity-45" : "",
                     ].join(" ")}
                   >
@@ -4762,7 +4762,7 @@ function AttendanceFollowupPanel({
                 title="원문으로 되돌리기"
                 disabled={!isDraftEdited}
                 onClick={onRestorePreview}
-                className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[#D8D6DE] bg-[#FBFAF7] text-[#62656f] hover:bg-[#F4F4F1] disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]"
+                className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-muted)] hover:bg-[var(--academy-surface-muted)] disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]"
               >
                 <RotateCcw size={15} />
               </button>
@@ -4779,7 +4779,7 @@ function AttendanceFollowupPanel({
                   : "결석 또는 지각 학생을 선택하면 문자 초안이 표시됩니다."
               }
               rows={8}
-              className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition disabled:bg-[#E9E7E1] disabled:text-[var(--clinic-muted)] focus:border-[#9f9da5] focus:ring-2 focus:ring-[#c9cdfa]"
+              className="mt-2 min-h-36 w-full resize-none rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 py-3 text-sm leading-6 text-[var(--clinic-text)] outline-none transition disabled:bg-[var(--academy-surface-strong)] disabled:text-[var(--clinic-muted)] focus:border-[var(--academy-muted)] focus:ring-2 focus:ring-[var(--academy-focus)]"
             />
             <p
               className={[
@@ -4808,13 +4808,13 @@ function AttendanceFollowupPanel({
               "rounded-sm border p-3 text-sm leading-6",
               isPreviewError
                 ? "border-red-200 bg-red-50 text-red-900"
-                : "border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-text)]",
+                : "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--clinic-text)]",
             ].join(" ")}
           >
             <div className="flex items-start gap-2">
               {isPreviewReady && !isPreviewError ? (
                 <CheckCircle2
-                  className="mt-0.5 shrink-0 text-[#494d5a]"
+                  className="mt-0.5 shrink-0 text-[var(--academy-muted-strong)]"
                   size={17}
                 />
               ) : (
@@ -4858,10 +4858,10 @@ function AttendanceFollowupPanel({
             disabled={!canSaveFollowup}
             onClick={onSaveFollowup}
             className={[
-              "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+              "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
               canSaveFollowup
-                ? "bg-[#17232B] text-white hover:bg-[#2f3437]"
-                : "bg-[#E9E7E1] text-[#9f9da5]",
+                ? "bg-[var(--academy-accent)] text-white hover:bg-[var(--academy-ink)]"
+                : "bg-[var(--academy-surface-strong)] text-[var(--academy-muted)]",
             ].join(" ")}
           >
             <Send size={17} />
@@ -4888,10 +4888,10 @@ function AttendanceFollowupPanel({
                 disabled={!canSendMessage}
                 onClick={onSendMessage}
                 className={[
-                  "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+                  "flex min-h-12 w-full items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
                   canSendMessage
-                    ? "bg-[#2f3437] text-white hover:bg-[#17232B]"
-                    : "bg-[#E9E7E1] text-[#62656f]",
+                    ? "bg-[var(--academy-ink)] text-white hover:bg-[var(--academy-accent)]"
+                    : "bg-[var(--academy-surface-strong)] text-[var(--academy-muted)]",
                 ].join(" ")}
               >
                 <Send size={17} />
@@ -5412,7 +5412,7 @@ function createDefaultNote(status: AttendanceStatus) {
 
 function attendanceStatusClass(status: AttendanceStatus) {
   const classes: Record<AttendanceStatus, string> = {
-    pending: "border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-muted)]",
+    pending: "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--clinic-muted)]",
     present:
       "border-[var(--console-status-success-border)] bg-[var(--console-status-success-bg)] text-[var(--console-status-success-text)]",
     late: "border-[var(--console-status-pending-border)] bg-[var(--console-status-pending-bg)] text-[var(--console-status-pending-text)]",

@@ -760,7 +760,7 @@ function StudentDetailPanel({
             <div className="divide-y divide-[var(--academy-border)] border-t border-[var(--academy-border)]">
               {groupedSchedules.map(({ dayOfWeek, schedules }) => (
                 <div key={dayOfWeek} className="bg-[var(--academy-surface)]">
-                  <p className="border-b border-[#E3E2E8] bg-[#FBFAF7] px-4 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#73777F]">
+                  <p className="border-b border-[var(--academy-border)] bg-[var(--academy-surface)] px-4 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#73777F]">
                     {weekDayLabel(dayOfWeek)}
                   </p>
                   {schedules.map((schedule) => (
@@ -768,7 +768,7 @@ function StudentDetailPanel({
                       key={schedule.id}
                       type="button"
                       onClick={() => onEditSchedule(student, schedule)}
-                      className="grid w-full grid-cols-[72px_minmax(0,1fr)_42px] items-center gap-3 border-b border-[#E3E2E8] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[#FBFAF7]"
+                      className="grid w-full grid-cols-[72px_minmax(0,1fr)_42px] items-center gap-3 border-b border-[var(--academy-border)] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[var(--academy-surface)]"
                     >
                       <span className="text-sm font-black tabular-nums text-[var(--clinic-text)]">{schedule.startTime}</span>
                       <span className="min-w-0">
@@ -812,10 +812,10 @@ function StudentDetailPanel({
 
 function StudentFileSectionHeader({ title, meta }: { title: string; meta?: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 bg-[#FBFAF7] px-4 py-3">
+    <div className="flex items-center justify-between gap-3 bg-[var(--academy-surface)] px-4 py-3">
       <p className="text-sm font-black text-[var(--academy-ink)]">{title}</p>
       {meta ? (
-        <p className="text-xs font-bold text-[#62656f]">{meta}</p>
+        <p className="text-xs font-bold text-[var(--academy-muted)]">{meta}</p>
       ) : null}
     </div>
   );
@@ -1137,7 +1137,7 @@ function SharedSchedulePanel({
   return (
     <section aria-labelledby="shared-schedule-title">
       <div className="flex items-center gap-2">
-        <Link2 className="text-[#494d5a]" size={16} />
+        <Link2 className="text-[var(--academy-muted-strong)]" size={16} />
         <div className="min-w-0">
           <p id="shared-schedule-title" className="text-sm font-semibold text-stone-950">
             타 학원 스케줄 공유

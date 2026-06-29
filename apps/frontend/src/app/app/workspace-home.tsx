@@ -244,7 +244,7 @@ export function WorkspaceHome({
       <section className="hidden border-b border-[#DED8CE] bg-transparent px-1 pb-4 sm:block sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white sm:px-5 sm:py-5 sm:shadow-sm xl:hidden">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-[#494d5a]">{academyName}</p>
+            <p className="text-sm font-semibold text-[var(--academy-muted-strong)]">{academyName}</p>
             <h2 className="mt-2 text-2xl font-semibold leading-tight text-stone-950 sm:text-3xl">
               {copy.title}
             </h2>
@@ -298,7 +298,7 @@ export function WorkspaceHome({
       <section className="hidden overflow-hidden rounded-lg border border-[#DED8CE] bg-white shadow-sm sm:block xl:hidden">
         <div className="border-b border-stone-200 px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-[#494d5a]">
+            <p className="text-sm font-semibold text-[var(--academy-muted-strong)]">
               {isToday ? "오늘 요약" : "선택 날짜 요약"}
             </p>
             {loadState.status === "loading" ? (
@@ -556,7 +556,7 @@ function PcOperationsDashboard({
                 </p>
               </div>
               {loadState.status === "loading" ? (
-                <span className="inline-flex items-center gap-1.5 border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-1 text-xs font-semibold text-[#62656f]">
+                <span className="inline-flex items-center gap-1.5 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2 py-1 text-xs font-semibold text-[var(--academy-muted)]">
                   <Loader2 size={13} className="animate-spin" />
                   불러오는 중
                 </span>
@@ -625,7 +625,7 @@ function PcStatusChip({
   }[tone];
 
   return (
-    <span className="inline-flex min-h-8 items-center gap-2 border border-[var(--console-line)] bg-[#fffefa] px-2.5 text-xs font-bold text-[#494d5a]">
+    <span className="inline-flex min-h-8 items-center gap-2 border border-[var(--console-line)] bg-[#fffefa] px-2.5 text-xs font-bold text-[var(--academy-muted-strong)]">
       <span className="truncate">
         {label}
       </span>
@@ -662,7 +662,7 @@ function PcEmptyOperationState({
             <button
               type="button"
               onClick={() => onNavigate("attendance")}
-              className="grid min-h-14 w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 bg-[#fffefa] px-3 text-left transition hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+              className="grid min-h-14 w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 bg-[#fffefa] px-3 text-left transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]"
             >
               <CalendarDays size={17} className="text-[#6f737c]" aria-hidden="true" />
               <span className="min-w-0">
@@ -679,7 +679,7 @@ function PcEmptyOperationState({
               <button
                 type="button"
                 onClick={() => onNavigate("management")}
-                className="grid min-h-14 w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 bg-[#fffefa] px-3 text-left transition hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+                className="grid min-h-14 w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 bg-[#fffefa] px-3 text-left transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]"
               >
                 <Settings size={17} className="text-[#6f737c]" aria-hidden="true" />
                 <span className="min-w-0">
@@ -758,7 +758,7 @@ function PcScheduleButton({
     <button
       type="button"
       onClick={() => onNavigate("attendance")}
-      className="flex min-h-[4.25rem] w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+      className="flex min-h-[4.25rem] w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]"
     >
       {content}
     </button>
@@ -810,8 +810,8 @@ function PcStudentFilterBar({
               isSelected
                 ? selectedChipTone(option.tone)
                 : isUnavailable
-                  ? "cursor-not-allowed border-[#D8D6DE] bg-[#F4F4F1] text-[#9f9da5] opacity-70"
-                : "border-[#D8D6DE] bg-[#FFFEFA] text-[var(--clinic-muted)] hover:border-[#BFC2C8] hover:bg-[#F7F7FA]",
+                  ? "cursor-not-allowed border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted)] opacity-70"
+                : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--clinic-muted)] hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]",
             ].join(" ")}
           >
             {option.label}
@@ -821,8 +821,8 @@ function PcStudentFilterBar({
                 isSelected
                   ? "border-white/20 bg-white/15 text-white"
                   : isUnavailable
-                    ? "border-[#D8D6DE] bg-[#F4F4F1] text-[#9f9da5]"
-                    : "border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-muted)]",
+                    ? "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted)]"
+                    : "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--clinic-muted)]",
               ].join(" ")}
             >
               {option.count}
@@ -855,10 +855,10 @@ function PcStudentBoardRowItem({
       aria-label={`${row.student.name} 학생 상세 보기, ${row.className}, ${row.startTime}-${row.endTime}, 출석 ${attendanceDisplayLabel(row.status)}, 연락 ${contactLabel}`}
       onClick={onClick}
       className={[
-        "flex min-h-[4.35rem] w-full items-center gap-3 border px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]",
+        "flex min-h-[4.35rem] w-full items-center gap-3 border px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]",
         isSelected
-          ? "border-[#d7dbe0] bg-[#f6f7f8]"
-          : "border-transparent bg-[#fffefa] hover:border-[#e1e4e8] hover:bg-[#f8f9fa]",
+          ? "border-[var(--academy-border)] bg-[var(--academy-surface-muted)]"
+          : "border-transparent bg-[#fffefa] hover:border-[var(--academy-border)] hover:bg-[var(--academy-surface-muted)]",
       ].join(" ")}
     >
       <span className="min-w-0 flex-[1.25]">
@@ -1002,7 +1002,7 @@ function PcStudentDetailPanel({
               <button
                 type="button"
                 onClick={() => onNavigate("attendance")}
-                className="min-h-11 border border-[var(--console-line)] bg-[#fffefa] px-3 text-sm font-semibold text-[var(--clinic-text)] transition hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]"
+                className="min-h-11 border border-[var(--console-line)] bg-[#fffefa] px-3 text-sm font-semibold text-[var(--clinic-text)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]"
               >
                 출석부로 이동
               </button>
@@ -1092,7 +1092,7 @@ function PcStudentDetailPanel({
                     reason: followupReasonForStatus(item.status),
                   })
                 }
-                className="flex w-full items-center justify-between gap-3 border border-transparent px-4 py-3 text-left transition hover:border-[#e1e4e8] hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#c9cdfa]"
+                className="flex w-full items-center justify-between gap-3 border border-transparent px-4 py-3 text-left transition hover:border-[var(--academy-border)] hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-focus)]"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-bold text-[var(--clinic-text)]">
@@ -1211,8 +1211,8 @@ function MobileHomeExperience({
 
   return (
     <div className="space-y-4 sm:hidden">
-      <section className="overflow-hidden border border-[#d7dbe0] bg-[#fffefa] text-[var(--clinic-text)]">
-        <div className="border-b border-[#d7dbe0] bg-[#f8f7f2] px-4 py-3">
+      <section className="overflow-hidden border border-[var(--academy-border)] bg-[#fffefa] text-[var(--clinic-text)]">
+        <div className="border-b border-[var(--academy-border)] bg-[#f8f7f2] px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-[#6f737c]">
               오늘 운영
@@ -1235,15 +1235,15 @@ function MobileHomeExperience({
             <MobileHeroMetric label="확인할 학생" value={`${followupItems.length}명`} />
             <MobileHeroMetric label="연락 필요" value={`${unsentCount}명`} tone="warm" />
           </div>
-          <p className="mt-3 border-t border-[#D8D6DE] pt-3 text-xs font-bold text-[#494d5a]">
+          <p className="mt-3 border-t border-[var(--academy-border)] pt-3 text-xs font-bold text-[var(--academy-muted-strong)]">
             오늘 {isStaffHome ? "담당 수업" : "학원 일정"}{" "}
             {scheduleSummary.academyScheduleCount}개 · 보강 불가{" "}
             {scheduleSummary.blockedScheduleCount}건
           </p>
 
-          <div className="mt-3 border border-[#D8D6DE] bg-[#FFFEFA] p-3">
+          <div className="mt-3 border border-[var(--academy-border)] bg-[var(--academy-surface)] p-3">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-primary)]">
+              <div className="flex size-10 shrink-0 items-center justify-center border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--clinic-primary)]">
                 <Image
                   src="/icons/education/education-book.svg"
                   alt=""
@@ -1280,7 +1280,7 @@ function MobileHomeExperience({
             <p className="text-lg font-black text-stone-950">빠른 시작</p>
             <p className="mt-0.5 text-xs font-medium text-stone-500">수업 후 처리할 일을 바로 엽니다.</p>
           </div>
-          <span className="border border-[#D8D6DE] bg-[#F4F4F1] px-2.5 py-1 text-xs font-bold text-[#494d5a]">
+          <span className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2.5 py-1 text-xs font-bold text-[var(--academy-muted-strong)]">
             {isToday ? "오늘" : "선택일"}
           </span>
         </div>
@@ -1318,8 +1318,8 @@ function MobileHomeExperience({
         </div>
       </section>
 
-      <section className="overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]">
-        <div className="border-b border-[#D8D6DE] bg-[#F4F4F1] px-4 py-4">
+      <section className="overflow-hidden border border-[var(--academy-border)] bg-[var(--academy-surface)]">
+        <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-4">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-[var(--clinic-primary)]">
@@ -1329,7 +1329,7 @@ function MobileHomeExperience({
                 {formatHomeDate(selectedDate)}
               </h3>
             </div>
-            <span className="border border-[#D8D6DE] bg-[#FFFEFA] px-2.5 py-1 text-xs font-bold text-[#494d5a]">
+            <span className="border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2.5 py-1 text-xs font-bold text-[var(--academy-muted-strong)]">
               운영 현황
             </span>
           </div>
@@ -1372,7 +1372,7 @@ function MobileHomeExperience({
 
         {expandedFilter && records.length > 0 ? (
           <div className="border-t border-stone-100">
-            <div className="flex items-center justify-between gap-3 bg-[#FBFAF7] px-4 py-3">
+            <div className="flex items-center justify-between gap-3 bg-[var(--academy-surface)] px-4 py-3">
               <p className="text-sm font-black text-stone-950">
                 {filterLabel(expandedFilter)} {filteredItems.length}명
               </p>
@@ -1421,17 +1421,17 @@ function HomeDateControl({
           type="button"
           aria-label="전날 운영 요약 보기"
           onClick={() => onChange(shiftDate(value, -1))}
-          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[var(--academy-border-strong)]"
         >
           <ChevronLeft size={18} />
         </button>
 
-        <label className="relative flex min-h-11 w-full cursor-pointer items-center gap-2 overflow-hidden rounded-md border border-[#C9D6E2] bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-[#494d5a] hover:bg-[#f6f7f8] focus-within:border-[#494d5a] focus-within:ring-2 focus-within:ring-[#C9D6E2]">
-          <CalendarDays size={17} className="shrink-0 text-[#494d5a]" />
+        <label className="relative flex min-h-11 w-full cursor-pointer items-center gap-2 overflow-hidden rounded-md border border-[var(--academy-border-strong)] bg-white px-3 text-left text-sm font-semibold text-stone-900 transition hover:border-[var(--academy-muted-strong)] hover:bg-[var(--academy-surface-muted)] focus-within:border-[var(--academy-muted-strong)] focus-within:ring-2 focus-within:ring-[var(--academy-border-strong)]">
+          <CalendarDays size={17} className="shrink-0 text-[var(--academy-muted-strong)]" />
           <span className="min-w-0 flex-1 truncate tabular-nums">
             {formatHomeDate(value)}
           </span>
-          <span className="shrink-0 text-xs font-semibold text-[#494d5a]">
+          <span className="shrink-0 text-xs font-semibold text-[var(--academy-muted-strong)]">
             달력 선택
           </span>
           <input
@@ -1452,7 +1452,7 @@ function HomeDateControl({
           type="button"
           aria-label="다음날 운영 요약 보기"
           onClick={() => onChange(shiftDate(value, 1))}
-          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+          className="flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 transition hover:border-stone-400 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-[var(--academy-border-strong)]"
         >
           <ChevronRight size={18} />
         </button>
@@ -1476,7 +1476,7 @@ function MobileHeroMetric({
         "border px-3 py-3",
         tone === "warm"
           ? "border-amber-300 bg-[#FFF6E7] text-[#7D3A15]"
-          : "border-[#D8D6DE] bg-[#FFFEFA] text-[var(--clinic-text)]",
+          : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--clinic-text)]",
       ].join(" ")}
     >
       <p className={["text-xs font-bold", tone === "warm" ? "text-[#A0531D]" : "text-[var(--clinic-muted)]"].join(" ")}>
@@ -1501,10 +1501,10 @@ function MobileActionCard({
   onClick: () => void;
 }) {
   const toneClass = {
-    coral: "border-[#d7dbe0]",
-    violet: "border-[#d7dbe0]",
-    mint: "border-[#d7dbe0]",
-    amber: "border-[#d7dbe0]",
+    coral: "border-[var(--academy-border)]",
+    violet: "border-[var(--academy-border)]",
+    mint: "border-[var(--academy-border)]",
+    amber: "border-[var(--academy-border)]",
   }[tone];
 
   return (
@@ -1512,12 +1512,12 @@ function MobileActionCard({
       type="button"
       onClick={onClick}
       className={[
-        "group min-h-[5.75rem] border bg-[#FFFEFA] p-3 text-left text-[var(--clinic-text)] transition hover:bg-[#F7F7FA] focus:outline-none focus:ring-2 focus:ring-[#c9cdfa]",
+        "group min-h-[5.75rem] border bg-[var(--academy-surface)] p-3 text-left text-[var(--clinic-text)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-focus)]",
         toneClass,
       ].join(" ")}
     >
       <span className="flex items-start justify-between gap-3">
-        <span className="flex size-9 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-primary)]">
+        <span className="flex size-9 items-center justify-center border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--clinic-primary)]">
           {icon}
         </span>
         <ArrowRight size={16} className="mt-1 text-[#78909A] transition group-active:translate-x-0.5" />
@@ -1562,21 +1562,21 @@ function TodayScheduleSection({
     <section
       aria-label="오늘 일정"
       className={[
-        "overflow-hidden border border-[#D8D6DE] bg-[#FFFEFA]",
+        "overflow-hidden border border-[var(--academy-border)] bg-[var(--academy-surface)]",
         className,
       ].join(" ")}
     >
-      <div className="border-b border-[#D8D6DE] bg-[#F4F4F1] px-4 py-3.5 sm:px-5">
+      <div className="border-b border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-4 py-3.5 sm:px-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#494d5a]">
+            <p className="text-xs font-bold uppercase tracking-wide text-[var(--academy-muted-strong)]">
               오늘 일정
             </p>
             <h3 className="mt-1 text-lg font-black leading-tight text-[var(--clinic-text)] sm:text-xl">
               {formatHomeDate(selectedDate)} 시간순
             </h3>
           </div>
-          <span className="shrink-0 border border-[#D8D6DE] bg-[#FFFEFA] px-2.5 py-1 text-xs font-bold text-[#494d5a]">
+          <span className="shrink-0 border border-[var(--academy-border)] bg-[var(--academy-surface)] px-2.5 py-1 text-xs font-bold text-[var(--academy-muted-strong)]">
             {isStaffHome ? "담당 " : ""}수업 {summary.academyScheduleCount} · 공유일정{" "}
             {summary.blockedScheduleCount}
           </span>
@@ -1590,7 +1590,7 @@ function TodayScheduleSection({
             : "이 날짜에는 학원 일정이 없습니다. 관리 탭에서 수업 시간이나 타 학원 일정을 등록하면 여기에 표시됩니다."}
         </div>
       ) : (
-        <div className="divide-y divide-[#E4E1DC]">
+        <div className="divide-y divide-[var(--academy-border)]">
           <div className="px-4 py-2.5 sm:px-5">
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -1599,7 +1599,7 @@ function TodayScheduleSection({
                   {academyScheduleDescription}
                 </p>
               </div>
-              <span className="border border-[#D8D6DE] bg-[#F4F4F1] px-2 py-1 text-[11px] font-black text-[#494d5a]">
+              <span className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2 py-1 text-[11px] font-black text-[var(--academy-muted-strong)]">
                 {academyItems.length}개
               </span>
             </div>
@@ -1611,12 +1611,12 @@ function TodayScheduleSection({
                 : `${academyScheduleLabel}이 없습니다. 수업 시간 등록 후 출석 체크를 시작할 수 있습니다.`}
             </div>
           ) : (
-            <div className="divide-y divide-[#E4E1DC]">
+            <div className="divide-y divide-[var(--academy-border)]">
               {visibleAcademyItems.map((item) => (
                 <TodayScheduleRow key={item.id} item={item} onNavigate={onNavigate} />
               ))}
               {hiddenAcademyCount > 0 ? (
-                <div className="bg-[#F4F4F1] px-4 py-3 text-center text-xs font-bold text-[var(--clinic-muted)] sm:px-5">
+                <div className="bg-[var(--academy-surface-muted)] px-4 py-3 text-center text-xs font-bold text-[var(--clinic-muted)] sm:px-5">
                   그 외 학원 일정 {hiddenAcademyCount}건은 출석/관리 화면에서 확인하세요.
                 </div>
               ) : null}
@@ -1969,9 +1969,9 @@ function MobileSummaryButton({
   onClick: () => void;
 }) {
   const toneClass = {
-    default: "border-[#d7dbe0]",
-    danger: "border-[#d7dbe0]",
-    success: "border-[#d7dbe0]",
+    default: "border-[var(--academy-border)]",
+    danger: "border-[var(--academy-border)]",
+    success: "border-[var(--academy-border)]",
   }[tone];
 
   return (
@@ -1982,13 +1982,13 @@ function MobileSummaryButton({
       className={[
         "border px-3 py-3 text-left transition",
         isActive
-          ? "border-[#d7dbe0] bg-[#f6f7f8] text-[var(--clinic-text)]"
-          : `bg-[#FFFEFA] text-[var(--clinic-text)] ${toneClass} hover:bg-[#F7F7FA]`,
+          ? "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--clinic-text)]"
+          : `bg-[var(--academy-surface)] text-[var(--clinic-text)] ${toneClass} hover:bg-[var(--academy-surface-muted)]`,
       ].join(" ")}
     >
-      <span className={["block text-xs font-black", isActive ? "text-[#62656f]" : "text-[var(--clinic-muted)]"].join(" ")}>{label}</span>
+      <span className={["block text-xs font-black", isActive ? "text-[var(--academy-muted)]" : "text-[var(--clinic-muted)]"].join(" ")}>{label}</span>
       <span className="mt-1 block text-2xl font-black tabular-nums">{value}</span>
-      <span className={["mt-2 inline-flex items-center gap-1 text-[11px] font-black", isActive ? "text-[#494d5a]" : "text-[#62656f]"].join(" ")}>
+      <span className={["mt-2 inline-flex items-center gap-1 text-[11px] font-black", isActive ? "text-[var(--academy-muted-strong)]" : "text-[var(--academy-muted)]"].join(" ")}>
         보기
         <ArrowRight size={12} />
       </span>
@@ -2037,7 +2037,7 @@ function MobileFollowupRow({
           {isSent ? "연락 완료" : item.followupStatus === "draft" ? "기록 저장" : "연락 필요"}
         </span>
       </span>
-      <span className="mt-1 flex size-9 items-center justify-center border border-[#D8D6DE] bg-[#F4F4F1] text-[var(--clinic-primary)]">
+      <span className="mt-1 flex size-9 items-center justify-center border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--clinic-primary)]">
         <ArrowRight size={15} />
       </span>
     </button>
@@ -2067,7 +2067,7 @@ function HomeEmptyState({
             <button
               type="button"
               onClick={() => onDateChange(shiftDate(getTodayDate(), -1))}
-              className="min-h-10 rounded-md border border-[#C9D6E2] bg-white px-4 text-sm font-semibold text-[#494d5a] transition hover:bg-[#f6f7f8]"
+              className="min-h-10 rounded-md border border-[var(--academy-border-strong)] bg-white px-4 text-sm font-semibold text-[var(--academy-muted-strong)] transition hover:bg-[var(--academy-surface-muted)]"
             >
               어제 기록 보기
             </button>
@@ -2100,7 +2100,7 @@ function HomeActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="group grid min-h-[3.5rem] w-full grid-cols-[1.4rem_minmax(0,1fr)_1rem] items-center gap-3 border-b border-[var(--console-line)] bg-[#fffefa] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[#f8f9fa] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C9D6E2] sm:px-4"
+      className="group grid min-h-[3.5rem] w-full grid-cols-[1.4rem_minmax(0,1fr)_1rem] items-center gap-3 border-b border-[var(--console-line)] bg-[#fffefa] px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--academy-border-strong)] sm:px-4"
     >
       <span className="flex size-5 shrink-0 items-center justify-center text-[var(--clinic-muted)]">
         {icon}
@@ -2111,7 +2111,7 @@ function HomeActionButton({
       </span>
       <ArrowRight
         size={15}
-        className="shrink-0 text-[#A9BCC4] transition group-hover:translate-x-0.5 group-hover:text-[var(--clinic-primary)]"
+        className="shrink-0 text-[var(--academy-border-strong)] transition group-hover:translate-x-0.5 group-hover:text-[var(--clinic-primary)]"
       />
     </button>
   );
@@ -2133,7 +2133,7 @@ function SummaryButton({
   const valueClass = {
     default: "text-stone-950",
     danger: "text-red-700",
-    success: "text-[#494d5a]",
+    success: "text-[var(--academy-muted-strong)]",
   }[tone];
 
   return (
@@ -2142,15 +2142,15 @@ function SummaryButton({
       aria-pressed={isActive}
       onClick={onClick}
       className={[
-        "rounded-lg border px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]",
+        "rounded-lg border px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-[var(--academy-border-strong)]",
         isActive
-          ? "border-[#494d5a] bg-[#f6f7f8]"
-          : "border-stone-300 bg-white hover:border-[#494d5a] hover:bg-[#F8FAFC]",
+          ? "border-[var(--academy-muted-strong)] bg-[var(--academy-surface-muted)]"
+          : "border-stone-300 bg-white hover:border-[var(--academy-muted-strong)] hover:bg-[#F8FAFC]",
       ].join(" ")}
     >
       <span className="block text-xs font-medium text-stone-500">{label}</span>
       <span className={`mt-1 block text-xl font-semibold ${valueClass}`}>{value}</span>
-      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#494d5a]">
+      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[var(--academy-muted-strong)]">
         목록 보기
         <ArrowRight size={13} />
       </span>
@@ -2189,7 +2189,7 @@ function HomeFollowupRow({
           <span
             className={[
               "rounded-md px-2 py-1 text-xs font-semibold",
-              isSent ? "bg-[#f6f7f8] text-[#2f3437]" : "bg-amber-50 text-amber-800",
+              isSent ? "bg-[var(--academy-surface-muted)] text-[var(--academy-ink)]" : "bg-amber-50 text-amber-800",
             ].join(" ")}
           >
             {isSent ? "연락 완료" : item.followupStatus === "draft" ? "기록 저장" : "연락 필요"}
@@ -2213,7 +2213,7 @@ function HomeFollowupRow({
               reason: followupReasonForStatus(item.status),
             })
           }
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[#C9D6E2] bg-white px-3 text-xs font-semibold text-[#494d5a] transition hover:bg-[#f6f7f8] focus:outline-none focus:ring-2 focus:ring-[#C9D6E2]"
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[var(--academy-border-strong)] bg-white px-3 text-xs font-semibold text-[var(--academy-muted-strong)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--academy-border-strong)]"
         >
           문자 작성
           <ArrowRight size={13} />
@@ -2506,7 +2506,7 @@ function getBlockedScheduleBadgeTone(item: HomeScheduleItem) {
   const category = getBlockedScheduleCategory(item);
 
   if (category === "shared") {
-    return "bg-[#f6f7f8] text-[#494d5a]";
+    return "bg-[var(--academy-surface-muted)] text-[var(--academy-muted-strong)]";
   }
 
   if (category === "manual") {
@@ -2574,10 +2574,10 @@ function statusTone(status: AttendanceStatus) {
   }
 
   if (status === "pending") {
-    return "border-[#D8D6DE] bg-[#F4F4F1] text-stone-700";
+    return "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-stone-700";
   }
 
-  return "border-[#D8D6DE] bg-[#F4F4F1] text-[#494d5a]";
+  return "border-[var(--academy-border)] bg-[var(--academy-surface-muted)] text-[var(--academy-muted-strong)]";
 }
 
 function selectedChipTone(tone: "default" | "blue" | "green" | "amber" | "red" | "violet") {
@@ -2620,7 +2620,7 @@ function scheduleTypeLabel(scheduleType: string) {
 function scheduleTypeTone(scheduleType: string) {
   const tones: Record<string, string> = {
     regular_class: "bg-blue-50 text-blue-800",
-    makeup: "bg-[#f6f7f8] text-[#2f3437]",
+    makeup: "bg-[var(--academy-surface-muted)] text-[var(--academy-ink)]",
     external: "bg-stone-100 text-stone-700",
     manual_external_class: "bg-amber-50 text-amber-800",
     consultation: "bg-violet-50 text-violet-800",
