@@ -175,6 +175,18 @@ export function AppWorkspace({
   const visibleView = normalizeWorkspaceView(activeView, canManage);
 
   useEffect(() => {
+    const nextView = getWorkspaceViewFromCurrentUrl(canManage);
+
+    if (nextView) {
+      const frame = window.requestAnimationFrame(() => {
+        setActiveView(nextView);
+      });
+
+      return () => window.cancelAnimationFrame(frame);
+    }
+  }, [canManage]);
+
+  useEffect(() => {
     function syncVisualViewportHeight() {
       const height = window.visualViewport?.height ?? window.innerHeight;
       document.documentElement.style.setProperty("--app-vvh", `${height}px`);
@@ -366,6 +378,36 @@ function normalizeWorkspaceView(view: WorkspaceView, canManage: boolean): Worksp
   }
 
   return view;
+}
+
+function getWorkspaceViewFromCurrentUrl(canManage: boolean): WorkspaceView | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const value = new URLSearchParams(window.location.search).get("view");
+
+  if (!value || !isWorkspaceView(value)) {
+    return null;
+  }
+
+  return normalizeWorkspaceView(value, canManage);
+}
+
+function isWorkspaceView(value: string): value is WorkspaceView {
+  return [
+    "home",
+    "operations",
+    "attendance",
+    "students",
+    "classes",
+    "members",
+    "templates",
+    "settings",
+    "history",
+    "reports",
+    "management",
+  ].includes(value);
 }
 
 function getManagementInitialSection(view: WorkspaceView) {
