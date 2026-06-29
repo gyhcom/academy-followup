@@ -74,10 +74,10 @@ export function MemberForm({
     <div className={managementFormShellClass}>
       <div className={managementFormHeaderClass}>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-[#17232B]">
+          <p className="text-sm font-bold text-[var(--academy-ink)]">
             {form.mode === "create" ? "새 구성원 등록" : "구성원 정보 수정"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-[#62656f]">
+          <p className="mt-1 text-xs leading-5 text-[var(--academy-muted)]">
             신규 등록은 이름, 연락처, 직위, 임시 비밀번호만 입력합니다. 시스템 로그인 ID는 자동 생성됩니다.
           </p>
         </div>
@@ -213,10 +213,10 @@ export function ClassForm({
     <div className={managementFormShellClass}>
       <div className={managementFormHeaderClass}>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-[#17232B]">
+          <p className="text-sm font-bold text-[var(--academy-ink)]">
             {form.mode === "create" ? "새 반 등록" : "반 정보 수정"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-[#62656f]">
+          <p className="mt-1 text-xs leading-5 text-[var(--academy-muted)]">
             반 이름을 먼저 정하고, 주 담당 선생님을 연결하면 선생님 권한과 출석부 필터가 같이 정리됩니다.
           </p>
         </div>
@@ -336,10 +336,10 @@ export function StudentForm({
     <div className={managementFormShellClass}>
       <div className={managementFormHeaderClass}>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-[#17232B]">
+          <p className="text-sm font-bold text-[var(--academy-ink)]">
             {form.mode === "create" ? "새 학생 등록" : "학생 정보 수정"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-[#62656f]">
+          <p className="mt-1 text-xs leading-5 text-[var(--academy-muted)]">
             반 배정, 연락처, 재원 상태를 먼저 정리합니다. 주간 스케줄은 저장 후 이어서 입력합니다.
           </p>
         </div>
@@ -450,7 +450,7 @@ export function StudentForm({
                 />
               </label>
 
-              <div className="border border-[#E3E2E8] bg-[#FBFAF7] px-3 py-2 text-xs leading-5 text-[#62656f]">
+              <div className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-xs leading-5 text-[var(--academy-muted)]">
                 엑셀에서 앞자리 0이 사라진 경우에도 이 입력칸에는 010으로 시작하는 번호를 그대로 입력해 저장할 수 있습니다.
               </div>
             </div>
@@ -478,34 +478,34 @@ export function StudentForm({
               <div
                 id="student-status-help"
                 role="note"
-                className="border border-[#E3E2E8] bg-[#FBFAF7] px-3 py-2 text-xs leading-5 text-[#62656f]"
+                className="border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-3 py-2 text-xs leading-5 text-[var(--academy-muted)]"
               >
-                <p className="font-semibold text-[#2f3437]">퇴원 처리 안내</p>
+                <p className="font-semibold text-[var(--academy-ink)]">퇴원 처리 안내</p>
                 <p className="mt-1">
-                  다니지 않는 학생은 상태를 <b className="text-[#17232B]">퇴원</b>으로
+                  다니지 않는 학생은 상태를 <b className="text-[var(--academy-ink)]">퇴원</b>으로
                   바꾼 뒤 저장합니다. 학생과 과거 출석·연락 기록은 삭제하지 않고 보존합니다.
                 </p>
               </div>
             </div>
           </section>
 
-          <label className="flex items-start gap-3 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] p-3 text-sm text-[#4B4F58]">
+          <label className="flex items-start gap-3 rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] p-3 text-sm text-[var(--academy-muted-strong)]">
             <input
               type="checkbox"
               checked={form.scheduleShareConsentConfirmed}
               onChange={(event) =>
                 onChange({ ...form, scheduleShareConsentConfirmed: event.target.checked })
               }
-              className="mt-1 size-4 shrink-0 accent-[#17232B]"
+              className="mt-1 size-4 shrink-0 accent-[var(--academy-accent)]"
             />
             <span className="min-w-0">
-              <span className="block font-semibold text-[#17232B]">
+              <span className="block font-semibold text-[var(--academy-ink)]">
                 타 학원 스케줄 공유 동의 확인
               </span>
               <span className="mt-1 block leading-5">
                 보호자에게 타 학원 스케줄 공유 목적과 범위를 안내했고 동의를 확인했습니다.
               </span>
-              <span className="mt-1 block text-xs leading-5 text-[#73777F]">
+              <span className="mt-1 block text-xs leading-5 text-[var(--academy-muted)]">
                 체크하면 같은 학생으로 확인되는 다른 학원 일정이 자동으로 연결됩니다. 전화번호는
                 동일 학생 확인에만 사용되며 상대 학원에 노출되지 않습니다.
               </span>
@@ -583,10 +583,10 @@ export function ScheduleForm({
     <div className={managementFormShellClass}>
       <div className={managementFormHeaderClass}>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-[#17232B]">
+          <p className="text-sm font-bold text-[var(--academy-ink)]">
             {form.mode === "create" ? "스케줄 등록" : "스케줄 수정"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-[#62656f]">
+          <p className="mt-1 text-xs leading-5 text-[var(--academy-muted)]">
             {form.studentName} 학생의 반복 수업, 날짜 지정 보강, 개인/기타 일정을 관리합니다.
           </p>
         </div>
@@ -732,7 +732,7 @@ export function ScheduleForm({
           />
         </label>
 
-        <label className="flex min-h-10 min-w-0 items-center gap-2 rounded-sm border border-[#D8D6DE] bg-[#FFFEFA] px-3 text-sm font-medium text-[#2f3437]">
+        <label className="flex min-h-10 min-w-0 items-center gap-2 rounded-sm border border-[var(--academy-border)] bg-[var(--academy-surface)] px-3 text-sm font-medium text-[var(--academy-ink)]">
           <input
             type="checkbox"
             checked={form.isActive}
@@ -749,13 +749,13 @@ export function ScheduleForm({
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-2 border-t border-[#D8D6DE] bg-[#FBFAF7] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className={managementActionsClass}>
         {form.mode === "edit" && form.isActive && onDelete ? (
           <button
             type="button"
             disabled={status.status === "saving"}
             onClick={onDelete}
-            className="flex min-h-10 w-full min-w-0 items-center justify-center gap-2 rounded-sm border border-red-200 bg-[#FFFEFA] px-4 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+            className="flex min-h-10 w-full min-w-0 items-center justify-center gap-2 rounded-sm border border-red-200 bg-red-50 px-4 text-sm font-semibold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             <Trash2 size={16} />
             스케줄 삭제
@@ -828,8 +828,8 @@ export function BulkScheduleForm({
     <div className={managementFormShellClass}>
       <div className={managementFormHeaderClass}>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-[#17232B]">이 반 학생 전체 수업 시간 등록</p>
-          <p className="mt-1 text-xs leading-5 text-[#62656f]">
+          <p className="text-sm font-bold text-[var(--academy-ink)]">이 반 학생 전체 수업 시간 등록</p>
+          <p className="mt-1 text-xs leading-5 text-[var(--academy-muted)]">
             {form.className} 재원 학생 전체에게 같은 요일·시간의 반복 수업을 등록합니다.
             이미 같은 시간의 활성 스케줄이 있는 학생은 자동으로 건너뜁니다.
           </p>
@@ -862,7 +862,7 @@ export function BulkScheduleForm({
         <div className={`${managementFieldClass} sm:col-span-2 xl:col-span-3`}>
           <div className="flex min-w-0 items-center justify-between gap-2">
             <span>요일</span>
-            <span className="truncate text-xs font-normal text-[#73777F]">
+            <span className="truncate text-xs font-normal text-[var(--academy-muted)]">
               {selectedDayLabels || "요일을 선택해 주세요"}
             </span>
           </div>
@@ -880,8 +880,8 @@ export function BulkScheduleForm({
                   className={[
                     "min-h-9 rounded-sm border px-3 text-xs font-semibold transition",
                     isSelected
-                      ? "border-[#17232B] bg-[#17232B] text-white"
-                      : "border-[#D8D6DE] bg-[#FFFEFA] text-[#2f3437] hover:border-[#BFC2C8] hover:bg-[#F7F7FA]",
+                      ? "border-[var(--academy-accent)] bg-[var(--academy-accent)] text-white"
+                      : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-ink)] hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]",
                   ].join(" ")}
                 >
                   {group.label}
@@ -901,8 +901,8 @@ export function BulkScheduleForm({
                   className={[
                     "min-h-10 rounded-sm border text-sm font-semibold transition",
                     isSelected
-                      ? "border-[#17232B] bg-[#17232B] text-white"
-                      : "border-[#D8D6DE] bg-[#FFFEFA] text-[#4B4F58] hover:border-[#BFC2C8] hover:bg-[#F7F7FA]",
+                      ? "border-[var(--academy-accent)] bg-[var(--academy-accent)] text-white"
+                      : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-muted-strong)] hover:border-[var(--academy-border-strong)] hover:bg-[var(--academy-surface-muted)]",
                   ].join(" ")}
                   aria-pressed={isSelected}
                 >

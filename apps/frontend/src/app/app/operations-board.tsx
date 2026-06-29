@@ -905,7 +905,7 @@ export function OperationsBoard({
         : "파일럿 시연을 위해 먼저 반과 학생 데이터를 추가해야 합니다.";
 
     return (
-        <section className="border border-[#D8D6DE] bg-[#FBFAF7] p-6">
+      <section className="border border-[var(--academy-border)] bg-[var(--academy-surface)] p-6">
         <div className="flex gap-3">
           <AlertCircle className="mt-0.5 text-amber-700" size={21} />
           <div>
@@ -1743,7 +1743,7 @@ function MessageComposer({
                   "border px-3 py-2.5 text-sm leading-6",
                   messageSendError
                     ? "border-red-200 bg-red-50 text-red-900"
-                    : "border-[#DEDEE4] bg-[#FFFEFA] text-[#3F434A]",
+                    : "border-[var(--academy-border)] bg-[var(--academy-surface)] text-[var(--academy-muted-strong)]",
                 ].join(" ")}
               >
                 <div className="flex items-start gap-2">
@@ -1763,18 +1763,18 @@ function MessageComposer({
             ) : null}
 
             {selectedReason === "makeup" && selectedMakeupCandidate ? (
-              <div className="border border-[#DED8CF] bg-[#FFFEFA] p-3">
-                <p className="text-sm font-semibold text-[#1F2328]">
+              <div className="border border-[var(--academy-border)] bg-[var(--academy-surface)] p-3">
+                <p className="text-sm font-semibold text-[var(--academy-ink)]">
                   보강 스케줄 등록
                 </p>
-                <p className="mt-1 text-xs leading-5 text-[#5F6368]">
+                <p className="mt-1 text-xs leading-5 text-[var(--academy-muted)]">
                   {selectedMakeupCandidate.label} 일정으로 학생 스케줄에 1회성 보강을
                   등록합니다.
                 </p>
                 {!canRegisterMakeupSchedule &&
                 makeupScheduleSave.status !== "saving" &&
                 makeupScheduleSave.status !== "saved" ? (
-                  <p className="mt-2 bg-[#F0EEE8] px-2 py-2 text-xs font-semibold text-[#5F6368]">
+                  <p className="mt-2 border border-[var(--academy-border)] bg-[var(--academy-surface-muted)] px-2 py-2 text-xs font-semibold text-[var(--academy-muted)]">
                     보강 스케줄은 테스트 발송이 완료된 뒤 등록할 수 있습니다.
                   </p>
                 ) : null}
@@ -1791,8 +1791,8 @@ function MessageComposer({
                     canRegisterMakeupSchedule &&
                     makeupScheduleSave.status !== "saving" &&
                     makeupScheduleSave.status !== "saved"
-                      ? "bg-[#2f3437] text-white hover:bg-[#17191f]"
-                      : "bg-[#E9E7E1] text-[#8A8780]",
+                      ? "bg-[var(--academy-accent)] text-white hover:bg-[var(--academy-accent-strong)]"
+                      : "bg-[var(--academy-surface-strong)] text-[var(--academy-muted)]",
                   ].join(" ")}
                 >
                   <CalendarDays size={16} aria-hidden="true" />
@@ -1808,7 +1808,7 @@ function MessageComposer({
                       "mt-2 rounded-md px-2 py-2 text-xs font-semibold",
                       makeupScheduleSave.status === "error"
                         ? "bg-red-50 text-red-900"
-                        : "bg-[#F0EEE8] text-[#3F434A]",
+                        : "bg-[var(--academy-surface-muted)] text-[var(--academy-muted-strong)]",
                     ].join(" ")}
                   >
                     {makeupScheduleSave.message}
@@ -1834,12 +1834,12 @@ function ComposerSummaryRow({
   tone?: "default" | "blue";
 }) {
   return (
-    <div className="grid min-h-9 grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 border-t border-[#DED8CF] px-4 py-2">
-      <span className="text-xs font-semibold text-[#5F6368]">{label}</span>
+    <div className="grid min-h-9 grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 border-t border-[var(--academy-border)] px-4 py-2">
+      <span className="text-xs font-semibold text-[var(--academy-muted)]">{label}</span>
       <span
         className={[
           "truncate text-sm font-semibold",
-          tone === "blue" ? "text-[#62656f]" : "text-[#1F2328]",
+          tone === "blue" ? "text-[var(--academy-muted-strong)]" : "text-[var(--academy-ink)]",
         ].join(" ")}
       >
         {value}
