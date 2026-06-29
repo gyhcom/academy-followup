@@ -450,7 +450,7 @@ function PcOperationsDashboard({
 
   return (
     <div className="hidden xl:block">
-      <section className="border border-[var(--console-line)] bg-[#fffefa]">
+      <section className="border border-[#dedbd4] bg-[#fffefa]">
         <div className="grid gap-4 px-4 py-3 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-center">
           <div className="min-w-0">
             <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#6f737c]">
@@ -466,7 +466,7 @@ function PcOperationsDashboard({
           <HomeDateControl value={selectedDate} onChange={onDateChange} />
         </div>
 
-        <div className="flex min-w-0 flex-wrap gap-1.5 border-t border-[var(--console-line)] bg-[#f8f7f2] px-4 py-2.5">
+        <div className="flex min-w-0 flex-wrap gap-1.5 border-t border-[#dedbd4] bg-[#f1f0ec] px-4 py-2.5">
           <PcStatusChip label="수업" value={`${scheduleSummary.academyScheduleCount}개`} />
           <PcStatusChip label="학생 체크" value={`${studentRows.length}명`} />
           <PcStatusChip label="체크 필요" value={`${boardSummary.unchecked}명`} tone="warning" />
@@ -488,10 +488,10 @@ function PcOperationsDashboard({
           onNavigate={onNavigate}
         />
       ) : (
-      <section className="mt-5 grid gap-4 xl:grid-cols-[20rem_minmax(0,1fr)_24rem] 2xl:grid-cols-[21rem_minmax(0,1fr)_26rem] xl:items-start">
-        <aside className="space-y-4">
-          <section className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
-            <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
+      <section className="mt-5 grid overflow-hidden border border-[#dedbd4] bg-[#fffefa] xl:grid-cols-[20rem_minmax(0,1fr)_24rem] 2xl:grid-cols-[21rem_minmax(0,1fr)_26rem] xl:items-stretch">
+        <aside className="border-b border-[#dedbd4] bg-[#f7f6f2] xl:border-b-0 xl:border-r">
+          <section className="overflow-hidden">
+            <div className="border-b border-[#dedbd4] bg-[#f1f0ec] px-4 py-3">
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <h3 className="text-sm font-bold text-[var(--clinic-text)]">
@@ -499,12 +499,12 @@ function PcOperationsDashboard({
                   </h3>
                   <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">수업을 누르면 출석부로 이동합니다.</p>
                 </div>
-                <span className="border border-[var(--console-line)] bg-[#f3f1ec] px-2 py-1 text-xs font-semibold text-[var(--clinic-muted)]">
+                <span className="border border-[#d9d6cf] bg-[#fffefa] px-2 py-1 text-xs font-semibold text-[var(--clinic-muted)]">
                   {academyItems.length}개
                 </span>
               </div>
             </div>
-            <div className="max-h-[31rem] divide-y divide-[var(--console-line)] overflow-y-auto">
+            <div className="max-h-[31rem] divide-y divide-[#dedbd4] overflow-y-auto">
               {academyItems.length > 0 ? (
                 academyItems.map((item) => (
                   <PcScheduleButton key={item.id} item={item} onNavigate={onNavigate} />
@@ -517,8 +517,8 @@ function PcOperationsDashboard({
             </div>
           </section>
 
-          <section className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
-            <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
+          <section className="overflow-hidden border-t border-[#dedbd4]">
+            <div className="border-b border-[#dedbd4] bg-[#f1f0ec] px-4 py-3">
               <h3 className="text-sm font-bold text-[var(--clinic-text)]">작업</h3>
             </div>
             <HomeActionButton
@@ -544,8 +544,8 @@ function PcOperationsDashboard({
           </section>
         </aside>
 
-        <section className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
-          <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
+        <section className="min-w-0 overflow-hidden border-b border-[#dedbd4] bg-[#fffefa] xl:border-b-0 xl:border-r">
+          <div className="border-b border-[#dedbd4] bg-[#fffefa] px-4 py-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h3 className="text-base font-bold text-[var(--clinic-text)]">
@@ -575,7 +575,7 @@ function PcOperationsDashboard({
             ) : null}
           </div>
 
-          <div className="max-h-[38rem] divide-y divide-[var(--console-line)] overflow-y-auto bg-[#fffefa]" role="listbox" aria-label="오늘 학생 처리 목록">
+          <div className="max-h-[38rem] divide-y divide-[#dedbd4] overflow-y-auto bg-[#fffefa]" role="listbox" aria-label="오늘 학생 처리 목록">
             {filteredStudentRows.length > 0 ? (
               filteredStudentRows.map((row) => (
                 <PcStudentBoardRowItem
@@ -938,9 +938,9 @@ function PcStudentDetailPanel({
   const studentSchedules = row ? getSortedActiveSchedules(row.student.schedules).slice(0, 5) : [];
 
   return (
-    <aside className="sticky top-4 space-y-3">
-      <section className="console-work-panel overflow-hidden">
-        <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
+    <aside className="sticky top-4 min-w-0 bg-[#fbfaf7]">
+      <section className="overflow-hidden">
+        <div className="border-b border-[#dedbd4] bg-[#f1f0ec] px-4 py-3">
           <h3 className="text-sm font-semibold text-[var(--clinic-text)]">학생 처리 패널</h3>
           <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">
             오늘 처리할 출석, 연락, 보강 제외 시간을 확인합니다.
@@ -949,7 +949,7 @@ function PcStudentDetailPanel({
 
         {row ? (
           <div>
-            <div className="border-b border-[var(--console-line)] bg-[#fffefa] px-4 py-3">
+            <div className="border-b border-[#dedbd4] bg-[#fffefa] px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-lg font-bold text-[var(--clinic-text)]">
@@ -971,7 +971,7 @@ function PcStudentDetailPanel({
               </div>
             </div>
 
-            <div className="divide-y divide-[#E1EAEE]">
+            <div className="divide-y divide-[#dedbd4]">
               <ConsoleDetailRow label="오늘 수업" value={row.className} />
               <ConsoleDetailRow label="수업 시간" value={`${row.startTime}-${row.endTime}`} mono />
               <ConsoleDetailRow
@@ -998,11 +998,11 @@ function PcStudentDetailPanel({
               />
             </div>
 
-            <div className="console-action-dock grid grid-cols-2 gap-2 px-4 py-3">
+            <div className="grid grid-cols-2 gap-2 border-y border-[#dedbd4] bg-[#f7f6f2] px-4 py-3">
               <button
                 type="button"
                 onClick={() => onNavigate("attendance")}
-                className="min-h-11 border border-[var(--console-line)] bg-[#fffefa] px-3 text-sm font-semibold text-[var(--clinic-text)] transition hover:bg-[var(--academy-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]"
+                className="min-h-11 border border-[#d9d6cf] bg-[#fffefa] px-3 text-sm font-semibold text-[var(--clinic-text)] transition hover:bg-[#f1f0ec] focus:outline-none focus:ring-2 focus:ring-[var(--clinic-accent)]"
               >
                 출석부로 이동
               </button>
@@ -1072,8 +1072,8 @@ function PcStudentDetailPanel({
         )}
       </section>
 
-      <section className="overflow-hidden border border-[var(--console-line)] bg-[#fffefa]">
-        <div className="border-b border-[var(--console-line)] bg-[#f8f7f2] px-4 py-3">
+      <section className="overflow-hidden border-t border-[#dedbd4] bg-[#fffefa]">
+        <div className="border-b border-[#dedbd4] bg-[#f1f0ec] px-4 py-3">
           <h3 className="text-sm font-bold text-[var(--clinic-text)]">오늘 연락 큐</h3>
           <p className="mt-0.5 text-xs text-[var(--clinic-muted)]">
             미발송 {unsentCount}명 · 발송 완료 {sentCount}명
