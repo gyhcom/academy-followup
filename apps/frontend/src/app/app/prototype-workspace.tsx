@@ -91,6 +91,7 @@ type PrototypeTask = {
 };
 
 type PrototypeMode = "home" | "attendance";
+type HomeNavSelection = "dashboard" | "today" | null;
 
 type SidebarChild =
   | {
@@ -117,6 +118,8 @@ export function PrototypeWorkspace({ data }: { data: PrototypeWorkspaceData }) {
   const visibleTasks = tasks.filter((task) => data.canManage || !isManagerTask(task));
   const [searchQuery, setSearchQuery] = useState("");
   const [prototypeMode, setPrototypeMode] = useState<PrototypeMode>("home");
+  const [homeNavSelection, setHomeNavSelection] =
+    useState<HomeNavSelection>("dashboard");
   const [activeGroup, setActiveGroup] = useState<TaskGroupId>("attendance");
   const [expandedMenuId, setExpandedMenuId] = useState<TaskGroupId | null>("attendance");
   const [selectedTaskId, setSelectedTaskId] = useState(
@@ -138,22 +141,45 @@ export function PrototypeWorkspace({ data }: { data: PrototypeWorkspaceData }) {
   const sessionBars = buildSessionBars(data);
   const attendanceCompletionRate = getAttendanceCompletionRate(data);
 
-  function selectGroup(groupId: TaskGroupId) {
+  function toggleMenuGroup(groupId: TaskGroupId) {
     setPrototypeMode("home");
+    setHomeNavSelection(null);
     setActiveGroup(groupId);
-    setExpandedMenuId(groupId);
+    setExpandedMenuId((current) => (current === groupId ? null : groupId));
     const firstTask = visibleTasks.find((task) => task.groupId === groupId);
     if (firstTask) setSelectedTaskId(firstTask.id);
   }
 
+  function selectHomeDashboard() {
+    setPrototypeMode("home");
+    setHomeNavSelection("dashboard");
+    setExpandedMenuId(null);
+    setActiveGroup("attendance");
+    const firstTask = visibleTasks.find((task) => task.groupId === "attendance");
+    if (firstTask) setSelectedTaskId(firstTask.id);
+  }
+
+  function selectTodayHome() {
+    setPrototypeMode("home");
+    setHomeNavSelection("today");
+    setExpandedMenuId(null);
+    setActiveGroup("attendance");
+    const todayTask =
+      visibleTasks.find((task) => task.id === "today-lessons") ??
+      visibleTasks.find((task) => task.groupId === "attendance");
+    if (todayTask) setSelectedTaskId(todayTask.id);
+  }
+
   function openAttendancePrototype() {
     setPrototypeMode("attendance");
+    setHomeNavSelection(null);
     setActiveGroup("attendance");
     setExpandedMenuId("attendance");
   }
 
   function selectTask(groupId: TaskGroupId, taskId: string) {
     setPrototypeMode("home");
+    setHomeNavSelection(null);
     setActiveGroup(groupId);
     setExpandedMenuId(groupId);
     setSelectedTaskId(taskId);
@@ -184,12 +210,17 @@ export function PrototypeWorkspace({ data }: { data: PrototypeWorkspaceData }) {
           <nav className="space-y-6 px-3 pb-8 pt-3">
             <SidebarSection title="운영 홈">
               <SidebarItem
-                active={prototypeMode === "home" && activeGroup === "attendance"}
+                active={prototypeMode === "home" && homeNavSelection === "dashboard"}
                 icon={Grid2X2}
                 title="업무 대시보드"
-                onClick={() => selectGroup("attendance")}
+                onClick={selectHomeDashboard}
               />
-              <SidebarItem icon={Home} title="오늘 업무" onClick={() => selectGroup("attendance")} />
+              <SidebarItem
+                active={prototypeMode === "home" && homeNavSelection === "today"}
+                icon={Home}
+                title="오늘 업무"
+                onClick={selectTodayHome}
+              />
             </SidebarSection>
 
             <SidebarSection title="업무 메뉴">
@@ -198,13 +229,11 @@ export function PrototypeWorkspace({ data }: { data: PrototypeWorkspaceData }) {
                 return (
                   <SidebarMenuGroup
                     key={group.id}
-                    active={activeGroup === group.id}
+                    active={homeNavSelection === null && activeGroup === group.id}
                     expanded={expandedMenuId === group.id}
                     icon={Icon}
                     title={group.title}
-                    onToggle={() =>
-                      setExpandedMenuId((current) => (current === group.id ? null : group.id))
-                    }
+                    onToggle={() => toggleMenuGroup(group.id)}
                   >
                     {getSidebarChildren(group.id, data.canManage).map((child) =>
                       child.kind === "button" ? (
@@ -256,11 +285,7 @@ export function PrototypeWorkspace({ data }: { data: PrototypeWorkspaceData }) {
               <TopIcon
                 icon={Home}
                 label="업무 홈"
-                onClick={() => {
-                  setPrototypeMode("home");
-                  setActiveGroup("attendance");
-                  setExpandedMenuId("attendance");
-                }}
+                onClick={selectHomeDashboard}
               />
               <TopIcon icon={Bell} label="알림" />
               <TopIcon icon={Mail} label="메시지" />
@@ -281,22 +306,20 @@ export function PrototypeWorkspace({ data }: { data: PrototypeWorkspaceData }) {
             <PrototypeAttendanceWorkbench data={data} />
           ) : (
             <>
-          <section className="relative overflow-hidden bg-gradient-to-r from-[#0048b8] via-[#0b5ee8] to-[#3994ff] px-5 py-8 text-white lg:h-[206px] lg:px-10">
-            <div className="pointer-events-none absolute -right-[22rem] -top-[35rem] h-[58rem] w-[58rem] rounded-full border-[140px] border-white/10" />
-            <div className="pointer-events-none absolute right-[12rem] top-[-7rem] h-[28rem] w-[28rem] rounded-full border-[84px] border-white/8" />
-            <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <section className="px-5 py-8 lg:px-10">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <h1 className="text-[34px] font-semibold leading-tight tracking-[-0.04em]">
+                <h1 className="text-[34px] font-semibold leading-tight tracking-[-0.04em] text-[#232d42]">
                   오늘 운영 업무
                 </h1>
-                <p className="mt-3 max-w-3xl text-[17px] leading-7 text-white/90">
+                <p className="mt-3 max-w-3xl text-[17px] leading-7 text-[#8a92a6]">
                   {data.userName} {data.userRole}님, {data.academyName}의 출석 체크와 연락 필요 업무를
                   실제 처리 화면으로 바로 이어갑니다.
                 </p>
               </div>
               <Link
                 href="/app?view=history"
-                className="inline-flex min-h-10 w-fit items-center gap-2 rounded bg-white/10 px-5 text-sm font-semibold text-white ring-1 ring-white/10 transition hover:bg-white/16"
+                className="inline-flex min-h-10 w-fit items-center gap-2 rounded-lg border border-[#dfe5ef] bg-white px-5 text-sm font-semibold text-[#596579] shadow-sm transition hover:border-[#3a57e8] hover:text-[#3a57e8]"
               >
                 <Megaphone size={17} aria-hidden="true" />
                 변경 이력 보기
@@ -305,7 +328,7 @@ export function PrototypeWorkspace({ data }: { data: PrototypeWorkspaceData }) {
           </section>
 
           <div className="px-4 pb-10 lg:px-10">
-            <section className="-mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+            <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
               {summaryCards.map((card) => (
                 <SummaryCard key={card.title} {...card} />
               ))}
@@ -738,12 +761,7 @@ function PrototypeAttendanceWorkbench({
                               {session.studentCount}명
                             </span>
                           </span>
-                          <span className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold">
-                            <span className="text-[#1aa053]">출석 {Math.max(0, session.studentCount - session.uncheckedCount - session.lateCount - session.absentCount)}</span>
-                            <span className="text-[#f59e0b]">지각 {session.lateCount}</span>
-                            <span className="text-[#ef4444]">결석 {session.absentCount}</span>
-                            <span className="text-[#8a92a6]">미체크 {session.uncheckedCount}</span>
-                          </span>
+                          <SessionStatusLine session={session} />
                           <StudentAvatarStack
                             names={session.studentPreviewNames}
                             totalCount={session.studentCount}
@@ -855,18 +873,18 @@ function PrototypeAttendanceWorkbench({
                           {day.day}
                         </span>
                         {day.metrics.uncheckedCount > 0 ? (
-                          <span className="rounded-full bg-[#fff7e8] px-2 py-1 text-[11px] font-semibold text-[#b45309]">
-                            미체크
+                          <span className="rounded-full bg-[#fff8ed] px-1.5 py-0.5 text-[10px] font-semibold text-[#d97706]">
+                            {day.metrics.uncheckedCount}
                           </span>
                         ) : null}
                       </span>
-                      <span className="relative mt-5 block space-y-2">
+                      <span className="relative mt-5 block space-y-1.5">
                         {day.eventBars.map((event) => (
                           <span
                             key={event.id}
-                            className="block truncate rounded-r-md px-2 py-1 text-[11px] font-semibold"
+                            className="block truncate rounded-r-md px-2 py-0.5 text-[10px] font-semibold"
                             style={{
-                              borderLeft: `4px solid ${event.color}`,
+                              borderLeft: `3px solid ${event.color}`,
                               backgroundColor: event.background,
                               color: event.color,
                             }}
@@ -875,18 +893,16 @@ function PrototypeAttendanceWorkbench({
                           </span>
                         ))}
                       </span>
-                      {day.isSelected ? (
-                        <span className="absolute bottom-3 right-3 rounded-full bg-[#5b86f7] px-2 py-1 text-[11px] font-bold text-white">
-                          선택
-                        </span>
+                      {day.metrics.contactNeedCount > 0 ? (
+                        <span className="absolute bottom-3 left-3 h-1.5 w-1.5 rounded-full bg-[#f97316]" />
                       ) : null}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-4 rounded-2xl border border-[#e5e9f0] bg-[#fbfcff] p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-                <div>
+              <div className="mt-5 grid gap-4 rounded-2xl border border-[#e5e9f0] bg-white px-5 py-4 shadow-[0_8px_18px_rgba(35,45,66,0.04)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+                <div className="min-w-0">
                   <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#8a92a6]">
                     <CalendarDays size={16} aria-hidden="true" />
                     선택 날짜
@@ -898,12 +914,18 @@ function PrototypeAttendanceWorkbench({
                     {selectedSession?.title ?? "수업 없음"} {selectedSession ? `· ${selectedSession.time}` : ""}
                   </p>
                 </div>
-                <div className="grid grid-cols-4 gap-3 text-center sm:grid-cols-5">
-                  <CalendarMiniMetric label="수업" value={selectedDay.metrics.sessionCount} />
-                  <CalendarMiniMetric label="학생" value={selectedDay.metrics.studentCount} />
-                  <CalendarMiniMetric label="지각" value={selectedDay.metrics.lateCount} tone="amber" />
-                  <CalendarMiniMetric label="결석" value={selectedDay.metrics.absentCount} tone="red" />
-                  <CalendarMiniMetric label="미체크" value={selectedDay.metrics.uncheckedCount} />
+                <div className="flex flex-wrap items-center justify-start gap-2 lg:justify-end">
+                  <CalendarDetailMetric label="수업" value={selectedDay.metrics.sessionCount} />
+                  <CalendarDetailMetric label="학생" value={selectedDay.metrics.studentCount} />
+                  <CalendarDetailMetric label="지각" value={selectedDay.metrics.lateCount} tone="amber" />
+                  <CalendarDetailMetric label="결석" value={selectedDay.metrics.absentCount} tone="red" />
+                  <CalendarDetailMetric label="미체크" value={selectedDay.metrics.uncheckedCount} />
+                  <Link
+                    href="/app?view=attendance"
+                    className="inline-flex min-h-9 items-center rounded-lg bg-[#eef3ff] px-3 text-xs font-bold text-[#3a57e8] transition hover:bg-[#e4ebff]"
+                  >
+                    처리 화면
+                  </Link>
                 </div>
               </div>
             </div>
@@ -939,9 +961,9 @@ function SidebarItem({
       type="button"
       onClick={onClick}
       className={[
-        "flex min-h-11 w-full items-center justify-between rounded px-4 text-left text-sm font-medium transition",
+        "flex min-h-11 w-full items-center justify-between rounded-lg px-4 text-left text-sm font-medium transition",
         active
-          ? "bg-[#3a57e8] text-white shadow-[0_10px_24px_rgba(58,87,232,0.2)]"
+          ? "bg-[#eef3ff] text-[#3a57e8]"
           : "text-[#8a92a6] hover:bg-[#f5f6fa] hover:text-[#232d42]",
       ].join(" ")}
     >
@@ -978,7 +1000,7 @@ function SidebarMenuGroup({
         className={[
           "flex min-h-11 w-full items-center justify-between rounded-lg px-4 text-left text-sm font-semibold transition",
           active || expanded
-            ? "border border-[#3a57e8] bg-[#f2f5ff] text-[#3a57e8]"
+            ? "border border-[#d8e2ff] bg-[#f3f6ff] text-[#3a57e8]"
             : "border border-transparent text-[#8a92a6] hover:bg-[#f5f6fa] hover:text-[#232d42]",
         ].join(" ")}
       >
@@ -1018,7 +1040,7 @@ function SidebarSubItem({
       onClick={onClick}
       className={[
         "block w-full rounded-lg px-3 py-2 text-left transition",
-        active ? "bg-[#eef2ff] text-[#3a57e8]" : "text-[#8a92a6] hover:bg-[#f5f6fa] hover:text-[#232d42]",
+        active ? "bg-[#eef3ff] text-[#3a57e8]" : "text-[#8a92a6] hover:bg-[#f5f6fa] hover:text-[#232d42]",
       ].join(" ")}
     >
       <span className="block text-sm font-semibold">{title}</span>
@@ -1082,27 +1104,19 @@ function SummaryCard({
   return (
     <Link
       href={href}
-      className="group relative z-10 flex min-h-[108px] items-center gap-3 rounded-lg bg-white px-4 shadow-[0_12px_32px_rgba(35,45,66,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_38px_rgba(35,45,66,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3a57e8]/30"
+      className="group relative z-10 flex min-h-[98px] items-center justify-between gap-3 rounded-2xl border border-[#dfe5ef] bg-white px-5 shadow-[0_10px_24px_rgba(35,45,66,0.05)] transition hover:-translate-y-0.5 hover:border-[#d8e2ff] hover:shadow-[0_14px_30px_rgba(35,45,66,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3a57e8]/30"
       aria-label={`${title} 업무 열기`}
     >
-      <div className="relative h-[54px] w-[54px] shrink-0 rounded-full border-[4px] border-[#e9ecef]">
-        <div
-          className="absolute inset-0 rounded-full border-[4px] border-r-transparent border-t-transparent"
-          style={{ borderColor: `${color} transparent transparent ${color}` }}
-        />
-        <ArrowUpRight
-          size={22}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[#adb5bd] transition group-hover:text-[#3a57e8]"
-          aria-hidden="true"
-        />
-      </div>
       <div className="min-w-0">
         <p className="truncate text-sm text-[#8a92a6]">{title}</p>
         <p className="mt-2 whitespace-nowrap text-xl font-semibold text-[#232d42]">{value}</p>
-        <p className="mt-1 text-xs font-semibold text-[#3a57e8] opacity-0 transition group-hover:opacity-100">
-          열기
-        </p>
       </div>
+      <span
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white shadow-sm transition group-hover:scale-105"
+        style={{ backgroundColor: color }}
+      >
+        <ArrowUpRight size={18} aria-hidden="true" />
+      </span>
     </Link>
   );
 }
@@ -1219,6 +1233,37 @@ function StudentAvatarStack({
   );
 }
 
+function SessionStatusLine({
+  session,
+}: {
+  session: PrototypeWorkspaceData["sessions"][number];
+}) {
+  const presentCount = Math.max(
+    0,
+    session.studentCount - session.uncheckedCount - session.lateCount - session.absentCount,
+  );
+  const visibleItems = [
+    { label: "출석", value: presentCount, color: "text-[#1aa053]" },
+    { label: "지각", value: session.lateCount, color: "text-[#f59e0b]" },
+    { label: "결석", value: session.absentCount, color: "text-[#ef4444]" },
+    { label: "미체크", value: session.uncheckedCount, color: "text-[#8a92a6]" },
+  ].filter((item) => item.value > 0 || item.label === "미체크");
+
+  return (
+    <span className="mt-4 flex flex-wrap gap-1.5">
+      {visibleItems.map((item) => (
+        <span
+          key={item.label}
+          className="inline-flex h-6 items-center gap-1 rounded-full bg-[#f5f6fa] px-2 text-[11px] font-semibold text-[#596579]"
+        >
+          <span className={item.color}>{item.label}</span>
+          <span>{item.value}</span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function getNameInitial(name: string) {
   return name.trim().charAt(0) || "?";
 }
@@ -1255,7 +1300,7 @@ type PrototypeCalendarDay = {
   }>;
 };
 
-function CalendarMiniMetric({
+function CalendarDetailMetric({
   label,
   value,
   tone = "blue",
@@ -1266,14 +1311,14 @@ function CalendarMiniMetric({
 }) {
   const className =
     tone === "red"
-      ? "bg-[#fff1f2] text-[#dc2626]"
+      ? "border-[#ffd9df] bg-[#fff7f8] text-[#dc2626]"
       : tone === "amber"
-        ? "bg-[#fff7e8] text-[#b45309]"
-        : "bg-white text-[#232d42]";
+        ? "border-[#ffe5b8] bg-[#fffaf0] text-[#b45309]"
+        : "border-[#e5e9f0] bg-[#fbfcff] text-[#232d42]";
   return (
-    <span className={`min-w-[68px] rounded-xl border border-[#e5e9f0] px-3 py-2 ${className}`}>
-      <span className="block text-[11px] font-semibold text-[#8a92a6]">{label}</span>
-      <span className="mt-0.5 block text-lg font-bold">{value}</span>
+    <span className={`inline-flex min-h-9 items-center gap-2 rounded-lg border px-3 ${className}`}>
+      <span className="text-[11px] font-semibold text-[#8a92a6]">{label}</span>
+      <span className="text-sm font-bold">{value}</span>
     </span>
   );
 }
